@@ -164,5 +164,76 @@ R$ 1.389,99 à vista no pix`;
       expect(parseGpuListings('')).toEqual([]);
       expect(parseGpuListings('   \n  ')).toEqual([]);
     });
+
+    it('splits and parses multiple markdown links pasted together (Pichau batch)', () => {
+      const userMarkdownBatch = `[Placa de Video PowerColor Radeon RX 9060 XT Reaper, 16GB, GDDR6, 128-bit, RX9060XT-16G-A-NACde R$ 5.176,46 porR$ 3.899,99À vista15% de desconto no PIXR$ 4.588,22Em até 12x de R$ 382,35 Sem juros no cartão](https://www.pichau.com.br/placa-de-video-powercolor-radeon-rx-9060-xt-reaper-16gb-gddr6-128-bit-rx9060xt-16g-a-nac)
+[Frete Grátis: Sul e SudestePlaca de Video Leadertech Radeon RX 550, 4GB, GDDR5, 128-bit, PV-LT-RX550-4G-D5de R$ 894,11 porR$ 639,99À vista15% de desconto no PIXR$ 752,93Em até 12x de R$ 62,74 Sem juros no cartão](https://www.pichau.com.br/placa-de-video-leadertech-radeon-rx-550-4gb-gddr5-128-bit-pv-lt-rx550-4g-d5)
+[Placa de Video XFX Swift Radeon RX 9050 Black, 8GB, GDDR6, 128-bit, RX-95SWFT8BEde R$ 3.529,40 porR$ 2.099,99À vista15% de desconto no PIXR$ 2.470,58Em até 12x de R$ 205,88 Sem juros no cartão](https://www.pichau.com.br/placa-de-video-xfx-swift-radeon-rx-9050-black-8gb-gddr6-128-bit-rx-95swft8be)
+[22%OFF30 UNIDFrete Grátis: Sul e SudestePlaca de Video Gigabyte Radeon RX 9050 Gaming OC, 8GB, GDDR6, 128-bit, GV-R9050GAMING-OC-8GDde R$ 3.176,46 porR$ 2.099,99À vista15% de desconto no PIXR$ 2.470,58Em até 12x de R$ 205,88 Sem juros no cartão](https://www.pichau.com.br/placa-de-video-gigabyte-radeon-rx-9050-gaming-oc-8gb-gddr6-128-bit-gv-r9050gaming-oc-8gd)
+[Frete Grátis: Sul e SudestePlaca de Video PowerColor Radeon RX 6500 XT Fighter, 4GB, GDDR6, 64-bit, AXRX-6500XT-4GBD6-DHV3-NACde R$ 1.764,69 porR$ 1.099,99À vista15% de desconto no PIXR$ 1.294,11Em até 12x de R$ 107,84 Sem juros no cartão](https://www.pichau.com.br/placa-de-video-powercolor-radeon-rx-6500-xt-fighter-4gb-gddr6-64-bit-axrx-6500xt-4gbd6-dhv3-nac)
+[Frete Grátis: Sul e SudestePlaca de Video PowerColor Radeon RX 9070 GRE Reaper, 12GB, GDDR6, 192-bit, RX9070GRE-12G-Ade R$ 5.411,75 porR$ 4.099,99À vista15% de desconto no PIXR$ 4.823,52Em até 12x de R$ 401,96 Sem juros no cartão](https://www.pichau.com.br/placa-de-video-powercolor-radeon-rx-9070-gre-reaper-12gb-gddr6-192-bit-rx9070gre-12g-a)`;
+
+      const chunks = splitMultiListings(userMarkdownBatch);
+      expect(chunks.length).toBe(6);
+
+      const parsed = parseGpuListings(userMarkdownBatch);
+      expect(parsed.length).toBe(6);
+
+      // 1. RX 9060 XT
+      expect(parsed[0].chip).toBe('RX 9060 XT');
+      expect(parsed[0].brand).toBe('PowerColor');
+      expect(parsed[0].vramGb).toBe(16);
+      expect(parsed[0].priceCash).toBe(3899.99);
+      expect(parsed[0].priceInstallment).toBe(4588.22);
+      expect(parsed[0].originalPrice).toBe(5176.46);
+      expect(parsed[0].price).toBe(3899.99);
+      expect(parsed[0].store).toBe('Pichau');
+      expect(parsed[0].url).toContain('rx9060xt-16g-a-nac');
+
+      // 2. RX 550
+      expect(parsed[1].chip).toBe('RX 550');
+      expect(parsed[1].brand).toBe('Leadertech');
+      expect(parsed[1].vramGb).toBe(4);
+      expect(parsed[1].priceCash).toBe(639.99);
+      expect(parsed[1].priceInstallment).toBe(752.93);
+      expect(parsed[1].originalPrice).toBe(894.11);
+      expect(parsed[1].store).toBe('Pichau');
+
+      // 3. RX 9050 (XFX)
+      expect(parsed[2].chip).toBe('RX 9050');
+      expect(parsed[2].brand).toBe('XFX');
+      expect(parsed[2].vramGb).toBe(8);
+      expect(parsed[2].priceCash).toBe(2099.99);
+      expect(parsed[2].priceInstallment).toBe(2470.58);
+      expect(parsed[2].originalPrice).toBe(3529.4);
+      expect(parsed[2].store).toBe('Pichau');
+
+      // 4. RX 9050 (Gigabyte)
+      expect(parsed[3].chip).toBe('RX 9050');
+      expect(parsed[3].brand).toBe('Gigabyte');
+      expect(parsed[3].vramGb).toBe(8);
+      expect(parsed[3].priceCash).toBe(2099.99);
+      expect(parsed[3].priceInstallment).toBe(2470.58);
+      expect(parsed[3].originalPrice).toBe(3176.46);
+      expect(parsed[3].store).toBe('Pichau');
+
+      // 5. RX 6500 XT
+      expect(parsed[4].chip).toBe('RX 6500 XT');
+      expect(parsed[4].brand).toBe('PowerColor');
+      expect(parsed[4].vramGb).toBe(4);
+      expect(parsed[4].priceCash).toBe(1099.99);
+      expect(parsed[4].priceInstallment).toBe(1294.11);
+      expect(parsed[4].originalPrice).toBe(1764.69);
+      expect(parsed[4].store).toBe('Pichau');
+
+      // 6. RX 9070 GRE
+      expect(parsed[5].chip).toBe('RX 9070 GRE');
+      expect(parsed[5].brand).toBe('PowerColor');
+      expect(parsed[5].vramGb).toBe(12);
+      expect(parsed[5].priceCash).toBe(4099.99);
+      expect(parsed[5].priceInstallment).toBe(4823.52);
+      expect(parsed[5].originalPrice).toBe(5411.75);
+      expect(parsed[5].store).toBe('Pichau');
+    });
   });
 });
