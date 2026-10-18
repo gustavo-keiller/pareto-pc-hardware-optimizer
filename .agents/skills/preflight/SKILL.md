@@ -32,6 +32,15 @@ It runs in sequence and stops at the first failing step:
 
 CI (`.github/workflows/check.yml`) runs `npm run check` and `npm run build` on every push to `main` and every PR.
 
+### UI changes: look, then test
+
+If you changed anything under `src/components/`, `src/App.tsx`, or styles:
+
+1. `npm run snap` (or `npm run snap -- simple`) saves desktop + phone screenshots of each mode to `snapshots/` (gitignored). Open the ones for the mode you touched and check them. Page errors are printed next to the file name.
+2. `npm run test:e2e` runs the Playwright test "a beginner gets a recommendation" on desktop and phone (first time on a machine: `npx playwright install chromium`).
+
+UI smoke tests (`src/__tests__/App.ui.test.tsx`) already run inside `npm run test`.
+
 ---
 
 ## 2. Math & State Invariants

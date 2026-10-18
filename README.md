@@ -6,12 +6,9 @@ Hardware buyers face a Multi-Criteria Decision Making (MCDM) problem: minimizing
 
 ---
 
-## 4-Stage Mathematical Pipeline
+## How It Ranks Hardware
 
-1. **Stage 1: Hard-Constraint Pruning (`filterByHardConstraints`)** — Filters out candidates that violate strict user dealbreakers (max budget, minimum VRAM, max PSU/board wattage).
-2. **Stage 2: Pareto Dominance & Frontier Identification (`evaluateParetoFrontier`)** — Identifies the non-dominated **Pareto Optimal Frontier** and flags strictly dominated "value trap" cards along with exact dollar/FPS/VRAM trade-off diagnostics.
-3. **Stage 3: TOPSIS Multi-Objective Ranking (`rankByTopsis`)** — Normalizes user preference sliders ($w_j$) and ranks candidates by geometric closeness ($C_i \in [0, 1]$) to the Positive Ideal Solution ($A^+$) vs. Negative Ideal Solution ($A^-$).
-4. **Stage 4 (Roadmap): Hedonic OLS Value Regression & Combinatorial Full-System Builder** — Log-linear fair-price regression ($\ln(\text{Price})$ vs. performance residuals) and pre-pruned full-build `(CPU, GPU, RAM, Motherboard, PSU)` optimization.
+Four stages: dealbreaker filters → Pareto frontier (drops cards that are worse *and* pricier than another) → TOPSIS ranking by your priorities → fair-price regression. The formulas live in [`CONTEXT.md`](CONTEXT.md) and the code map in [`CODEMAP.md`](CODEMAP.md).
 
 ---
 
@@ -30,6 +27,8 @@ npm run format     # Auto-format with Prettier
 npm run test       # Run Vitest unit & mathematical property tests
 npm run check:docs # Verify AGENTS.md cap, skills, CODEMAP paths, links, math isolation, and file sizes
 npm run build      # Production build to dist/
+npm run test:e2e   # Playwright end-to-end test (first run: npx playwright install chromium)
+npm run snap       # Desktop + phone screenshots of each mode into snapshots/
 ```
 
 ---
@@ -38,6 +37,7 @@ npm run build      # Production build to dist/
 
 - **[`AGENTS.md`](AGENTS.md)** — AI agent entry point, invariants, and verification workflow.
 - **[`CODEMAP.md`](CODEMAP.md)** — Module topology and pipeline call chains.
-- **[`CONTEXT.md`](CONTEXT.md)** — Full mathematical specification and phased roadmap.
+- **[`CONTEXT.md`](CONTEXT.md)** — Full mathematical specification.
 - **[`TODO.md`](TODO.md) & [`DONE.md`](DONE.md)** — Active task backlog and shipped milestones.
-- **[`DOCUMENTATION_INDEX.md`](DOCUMENTATION_INDEX.md)** — Master catalog of all project documentation, skills, and reference manuals.
+- **[`.agents/skills/skill-library/SKILL.md`](.agents/skills/skill-library/SKILL.md)** — Index of agent skills and reference manuals.
+- **[`.agents/GLOSSARY.md`](.agents/GLOSSARY.md)** — Math term → beginner wording → Pro wording.

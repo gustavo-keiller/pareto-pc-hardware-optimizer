@@ -16,7 +16,13 @@ Read only the part your task needs:
 3. [`CONTEXT.md`](CONTEXT.md) — mathematical specification (Hard Constraints, Pareto Dominance, TOPSIS, Hedonic OLS Regression, and Combinatorial System Builder).
 4. [`.agents/AGENTS.md`](.agents/AGENTS.md) — the 16 architectural principles. Read when a change spans multiple subsystems or adds new state/math layers.
 
-Roadmap and backlog: [`TODO.md`](TODO.md). Shipped milestones: [`DONE.md`](DONE.md).
+Roadmap and backlog: [`TODO.md`](TODO.md). Shipped milestones: [`DONE.md`](DONE.md). Words for UI copy: [`.agents/GLOSSARY.md`](.agents/GLOSSARY.md).
+
+**One home per fact.** Math lives in `CONTEXT.md`, files in `CODEMAP.md`, skills in `skill-library`, terms in `GLOSSARY.md`, tasks in `TODO.md`/`DONE.md`. Link to the home instead of restating it elsewhere.
+
+## Work from a real clone
+
+Cloud and remote sessions clone the GitHub repo (`gustavo-keiller/pareto-pc-hardware-optimizer`) and open PRs against `main`. Don't work from synced or uploaded copies of the folder: they usually lack the dot-folders (`.agents/`, `.claude/`, `.gemini/`, `.github/`), so skills are missing and `check:docs` reports broken links. After a PR merges, local checkouts need `git pull`.
 
 ## This checkout may be shared
 
