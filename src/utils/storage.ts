@@ -15,6 +15,9 @@ export function safeGetJSON<T>(key: string, defaultValue: T): T {
       return defaultValue;
     }
     const parsed: unknown = JSON.parse(raw);
+    // This file is the one trust boundary for localStorage: the shape checks below
+    // match `defaultValue`'s kind, then the result is handed back as T.
+    /* eslint-disable @typescript-eslint/consistent-type-assertions */
     if (parsed === null || parsed === undefined) {
       return defaultValue;
     }
@@ -29,6 +32,7 @@ export function safeGetJSON<T>(key: string, defaultValue: T): T {
       ) as T;
     }
     return parsed as T;
+    /* eslint-enable @typescript-eslint/consistent-type-assertions */
   } catch {
     return defaultValue;
   }

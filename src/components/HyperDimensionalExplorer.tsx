@@ -21,6 +21,19 @@ export type HyperDimKey =
   | 'fpsPerDollar'
   | 'fpsPerWatt';
 
+/** Builds a record over every HyperDimKey (typed without an `as` cast). */
+function mapHyperDims<T>(init: (key: HyperDimKey) => T): Record<HyperDimKey, T> {
+  return {
+    price: init('price'),
+    rasterFps1440p: init('rasterFps1440p'),
+    rtFps1440p: init('rtFps1440p'),
+    vramGb: init('vramGb'),
+    tdpWatts: init('tdpWatts'),
+    fpsPerDollar: init('fpsPerDollar'),
+    fpsPerWatt: init('fpsPerWatt'),
+  };
+}
+
 interface HyperDimDefinition {
   key: HyperDimKey;
   label: string;
@@ -177,10 +190,7 @@ export function HyperDimensionalExplorer({
 
   // Compute min/max bounds for all 7 dimensions
   const dimBounds = useMemo(() => {
-    const map = {} as Record<
-      HyperDimKey,
-      { min: number; max: number; mid: number }
-    >;
+    const map = mapHyperDims(() => ({ min: 0, max: 100, mid: 50 }));
     for (const dim of HYPER_DIMENSIONS) {
       if (gpus.length === 0) {
         map[dim.key] = { min: 0, max: 100, mid: 50 };
@@ -200,7 +210,7 @@ export function HyperDimensionalExplorer({
     const utilitiesById = new Map<string, Record<HyperDimKey, number>>();
 
     for (const gpu of gpus) {
-      const uRecord = {} as Record<HyperDimKey, number>;
+      const uRecord = mapHyperDims(() => 0);
       for (const dim of HYPER_DIMENSIONS) {
         const { min, max } = dimBounds[dim.key];
         const val = dim.getValue(gpu);

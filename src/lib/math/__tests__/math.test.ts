@@ -22,7 +22,9 @@ import {
   evaluateLinearExtrapolation,
   getClippedExtrapolationLine,
   getExtrapolationCurvePoints,
+  isExtrapolationScalingModel,
 } from '../extrapolation';
+import { METRIC_DEFINITIONS, isMetricKey } from '../types';
 import { GpuCandidate } from '../types';
 
 describe('Stage 1: Hard-Constraint Filtering (filterByHardConstraints)', () => {
@@ -500,3 +502,20 @@ describe('Personalized Value Extrapolation Engine (extrapolation.ts)', () => {
   });
 });
 
+
+describe('Type guards for untrusted strings', () => {
+  it('isMetricKey accepts exactly the keys of METRIC_DEFINITIONS', () => {
+    for (const key of Object.keys(METRIC_DEFINITIONS)) {
+      expect(isMetricKey(key)).toBe(true);
+    }
+    for (const bad of ['', 'Price', 'toString', '__proto__', 'constructor']) {
+      expect(isMetricKey(bad)).toBe(false);
+    }
+  });
+
+  it('isExtrapolationScalingModel rejects unknown models', () => {
+    expect(isExtrapolationScalingModel('linear-ratio')).toBe(true);
+    expect(isExtrapolationScalingModel('two-point-line')).toBe(true);
+    expect(isExtrapolationScalingModel('cubic')).toBe(false);
+  });
+});

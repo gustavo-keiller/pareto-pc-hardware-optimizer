@@ -4,6 +4,7 @@ import {
   METRIC_DEFINITIONS,
   MetricKey,
   RankedGpu,
+  isMetricKey,
 } from '../lib/math/types';
 import { ALL_METRIC_KEYS } from '../lib/math/topsis';
 import { get2DParetoFrontierCurve } from '../lib/math/pareto';
@@ -404,7 +405,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
             <select
               aria-label="Personalizable Base Axis (Bottom-Left)"
               value={baseMetric}
-              onChange={(e) => onChangeBaseMetric(e.target.value as MetricKey)}
+              onChange={(e) => isMetricKey(e.target.value) && onChangeBaseMetric(e.target.value)}
               className="bg-transparent font-bold text-emerald-300 focus:outline-none cursor-pointer"
             >
               {ALL_METRIC_KEYS.map((k) => (

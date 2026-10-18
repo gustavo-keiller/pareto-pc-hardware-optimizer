@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { METRIC_DEFINITIONS, MetricKey, RankedGpu } from '../lib/math/types';
+import {
+  METRIC_DEFINITIONS,
+  MetricKey,
+  RankedGpu,
+  isMetricKey,
+} from '../lib/math/types';
 import { ALL_METRIC_KEYS } from '../lib/math/topsis';
 import { evaluateParetoFrontier } from '../lib/math/pareto';
 import {
@@ -794,7 +799,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
               <select
                 aria-label="Base Bottom-Left Axis Metric"
                 value={xMetric}
-                onChange={(e) => onChangeXMetric(e.target.value as MetricKey)}
+                onChange={(e) => isMetricKey(e.target.value) && onChangeXMetric(e.target.value)}
                 className="bg-transparent font-bold text-emerald-400 focus:outline-none cursor-pointer"
               >
                 {ALL_METRIC_KEYS.map((k) => (
@@ -820,7 +825,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
               <select
                 aria-label="Y-Vertical Axis Metric"
                 value={yMetric}
-                onChange={(e) => onChangeYMetric(e.target.value as MetricKey)}
+                onChange={(e) => isMetricKey(e.target.value) && onChangeYMetric(e.target.value)}
                 className="bg-transparent font-semibold text-sky-400 focus:outline-none cursor-pointer"
               >
                 {ALL_METRIC_KEYS.map((k) => (
@@ -845,7 +850,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
             <select
               aria-label="Z-Axis Metric"
               value={zMetric}
-              onChange={(e) => onChangeZMetric(e.target.value as MetricKey)}
+              onChange={(e) => isMetricKey(e.target.value) && onChangeZMetric(e.target.value)}
               className="bg-transparent font-semibold text-purple-400 focus:outline-none cursor-pointer"
             >
               {ALL_METRIC_KEYS.map((k) => (

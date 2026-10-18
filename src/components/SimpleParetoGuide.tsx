@@ -5,6 +5,7 @@ import {
   MetricKey,
   PreferenceWeights,
   RankedGpu,
+  isMetricKey,
 } from '../lib/math/types';
 import { ALL_METRIC_KEYS } from '../lib/math/topsis';
 import { evaluateParetoFrontier } from '../lib/math/pareto';
@@ -46,6 +47,15 @@ interface SimpleParetoGuideProps {
 }
 
 type StoryStep = 1 | 2 | 3 | 4 | 5;
+
+/** Clamps any number into a valid StoryStep (1..5). */
+function toStoryStep(n: number): StoryStep {
+  if (n <= 1) return 1;
+  if (n === 2) return 2;
+  if (n === 3) return 3;
+  if (n === 4) return 4;
+  return 5;
+}
 
 /**
  * Vertical fill meter displaying normalized weight share.
@@ -481,11 +491,11 @@ export function SimpleParetoGuide({
           <div className="flex flex-wrap items-center gap-1.5">
             {(
               [
-                { step: 1 as StoryStep, label: '1. One Spec' },
-                { step: 2 as StoryStep, label: '2. Trade-Offs' },
-                { step: 3 as StoryStep, label: '3. Avoid Bad Deals' },
-                { step: 4 as StoryStep, label: '4. Value Frontier' },
-                { step: 5 as StoryStep, label: '5. Priorities & Top Picks' },
+                { step: 1, label: '1. One Spec' },
+                { step: 2, label: '2. Trade-Offs' },
+                { step: 3, label: '3. Avoid Bad Deals' },
+                { step: 4, label: '4. Value Frontier' },
+                { step: 5, label: '5. Priorities & Top Picks' },
               ] as const
             ).map((item) => (
               <button
@@ -576,7 +586,7 @@ export function SimpleParetoGuide({
                 value={yMetric}
                 onChange={(e) => {
                   e.stopPropagation();
-                  onSelectYMetric(e.target.value as MetricKey);
+                  if (isMetricKey(e.target.value)) onSelectYMetric(e.target.value);
                   setActiveStep(1);
                 }}
                 className="mx-1 rounded border border-amber-400/50 bg-slate-950 px-2 py-0.5 font-bold text-amber-300 focus:outline-none"
@@ -631,7 +641,7 @@ export function SimpleParetoGuide({
                 value={xMetric}
                 onChange={(e) => {
                   e.stopPropagation();
-                  onSelectXMetric(e.target.value as MetricKey);
+                  if (isMetricKey(e.target.value)) onSelectXMetric(e.target.value);
                   setActiveStep(2);
                 }}
                 className="my-1 rounded border border-emerald-400/50 bg-slate-950 px-2 py-0.5 font-bold text-emerald-300 focus:outline-none"
@@ -652,7 +662,7 @@ export function SimpleParetoGuide({
                 value={yMetric}
                 onChange={(e) => {
                   e.stopPropagation();
-                  onSelectYMetric(e.target.value as MetricKey);
+                  if (isMetricKey(e.target.value)) onSelectYMetric(e.target.value);
                   setActiveStep(2);
                 }}
                 className="my-1 rounded border border-sky-400/50 bg-slate-950 px-2 py-0.5 font-bold text-sky-300 focus:outline-none"
@@ -891,7 +901,7 @@ export function SimpleParetoGuide({
                       aria-label="Priority Variable 1"
                       value={xMetric}
                       onChange={(e) => {
-                        onSelectXMetric(e.target.value as MetricKey);
+                        if (isMetricKey(e.target.value)) onSelectXMetric(e.target.value);
                         setActiveStep(5);
                       }}
                       className="rounded border border-emerald-500/40 bg-slate-900 px-2 py-1 font-bold text-emerald-300 focus:outline-none"
@@ -921,7 +931,7 @@ export function SimpleParetoGuide({
                       aria-label="Priority Variable 2"
                       value={yMetric}
                       onChange={(e) => {
-                        onSelectYMetric(e.target.value as MetricKey);
+                        if (isMetricKey(e.target.value)) onSelectYMetric(e.target.value);
                         setActiveStep(5);
                       }}
                       className="rounded border border-sky-500/40 bg-slate-900 px-2 py-1 font-bold text-sky-300 focus:outline-none"
@@ -996,7 +1006,7 @@ export function SimpleParetoGuide({
                         aria-label="3-Var Priority 1"
                         value={xMetric}
                         onChange={(e) =>
-                          onSelectXMetric(e.target.value as MetricKey)
+                          isMetricKey(e.target.value) && onSelectXMetric(e.target.value)
                         }
                         className="w-full bg-transparent font-bold text-emerald-200 text-[11px] focus:outline-none"
                       >
@@ -1027,7 +1037,7 @@ export function SimpleParetoGuide({
                         aria-label="3-Var Priority 2"
                         value={yMetric}
                         onChange={(e) =>
-                          onSelectYMetric(e.target.value as MetricKey)
+                          isMetricKey(e.target.value) && onSelectYMetric(e.target.value)
                         }
                         className="w-full bg-transparent font-bold text-sky-200 text-[11px] focus:outline-none"
                       >
@@ -1058,7 +1068,7 @@ export function SimpleParetoGuide({
                         aria-label="3-Var Priority 3"
                         value={zMetric}
                         onChange={(e) =>
-                          onSelectZMetric(e.target.value as MetricKey)
+                          isMetricKey(e.target.value) && onSelectZMetric(e.target.value)
                         }
                         className="w-full bg-transparent font-bold text-amber-200 text-[11px] focus:outline-none"
                       >
@@ -1198,7 +1208,7 @@ export function SimpleParetoGuide({
                   type="button"
                   disabled={activeStep === 1}
                   onClick={() =>
-                    setActiveStep((s) => Math.max(1, s - 1) as StoryStep)
+                    setActiveStep((s) => toStoryStep(s - 1))
                   }
                   className="inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs font-semibold text-slate-300 hover:text-white disabled:opacity-40"
                 >
@@ -1208,7 +1218,7 @@ export function SimpleParetoGuide({
                   type="button"
                   disabled={activeStep === 5}
                   onClick={() =>
-                    setActiveStep((s) => Math.min(5, s + 1) as StoryStep)
+                    setActiveStep((s) => toStoryStep(s + 1))
                   }
                   className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/15 px-2.5 py-1 text-xs font-bold text-amber-300 hover:bg-amber-500/25 disabled:opacity-40"
                 >

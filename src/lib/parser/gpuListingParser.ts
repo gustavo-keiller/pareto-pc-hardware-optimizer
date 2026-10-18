@@ -154,8 +154,8 @@ export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuD
   }
 
   // Markdown link or direct URL
-  const mdUrlMatch = rawListing.match(/\[.*?\]\((https?:\/\/[^\s\)]+)\)/i);
-  const rawUrlMatch = rawListing.match(/https?:\/\/[^\s\)]+/i);
+  const mdUrlMatch = rawListing.match(/\[.*?\]\((https?:\/\/[^\s)]+)\)/i);
+  const rawUrlMatch = rawListing.match(/https?:\/\/[^\s)]+/i);
   if (mdUrlMatch && mdUrlMatch[1]) {
     url = mdUrlMatch[1];
   } else if (rawUrlMatch && rawUrlMatch[0]) {
@@ -172,7 +172,7 @@ export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuD
   let priceInstallment: number | undefined;
 
   // Original price: e.g. "de R$ 5.176,46 por:" or "De: R$ 1.449,99 por:"
-  const origMatch = rawListing.match(/(?:de|de:)\s*R?\$?\s*([\d\.]+(?:,\d{2})?)\s*por/i);
+  const origMatch = rawListing.match(/(?:de|de:)\s*R?\$?\s*([\d.]+(?:,\d{2})?)\s*por/i);
   if (origMatch && origMatch[1]) {
     originalPrice = parsePriceString(origMatch[1]);
   }
@@ -247,12 +247,12 @@ export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuD
   }
 
   // 8. Performance specs (from benchmark database or estimated defaults)
-  let rasterFps1440p = benchmarkMatch ? benchmarkMatch.rasterFps1440p : 60;
-  let rtFps1440p = benchmarkMatch ? benchmarkMatch.rtFps1440p : 30;
-  let tdpWatts = benchmarkMatch ? benchmarkMatch.tdpWatts : 180;
+  const rasterFps1440p = benchmarkMatch ? benchmarkMatch.rasterFps1440p : 60;
+  const rtFps1440p = benchmarkMatch ? benchmarkMatch.rtFps1440p : 30;
+  const tdpWatts = benchmarkMatch ? benchmarkMatch.tdpWatts : 180;
 
   // 9. Generate Clean Display Name
-  let name = cleanGpuName(rawTitle, brand, chip, vramGb);
+  const name = cleanGpuName(rawTitle, brand, chip, vramGb);
 
   // 10. Generate Unique ID
   const cleanId = `${store.toLowerCase().replace(/[^a-z0-9]/g, '')}-${chip.toLowerCase().replace(/[^a-z0-9]/g, '')}-${Date.now().toString(36)}-${index}`;

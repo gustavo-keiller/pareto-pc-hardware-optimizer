@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { METRIC_DEFINITIONS, MetricKey } from './lib/math/types';
+import { METRIC_DEFINITIONS, isMetricKey } from './lib/math/types';
 import { ALL_METRIC_KEYS } from './lib/math/topsis';
 import {
   PRESET_PROFILES,
@@ -854,7 +854,7 @@ export function App() {
                         aria-label="Base (Bottom-Left) Metric"
                         value={xMetric}
                         onChange={(e) =>
-                          setXMetric(e.target.value as MetricKey)
+                          isMetricKey(e.target.value) && setXMetric(e.target.value)
                         }
                         className="bg-transparent font-bold text-emerald-400 focus:outline-none cursor-pointer"
                       >
@@ -876,7 +876,7 @@ export function App() {
                         aria-label="Y-Axis Metric"
                         value={yMetric}
                         onChange={(e) =>
-                          setYMetric(e.target.value as MetricKey)
+                          isMetricKey(e.target.value) && setYMetric(e.target.value)
                         }
                         className="bg-transparent font-semibold text-sky-400 focus:outline-none cursor-pointer"
                       >

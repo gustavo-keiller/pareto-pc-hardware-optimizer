@@ -88,6 +88,14 @@ export const METRIC_DEFINITIONS: Record<MetricKey, MetricDefinition> = {
   },
 };
 
+/**
+ * Type guard for untrusted strings (e.g. `<select>` values) that must be a MetricKey.
+ * Use this instead of `value as MetricKey`.
+ */
+export function isMetricKey(value: string): value is MetricKey {
+  return Object.prototype.hasOwnProperty.call(METRIC_DEFINITIONS, value);
+}
+
 export interface HardConstraints {
   maxPrice: number;
   minVram: number;

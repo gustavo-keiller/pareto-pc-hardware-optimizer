@@ -6,6 +6,18 @@ export type ExtrapolationScalingModel =
   | 'diminishing-power'
   | 'two-point-line';
 
+const EXTRAPOLATION_SCALING_MODELS: readonly ExtrapolationScalingModel[] = [
+  'linear-ratio',
+  'diminishing-power',
+  'two-point-line',
+];
+
+export function isExtrapolationScalingModel(
+  value: string,
+): value is ExtrapolationScalingModel {
+  return EXTRAPOLATION_SCALING_MODELS.some((model) => model === value);
+}
+
 export interface ExtrapolationConfig {
   enabled: boolean;
   mode: ExtrapolationMode;
