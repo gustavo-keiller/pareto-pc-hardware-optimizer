@@ -129,13 +129,13 @@ function checkMarkdownLinks() {
   const mdFiles = [
     path.join(ROOT, 'AGENTS.md'),
     path.join(ROOT, 'README.md'),
-    path.join(ROOT, 'DOCUMENTATION_INDEX.md'),
     path.join(ROOT, 'CODEMAP.md'),
     path.join(ROOT, 'CONTEXT.md'),
     path.join(ROOT, 'TODO.md'),
     path.join(ROOT, 'DONE.md'),
     path.join(ROOT, '.agents', 'AGENTS.md'),
     path.join(ROOT, '.agents', 'CURRENT_STATE.md'),
+    path.join(ROOT, '.agents', 'GLOSSARY.md'),
     path.join(ROOT, '.agents', 'skills', 'skill-library', 'SKILL.md'),
   ].filter((f) => fs.existsSync(f));
 
