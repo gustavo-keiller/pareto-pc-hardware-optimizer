@@ -25,9 +25,10 @@ npm run dev        # Start Vite dev server at http://localhost:5173
 ## Verification & Quality Gates
 
 ```bash
-npm run check      # Runs tsc --noEmit + vitest run + check:docs
+npm run check      # Runs tsc --noEmit + eslint + prettier --check + vitest run + check:docs
+npm run format     # Auto-format with Prettier
 npm run test       # Run Vitest unit & mathematical property tests
-npm run check:docs # Verify AGENTS.md cap, skills, CODEMAP paths, links, and math isolation
+npm run check:docs # Verify AGENTS.md cap, skills, CODEMAP paths, links, math isolation, and file sizes
 npm run build      # Production build to dist/
 ```
 

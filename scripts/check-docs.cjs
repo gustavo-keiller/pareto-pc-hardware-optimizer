@@ -10,6 +10,8 @@
  * 6. Relative markdown links in root docs and .agents/ resolve to real files.
  * 7. Math engine isolation: files in src/lib/math/ (excluding __tests__) never import 'react' or 'echarts', and never use 'any'.
  * 8. Safe storage rule: no raw JSON.parse(localStorage.getItem(...)) outside src/utils/storage.ts.
+ * 9. File size cap (Rule 7): src/ files warn above 600 lines and fail above 800, except the
+ *    allowlisted legacy files, which fail only if they grow past their recorded ceiling.
  */
 
 const fs = require('fs');
@@ -18,6 +20,18 @@ const { diffStubs } = require('./sync-claude-skills.cjs');
 
 const ROOT = path.join(__dirname, '..');
 const MAX_AGENTS_MD_CHARS = 12_000;
+const WARN_FILE_LINES = 600;
+const MAX_FILE_LINES = 800;
+
+// Legacy files already over MAX_FILE_LINES (line count when the cap was added).
+// They may shrink but not grow. When PERF-03 splits one below 800, delete its entry.
+const OVERSIZED_FILE_ALLOWLIST = {
+  'src/App.tsx': 1112,
+  'src/components/Pareto3DCloud.tsx': 1168,
+  'src/components/HyperDimensionalExplorer.tsx': 1489,
+  'src/components/SimpleParetoGuide.tsx': 1793,
+};
+const warnings = [];
 
 const errors = [];
 
@@ -204,11 +218,51 @@ function checkMathIsolationAndSafety() {
   }
 }
 
+function checkFileSizes() {
+  const srcFiles = walkFiles(path.join(ROOT, 'src'), ['.ts', '.tsx']);
+  for (const file of srcFiles) {
+    const rel = path.relative(ROOT, file).split(path.sep).join('/');
+    const lines = (fs.readFileSync(file, 'utf-8').match(/\n/g) ?? []).length;
+    const ceiling = OVERSIZED_FILE_ALLOWLIST[rel];
+    if (ceiling !== undefined) {
+      if (lines > ceiling) {
+        errors.push(
+          `${rel} grew to ${lines} lines (allowlisted ceiling: ${ceiling}). Split it instead of growing it (Rule 7).`,
+        );
+      } else if (lines <= MAX_FILE_LINES) {
+        warnings.push(
+          `${rel} is now ${lines} lines: remove it from OVERSIZED_FILE_ALLOWLIST in scripts/check-docs.cjs.`,
+        );
+      }
+    } else if (lines > MAX_FILE_LINES) {
+      errors.push(
+        `${rel} is ${lines} lines (max ${MAX_FILE_LINES}). Split it into focused modules or hooks (Rule 7).`,
+      );
+    } else if (lines > WARN_FILE_LINES) {
+      warnings.push(
+        `${rel} is ${lines} lines (warn above ${WARN_FILE_LINES}, fail above ${MAX_FILE_LINES}).`,
+      );
+    }
+  }
+  for (const rel of Object.keys(OVERSIZED_FILE_ALLOWLIST)) {
+    if (!fs.existsSync(path.join(ROOT, rel))) {
+      errors.push(
+        `OVERSIZED_FILE_ALLOWLIST lists missing file ${rel}: remove the entry.`,
+      );
+    }
+  }
+}
+
 checkAgentsMdCap();
 checkSkillsAndStubs();
 checkCodemapPaths();
 checkMarkdownLinks();
 checkMathIsolationAndSafety();
+checkFileSizes();
+
+for (const warning of warnings) {
+  console.warn(`[check:docs] warning: ${warning}`);
+}
 
 if (errors.length > 0) {
   console.error('[check:docs] FAILED with the following issues:');
@@ -218,6 +272,6 @@ if (errors.length > 0) {
   process.exit(1);
 } else {
   console.log(
-    '[check:docs] OK — AGENTS.md cap, skills, stubs, CODEMAP, links, math isolation, and safe storage verified.',
+    '[check:docs] OK — AGENTS.md cap, skills, stubs, CODEMAP, links, math isolation, safe storage, and file sizes verified.',
   );
 }
