@@ -12,6 +12,7 @@ import { GpuLeaderboardTable } from './components/GpuLeaderboardTable';
 import { SimpleParetoGuide } from './components/SimpleParetoGuide';
 import { HyperDimensionalExplorer } from './components/HyperDimensionalExplorer';
 import { GpuDealImporterModal } from './components/GpuDealImporterModal';
+import { HardwareFilterPanel } from './components/HardwareFilterPanel';
 import { formatCurrency } from './utils/currency';
 import {
   Award,
@@ -509,6 +510,15 @@ export function App() {
                         <span>260W</span>
                         <span>{maxWattsBound}W (No Limit)</span>
                       </div>
+                    </div>
+
+                    {/* Brand & Ecosystem Filters */}
+                    <div className="pt-2 border-t border-slate-800/80">
+                      <HardwareFilterPanel
+                        candidates={rawCatalog}
+                        constraints={constraints}
+                        onChangeConstraints={setConstraints}
+                      />
                     </div>
                   </div>
                 </section>

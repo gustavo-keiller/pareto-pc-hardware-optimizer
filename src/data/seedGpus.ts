@@ -4,6 +4,7 @@ export const PHASE1_SEED_GPUS: GpuCandidate[] = [
   {
     id: 'gpu-1',
     name: 'Apex 4050 Lite',
+    vendor: 'NVIDIA',
     price: 220,
     rasterFps1440p: 52,
     rtFps1440p: 25,
@@ -14,6 +15,7 @@ export const PHASE1_SEED_GPUS: GpuCandidate[] = [
   {
     id: 'gpu-2',
     name: 'Vortex RX 760',
+    vendor: 'AMD',
     price: 260,
     rasterFps1440p: 68,
     rtFps1440p: 32,
@@ -24,6 +26,7 @@ export const PHASE1_SEED_GPUS: GpuCandidate[] = [
   {
     id: 'gpu-3',
     name: 'Apex 3060 Legacy [TRAP]',
+    vendor: 'NVIDIA',
     price: 295,
     rasterFps1440p: 61,
     rtFps1440p: 29,
@@ -34,6 +37,7 @@ export const PHASE1_SEED_GPUS: GpuCandidate[] = [
   {
     id: 'gpu-4',
     name: 'Vortex RX 770 XT',
+    vendor: 'AMD',
     price: 380,
     rasterFps1440p: 94,
     rtFps1440p: 54,
@@ -44,6 +48,7 @@ export const PHASE1_SEED_GPUS: GpuCandidate[] = [
   {
     id: 'gpu-5',
     name: 'Apex 4065 Ti 8GB [TRAP]',
+    vendor: 'NVIDIA',
     price: 410,
     rasterFps1440p: 88,
     rtFps1440p: 52,
@@ -54,6 +59,7 @@ export const PHASE1_SEED_GPUS: GpuCandidate[] = [
   {
     id: 'gpu-6',
     name: 'Nova Arc B850',
+    vendor: 'Intel',
     price: 330,
     rasterFps1440p: 82,
     rtFps1440p: 48,
@@ -64,6 +70,7 @@ export const PHASE1_SEED_GPUS: GpuCandidate[] = [
   {
     id: 'gpu-7',
     name: 'Apex 4075 Super',
+    vendor: 'NVIDIA',
     price: 560,
     rasterFps1440p: 122,
     rtFps1440p: 86,
@@ -74,6 +81,7 @@ export const PHASE1_SEED_GPUS: GpuCandidate[] = [
   {
     id: 'gpu-8',
     name: 'Vortex RX 7850 [TRAP]',
+    vendor: 'AMD',
     price: 590,
     rasterFps1440p: 118,
     rtFps1440p: 64,
@@ -84,6 +92,7 @@ export const PHASE1_SEED_GPUS: GpuCandidate[] = [
   {
     id: 'gpu-9',
     name: 'Vortex RX 7900 Pro',
+    vendor: 'AMD',
     price: 680,
     rasterFps1440p: 142,
     rtFps1440p: 88,
@@ -94,6 +103,7 @@ export const PHASE1_SEED_GPUS: GpuCandidate[] = [
   {
     id: 'gpu-10',
     name: 'Apex 4085 Ultra',
+    vendor: 'NVIDIA',
     price: 950,
     rasterFps1440p: 168,
     rtFps1440p: 124,

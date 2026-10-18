@@ -6,11 +6,17 @@ import {
   MetricKey,
   ParetoEvaluatedGpu,
 } from './types';
+import {
+  inferGpuVendor,
+  inferGpuArchitecture,
+  inferGpuFeatures,
+} from './capabilities';
 
 /**
  * Stage 1: Hard-Constraint Filtering ("The Dealbreakers")
- * Filters out candidates that violate strict user thresholds:
- * x.price <= C.maxPrice && x.vramGb >= C.minVram && x.tdpWatts <= C.maxWatts
+ * Filters out candidates that violate strict user thresholds or categorical filters:
+ * 1. Numeric: x.price <= C.maxPrice && x.vramGb >= C.minVram && x.tdpWatts <= C.maxWatts
+ * 2. Categorical: Brand / Vendor, Architecture, and Proprietary Ecosystem Technologies
  */
 export function filterByHardConstraints(
   candidates: GpuCandidate[],
@@ -19,13 +25,43 @@ export function filterByHardConstraints(
   const maxPrice = constraints.maxPrice ?? Infinity;
   const minVram = constraints.minVram ?? 0;
   const maxWatts = constraints.maxWatts ?? Infinity;
+  const selectedVendors = constraints.selectedVendors;
+  const selectedArchitectures = constraints.selectedArchitectures;
+  const requiredFeatures = constraints.requiredFeatures;
 
-  return candidates.filter(
-    (gpu) =>
-      gpu.price <= maxPrice &&
-      gpu.vramGb >= minVram &&
-      gpu.tdpWatts <= maxWatts,
-  );
+  return candidates.filter((gpu) => {
+    // 1. Numeric dealbreakers
+    if (gpu.price > maxPrice) return false;
+    if (gpu.vramGb < minVram) return false;
+    if (gpu.tdpWatts > maxWatts) return false;
+
+    // 2. Brand / Vendor filter (if active and non-empty)
+    if (selectedVendors && selectedVendors.length > 0) {
+      const vendor = gpu.vendor ?? inferGpuVendor(gpu);
+      if (!selectedVendors.includes(vendor)) {
+        return false;
+      }
+    }
+
+    // 3. Architecture filter (if active and non-empty)
+    if (selectedArchitectures && selectedArchitectures.length > 0) {
+      const arch = gpu.architecture ?? inferGpuArchitecture(gpu);
+      if (!selectedArchitectures.includes(arch)) {
+        return false;
+      }
+    }
+
+    // 4. Ecosystem & Technology requirements (if active and non-empty)
+    if (requiredFeatures && requiredFeatures.length > 0) {
+      const feats = gpu.features ?? inferGpuFeatures(gpu);
+      const hasAll = requiredFeatures.every((req) => feats.includes(req));
+      if (!hasAll) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 }
 
 /**

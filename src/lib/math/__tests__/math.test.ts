@@ -47,9 +47,63 @@ describe('Stage 1: Hard-Constraint Filtering (filterByHardConstraints)', () => {
     expect(ids).toEqual(['gpu-4', 'gpu-6', 'gpu-7']);
   });
 
-  it('applies default permissive bounds when partial constraints are passed', () => {
-    const valid = filterByHardConstraints(PHASE1_SEED_GPUS, {});
-    expect(valid).toHaveLength(10);
+  it('filters by brand / vendor when selectedVendors is provided', () => {
+    const nvidiaOnly = filterByHardConstraints(REAL_WORLD_GPUS, {
+      selectedVendors: ['NVIDIA'],
+    });
+    expect(nvidiaOnly).toHaveLength(8);
+    expect(nvidiaOnly.every((g) => g.vendor === 'NVIDIA')).toBe(true);
+
+    const amdOnly = filterByHardConstraints(REAL_WORLD_GPUS, {
+      selectedVendors: ['AMD'],
+    });
+    expect(amdOnly).toHaveLength(9);
+    expect(amdOnly.every((g) => g.vendor === 'AMD')).toBe(true);
+
+    const intelOnly = filterByHardConstraints(REAL_WORLD_GPUS, {
+      selectedVendors: ['Intel'],
+    });
+    expect(intelOnly).toHaveLength(1);
+    expect(intelOnly[0].id).toBe('arc-b580');
+
+    const multiVendor = filterByHardConstraints(REAL_WORLD_GPUS, {
+      selectedVendors: ['AMD', 'Intel'],
+    });
+    expect(multiVendor).toHaveLength(10);
+  });
+
+  it('filters by proprietary technology requirements (e.g. DLSS 3+ Frame Gen, AV1 Video Encode)', () => {
+    const dlssGpus = filterByHardConstraints(REAL_WORLD_GPUS, {
+      requiredFeatures: ['DLSS 3+ Frame Gen'],
+    });
+    // RTX 40 cards have DLSS 3 Frame Gen; RTX 3060 12GB does not
+    expect(dlssGpus.length).toBeGreaterThan(0);
+    expect(dlssGpus.some((g) => g.id === 'rtx-3060-12gb')).toBe(false);
+    expect(dlssGpus.every((g) => g.vendor === 'NVIDIA')).toBe(true);
+
+    const av1Gpus = filterByHardConstraints(REAL_WORLD_GPUS, {
+      requiredFeatures: ['AV1 Video Encode'],
+    });
+    // Older RX 6000 and RTX 3000 do not have AV1 encoder
+    expect(av1Gpus.some((g) => g.id === 'rx-6600')).toBe(false);
+    expect(av1Gpus.some((g) => g.id === 'rx-6750-xt')).toBe(false);
+    expect(av1Gpus.some((g) => g.id === 'rtx-3060-12gb')).toBe(false);
+    expect(av1Gpus.some((g) => g.id === 'arc-b580')).toBe(true);
+    expect(av1Gpus.some((g) => g.id === 'rx-7800-xt')).toBe(true);
+  });
+
+  it('combines numeric budget constraints with brand and technology filters', () => {
+    const filtered = filterByHardConstraints(REAL_WORLD_GPUS, {
+      maxPrice: 500,
+      minVram: 12,
+      selectedVendors: ['AMD'],
+      requiredFeatures: ['AV1 Video Encode'],
+    });
+    // Must be AMD, <= $500, >= 12GB VRAM, and have AV1 encode (RX 7600 XT, RX 7700 XT, RX 7800 XT)
+    expect(filtered.every((g) => g.vendor === 'AMD')).toBe(true);
+    expect(filtered.every((g) => g.price <= 500)).toBe(true);
+    expect(filtered.every((g) => g.vramGb >= 12)).toBe(true);
+    expect(filtered.some((g) => g.id === 'rx-6750-xt')).toBe(false); // RX 6750 XT lacks AV1
   });
 });
 

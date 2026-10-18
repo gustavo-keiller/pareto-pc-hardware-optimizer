@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   HardConstraints,
   METRIC_DEFINITIONS,
@@ -22,6 +22,8 @@ import {
   DollarSign,
   CheckCircle2,
   Check,
+  RotateCcw,
+  Cpu,
 } from 'lucide-react';
 
 interface SimpleParetoGuideProps {
@@ -149,8 +151,21 @@ export function SimpleParetoGuide({
   onSwitchToHyper,
   maxBudgetBound,
 }: SimpleParetoGuideProps) {
-  // Default to Step 5 (Interactive Priority & Top Valor) or let the user step 1 -> 5 through the story
-  const [activeStep, setActiveStep] = useState<StoryStep>(5);
+  // Step 1 -> 5 walkthrough (shows 1 step at a time until Step 5 unlocks all 5 steps)
+  const [activeStep, setActiveStep] = useState<StoryStep>(1);
+  const [unlockedAllSteps, setUnlockedAllSteps] = useState<boolean>(false);
+  const [focusStep5Only, setFocusStep5Only] = useState<boolean>(false);
+
+  // Automatically unlock all steps once the user reaches Step 5
+  useEffect(() => {
+    if (activeStep === 5 && !unlockedAllSteps) {
+      setUnlockedAllSteps(true);
+    }
+  }, [activeStep, unlockedAllSteps]);
+
+  // When unlocked (or activeStep is 5), all 5 steps are displayed unless explicitly focusing on Step 5 only
+  const showAllSteps =
+    (unlockedAllSteps || activeStep === 5) && !focusStep5Only;
   const [useThreeVars, setUseThreeVars] = useState<boolean>(false);
 
   // 2-variable tug-of-war slider (alpha = share of Variable 2, 1-alpha = share of Variable 1)
@@ -506,6 +521,7 @@ export function SimpleParetoGuide({
                 type="button"
                 onClick={() => {
                   setActiveStep(item.step);
+                  if (item.step === 5) setUnlockedAllSteps(true);
                   if (item.step !== 4) setOnlyFrontier(false);
                 }}
                 className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition flex items-center gap-1 ${
@@ -560,505 +576,683 @@ export function SimpleParetoGuide({
                 </button>
               ))}
             </div>
-          </div>
 
-          {/* STEP 1 CARD: One Dimension ("Looking at One Spec") */}
-          <div
-            onClick={() => setActiveStep(1)}
-            className={`cursor-pointer rounded-xl border p-4 transition-all ${
-              activeStep === 1
-                ? 'border-amber-400 bg-slate-900 shadow-lg shadow-amber-500/10'
-                : 'border-slate-800/80 bg-slate-900/50 opacity-75 hover:opacity-100'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-400">
-                Step 1 • The Single-Spec Trap
-              </span>
-              {activeStep === 1 && (
-                <span className="rounded bg-amber-400/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-                  Active on Graph →
+            {/* Quick Brand Filter */}
+            <div className="mt-3 pt-2.5 border-t border-slate-800/80">
+              <div className="flex items-center justify-between text-xs mb-1.5">
+                <span className="flex items-center gap-1.5 font-bold text-slate-200">
+                  <Cpu className="h-3.5 w-3.5 text-sky-400" />
+                  GPU Brand:
                 </span>
-              )}
-            </div>
-            <p className="text-sm leading-relaxed text-slate-200">
-              Comparing graphics cards by just one metric seems simple. If you
-              only rank GPUs by{' '}
-              <select
-                aria-label="Step 1 Metric"
-                value={yMetric}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  if (isMetricKey(e.target.value))
-                    onSelectYMetric(e.target.value);
-                  setActiveStep(1);
-                }}
-                className="mx-1 rounded border border-amber-400/50 bg-slate-950 px-2 py-0.5 font-bold text-amber-300 focus:outline-none"
-              >
-                {ALL_METRIC_KEYS.map((k) => (
-                  <option key={k} value={k}>
-                    {METRIC_DEFINITIONS[k].shortLabel}
-                  </option>
-                ))}
-              </select>
-              , you might think{' '}
-              <strong className="text-emerald-400">
-                {step1Leader?.name ?? 'the flagship GPU'}
-              </strong>{' '}
-              ({step1Leader ? `${step1Leader[yMetric]} ${yDef.unit}` : ''} for $
-              {step1Leader?.price}) is the obvious pick. But looking at only one
-              specification ignores price and power consumption, which is how
-              buyers overspend by hundreds of dollars.
-            </p>
-          </div>
-
-          {/* STEP 2 CARD: Two Variables ("Balancing Trade-Offs") */}
-          <div
-            onClick={() => setActiveStep(2)}
-            className={`cursor-pointer rounded-xl border p-4 transition-all ${
-              activeStep === 2
-                ? 'border-amber-400 bg-slate-900 shadow-lg shadow-amber-500/10'
-                : 'border-slate-800/80 bg-slate-900/50 opacity-75 hover:opacity-100'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-400">
-                Step 2 • The Budget Trade-Off
-              </span>
-              {activeStep === 2 && (
-                <span className="rounded bg-amber-400/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-                  Active on Graph →
-                </span>
-              )}
-            </div>
-            <p className="text-sm leading-relaxed text-slate-200">
-              Smart shoppers never evaluate performance in isolation. You have
-              to balance{' '}
-              <span className="italic text-sky-300">{yDef.shortLabel}</span>{' '}
-              against{' '}
-              <span className="italic text-emerald-300">{xDef.shortLabel}</span>
-              . Finding the right card means making a clear trade-off between{' '}
-              <select
-                aria-label="Trade-off Variable 1"
-                value={xMetric}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  if (isMetricKey(e.target.value))
-                    onSelectXMetric(e.target.value);
-                  setActiveStep(2);
-                }}
-                className="my-1 rounded border border-emerald-400/50 bg-slate-950 px-2 py-0.5 font-bold text-emerald-300 focus:outline-none"
-              >
-                {ALL_METRIC_KEYS.map((k) => (
-                  <option key={k} value={k}>
-                    {METRIC_DEFINITIONS[k].shortLabel} (
-                    {METRIC_DEFINITIONS[k].direction === 'min'
-                      ? 'lower is better'
-                      : 'higher is better'}
-                    )
-                  </option>
-                ))}
-              </select>{' '}
-              and{' '}
-              <select
-                aria-label="Trade-off Variable 2"
-                value={yMetric}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  if (isMetricKey(e.target.value))
-                    onSelectYMetric(e.target.value);
-                  setActiveStep(2);
-                }}
-                className="my-1 rounded border border-sky-400/50 bg-slate-950 px-2 py-0.5 font-bold text-sky-300 focus:outline-none"
-              >
-                {ALL_METRIC_KEYS.map((k) => (
-                  <option key={k} value={k}>
-                    {METRIC_DEFINITIONS[k].shortLabel} (
-                    {METRIC_DEFINITIONS[k].direction === 'min'
-                      ? 'lower is better'
-                      : 'higher is better'}
-                    )
-                  </option>
-                ))}
-              </select>
-              .
-            </p>
-            {frontier2DGpus.length === 1 && xMetric !== yMetric && (
-              <div className="mt-2 flex items-center gap-2 rounded-lg border border-amber-400/50 bg-amber-500/10 p-2 text-xs text-amber-200">
-                <Sparkles className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>
-                  Clear winner: In this comparison,{' '}
-                  <strong>{frontier2DGpus[0].name}</strong> wins on both specs
-                  simultaneously with no compromise required!
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* STEP 3 CARD: Value Traps ("Strictly Dominated Bad Deals") */}
-          <div
-            onClick={() => setActiveStep(3)}
-            className={`cursor-pointer rounded-xl border p-4 transition-all ${
-              activeStep === 3
-                ? 'border-rose-400 bg-slate-900 shadow-lg shadow-rose-500/10'
-                : 'border-slate-800/80 bg-slate-900/50 opacity-75 hover:opacity-100'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-rose-400">
-                Step 3 • Eliminating Bad Deals (Value Traps)
-              </span>
-              {dominated2DGpus.length > 1 && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveStep(3);
-                    setTrapSpotlightIdx((prev) => prev + 1);
-                  }}
-                  className="rounded border border-rose-500/40 bg-rose-500/15 px-2 py-0.5 text-[11px] font-bold text-rose-200 hover:bg-rose-500/25"
-                >
-                  Inspect Next Bad Deal (
-                  {(trapSpotlightIdx % dominated2DGpus.length) + 1}/
-                  {dominated2DGpus.length}) →
-                </button>
-              )}
-            </div>
-            {spotlightTrap ? (
-              <div className="text-sm leading-relaxed text-slate-200 space-y-1.5">
-                <p>
-                  Some graphics cards on retail shelves are strictly worse than
-                  competitors. In economics and decision theory, these are
-                  called{' '}
-                  <strong className="text-rose-400 font-bold">
-                    strictly dominated traps
-                  </strong>
-                  . For example, look at{' '}
-                  <span className="rounded bg-rose-500/20 px-1.5 py-0.5 font-bold text-rose-300 border border-rose-500/30">
-                    {spotlightTrap.name} (${spotlightTrap.price})
-                  </span>
-                  :
-                </p>
-                {spotlightDominators.slice(0, 2).map((dom) => (
-                  <div
-                    key={dom.id}
-                    className="flex items-start gap-2 rounded-lg bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-300 border border-slate-800"
-                  >
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-emerald-400">
-                        {dom.name} (${dom.price})
-                      </strong>{' '}
-                      costs less and performs better: gives you{' '}
-                      <strong className="text-sky-300">
-                        {dom[yMetric]} {yDef.unit}
-                      </strong>{' '}
-                      vs {spotlightTrap[yMetric]} {yDef.unit} and{' '}
-                      <strong className="text-emerald-300">
-                        {dom[xMetric]} {xDef.unit}
-                      </strong>{' '}
-                      vs {spotlightTrap[xMetric]} {xDef.unit}.
-                    </div>
-                  </div>
-                ))}
-                <p className="text-xs text-slate-400 italic">
-                  Smart buyer rule: Skip{' '}
-                  <strong className="text-rose-300">
-                    {spotlightTrap.name}
-                  </strong>{' '}
-                  — you get higher performance for less money with the
-                  alternatives above.
-                </p>
-              </div>
-            ) : (
-              <p className="text-xs text-slate-400">
-                No dominated bad deals found for this pair of variables!
-              </p>
-            )}
-          </div>
-
-          {/* STEP 4 CARD: The Value Frontier */}
-          <div
-            onClick={() => setActiveStep(4)}
-            className={`cursor-pointer rounded-xl border p-4 transition-all ${
-              activeStep === 4
-                ? 'border-emerald-400 bg-slate-900 shadow-lg shadow-emerald-500/10'
-                : 'border-slate-800/80 bg-slate-900/50 opacity-75 hover:opacity-100'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-400">
-                Step 4 • The Value Frontier (Smart Shortlist)
-              </span>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveStep(4);
-                  setOnlyFrontier((prev) => !prev);
-                }}
-                className={`inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[11px] font-bold transition ${
-                  onlyFrontier
-                    ? 'border-amber-400 bg-amber-400/20 text-amber-300'
-                    : 'border-slate-700 bg-slate-950 text-slate-300 hover:text-white'
-                }`}
-              >
-                {onlyFrontier ? (
-                  <>
-                    <Eye className="h-3 w-3" /> Show All {gpus.length} GPUs
-                  </>
-                ) : (
-                  <>
-                    <EyeOff className="h-3 w-3" /> Hide {dominated2DGpus.length}{' '}
-                    Bad Deals
-                  </>
-                )}
-              </button>
-            </div>
-            <p className="text-sm leading-relaxed text-slate-200">
-              There are {gpus.length} graphics cards in your budget. Instead of
-              analyzing dozens of mediocre options, the{' '}
-              <span className="rounded bg-amber-400 px-1.5 py-0.5 font-black text-slate-950">
-                Value Frontier
-              </span>{' '}
-              narrows the field to the{' '}
-              <strong className="text-emerald-400">
-                {frontier2DGpus.length} most efficient options
-              </strong>
-              . Every card on this line delivers the maximum performance at its
-              price bracket.
-            </p>
-          </div>
-
-          {/* STEP 5 CARD: Interactive Variable & Priority Selector (Tug-of-War & 3-Way Split Bar) */}
-          <div
-            onClick={() => setActiveStep(5)}
-            className={`rounded-2xl border-2 p-4 transition-all ${
-              activeStep === 5
-                ? 'border-amber-400 bg-slate-900 shadow-xl shadow-amber-500/15'
-                : 'border-slate-800 bg-slate-900/70 hover:border-slate-700'
-            }`}
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-              <div className="flex items-center gap-1.5">
-                <Sliders className="h-4 w-4 text-amber-400" />
-                <span className="text-xs font-black uppercase tracking-wider text-amber-400">
-                  Step 5 • Choose Variables &amp; Priority
-                </span>
-              </div>
-              {/* 2-Var vs 3-Var Switcher */}
-              <div className="inline-flex rounded-lg border border-slate-800 bg-slate-950 p-0.5 text-[11px]">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveStep(5);
-                    setUseThreeVars(false);
-                    syncGlobalWeights(1 - twoVarAlpha, twoVarAlpha, 0);
-                  }}
-                  className={`rounded px-2 py-0.5 font-bold transition ${
-                    !useThreeVars
-                      ? 'bg-amber-400 text-slate-950'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  2 Variables
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveStep(5);
-                    setUseThreeVars(true);
-                    syncGlobalWeights(splitX1, splitX2 - splitX1, 1 - splitX2);
-                  }}
-                  className={`rounded px-2 py-0.5 font-bold transition ${
-                    useThreeVars
-                      ? 'bg-amber-400 text-slate-950'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  3 Variables (3D Split)
-                </button>
-              </div>
-            </div>
-
-            <p className="text-xs text-slate-300 leading-relaxed mb-3">
-              Given your needs, put more{' '}
-              <span className="rounded bg-amber-400 px-1 font-bold text-slate-950">
-                weight
-              </span>{' '}
-              on one statistic over the other to reveal the frontier GPU with
-              the highest value for you:
-            </p>
-
-            {!useThreeVars ? (
-              /* 2-VARIABLE TUG-OF-WAR PRIORITY WIDGET (Mayerowitz's `su` component) */
-              <div className="rounded-xl border border-slate-800 bg-slate-950/90 p-3 space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                  {/* Variable 1 */}
-                  <div className="flex items-center gap-1.5">
-                    <MiniWeightBar
-                      pct={priorityShares.w1 * 100}
-                      color="#10b981"
-                    />
-                    <span className="font-mono font-bold text-emerald-400">
-                      {Math.round(priorityShares.w1 * 100)}%
-                    </span>
-                    <select
-                      aria-label="Priority Variable 1"
-                      value={xMetric}
-                      onChange={(e) => {
-                        if (isMetricKey(e.target.value))
-                          onSelectXMetric(e.target.value);
-                        setActiveStep(5);
-                      }}
-                      className="rounded border border-emerald-500/40 bg-slate-900 px-2 py-1 font-bold text-emerald-300 focus:outline-none"
-                    >
-                      {ALL_METRIC_KEYS.map((k) => (
-                        <option key={k} value={k}>
-                          {METRIC_DEFINITIONS[k].shortLabel}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <span className="text-[11px] font-bold text-slate-500">
-                    VS
-                  </span>
-
-                  {/* Variable 2 */}
-                  <div className="flex items-center gap-1.5">
-                    <MiniWeightBar
-                      pct={priorityShares.w2 * 100}
-                      color="#38bdf8"
-                    />
-                    <span className="font-mono font-bold text-sky-400">
-                      {Math.round(priorityShares.w2 * 100)}%
-                    </span>
-                    <select
-                      aria-label="Priority Variable 2"
-                      value={yMetric}
-                      onChange={(e) => {
-                        if (isMetricKey(e.target.value))
-                          onSelectYMetric(e.target.value);
-                        setActiveStep(5);
-                      }}
-                      className="rounded border border-sky-500/40 bg-slate-900 px-2 py-1 font-bold text-sky-300 focus:outline-none"
-                    >
-                      {ALL_METRIC_KEYS.map((k) => (
-                        <option key={k} value={k}>
-                          {METRIC_DEFINITIONS[k].shortLabel}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Single Tug-of-War Range Slider */}
-                <div>
-                  <div className="relative h-3 w-full overflow-hidden rounded-full bg-slate-800 flex">
-                    <div
-                      className="h-full bg-emerald-500 transition-all duration-75"
-                      style={{ width: `${priorityShares.w1 * 100}%` }}
-                    />
-                    <div
-                      className="h-full bg-sky-400 transition-all duration-75"
-                      style={{ width: `${priorityShares.w2 * 100}%` }}
-                    />
-                  </div>
-                  <input
-                    type="range"
-                    aria-label="Balance priority between Variable 1 and Variable 2"
-                    min={0.05}
-                    max={0.95}
-                    step={0.05}
-                    value={twoVarAlpha}
-                    onChange={(e) => {
-                      const val = Number(e.target.value);
-                      setTwoVarAlpha(val);
-                      setActiveStep(5);
-                      syncGlobalWeights(1 - val, val, 0);
-                    }}
-                    className="-mt-3 w-full cursor-pointer accent-amber-400 relative z-10"
-                  />
-                  <div className="mt-1 flex justify-between text-[10px] text-slate-400">
-                    <span>← Favor {xDef.shortLabel}</span>
+                {constraints.selectedVendors &&
+                  constraints.selectedVendors.length > 0 && (
                     <button
                       type="button"
-                      onClick={() => {
-                        setTwoVarAlpha(0.5);
-                        syncGlobalWeights(0.5, 0.5, 0);
-                      }}
-                      className="text-amber-400 hover:underline font-semibold"
+                      onClick={() =>
+                        onChangeConstraints((prev) => ({
+                          ...prev,
+                          selectedVendors: [],
+                        }))
+                      }
+                      className="text-[10px] text-amber-400 hover:underline"
                     >
-                      50 / 50 Balance
+                      Clear (Show All)
                     </button>
-                    <span>Favor {yDef.shortLabel} →</span>
-                  </div>
+                  )}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {(['ALL', 'NVIDIA', 'AMD', 'Intel'] as const).map((v) => {
+                  const isAll = v === 'ALL';
+                  const active = isAll
+                    ? !constraints.selectedVendors ||
+                      constraints.selectedVendors.length === 0
+                    : constraints.selectedVendors?.includes(v);
+                  return (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() =>
+                        onChangeConstraints((prev) => {
+                          if (isAll) return { ...prev, selectedVendors: [] };
+                          const current = prev.selectedVendors ?? [];
+                          const next = current.includes(v)
+                            ? current.filter((x) => x !== v)
+                            : [...current, v];
+                          return { ...prev, selectedVendors: next };
+                        })
+                      }
+                      className={`flex-1 rounded-lg border px-2 py-1.5 text-[11px] font-bold transition ${
+                        active
+                          ? v === 'NVIDIA'
+                            ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300'
+                            : v === 'AMD'
+                              ? 'border-rose-500/50 bg-rose-500/20 text-rose-300'
+                              : v === 'Intel'
+                                ? 'border-sky-500/50 bg-sky-500/20 text-sky-300'
+                                : 'border-amber-400 bg-amber-400 text-slate-950 shadow-sm'
+                          : 'border-slate-800 bg-slate-950 text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      {v === 'ALL' ? 'All Brands' : v}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Walkthrough Progress Banner (When in 1-by-1 walkthrough mode) */}
+          {!showAllSteps && !focusStep5Only && (
+            <div className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-slate-900/60 px-3.5 py-2.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-300">
+                  Walkthrough:
+                </span>
+                <span className="rounded bg-amber-400/20 px-2 py-0.5 text-[11px] font-extrabold text-amber-300">
+                  Step {activeStep} of 5
+                </span>
+              </div>
+              {/* 5 mini dots/pills showing progress */}
+              <div className="flex items-center gap-1.5">
+                {([1, 2, 3, 4, 5] as const).map((stepNum) => (
+                  <button
+                    key={stepNum}
+                    type="button"
+                    onClick={() => {
+                      setActiveStep(stepNum);
+                      if (stepNum === 5) setUnlockedAllSteps(true);
+                    }}
+                    className={`h-2 rounded-full transition-all ${
+                      activeStep === stepNum
+                        ? 'w-6 bg-amber-400'
+                        : activeStep > stepNum
+                          ? 'w-2 bg-emerald-400/80'
+                          : 'w-2 bg-slate-700'
+                    }`}
+                    title={`Go to Step ${stepNum}`}
+                    aria-label={`Go to Step ${stepNum}`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* All Steps Unlocked Banner (When all 5 steps are available) */}
+          {showAllSteps && (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-500/30 bg-emerald-950/20 px-3.5 py-2.5 shadow-md">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-emerald-400 shrink-0" />
+                <span className="text-xs font-bold text-emerald-200">
+                  All 5 Steps Available
+                </span>
+                <span className="text-[11px] text-slate-400 hidden sm:inline">
+                  — Walkthrough completed
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setFocusStep5Only(true)}
+                  className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-slate-300 hover:text-white transition"
+                >
+                  Focus Step 5 Only
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUnlockedAllSteps(false);
+                    setFocusStep5Only(false);
+                    setActiveStep(1);
+                  }}
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/80 px-2 py-1 text-[11px] font-medium text-slate-400 hover:text-slate-200 transition"
+                  title="Restart step-by-step walkthrough"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  Restart
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Focused on Step 5 Banner (When user chose to focus on Step 5 only) */}
+          {focusStep5Only && (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-500/30 bg-amber-950/20 px-3.5 py-2.5 shadow-md">
+              <div className="flex items-center gap-2">
+                <Sliders className="h-4 w-4 text-amber-400 shrink-0" />
+                <span className="text-xs font-bold text-amber-200">
+                  Step 5 Focused View
+                </span>
+                <span className="text-[11px] text-slate-400 hidden sm:inline">
+                  (Priority Controls &amp; Top Picks)
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setFocusStep5Only(false)}
+                  className="rounded-lg border border-amber-400/50 bg-amber-400/20 px-2.5 py-1 text-[11px] font-bold text-amber-300 hover:bg-amber-400/30 transition"
+                >
+                  Show All 5 Steps
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUnlockedAllSteps(false);
+                    setFocusStep5Only(false);
+                    setActiveStep(1);
+                  }}
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/80 px-2 py-1 text-[11px] font-medium text-slate-400 hover:text-slate-200 transition"
+                  title="Restart step-by-step walkthrough"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  Restart
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 1 CARD: One Dimension ("Looking at One Spec") */}
+          {(showAllSteps || activeStep === 1) && (
+            <div
+              onClick={() => setActiveStep(1)}
+              className={`cursor-pointer rounded-xl border p-4 transition-all ${
+                activeStep === 1
+                  ? 'border-amber-400 bg-slate-900 shadow-lg shadow-amber-500/10'
+                  : 'border-slate-800/80 bg-slate-900/50 opacity-75 hover:opacity-100'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-400">
+                  Step 1 • The Single-Spec Trap
+                </span>
+                {activeStep === 1 && (
+                  <span className="rounded bg-amber-400/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">
+                    Active on Graph →
+                  </span>
+                )}
+              </div>
+              <p className="text-sm leading-relaxed text-slate-200">
+                Comparing graphics cards by just one metric seems simple. If you
+                only rank GPUs by{' '}
+                <select
+                  aria-label="Step 1 Metric"
+                  value={yMetric}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    if (isMetricKey(e.target.value)) {
+                      onSelectYMetric(e.target.value);
+                    }
+                    setActiveStep(1);
+                  }}
+                  className="mx-1 rounded border border-amber-400/50 bg-slate-950 px-2 py-0.5 font-bold text-amber-300 focus:outline-none"
+                >
+                  {ALL_METRIC_KEYS.map((k) => (
+                    <option key={k} value={k}>
+                      {METRIC_DEFINITIONS[k].shortLabel}
+                    </option>
+                  ))}
+                </select>
+                , you might think{' '}
+                <strong className="text-emerald-400">
+                  {step1Leader?.name ?? 'the flagship GPU'}
+                </strong>{' '}
+                ({step1Leader ? `${step1Leader[yMetric]} ${yDef.unit}` : ''} for
+                ${step1Leader?.price}) is the obvious pick. But looking at only
+                one specification ignores price and power consumption, which is
+                how buyers overspend by hundreds of dollars.
+              </p>
+
+              {!showAllSteps && (
+                <div className="mt-4 flex items-center justify-between border-t border-slate-800/80 pt-3">
+                  <span className="text-[11px] font-medium text-slate-400">
+                    Step 1 of 5
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveStep(2);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/50 bg-amber-400 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition hover:bg-amber-300 shadow-md shadow-amber-500/20"
+                  >
+                    Next: The Budget Trade-Off{' '}
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* STEP 2 CARD: Two Variables ("Balancing Trade-Offs") */}
+          {(showAllSteps || activeStep === 2) && (
+            <div
+              onClick={() => setActiveStep(2)}
+              className={`cursor-pointer rounded-xl border p-4 transition-all ${
+                activeStep === 2
+                  ? 'border-amber-400 bg-slate-900 shadow-lg shadow-amber-500/10'
+                  : 'border-slate-800/80 bg-slate-900/50 opacity-75 hover:opacity-100'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-400">
+                  Step 2 • The Budget Trade-Off
+                </span>
+                {activeStep === 2 && (
+                  <span className="rounded bg-amber-400/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">
+                    Active on Graph →
+                  </span>
+                )}
+              </div>
+              <p className="text-sm leading-relaxed text-slate-200">
+                Smart shoppers never evaluate performance in isolation. You have
+                to balance{' '}
+                <span className="italic text-sky-300">{yDef.shortLabel}</span>{' '}
+                against{' '}
+                <span className="italic text-emerald-300">
+                  {xDef.shortLabel}
+                </span>
+                . Finding the right card means making a clear trade-off between{' '}
+                <select
+                  aria-label="Trade-off Variable 1"
+                  value={xMetric}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    if (isMetricKey(e.target.value)) {
+                      onSelectXMetric(e.target.value);
+                    }
+                    setActiveStep(2);
+                  }}
+                  className="my-1 rounded border border-emerald-400/50 bg-slate-950 px-2 py-0.5 font-bold text-emerald-300 focus:outline-none"
+                >
+                  {ALL_METRIC_KEYS.map((k) => (
+                    <option key={k} value={k}>
+                      {METRIC_DEFINITIONS[k].shortLabel} (
+                      {METRIC_DEFINITIONS[k].direction === 'min'
+                        ? 'lower is better'
+                        : 'higher is better'}
+                      )
+                    </option>
+                  ))}
+                </select>{' '}
+                and{' '}
+                <select
+                  aria-label="Trade-off Variable 2"
+                  value={yMetric}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    if (isMetricKey(e.target.value)) {
+                      onSelectYMetric(e.target.value);
+                    }
+                    setActiveStep(2);
+                  }}
+                  className="my-1 rounded border border-sky-400/50 bg-slate-950 px-2 py-0.5 font-bold text-sky-300 focus:outline-none"
+                >
+                  {ALL_METRIC_KEYS.map((k) => (
+                    <option key={k} value={k}>
+                      {METRIC_DEFINITIONS[k].shortLabel} (
+                      {METRIC_DEFINITIONS[k].direction === 'min'
+                        ? 'lower is better'
+                        : 'higher is better'}
+                      )
+                    </option>
+                  ))}
+                </select>
+                .
+              </p>
+              {frontier2DGpus.length === 1 && xMetric !== yMetric && (
+                <div className="mt-2 flex items-center gap-2 rounded-lg border border-amber-400/50 bg-amber-500/10 p-2 text-xs text-amber-200">
+                  <Sparkles className="h-4 w-4 text-amber-400 shrink-0" />
+                  <span>
+                    Clear winner: In this comparison,{' '}
+                    <strong>{frontier2DGpus[0].name}</strong> wins on both specs
+                    simultaneously with no compromise required!
+                  </span>
+                </div>
+              )}
+
+              {!showAllSteps && (
+                <div className="mt-4 flex items-center justify-between border-t border-slate-800/80 pt-3">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveStep(1);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 hover:text-white"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" /> Back: Step 1
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveStep(3);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/50 bg-amber-400 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition hover:bg-amber-300 shadow-md shadow-amber-500/20"
+                  >
+                    Next: Eliminating Bad Deals{' '}
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* STEP 3 CARD: Value Traps ("Strictly Dominated Bad Deals") */}
+          {(showAllSteps || activeStep === 3) && (
+            <div
+              onClick={() => setActiveStep(3)}
+              className={`cursor-pointer rounded-xl border p-4 transition-all ${
+                activeStep === 3
+                  ? 'border-rose-400 bg-slate-900 shadow-lg shadow-rose-500/10'
+                  : 'border-slate-800/80 bg-slate-900/50 opacity-75 hover:opacity-100'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-rose-400">
+                  Step 3 • Eliminating Bad Deals (Value Traps)
+                </span>
+                {dominated2DGpus.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveStep(3);
+                      setTrapSpotlightIdx((prev) => prev + 1);
+                    }}
+                    className="rounded border border-rose-500/40 bg-rose-500/15 px-2 py-0.5 text-[11px] font-bold text-rose-200 hover:bg-rose-500/25"
+                  >
+                    Inspect Next Bad Deal (
+                    {(trapSpotlightIdx % dominated2DGpus.length) + 1}/
+                    {dominated2DGpus.length}) →
+                  </button>
+                )}
+              </div>
+              {spotlightTrap ? (
+                <div className="text-sm leading-relaxed text-slate-200 space-y-1.5">
+                  <p>
+                    Some graphics cards on retail shelves are strictly worse
+                    than competitors. In economics and decision theory, these
+                    are called{' '}
+                    <strong className="text-rose-400 font-bold">
+                      strictly dominated traps
+                    </strong>
+                    . For example, look at{' '}
+                    <span className="rounded bg-rose-500/20 px-1.5 py-0.5 font-bold text-rose-300 border border-rose-500/30">
+                      {spotlightTrap.name} (${spotlightTrap.price})
+                    </span>
+                    :
+                  </p>
+                  {spotlightDominators.slice(0, 2).map((dom) => (
+                    <div
+                      key={dom.id}
+                      className="flex items-start gap-2 rounded-lg bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-300 border border-slate-800"
+                    >
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-emerald-400">
+                          {dom.name} (${dom.price})
+                        </strong>{' '}
+                        costs less and performs better: gives you{' '}
+                        <strong className="text-sky-300">
+                          {dom[yMetric]} {yDef.unit}
+                        </strong>{' '}
+                        vs {spotlightTrap[yMetric]} {yDef.unit} and{' '}
+                        <strong className="text-emerald-300">
+                          {dom[xMetric]} {xDef.unit}
+                        </strong>{' '}
+                        vs {spotlightTrap[xMetric]} {xDef.unit}.
+                      </div>
+                    </div>
+                  ))}
+                  <p className="text-xs text-slate-400 italic">
+                    Smart buyer rule: Skip{' '}
+                    <strong className="text-rose-300">
+                      {spotlightTrap.name}
+                    </strong>{' '}
+                    — you get higher performance for less money with the
+                    alternatives above.
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400">
+                  No dominated bad deals found for this pair of variables!
+                </p>
+              )}
+
+              {!showAllSteps && (
+                <div className="mt-4 flex items-center justify-between border-t border-slate-800/80 pt-3">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveStep(2);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 hover:text-white"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" /> Back: Step 2
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveStep(4);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/50 bg-amber-400 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition hover:bg-amber-300 shadow-md shadow-amber-500/20"
+                  >
+                    Next: The Value Frontier{' '}
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* STEP 4 CARD: The Value Frontier */}
+          {(showAllSteps || activeStep === 4) && (
+            <div
+              onClick={() => setActiveStep(4)}
+              className={`cursor-pointer rounded-xl border p-4 transition-all ${
+                activeStep === 4
+                  ? 'border-emerald-400 bg-slate-900 shadow-lg shadow-emerald-500/10'
+                  : 'border-slate-800/80 bg-slate-900/50 opacity-75 hover:opacity-100'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-400">
+                  Step 4 • The Value Frontier (Smart Shortlist)
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveStep(4);
+                    setOnlyFrontier((prev) => !prev);
+                  }}
+                  className={`inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[11px] font-bold transition ${
+                    onlyFrontier
+                      ? 'border-amber-400 bg-amber-400/20 text-amber-300'
+                      : 'border-slate-700 bg-slate-950 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  {onlyFrontier ? (
+                    <>
+                      <Eye className="h-3 w-3" /> Show All {gpus.length} GPUs
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff className="h-3 w-3" /> Hide{' '}
+                      {dominated2DGpus.length} Bad Deals
+                    </>
+                  )}
+                </button>
+              </div>
+              <p className="text-sm leading-relaxed text-slate-200">
+                There are {gpus.length} graphics cards in your budget. Instead
+                of analyzing dozens of mediocre options, the{' '}
+                <span className="rounded bg-amber-400 px-1.5 py-0.5 font-black text-slate-950">
+                  Value Frontier
+                </span>{' '}
+                narrows the field to the{' '}
+                <strong className="text-emerald-400">
+                  {frontier2DGpus.length} most efficient options
+                </strong>
+                . Every card on this line delivers the maximum performance at
+                its price bracket.
+              </p>
+
+              {!showAllSteps && (
+                <div className="mt-4 flex items-center justify-between border-t border-slate-800/80 pt-3">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveStep(3);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 hover:text-white"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" /> Back: Step 3
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveStep(5);
+                      setUnlockedAllSteps(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/50 bg-emerald-500 px-3.5 py-1.5 text-xs font-black text-slate-950 transition hover:bg-emerald-400 shadow-lg shadow-emerald-500/20"
+                  >
+                    <Award className="h-3.5 w-3.5" /> Unlock Step 5: Priorities
+                    &amp; Top Picks <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* STEP 5 CARD: Interactive Variable & Priority Selector (Tug-of-War & 3-Way Split Bar) */}
+          {(showAllSteps || activeStep === 5) && (
+            <div
+              onClick={() => setActiveStep(5)}
+              className={`rounded-2xl border-2 p-4 transition-all ${
+                activeStep === 5
+                  ? 'border-amber-400 bg-slate-900 shadow-xl shadow-amber-500/15'
+                  : 'border-slate-800 bg-slate-900/70 hover:border-slate-700'
+              }`}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-1.5">
+                  <Sliders className="h-4 w-4 text-amber-400" />
+                  <span className="text-xs font-black uppercase tracking-wider text-amber-400">
+                    Step 5 • Choose Variables &amp; Priority
+                  </span>
+                </div>
+                {/* 2-Var vs 3-Var Switcher */}
+                <div className="inline-flex rounded-lg border border-slate-800 bg-slate-950 p-0.5 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveStep(5);
+                      setUseThreeVars(false);
+                      syncGlobalWeights(1 - twoVarAlpha, twoVarAlpha, 0);
+                    }}
+                    className={`rounded px-2 py-0.5 font-bold transition ${
+                      !useThreeVars
+                        ? 'bg-amber-400 text-slate-950'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    2 Variables
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveStep(5);
+                      setUseThreeVars(true);
+                      syncGlobalWeights(
+                        splitX1,
+                        splitX2 - splitX1,
+                        1 - splitX2,
+                      );
+                    }}
+                    className={`rounded px-2 py-0.5 font-bold transition ${
+                      useThreeVars
+                        ? 'bg-amber-400 text-slate-950'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    3 Variables (3D Split)
+                  </button>
                 </div>
               </div>
-            ) : (
-              /* 3-VARIABLE SPLIT BAR WIDGET (Mayerowitz's `hu` 2-handle 3-color bar!) */
-              <div className="rounded-xl border border-slate-800 bg-slate-950/90 p-3 space-y-3">
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 text-xs">
-                  {/* Var 1 */}
-                  <div className="flex items-center gap-1 rounded border border-emerald-500/30 bg-emerald-500/10 p-1.5">
-                    <MiniWeightBar
-                      pct={priorityShares.w1 * 100}
-                      color="#10b981"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-mono text-[10px] font-bold text-emerald-400">
-                        {Math.round(priorityShares.w1 * 100)}% Weight
-                      </div>
+
+              <p className="text-xs text-slate-300 leading-relaxed mb-3">
+                Given your needs, put more{' '}
+                <span className="rounded bg-amber-400 px-1 font-bold text-slate-950">
+                  weight
+                </span>{' '}
+                on one statistic over the other to reveal the frontier GPU with
+                the highest value for you:
+              </p>
+
+              {!useThreeVars ? (
+                /* 2-VARIABLE TUG-OF-WAR PRIORITY WIDGET (Mayerowitz's `su` component) */
+                <div className="rounded-xl border border-slate-800 bg-slate-950/90 p-3 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    {/* Variable 1 */}
+                    <div className="flex items-center gap-1.5">
+                      <MiniWeightBar
+                        pct={priorityShares.w1 * 100}
+                        color="#10b981"
+                      />
+                      <span className="font-mono font-bold text-emerald-400">
+                        {Math.round(priorityShares.w1 * 100)}%
+                      </span>
                       <select
-                        aria-label="3-Var Priority 1"
+                        aria-label="Priority Variable 1"
                         value={xMetric}
-                        onChange={(e) =>
-                          isMetricKey(e.target.value) &&
-                          onSelectXMetric(e.target.value)
-                        }
-                        className="w-full bg-transparent font-bold text-emerald-200 text-[11px] focus:outline-none"
+                        onChange={(e) => {
+                          if (isMetricKey(e.target.value))
+                            onSelectXMetric(e.target.value);
+                          setActiveStep(5);
+                        }}
+                        className="rounded border border-emerald-500/40 bg-slate-900 px-2 py-1 font-bold text-emerald-300 focus:outline-none"
                       >
                         {ALL_METRIC_KEYS.map((k) => (
-                          <option
-                            key={k}
-                            value={k}
-                            className="bg-slate-900 text-white"
-                          >
+                          <option key={k} value={k}>
                             {METRIC_DEFINITIONS[k].shortLabel}
                           </option>
                         ))}
                       </select>
                     </div>
-                  </div>
 
-                  {/* Var 2 */}
-                  <div className="flex items-center gap-1 rounded border border-sky-500/30 bg-sky-500/10 p-1.5">
-                    <MiniWeightBar
-                      pct={priorityShares.w2 * 100}
-                      color="#38bdf8"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-mono text-[10px] font-bold text-sky-400">
-                        {Math.round(priorityShares.w2 * 100)}% Weight
-                      </div>
+                    <span className="text-[11px] font-bold text-slate-500">
+                      VS
+                    </span>
+
+                    {/* Variable 2 */}
+                    <div className="flex items-center gap-1.5">
+                      <MiniWeightBar
+                        pct={priorityShares.w2 * 100}
+                        color="#38bdf8"
+                      />
+                      <span className="font-mono font-bold text-sky-400">
+                        {Math.round(priorityShares.w2 * 100)}%
+                      </span>
                       <select
-                        aria-label="3-Var Priority 2"
+                        aria-label="Priority Variable 2"
                         value={yMetric}
-                        onChange={(e) =>
-                          isMetricKey(e.target.value) &&
-                          onSelectYMetric(e.target.value)
-                        }
-                        className="w-full bg-transparent font-bold text-sky-200 text-[11px] focus:outline-none"
+                        onChange={(e) => {
+                          if (isMetricKey(e.target.value))
+                            onSelectYMetric(e.target.value);
+                          setActiveStep(5);
+                        }}
+                        className="rounded border border-sky-500/40 bg-slate-900 px-2 py-1 font-bold text-sky-300 focus:outline-none"
                       >
                         {ALL_METRIC_KEYS.map((k) => (
-                          <option
-                            key={k}
-                            value={k}
-                            className="bg-slate-900 text-white"
-                          >
+                          <option key={k} value={k}>
                             {METRIC_DEFINITIONS[k].shortLabel}
                           </option>
                         ))}
@@ -1066,127 +1260,239 @@ export function SimpleParetoGuide({
                     </div>
                   </div>
 
-                  {/* Var 3 */}
-                  <div className="flex items-center gap-1 rounded border border-amber-500/30 bg-amber-500/10 p-1.5">
-                    <MiniWeightBar
-                      pct={priorityShares.w3 * 100}
-                      color="#fbbf24"
+                  {/* Single Tug-of-War Range Slider */}
+                  <div>
+                    <div className="relative h-3 w-full overflow-hidden rounded-full bg-slate-800 flex">
+                      <div
+                        className="h-full bg-emerald-500 transition-all duration-75"
+                        style={{ width: `${priorityShares.w1 * 100}%` }}
+                      />
+                      <div
+                        className="h-full bg-sky-400 transition-all duration-75"
+                        style={{ width: `${priorityShares.w2 * 100}%` }}
+                      />
+                    </div>
+                    <input
+                      type="range"
+                      aria-label="Balance priority between Variable 1 and Variable 2"
+                      min={0.05}
+                      max={0.95}
+                      step={0.05}
+                      value={twoVarAlpha}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setTwoVarAlpha(val);
+                        setActiveStep(5);
+                        syncGlobalWeights(1 - val, val, 0);
+                      }}
+                      className="-mt-3 w-full cursor-pointer accent-amber-400 relative z-10"
                     />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-mono text-[10px] font-bold text-amber-400">
-                        {Math.round(priorityShares.w3 * 100)}% Weight
+                    <div className="mt-1 flex justify-between text-[10px] text-slate-400">
+                      <span>← Favor {xDef.shortLabel}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTwoVarAlpha(0.5);
+                          syncGlobalWeights(0.5, 0.5, 0);
+                        }}
+                        className="text-amber-400 hover:underline font-semibold"
+                      >
+                        50 / 50 Balance
+                      </button>
+                      <span>Favor {yDef.shortLabel} →</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* 3-VARIABLE SPLIT BAR WIDGET (Mayerowitz's `hu` 2-handle 3-color bar!) */
+                <div className="rounded-xl border border-slate-800 bg-slate-950/90 p-3 space-y-3">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 text-xs">
+                    {/* Var 1 */}
+                    <div className="flex items-center gap-1 rounded border border-emerald-500/30 bg-emerald-500/10 p-1.5">
+                      <MiniWeightBar
+                        pct={priorityShares.w1 * 100}
+                        color="#10b981"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="font-mono text-[10px] font-bold text-emerald-400">
+                          {Math.round(priorityShares.w1 * 100)}% Weight
+                        </div>
+                        <select
+                          aria-label="3-Var Priority 1"
+                          value={xMetric}
+                          onChange={(e) =>
+                            isMetricKey(e.target.value) &&
+                            onSelectXMetric(e.target.value)
+                          }
+                          className="w-full bg-transparent font-bold text-emerald-200 text-[11px] focus:outline-none"
+                        >
+                          {ALL_METRIC_KEYS.map((k) => (
+                            <option
+                              key={k}
+                              value={k}
+                              className="bg-slate-900 text-white"
+                            >
+                              {METRIC_DEFINITIONS[k].shortLabel}
+                            </option>
+                          ))}
+                        </select>
                       </div>
-                      <select
-                        aria-label="3-Var Priority 3"
-                        value={zMetric}
-                        onChange={(e) =>
-                          isMetricKey(e.target.value) &&
-                          onSelectZMetric(e.target.value)
-                        }
-                        className="w-full bg-transparent font-bold text-amber-200 text-[11px] focus:outline-none"
-                      >
-                        {ALL_METRIC_KEYS.map((k) => (
-                          <option
-                            key={k}
-                            value={k}
-                            className="bg-slate-900 text-white"
-                          >
-                            {METRIC_DEFINITIONS[k].shortLabel}
-                          </option>
-                        ))}
-                      </select>
+                    </div>
+
+                    {/* Var 2 */}
+                    <div className="flex items-center gap-1 rounded border border-sky-500/30 bg-sky-500/10 p-1.5">
+                      <MiniWeightBar
+                        pct={priorityShares.w2 * 100}
+                        color="#38bdf8"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="font-mono text-[10px] font-bold text-sky-400">
+                          {Math.round(priorityShares.w2 * 100)}% Weight
+                        </div>
+                        <select
+                          aria-label="3-Var Priority 2"
+                          value={yMetric}
+                          onChange={(e) =>
+                            isMetricKey(e.target.value) &&
+                            onSelectYMetric(e.target.value)
+                          }
+                          className="w-full bg-transparent font-bold text-sky-200 text-[11px] focus:outline-none"
+                        >
+                          {ALL_METRIC_KEYS.map((k) => (
+                            <option
+                              key={k}
+                              value={k}
+                              className="bg-slate-900 text-white"
+                            >
+                              {METRIC_DEFINITIONS[k].shortLabel}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Var 3 */}
+                    <div className="flex items-center gap-1 rounded border border-amber-500/30 bg-amber-500/10 p-1.5">
+                      <MiniWeightBar
+                        pct={priorityShares.w3 * 100}
+                        color="#fbbf24"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="font-mono text-[10px] font-bold text-amber-400">
+                          {Math.round(priorityShares.w3 * 100)}% Weight
+                        </div>
+                        <select
+                          aria-label="3-Var Priority 3"
+                          value={zMetric}
+                          onChange={(e) =>
+                            isMetricKey(e.target.value) &&
+                            onSelectZMetric(e.target.value)
+                          }
+                          className="w-full bg-transparent font-bold text-amber-200 text-[11px] focus:outline-none"
+                        >
+                          {ALL_METRIC_KEYS.map((k) => (
+                            <option
+                              key={k}
+                              value={k}
+                              className="bg-slate-900 text-white"
+                            >
+                              {METRIC_DEFINITIONS[k].shortLabel}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3-Color Segmented Bar + 2 Divider Sliders */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="relative h-3.5 w-full overflow-hidden rounded-full flex border border-slate-700">
+                      <div
+                        className="h-full bg-emerald-500 transition-all duration-75"
+                        style={{ width: `${priorityShares.w1 * 100}%` }}
+                      />
+                      <div
+                        className="h-full bg-sky-400 transition-all duration-75"
+                        style={{ width: `${priorityShares.w2 * 100}%` }}
+                      />
+                      <div
+                        className="h-full bg-amber-400 transition-all duration-75"
+                        style={{ width: `${priorityShares.w3 * 100}%` }}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <div>
+                        <label className="block text-[10px] text-emerald-300 font-semibold mb-0.5">
+                          Divider 1 ({xDef.shortLabel} ↔ {yDef.shortLabel})
+                        </label>
+                        <input
+                          type="range"
+                          min={0.05}
+                          max={0.85}
+                          step={0.05}
+                          value={splitX1}
+                          onChange={(e) => {
+                            const v = Math.min(
+                              Number(e.target.value),
+                              splitX2 - 0.05,
+                            );
+                            setSplitX1(v);
+                            syncGlobalWeights(v, splitX2 - v, 1 - splitX2);
+                          }}
+                          className="w-full accent-emerald-400 cursor-pointer"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-amber-300 font-semibold mb-0.5">
+                          Divider 2 ({yDef.shortLabel} ↔ {zDef.shortLabel})
+                        </label>
+                        <input
+                          type="range"
+                          min={0.15}
+                          max={0.95}
+                          step={0.05}
+                          value={splitX2}
+                          onChange={(e) => {
+                            const v = Math.max(
+                              Number(e.target.value),
+                              splitX1 + 0.05,
+                            );
+                            setSplitX2(v);
+                            syncGlobalWeights(splitX1, v - splitX1, 1 - v);
+                          }}
+                          className="w-full accent-amber-400 cursor-pointer"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
+              )}
 
-                {/* 3-Color Segmented Bar + 2 Divider Sliders */}
-                <div className="space-y-1.5 pt-1">
-                  <div className="relative h-3.5 w-full overflow-hidden rounded-full flex border border-slate-700">
-                    <div
-                      className="h-full bg-emerald-500 transition-all duration-75"
-                      style={{ width: `${priorityShares.w1 * 100}%` }}
-                    />
-                    <div
-                      className="h-full bg-sky-400 transition-all duration-75"
-                      style={{ width: `${priorityShares.w2 * 100}%` }}
-                    />
-                    <div
-                      className="h-full bg-amber-400 transition-all duration-75"
-                      style={{ width: `${priorityShares.w3 * 100}%` }}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 pt-1">
-                    <div>
-                      <label className="block text-[10px] text-emerald-300 font-semibold mb-0.5">
-                        Divider 1 ({xDef.shortLabel} ↔ {yDef.shortLabel})
-                      </label>
-                      <input
-                        type="range"
-                        min={0.05}
-                        max={0.85}
-                        step={0.05}
-                        value={splitX1}
-                        onChange={(e) => {
-                          const v = Math.min(
-                            Number(e.target.value),
-                            splitX2 - 0.05,
-                          );
-                          setSplitX1(v);
-                          syncGlobalWeights(v, splitX2 - v, 1 - splitX2);
-                        }}
-                        className="w-full accent-emerald-400 cursor-pointer"
-                      />
+              {/* Instant Best Winner Callout Inside Card (Like Mayerowitz's `Best driver: { ... }`) */}
+              {bestChoice && (
+                <div className="mt-3 flex items-center justify-between rounded-xl border border-amber-400/50 bg-amber-500/15 px-3.5 py-2.5">
+                  <div>
+                    <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-300">
+                      <Award className="h-3.5 w-3.5" /> Best Match For Your
+                      Priorities
                     </div>
-                    <div>
-                      <label className="block text-[10px] text-amber-300 font-semibold mb-0.5">
-                        Divider 2 ({yDef.shortLabel} ↔ {zDef.shortLabel})
-                      </label>
-                      <input
-                        type="range"
-                        min={0.15}
-                        max={0.95}
-                        step={0.05}
-                        value={splitX2}
-                        onChange={(e) => {
-                          const v = Math.max(
-                            Number(e.target.value),
-                            splitX1 + 0.05,
-                          );
-                          setSplitX2(v);
-                          syncGlobalWeights(splitX1, v - splitX1, 1 - v);
-                        }}
-                        className="w-full accent-amber-400 cursor-pointer"
-                      />
+                    <div className="text-base font-extrabold text-white">
+                      {bestChoice.gpu.name}{' '}
+                      <span className="text-emerald-400">
+                        (${bestChoice.gpu.price})
+                      </span>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* Instant Best Winner Callout Inside Card (Like Mayerowitz's `Best driver: { ... }`) */}
-            {bestChoice && (
-              <div className="mt-3 flex items-center justify-between rounded-xl border border-amber-400/50 bg-amber-500/15 px-3.5 py-2.5">
-                <div>
-                  <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-300">
-                    <Award className="h-3.5 w-3.5" /> Best Match For Your
-                    Priorities
-                  </div>
-                  <div className="text-base font-extrabold text-white">
-                    {bestChoice.gpu.name}{' '}
-                    <span className="text-emerald-400">
-                      (${bestChoice.gpu.price})
+                  <div className="text-right">
+                    <span className="rounded-lg bg-amber-400 px-2.5 py-1 text-xs font-black text-slate-950">
+                      {bestChoice.matchPct.toFixed(0)}% Score
                     </span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="rounded-lg bg-amber-400 px-2.5 py-1 text-xs font-black text-slate-950">
-                    {bestChoice.matchPct.toFixed(0)}% Score
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* RIGHT COLUMN (7 cols): Interactive Graphic & Value Recommendations */}
