@@ -119,7 +119,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
   const [yaw, setYaw] = useState<number>(25);
   const [pitch, setPitch] = useState<number>(22);
   const [activePreset, setActivePreset] = useState<CameraPresetId | 'custom'>(
-    'iso'
+    'iso',
   );
   const [zoom, setZoom] = useState<number>(1.05);
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -185,7 +185,11 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
       const isBelowMargin = belowMarginSet.has(item.id);
       const isViewOptimal =
         item.isParetoOptimal &&
-        !(extrapolation.enabled && extrapolation.enforceAsTrap && isBelowMargin);
+        !(
+          extrapolation.enabled &&
+          extrapolation.enforceAsTrap &&
+          isBelowMargin
+        );
       map.set(item.id, { isViewOptimal, isBelowMargin });
     }
     return map;
@@ -197,7 +201,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
       gpus.find((g) => viewOptimalityMap.get(g.id)?.isViewOptimal) ??
       gpus[0] ??
       null,
-    [gpus, viewOptimalityMap]
+    [gpus, viewOptimalityMap],
   );
 
   // Compute padded min/max bounds so boundary GPUs (e.g. 8GB VRAM or $250 Price)
@@ -354,25 +358,13 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
           const cz = (zCoords[iz] + zCoords[iz + 1]) / 2;
 
           for (const g of optimalGpus) {
-            const domX = !useX
-              ? true
-              : xMinDir
-              ? cx > g.nx
-              : cx < g.nx;
+            const domX = !useX ? true : xMinDir ? cx > g.nx : cx < g.nx;
             if (!domX) continue;
 
-            const domY = !useY
-              ? true
-              : yMaxDir
-              ? cy < g.ny
-              : cy > g.ny;
+            const domY = !useY ? true : yMaxDir ? cy < g.ny : cy > g.ny;
             if (!domY) continue;
 
-            const domZ = !useZ
-              ? true
-              : zMaxDir
-              ? cz < g.nz
-              : cz > g.nz;
+            const domZ = !useZ ? true : zMaxDir ? cz < g.nz : cz > g.nz;
             if (domZ) return true;
           }
           return false;
@@ -501,17 +493,17 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
       const tx = projectPoint(
         Math.max(-1, Math.min(1, g.nx + dxTick)),
         g.ny,
-        g.nz
+        g.nz,
       );
       const ty = projectPoint(
         g.nx,
         Math.max(-1, Math.min(1, g.ny + dyTick)),
-        g.nz
+        g.nz,
       );
       const tz = projectPoint(
         g.nx,
         g.ny,
-        Math.max(-1, Math.min(1, g.nz + dzTick))
+        Math.max(-1, Math.min(1, g.nz + dzTick)),
       );
       return { id: g.id, origin, tx, ty, tz };
     });
@@ -633,7 +625,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
       setActivePreset('custom');
       setYaw(dragRef.current.startYaw - dx * 0.45);
       setPitch(
-        Math.max(-89, Math.min(89, dragRef.current.startPitch + dy * 0.35))
+        Math.max(-89, Math.min(89, dragRef.current.startPitch + dy * 0.35)),
       );
     }
   };
@@ -643,9 +635,8 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
   };
 
   const viewOptimalCount = useMemo(
-    () =>
-      gpus.filter((g) => viewOptimalityMap.get(g.id)?.isViewOptimal).length,
-    [gpus, viewOptimalityMap]
+    () => gpus.filter((g) => viewOptimalityMap.get(g.id)?.isViewOptimal).length,
+    [gpus, viewOptimalityMap],
   );
 
   const fmtVal = (def: typeof xDef, val: number) =>
@@ -706,7 +697,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
 
             {/* Quick buttons for remaining specs so user can check ANY axis with Base Money on Bottom-Left */}
             {ALL_METRIC_KEYS.filter(
-              (k) => k !== xMetric && k !== yMetric && k !== zMetric
+              (k) => k !== xMetric && k !== yMetric && k !== zMetric,
             ).map((otherKey) => (
               <button
                 key={otherKey}
@@ -799,7 +790,9 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
               <select
                 aria-label="Base Bottom-Left Axis Metric"
                 value={xMetric}
-                onChange={(e) => isMetricKey(e.target.value) && onChangeXMetric(e.target.value)}
+                onChange={(e) =>
+                  isMetricKey(e.target.value) && onChangeXMetric(e.target.value)
+                }
                 className="bg-transparent font-bold text-emerald-400 focus:outline-none cursor-pointer"
               >
                 {ALL_METRIC_KEYS.map((k) => (
@@ -825,7 +818,9 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
               <select
                 aria-label="Y-Vertical Axis Metric"
                 value={yMetric}
-                onChange={(e) => isMetricKey(e.target.value) && onChangeYMetric(e.target.value)}
+                onChange={(e) =>
+                  isMetricKey(e.target.value) && onChangeYMetric(e.target.value)
+                }
                 className="bg-transparent font-semibold text-sky-400 focus:outline-none cursor-pointer"
               >
                 {ALL_METRIC_KEYS.map((k) => (
@@ -850,7 +845,9 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
             <select
               aria-label="Z-Axis Metric"
               value={zMetric}
-              onChange={(e) => isMetricKey(e.target.value) && onChangeZMetric(e.target.value)}
+              onChange={(e) =>
+                isMetricKey(e.target.value) && onChangeZMetric(e.target.value)
+              }
               className="bg-transparent font-semibold text-purple-400 focus:outline-none cursor-pointer"
             >
               {ALL_METRIC_KEYS.map((k) => (
@@ -866,7 +863,9 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
 
             <span className="text-slate-600">|</span>
             <span className="text-emerald-300 font-medium">
-              {viewAxes.map((a) => METRIC_DEFINITIONS[a].shortLabel).join(' × ')}{' '}
+              {viewAxes
+                .map((a) => METRIC_DEFINITIONS[a].shortLabel)
+                .join(' × ')}{' '}
               ({viewOptimalCount} Optimal)
             </span>
           </div>
@@ -909,10 +908,10 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
             edge.role === 'x-base'
               ? '#10b981'
               : edge.role === 'y-axis'
-              ? '#38bdf8'
-              : edge.role === 'z-axis'
-              ? '#c084fc'
-              : '#1e293b';
+                ? '#38bdf8'
+                : edge.role === 'z-axis'
+                  ? '#c084fc'
+                  : '#1e293b';
           const width = edge.role === 'frame' ? 1 : 2.2;
           return (
             <line
@@ -1090,16 +1089,16 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
           const fillUrl = isWinner
             ? 'url(#winnerGrad)'
             : isViewOptimal
-            ? 'url(#optimalGrad)'
-            : 'url(#trapGrad)';
+              ? 'url(#optimalGrad)'
+              : 'url(#trapGrad)';
 
           const strokeColor = isWinner
             ? '#fef08a'
             : isHovered || isSelected
-            ? '#ffffff'
-            : isViewOptimal
-            ? '#34d399'
-            : '#fb7185';
+              ? '#ffffff'
+              : isViewOptimal
+                ? '#34d399'
+                : '#fb7185';
 
           return (
             <g
@@ -1119,8 +1118,8 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
                   isWinner
                     ? 'rgba(245, 158, 11, 0.55)'
                     : isViewOptimal
-                    ? 'rgba(16, 185, 129, 0.35)'
-                    : 'rgba(244, 63, 94, 0.22)'
+                      ? 'rgba(16, 185, 129, 0.35)'
+                      : 'rgba(244, 63, 94, 0.22)'
                 }
                 strokeWidth={isHovered || isWinner ? 1.8 : 0.9}
                 strokeDasharray="2 2"
@@ -1131,11 +1130,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
                 rx={3}
                 ry={1.5}
                 fill={
-                  isWinner
-                    ? '#f59e0b'
-                    : isViewOptimal
-                    ? '#10b981'
-                    : '#f43f5e'
+                  isWinner ? '#f59e0b' : isViewOptimal ? '#10b981' : '#f43f5e'
                 }
                 opacity={0.4}
               />
@@ -1156,11 +1151,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
                 x={pos.screenX}
                 y={pos.screenY - radius - 5}
                 fill={
-                  isWinner
-                    ? '#fbbf24'
-                    : isViewOptimal
-                    ? '#f1f5f9'
-                    : '#94a3b8'
+                  isWinner ? '#fbbf24' : isViewOptimal ? '#f1f5f9' : '#94a3b8'
                 }
                 fontSize={isWinner || isHovered ? '11.5' : '9.5'}
                 fontWeight={isWinner || isViewOptimal ? '700' : '500'}

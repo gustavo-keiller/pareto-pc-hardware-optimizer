@@ -96,7 +96,12 @@ export const KNOWN_GPU_BENCHMARKS: KnownGpuBenchmark[] = [
     rasterFps1440p: 138,
     rtFps1440p: 110,
     tdpWatts: 320,
-    aliases: ['rtx 4080 super', 'geforce rtx 4080 super', 'rtx4080 super', 'rtx4080super'],
+    aliases: [
+      'rtx 4080 super',
+      'geforce rtx 4080 super',
+      'rtx4080 super',
+      'rtx4080super',
+    ],
   },
   {
     chip: 'RTX 4080',
@@ -116,7 +121,12 @@ export const KNOWN_GPU_BENCHMARKS: KnownGpuBenchmark[] = [
     rasterFps1440p: 124,
     rtFps1440p: 96,
     tdpWatts: 285,
-    aliases: ['rtx 4070 ti super', 'geforce rtx 4070 ti super', 'rtx4070ti super', 'rtx 4070ti super'],
+    aliases: [
+      'rtx 4070 ti super',
+      'geforce rtx 4070 ti super',
+      'rtx4070ti super',
+      'rtx 4070ti super',
+    ],
   },
   {
     chip: 'RTX 4070 Ti',
@@ -136,7 +146,12 @@ export const KNOWN_GPU_BENCHMARKS: KnownGpuBenchmark[] = [
     rasterFps1440p: 108,
     rtFps1440p: 80,
     tdpWatts: 220,
-    aliases: ['rtx 4070 super', 'geforce rtx 4070 super', 'rtx4070 super', 'rtx4070super'],
+    aliases: [
+      'rtx 4070 super',
+      'geforce rtx 4070 super',
+      'rtx4070 super',
+      'rtx4070super',
+    ],
   },
   {
     chip: 'RTX 4070',
@@ -166,7 +181,13 @@ export const KNOWN_GPU_BENCHMARKS: KnownGpuBenchmark[] = [
     rasterFps1440p: 78,
     rtFps1440p: 55,
     tdpWatts: 160,
-    aliases: ['rtx 4060 ti', 'geforce rtx 4060 ti', 'rtx4060ti', 'rtx 4060ti', '4060 ti'],
+    aliases: [
+      'rtx 4060 ti',
+      'geforce rtx 4060 ti',
+      'rtx4060ti',
+      'rtx 4060ti',
+      '4060 ti',
+    ],
   },
   {
     chip: 'RTX 4060',
@@ -290,7 +311,14 @@ export const KNOWN_GPU_BENCHMARKS: KnownGpuBenchmark[] = [
     rasterFps1440p: 34,
     rtFps1440p: 0,
     tdpWatts: 125,
-    aliases: ['gtx 1660 super', 'gtx 1660s', '1660 super', '1660s', 'gtx1660s', 'gtx1660 super'],
+    aliases: [
+      'gtx 1660 super',
+      'gtx 1660s',
+      '1660 super',
+      '1660s',
+      'gtx1660s',
+      'gtx1660 super',
+    ],
   },
   {
     chip: 'GTX 1660',

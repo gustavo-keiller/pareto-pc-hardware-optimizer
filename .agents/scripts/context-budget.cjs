@@ -57,7 +57,9 @@ function lastContextTokens(transcript) {
 }
 
 function ageHours(transcript) {
-  const first = parseLines(readSlice(transcript, 0, HEAD_BYTES)).find((r) => r.timestamp);
+  const first = parseLines(readSlice(transcript, 0, HEAD_BYTES)).find(
+    (r) => r.timestamp,
+  );
   return first ? (Date.now() - Date.parse(first.timestamp)) / 36e5 : 0;
 }
 
@@ -70,7 +72,10 @@ function main(payload) {
   if (!transcript || !sessionId || !fs.existsSync(transcript)) return;
 
   const stateDir = path.join(os.tmpdir(), 'claude-context-budget');
-  const stateFile = path.join(stateDir, `${sessionId.replace(/[^\w-]/g, '')}.json`);
+  const stateFile = path.join(
+    stateDir,
+    `${sessionId.replace(/[^\w-]/g, '')}.json`,
+  );
   let state = { context: 0, age: 0 };
   try {
     state = { ...state, ...JSON.parse(fs.readFileSync(stateFile, 'utf8')) };
@@ -87,7 +92,7 @@ function main(payload) {
   if (contextBand > state.context) {
     notes.push(
       `Context is at ${Math.round(tokens / 1000)}K tokens, and every message re-sends all of it ` +
-        `(auto-compaction at 300K).`
+        `(auto-compaction at 300K).`,
     );
   }
   if (ageBand > state.age) {
@@ -97,12 +102,12 @@ function main(payload) {
   fs.mkdirSync(stateDir, { recursive: true });
   fs.writeFileSync(
     stateFile,
-    JSON.stringify({ context: contextBand, age: Math.max(ageBand, state.age) })
+    JSON.stringify({ context: contextBand, age: Math.max(ageBand, state.age) }),
   );
 
   if (notes.length > 0) {
     notes.push(
-      'Switching tasks? Start a new session. Unfinished work: ask for a handoff first (handoff skill).'
+      'Switching tasks? Start a new session. Unfinished work: ask for a handoff first (handoff skill).',
     );
     process.stdout.write(JSON.stringify({ systemMessage: notes.join(' ') }));
   }

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Optimize complex layout regions per modern-web-guidance: interactions-in-complex-layouts */
 .dashboard-region {

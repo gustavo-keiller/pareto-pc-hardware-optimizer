@@ -25,11 +25,7 @@ export interface GpuCandidate {
 }
 
 export type MetricKey =
-  | 'price'
-  | 'rasterFps1440p'
-  | 'rtFps1440p'
-  | 'vramGb'
-  | 'tdpWatts';
+  'price' | 'rasterFps1440p' | 'rtFps1440p' | 'vramGb' | 'tdpWatts';
 
 export type OptimizationDirection = 'min' | 'max';
 

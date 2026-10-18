@@ -28,7 +28,7 @@ interface SimpleParetoGuideProps {
   gpus: RankedGpu[];
   constraints: HardConstraints;
   onChangeConstraints: (
-    updater: (prev: HardConstraints) => HardConstraints
+    updater: (prev: HardConstraints) => HardConstraints,
   ) => void;
   xMetric: MetricKey;
   yMetric: MetricKey;
@@ -37,7 +37,9 @@ interface SimpleParetoGuideProps {
   onSelectYMetric: (m: MetricKey) => void;
   onSelectZMetric: (m: MetricKey) => void;
   weights: PreferenceWeights;
-  onChangeWeights: (updater: (prev: PreferenceWeights) => PreferenceWeights) => void;
+  onChangeWeights: (
+    updater: (prev: PreferenceWeights) => PreferenceWeights,
+  ) => void;
   selectedGpuIds: string[];
   onToggleSelectGpu: (id: string) => void;
   onSwitchToExplorer: () => void;
@@ -60,13 +62,7 @@ function toStoryStep(n: number): StoryStep {
 /**
  * Vertical fill meter displaying normalized weight share.
  */
-function MiniWeightBar({
-  pct,
-  color,
-}: {
-  pct: number;
-  color: string;
-}) {
+function MiniWeightBar({ pct, color }: { pct: number; color: string }) {
   const clamped = Math.max(0, Math.min(100, pct));
   return (
     <span
@@ -125,7 +121,7 @@ function computeDirectionalUtility(
   gpu: RankedGpu,
   metric: MetricKey,
   minVal: number,
-  maxVal: number
+  maxVal: number,
 ): number {
   const dir = METRIC_DEFINITIONS[metric].direction;
   const val = gpu[metric];
@@ -195,12 +191,12 @@ export function SimpleParetoGuide({
   // Separate 2D frontier GPUs vs 2D dominated traps
   const frontier2DGpus = useMemo(
     () => gpus.filter((g) => pareto2DMap.get(g.id)?.isParetoOptimal),
-    [gpus, pareto2DMap]
+    [gpus, pareto2DMap],
   );
 
   const dominated2DGpus = useMemo(
     () => gpus.filter((g) => !pareto2DMap.get(g.id)?.isParetoOptimal),
-    [gpus, pareto2DMap]
+    [gpus, pareto2DMap],
   );
 
   // Step 1 Leader: Best GPU on yMetric alone
@@ -209,7 +205,7 @@ export function SimpleParetoGuide({
     const sorted = [...gpus].sort((a, b) =>
       yDef.direction === 'min'
         ? a[yMetric] - b[yMetric]
-        : b[yMetric] - a[yMetric]
+        : b[yMetric] - a[yMetric],
     );
     return sorted[0];
   }, [gpus, yMetric, yDef.direction]);
@@ -285,7 +281,7 @@ export function SimpleParetoGuide({
   // Restricted to Pareto-optimal candidates on the active objectives so dominated traps never win!
   const rankedFrontierChoices = useMemo(() => {
     const candidates = gpus.filter(
-      (g) => paretoActiveMap.get(g.id)?.isParetoOptimal
+      (g) => paretoActiveMap.get(g.id)?.isParetoOptimal,
     );
     const pool = candidates.length > 0 ? candidates : gpus;
 
@@ -294,19 +290,19 @@ export function SimpleParetoGuide({
         gpu,
         xMetric,
         bounds.x.min,
-        bounds.x.max
+        bounds.x.max,
       );
       const uy = computeDirectionalUtility(
         gpu,
         yMetric,
         bounds.y.min,
-        bounds.y.max
+        bounds.y.max,
       );
       const uz = computeDirectionalUtility(
         gpu,
         zMetric,
         bounds.z.min,
-        bounds.z.max
+        bounds.z.max,
       );
 
       const logUtility = useThreeVars
@@ -379,9 +375,7 @@ export function SimpleParetoGuide({
   // Build 2D Pareto Frontier Staircase SVG path
   const frontierStaircasePath = useMemo(() => {
     if (frontier2DGpus.length === 0) return '';
-    const sorted = [...frontier2DGpus].sort(
-      (a, b) => a[xMetric] - b[xMetric]
-    );
+    const sorted = [...frontier2DGpus].sort((a, b) => a[xMetric] - b[xMetric]);
     const pts: string[] = [];
     for (let i = 0; i < sorted.length; i++) {
       const sx = toScreenX(sorted[i][xMetric]);
@@ -390,7 +384,9 @@ export function SimpleParetoGuide({
         pts.push(`M ${sx.toFixed(1)} ${sy.toFixed(1)}`);
       } else {
         // Horizontal then vertical step
-        pts.push(`L ${sx.toFixed(1)} ${toScreenY(sorted[i - 1][yMetric]).toFixed(1)}`);
+        pts.push(
+          `L ${sx.toFixed(1)} ${toScreenY(sorted[i - 1][yMetric]).toFixed(1)}`,
+        );
         pts.push(`L ${sx.toFixed(1)} ${sy.toFixed(1)}`);
       }
     }
@@ -434,18 +430,25 @@ export function SimpleParetoGuide({
       if (sy < padT - 10 || sy > padT + plotH + 10) continue;
 
       pathSegments.push(
-        `${pathSegments.length === 0 ? 'M' : 'L'} ${sx.toFixed(1)} ${sy.toFixed(1)}`
+        `${pathSegments.length === 0 ? 'M' : 'L'} ${sx.toFixed(1)} ${sy.toFixed(1)}`,
       );
     }
     return pathSegments.join(' ');
-  }, [bestChoice, activeStep, priorityShares, bounds, xDef.direction, yDef.direction]);
+  }, [
+    bestChoice,
+    activeStep,
+    priorityShares,
+    bounds,
+    xDef.direction,
+    yDef.direction,
+  ]);
 
   // X and Y ticks
   const xTicks = useMemo(() => {
     const count = 5;
     const span = bounds.x.max - bounds.x.min || 1;
     return Array.from({ length: count + 1 }, (_, i) =>
-      Math.round(bounds.x.min + (i / count) * span)
+      Math.round(bounds.x.min + (i / count) * span),
     );
   }, [bounds.x]);
 
@@ -453,13 +456,13 @@ export function SimpleParetoGuide({
     const count = 4;
     const span = bounds.y.max - bounds.y.min || 1;
     return Array.from({ length: count + 1 }, (_, i) =>
-      Math.round(bounds.y.min + (i / count) * span)
+      Math.round(bounds.y.min + (i / count) * span),
     );
   }, [bounds.y]);
 
   const hoveredGpu = useMemo(
     () => gpus.find((g) => g.id === hoveredId) ?? null,
-    [gpus, hoveredId]
+    [gpus, hoveredId],
   );
 
   return (
@@ -478,8 +481,8 @@ export function SimpleParetoGuide({
               </span>
             </div>
             <p className="mt-1 text-xs text-slate-400">
-              New to PC building? Follow Steps 1 to 4 to see how economists
-              and smart buyers eliminate overpriced hardware traps, or use{' '}
+              New to PC building? Follow Steps 1 to 4 to see how economists and
+              smart buyers eliminate overpriced hardware traps, or use{' '}
               <strong className="text-amber-300">
                 Step 5 (Priority Matcher)
               </strong>{' '}
@@ -586,7 +589,8 @@ export function SimpleParetoGuide({
                 value={yMetric}
                 onChange={(e) => {
                   e.stopPropagation();
-                  if (isMetricKey(e.target.value)) onSelectYMetric(e.target.value);
+                  if (isMetricKey(e.target.value))
+                    onSelectYMetric(e.target.value);
                   setActiveStep(1);
                 }}
                 className="mx-1 rounded border border-amber-400/50 bg-slate-950 px-2 py-0.5 font-bold text-amber-300 focus:outline-none"
@@ -601,13 +605,10 @@ export function SimpleParetoGuide({
               <strong className="text-emerald-400">
                 {step1Leader?.name ?? 'the flagship GPU'}
               </strong>{' '}
-              (
-              {step1Leader
-                ? `${step1Leader[yMetric]} ${yDef.unit}`
-                : ''}{' '}
-              for ${step1Leader?.price}) is the obvious pick. But looking at
-              only one specification ignores price and power consumption, which
-              is how buyers overspend by hundreds of dollars.
+              ({step1Leader ? `${step1Leader[yMetric]} ${yDef.unit}` : ''} for $
+              {step1Leader?.price}) is the obvious pick. But looking at only one
+              specification ignores price and power consumption, which is how
+              buyers overspend by hundreds of dollars.
             </p>
           </div>
 
@@ -631,17 +632,19 @@ export function SimpleParetoGuide({
               )}
             </div>
             <p className="text-sm leading-relaxed text-slate-200">
-              Smart shoppers never evaluate performance in isolation. You have to balance{' '}
+              Smart shoppers never evaluate performance in isolation. You have
+              to balance{' '}
               <span className="italic text-sky-300">{yDef.shortLabel}</span>{' '}
               against{' '}
-              <span className="italic text-emerald-300">{xDef.shortLabel}</span>.
-              Finding the right card means making a clear trade-off between{' '}
+              <span className="italic text-emerald-300">{xDef.shortLabel}</span>
+              . Finding the right card means making a clear trade-off between{' '}
               <select
                 aria-label="Trade-off Variable 1"
                 value={xMetric}
                 onChange={(e) => {
                   e.stopPropagation();
-                  if (isMetricKey(e.target.value)) onSelectXMetric(e.target.value);
+                  if (isMetricKey(e.target.value))
+                    onSelectXMetric(e.target.value);
                   setActiveStep(2);
                 }}
                 className="my-1 rounded border border-emerald-400/50 bg-slate-950 px-2 py-0.5 font-bold text-emerald-300 focus:outline-none"
@@ -662,7 +665,8 @@ export function SimpleParetoGuide({
                 value={yMetric}
                 onChange={(e) => {
                   e.stopPropagation();
-                  if (isMetricKey(e.target.value)) onSelectYMetric(e.target.value);
+                  if (isMetricKey(e.target.value))
+                    onSelectYMetric(e.target.value);
                   setActiveStep(2);
                 }}
                 className="my-1 rounded border border-sky-400/50 bg-slate-950 px-2 py-0.5 font-bold text-sky-300 focus:outline-none"
@@ -714,7 +718,8 @@ export function SimpleParetoGuide({
                   }}
                   className="rounded border border-rose-500/40 bg-rose-500/15 px-2 py-0.5 text-[11px] font-bold text-rose-200 hover:bg-rose-500/25"
                 >
-                  Inspect Next Bad Deal ({(trapSpotlightIdx % dominated2DGpus.length) + 1}/
+                  Inspect Next Bad Deal (
+                  {(trapSpotlightIdx % dominated2DGpus.length) + 1}/
                   {dominated2DGpus.length}) →
                 </button>
               )}
@@ -722,10 +727,13 @@ export function SimpleParetoGuide({
             {spotlightTrap ? (
               <div className="text-sm leading-relaxed text-slate-200 space-y-1.5">
                 <p>
-                  Some graphics cards on retail shelves are strictly worse than competitors.
-                  In economics and decision theory, these are called{' '}
-                  <strong className="text-rose-400 font-bold">strictly dominated traps</strong>.
-                  For example, look at{' '}
+                  Some graphics cards on retail shelves are strictly worse than
+                  competitors. In economics and decision theory, these are
+                  called{' '}
+                  <strong className="text-rose-400 font-bold">
+                    strictly dominated traps
+                  </strong>
+                  . For example, look at{' '}
                   <span className="rounded bg-rose-500/20 px-1.5 py-0.5 font-bold text-rose-300 border border-rose-500/30">
                     {spotlightTrap.name} (${spotlightTrap.price})
                   </span>
@@ -755,8 +763,11 @@ export function SimpleParetoGuide({
                 ))}
                 <p className="text-xs text-slate-400 italic">
                   Smart buyer rule: Skip{' '}
-                  <strong className="text-rose-300">{spotlightTrap.name}</strong>{' '}
-                  — you get higher performance for less money with the alternatives above.
+                  <strong className="text-rose-300">
+                    {spotlightTrap.name}
+                  </strong>{' '}
+                  — you get higher performance for less money with the
+                  alternatives above.
                 </p>
               </div>
             ) : (
@@ -814,7 +825,8 @@ export function SimpleParetoGuide({
               <strong className="text-emerald-400">
                 {frontier2DGpus.length} most efficient options
               </strong>
-              . Every card on this line delivers the maximum performance at its price bracket.
+              . Every card on this line delivers the maximum performance at its
+              price bracket.
             </p>
           </div>
 
@@ -858,11 +870,7 @@ export function SimpleParetoGuide({
                     e.stopPropagation();
                     setActiveStep(5);
                     setUseThreeVars(true);
-                    syncGlobalWeights(
-                      splitX1,
-                      splitX2 - splitX1,
-                      1 - splitX2
-                    );
+                    syncGlobalWeights(splitX1, splitX2 - splitX1, 1 - splitX2);
                   }}
                   className={`rounded px-2 py-0.5 font-bold transition ${
                     useThreeVars
@@ -901,7 +909,8 @@ export function SimpleParetoGuide({
                       aria-label="Priority Variable 1"
                       value={xMetric}
                       onChange={(e) => {
-                        if (isMetricKey(e.target.value)) onSelectXMetric(e.target.value);
+                        if (isMetricKey(e.target.value))
+                          onSelectXMetric(e.target.value);
                         setActiveStep(5);
                       }}
                       className="rounded border border-emerald-500/40 bg-slate-900 px-2 py-1 font-bold text-emerald-300 focus:outline-none"
@@ -931,7 +940,8 @@ export function SimpleParetoGuide({
                       aria-label="Priority Variable 2"
                       value={yMetric}
                       onChange={(e) => {
-                        if (isMetricKey(e.target.value)) onSelectYMetric(e.target.value);
+                        if (isMetricKey(e.target.value))
+                          onSelectYMetric(e.target.value);
                         setActiveStep(5);
                       }}
                       className="rounded border border-sky-500/40 bg-slate-900 px-2 py-1 font-bold text-sky-300 focus:outline-none"
@@ -1006,7 +1016,8 @@ export function SimpleParetoGuide({
                         aria-label="3-Var Priority 1"
                         value={xMetric}
                         onChange={(e) =>
-                          isMetricKey(e.target.value) && onSelectXMetric(e.target.value)
+                          isMetricKey(e.target.value) &&
+                          onSelectXMetric(e.target.value)
                         }
                         className="w-full bg-transparent font-bold text-emerald-200 text-[11px] focus:outline-none"
                       >
@@ -1037,7 +1048,8 @@ export function SimpleParetoGuide({
                         aria-label="3-Var Priority 2"
                         value={yMetric}
                         onChange={(e) =>
-                          isMetricKey(e.target.value) && onSelectYMetric(e.target.value)
+                          isMetricKey(e.target.value) &&
+                          onSelectYMetric(e.target.value)
                         }
                         className="w-full bg-transparent font-bold text-sky-200 text-[11px] focus:outline-none"
                       >
@@ -1068,7 +1080,8 @@ export function SimpleParetoGuide({
                         aria-label="3-Var Priority 3"
                         value={zMetric}
                         onChange={(e) =>
-                          isMetricKey(e.target.value) && onSelectZMetric(e.target.value)
+                          isMetricKey(e.target.value) &&
+                          onSelectZMetric(e.target.value)
                         }
                         className="w-full bg-transparent font-bold text-amber-200 text-[11px] focus:outline-none"
                       >
@@ -1117,7 +1130,7 @@ export function SimpleParetoGuide({
                         onChange={(e) => {
                           const v = Math.min(
                             Number(e.target.value),
-                            splitX2 - 0.05
+                            splitX2 - 0.05,
                           );
                           setSplitX1(v);
                           syncGlobalWeights(v, splitX2 - v, 1 - splitX2);
@@ -1138,7 +1151,7 @@ export function SimpleParetoGuide({
                         onChange={(e) => {
                           const v = Math.max(
                             Number(e.target.value),
-                            splitX1 + 0.05
+                            splitX1 + 0.05,
                           );
                           setSplitX2(v);
                           syncGlobalWeights(splitX1, v - splitX1, 1 - v);
@@ -1156,7 +1169,8 @@ export function SimpleParetoGuide({
               <div className="mt-3 flex items-center justify-between rounded-xl border border-amber-400/50 bg-amber-500/15 px-3.5 py-2.5">
                 <div>
                   <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-300">
-                    <Award className="h-3.5 w-3.5" /> Best Match For Your Priorities
+                    <Award className="h-3.5 w-3.5" /> Best Match For Your
+                    Priorities
                   </div>
                   <div className="text-base font-extrabold text-white">
                     {bestChoice.gpu.name}{' '}
@@ -1186,19 +1200,19 @@ export function SimpleParetoGuide({
                   {activeStep === 1
                     ? `Step 1: Single-Metric Ranking by ${yDef.shortLabel}`
                     : activeStep === 2
-                    ? `Step 2: Trade-Off Between ${xDef.shortLabel} & ${yDef.shortLabel}`
-                    : activeStep === 3
-                    ? `Step 3: Why ${spotlightTrap?.name ?? 'a Bad Deal'} Is Strictly Dominated`
-                    : activeStep === 4
-                    ? `Step 4: The Value Frontier (${frontier2DGpus.length} Efficient Options)`
-                    : `Step 5: Value Trade-Off Curve & Top Recommendations`}
+                      ? `Step 2: Trade-Off Between ${xDef.shortLabel} & ${yDef.shortLabel}`
+                      : activeStep === 3
+                        ? `Step 3: Why ${spotlightTrap?.name ?? 'a Bad Deal'} Is Strictly Dominated`
+                        : activeStep === 4
+                          ? `Step 4: The Value Frontier (${frontier2DGpus.length} Efficient Options)`
+                          : `Step 5: Value Trade-Off Curve & Top Recommendations`}
                 </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">
                   {activeStep === 1
                     ? 'When you only look at 1 metric, every GPU sits on a single line.'
                     : activeStep === 5
-                    ? 'Drag the priority slider on the left to balance what matters most to your setup.'
-                    : 'Green points sit on the Value Frontier. Red points are bad deals beaten on both axes.'}
+                      ? 'Drag the priority slider on the left to balance what matters most to your setup.'
+                      : 'Green points sit on the Value Frontier. Red points are bad deals beaten on both axes.'}
                 </p>
               </div>
 
@@ -1207,9 +1221,7 @@ export function SimpleParetoGuide({
                 <button
                   type="button"
                   disabled={activeStep === 1}
-                  onClick={() =>
-                    setActiveStep((s) => toStoryStep(s - 1))
-                  }
+                  onClick={() => setActiveStep((s) => toStoryStep(s - 1))}
                   className="inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs font-semibold text-slate-300 hover:text-white disabled:opacity-40"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" /> Prev
@@ -1217,9 +1229,7 @@ export function SimpleParetoGuide({
                 <button
                   type="button"
                   disabled={activeStep === 5}
-                  onClick={() =>
-                    setActiveStep((s) => toStoryStep(s + 1))
-                  }
+                  onClick={() => setActiveStep((s) => toStoryStep(s + 1))}
                   className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/15 px-2.5 py-1 text-xs font-bold text-amber-300 hover:bg-amber-500/25 disabled:opacity-40"
                 >
                   Next <ArrowRight className="h-3.5 w-3.5" />
@@ -1427,7 +1437,10 @@ export function SimpleParetoGuide({
                       stroke="#f59e0b"
                       strokeWidth={2.5}
                     />
-                    <text dy="-6" className="fill-amber-300 text-[11px] font-bold">
+                    <text
+                      dy="-6"
+                      className="fill-amber-300 text-[11px] font-bold"
+                    >
                       <textPath
                         href="#pareto-isoutility-curve"
                         startOffset="12%"
@@ -1469,16 +1482,15 @@ export function SimpleParetoGuide({
                   // Opacity based on step focus
                   let opacity = 0.9;
                   if (activeStep === 3) {
-                    opacity =
-                      isSpotlightTrap || isSpotlightDom ? 1.0 : 0.18;
+                    opacity = isSpotlightTrap || isSpotlightDom ? 1.0 : 0.18;
                   } else if (activeStep === 4) {
                     opacity = is2DFrontier ? 1.0 : 0.25;
                   } else if (activeStep === 5) {
                     opacity = isBestWinner
                       ? 1.0
                       : isActiveFrontier
-                      ? 0.92
-                      : 0.22;
+                        ? 0.92
+                        : 0.22;
                   }
 
                   // Node color & radius
@@ -1535,7 +1547,9 @@ export function SimpleParetoGuide({
                         r={radius}
                         fill={fill}
                         stroke={stroke}
-                        strokeWidth={isBestWinner || isSpotlightTrap ? 2.5 : 1.5}
+                        strokeWidth={
+                          isBestWinner || isSpotlightTrap ? 2.5 : 1.5
+                        }
                         filter={
                           isBestWinner || isStep1Top
                             ? 'url(#pareto-gold-glow)'
@@ -1551,11 +1565,13 @@ export function SimpleParetoGuide({
                             isBestWinner || isStep1Top
                               ? 'fill-amber-300'
                               : isSpotlightTrap
-                              ? 'fill-rose-300'
-                              : 'fill-slate-200'
+                                ? 'fill-rose-300'
+                                : 'fill-slate-200'
                           }`}
                         >
-                          {gpu.name.replace('GeForce ', '').replace('Radeon ', '')}{' '}
+                          {gpu.name
+                            .replace('GeForce ', '')
+                            .replace('Radeon ', '')}{' '}
                           (${gpu.price})
                         </text>
                       )}
@@ -1569,12 +1585,20 @@ export function SimpleParetoGuide({
                 <div className="absolute bottom-3 right-3 rounded-xl border border-slate-700 bg-slate-900/95 px-3 py-2 text-xs shadow-xl backdrop-blur-md">
                   <div className="font-bold text-white">
                     {hoveredGpu.name}{' '}
-                    <span className="text-emerald-400">${hoveredGpu.price}</span>
+                    <span className="text-emerald-400">
+                      ${hoveredGpu.price}
+                    </span>
                   </div>
                   <div className="text-[11px] text-slate-300">
-                    {xDef.shortLabel}: <strong>{hoveredGpu[xMetric]} {xDef.unit}</strong> •{' '}
-                    {yDef.shortLabel}: <strong>{hoveredGpu[yMetric]} {yDef.unit}</strong> •{' '}
-                    VRAM: <strong>{hoveredGpu.vramGb} GB</strong>
+                    {xDef.shortLabel}:{' '}
+                    <strong>
+                      {hoveredGpu[xMetric]} {xDef.unit}
+                    </strong>{' '}
+                    • {yDef.shortLabel}:{' '}
+                    <strong>
+                      {hoveredGpu[yMetric]} {yDef.unit}
+                    </strong>{' '}
+                    • VRAM: <strong>{hoveredGpu.vramGb} GB</strong>
                   </div>
                 </div>
               )}
@@ -1592,8 +1616,11 @@ export function SimpleParetoGuide({
                   </h3>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Ranked along the Value Frontier using your selected variables (
-                  <strong className="text-emerald-300">{xDef.shortLabel}</strong>
+                  Ranked along the Value Frontier using your selected variables
+                  (
+                  <strong className="text-emerald-300">
+                    {xDef.shortLabel}
+                  </strong>
                   , <strong className="text-sky-300">{yDef.shortLabel}</strong>
                   {useThreeVars ? (
                     <>
@@ -1640,9 +1667,10 @@ export function SimpleParetoGuide({
               {topThreeChoices.map((item, idx) => {
                 const { gpu, matchPct, ux, uy, uz } = item;
                 const isSelected = selectedGpuIds.includes(gpu.id);
-                const fpsPer100Usd = ((gpu.rasterFps1440p / gpu.price) * 100).toFixed(
-                  1
-                );
+                const fpsPer100Usd = (
+                  (gpu.rasterFps1440p / gpu.price) *
+                  100
+                ).toFixed(1);
 
                 return (
                   <div
@@ -1661,16 +1689,16 @@ export function SimpleParetoGuide({
                             idx === 0
                               ? 'bg-amber-400 text-slate-950'
                               : idx === 1
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                              : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
                           }`}
                         >
                           {idx === 0 && <Award className="h-3 w-3" />}
                           {idx === 0
                             ? '#1 Top Pick'
                             : idx === 1
-                            ? '#2 Runner-Up'
-                            : '#3 Value Pick'}
+                              ? '#2 Runner-Up'
+                              : '#3 Value Pick'}
                         </span>
                         <span className="font-mono text-xs font-bold text-amber-300">
                           {matchPct.toFixed(0)}% Match

@@ -29,14 +29,18 @@ function checkAgentsMdCap() {
   }
   const len = fs.readFileSync(agentsPath, 'utf-8').length;
   if (len > MAX_AGENTS_MD_CHARS) {
-    errors.push(`AGENTS.md is ${len} chars (max allowed: ${MAX_AGENTS_MD_CHARS})`);
+    errors.push(
+      `AGENTS.md is ${len} chars (max allowed: ${MAX_AGENTS_MD_CHARS})`,
+    );
   }
 }
 
 function checkSkillsAndStubs() {
   const skillsDir = path.join(ROOT, '.agents', 'skills');
   const routerPath = path.join(skillsDir, 'skill-library', 'SKILL.md');
-  const routerText = fs.existsSync(routerPath) ? fs.readFileSync(routerPath, 'utf-8') : '';
+  const routerText = fs.existsSync(routerPath)
+    ? fs.readFileSync(routerPath, 'utf-8')
+    : '';
 
   if (!fs.existsSync(skillsDir)) {
     errors.push('Missing .agents/skills/ directory');
@@ -47,30 +51,43 @@ function checkSkillsAndStubs() {
     if (!entry.isDirectory()) continue;
     const skillPath = path.join(skillsDir, entry.name, 'SKILL.md');
     if (!fs.existsSync(skillPath)) {
-      errors.push(`Skill directory .agents/skills/${entry.name} is missing SKILL.md`);
+      errors.push(
+        `Skill directory .agents/skills/${entry.name} is missing SKILL.md`,
+      );
       continue;
     }
     const content = fs.readFileSync(skillPath, 'utf-8').replace(/\r\n/g, '\n');
     const fm = content.match(/^---\n([\s\S]*?)\n---/);
     if (!fm) {
-      errors.push(`.agents/skills/${entry.name}/SKILL.md is missing YAML frontmatter`);
+      errors.push(
+        `.agents/skills/${entry.name}/SKILL.md is missing YAML frontmatter`,
+      );
       continue;
     }
     if (!fm[1].includes(`name: ${entry.name}`)) {
-      errors.push(`.agents/skills/${entry.name}/SKILL.md frontmatter name must match folder '${entry.name}'`);
+      errors.push(
+        `.agents/skills/${entry.name}/SKILL.md frontmatter name must match folder '${entry.name}'`,
+      );
     }
     if (!fm[1].includes('description:')) {
-      errors.push(`.agents/skills/${entry.name}/SKILL.md frontmatter is missing 'description:'`);
+      errors.push(
+        `.agents/skills/${entry.name}/SKILL.md frontmatter is missing 'description:'`,
+      );
     }
-    if (entry.name !== 'skill-library' && !routerText.includes(`${entry.name}/SKILL.md`)) {
-      errors.push(`Skill '${entry.name}' is not indexed in .agents/skills/skill-library/SKILL.md`);
+    if (
+      entry.name !== 'skill-library' &&
+      !routerText.includes(`${entry.name}/SKILL.md`)
+    ) {
+      errors.push(
+        `Skill '${entry.name}' is not indexed in .agents/skills/skill-library/SKILL.md`,
+      );
     }
   }
 
   const { missing, stale, orphaned } = diffStubs();
   if (missing.length || stale.length || orphaned.length) {
     errors.push(
-      `Claude skill stubs out of sync (missing: ${missing.length}, stale: ${stale.length}, orphaned: ${orphaned.length}). Run: npm run sync:skills`
+      `Claude skill stubs out of sync (missing: ${missing.length}, stale: ${stale.length}, orphaned: ${orphaned.length}). Run: npm run sync:skills`,
     );
   }
 }
@@ -82,7 +99,9 @@ function checkCodemapPaths() {
     return;
   }
   const text = fs.readFileSync(codemapPath, 'utf-8');
-  const matches = text.matchAll(/\|\s*`((?:src|scripts|\.agents)\/[^`]+)`\s*\|/g);
+  const matches = text.matchAll(
+    /\|\s*`((?:src|scripts|\.agents)\/[^`]+)`\s*\|/g,
+  );
   for (const m of matches) {
     const rel = m[1];
     const full = path.join(ROOT, rel);
@@ -152,23 +171,35 @@ function checkMathIsolationAndSafety() {
       if (!entry.isFile() || !entry.name.endsWith('.ts')) continue;
       const filePath = path.join(mathDir, entry.name);
       const code = fs.readFileSync(filePath, 'utf-8');
-      if (/from\s+['"](?:react|react-dom|echarts|echarts-for-react|lucide-react)['"]/.test(code)) {
-        errors.push(`Math isolation violation: src/lib/math/${entry.name} imports a UI/chart library`);
+      if (
+        /from\s+['"](?:react|react-dom|echarts|echarts-for-react|lucide-react)['"]/.test(
+          code,
+        )
+      ) {
+        errors.push(
+          `Math isolation violation: src/lib/math/${entry.name} imports a UI/chart library`,
+        );
       }
       if (/:\s*any\b|\bas\s+any\b/.test(code)) {
-        errors.push(`Type safety violation: src/lib/math/${entry.name} uses explicit 'any'`);
+        errors.push(
+          `Type safety violation: src/lib/math/${entry.name} uses explicit 'any'`,
+        );
       }
     }
   }
 
   const srcFiles = walkFiles(path.join(ROOT, 'src'), ['.ts', '.tsx']);
-  const storageFile = path.normalize(path.join(ROOT, 'src', 'utils', 'storage.ts'));
+  const storageFile = path.normalize(
+    path.join(ROOT, 'src', 'utils', 'storage.ts'),
+  );
   for (const file of srcFiles) {
     if (path.normalize(file) === storageFile) continue;
     const code = fs.readFileSync(file, 'utf-8');
     if (/JSON\.parse\s*\(\s*localStorage\.getItem/.test(code)) {
       const rel = path.relative(ROOT, file);
-      errors.push(`Safe storage violation in ${rel}: use safeGetJSON from src/utils/storage.ts instead of raw JSON.parse(localStorage.getItem(...))`);
+      errors.push(
+        `Safe storage violation in ${rel}: use safeGetJSON from src/utils/storage.ts instead of raw JSON.parse(localStorage.getItem(...))`,
+      );
     }
   }
 }
@@ -186,5 +217,7 @@ if (errors.length > 0) {
   }
   process.exit(1);
 } else {
-  console.log('[check:docs] OK — AGENTS.md cap, skills, stubs, CODEMAP, links, math isolation, and safe storage verified.');
+  console.log(
+    '[check:docs] OK — AGENTS.md cap, skills, stubs, CODEMAP, links, math isolation, and safe storage verified.',
+  );
 }

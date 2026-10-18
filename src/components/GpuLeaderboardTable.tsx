@@ -97,8 +97,8 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                     isWinner
                       ? 'bg-amber-500/10 hover:bg-amber-500/15'
                       : gpu.isDominated
-                      ? 'opacity-65 bg-rose-950/10 hover:opacity-100 hover:bg-rose-950/20'
-                      : 'hover:bg-slate-800/50'
+                        ? 'opacity-65 bg-rose-950/10 hover:opacity-100 hover:bg-rose-950/20'
+                        : 'hover:bg-slate-800/50'
                   } ${
                     isHovered ? 'ring-1 ring-inset ring-emerald-500/50' : ''
                   }`}
@@ -180,8 +180,8 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                           isWinner
                             ? 'bg-amber-400'
                             : gpu.isParetoOptimal
-                            ? 'bg-emerald-500'
-                            : 'bg-rose-500/60'
+                              ? 'bg-emerald-500'
+                              : 'bg-rose-500/60'
                         }`}
                         style={{ width: `${gpu.topsisScorePct}%` }}
                       />
@@ -203,19 +203,22 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                             val.residualUsd <= -15
                               ? 'text-emerald-400'
                               : val.residualUsd >= 15
-                              ? 'text-rose-400'
-                              : 'text-slate-400'
+                                ? 'text-rose-400'
+                                : 'text-slate-400'
                           }`}
                         >
                           {val.residualUsd <= 0 ? (
                             <>
-                              <TrendingDown className="h-2.5 w-2.5" />
-                              -{formatCurrency(Math.abs(val.residualUsd), gpu.currency)}
+                              <TrendingDown className="h-2.5 w-2.5" />-
+                              {formatCurrency(
+                                Math.abs(val.residualUsd),
+                                gpu.currency,
+                              )}
                             </>
                           ) : (
                             <>
-                              <TrendingUp className="h-2.5 w-2.5" />
-                              +{formatCurrency(val.residualUsd, gpu.currency)}
+                              <TrendingUp className="h-2.5 w-2.5" />+
+                              {formatCurrency(val.residualUsd, gpu.currency)}
                             </>
                           )}
                         </span>

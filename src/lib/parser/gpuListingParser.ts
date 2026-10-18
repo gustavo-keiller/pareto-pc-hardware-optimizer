@@ -79,16 +79,23 @@ export function splitMultiListings(rawText: string): string[] {
   if (!rawText || !rawText.trim()) return [];
 
   // Match boundaries where a new listing starts (e.g. "Placa de Video", "Placa de Vídeo", or 3+ newlines)
-  const productHeaderRegex = /(?:^|\n\s*\n+)(?=(?:Placa\s+de\s+V[íi]deo|NVIDIA|AMD|Intel|PowerColor|Gamer\s+Ninja|Palit|PCYes|ASUS|Gigabyte|MSI|Galax|Zotac|Sapphire|XFX|GeForce|Radeon|Arc)\b)/i;
+  const productHeaderRegex =
+    /(?:^|\n\s*\n+)(?=(?:Placa\s+de\s+V[íi]deo|NVIDIA|AMD|Intel|PowerColor|Gamer\s+Ninja|Palit|PCYes|ASUS|Gigabyte|MSI|Galax|Zotac|Sapphire|XFX|GeForce|Radeon|Arc)\b)/i;
 
-  const chunks = rawText.split(productHeaderRegex).map((c) => c.trim()).filter(Boolean);
+  const chunks = rawText
+    .split(productHeaderRegex)
+    .map((c) => c.trim())
+    .filter(Boolean);
 
   if (chunks.length > 1) {
     return chunks;
   }
 
   // Fallback: split by 3 or more newlines
-  const blankSplit = rawText.split(/\n{3,}/).map((c) => c.trim()).filter(Boolean);
+  const blankSplit = rawText
+    .split(/\n{3,}/)
+    .map((c) => c.trim())
+    .filter(Boolean);
   if (blankSplit.length > 1) {
     return blankSplit;
   }
@@ -99,9 +106,15 @@ export function splitMultiListings(rawText: string): string[] {
 /**
  * Parses a single GPU listing block into a typed ParsedGpuDeal.
  */
-export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuDeal {
+export function parseSingleGpuListing(
+  rawListing: string,
+  index = 0,
+): ParsedGpuDeal {
   const warnings: string[] = [];
-  const lines = rawListing.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const lines = rawListing
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
 
   // 1. Raw Title & Clean Name
   const rawTitle = lines[0] || 'Unknown GPU Listing';
@@ -112,7 +125,9 @@ export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuD
   const vendor = benchmarkMatch ? benchmarkMatch.vendor : 'Other';
 
   if (!benchmarkMatch) {
-    warnings.push('Could not identify a known GPU chip. Benchmark specs are estimated.');
+    warnings.push(
+      'Could not identify a known GPU chip. Benchmark specs are estimated.',
+    );
   }
 
   // 3. VRAM extraction
@@ -141,7 +156,9 @@ export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuD
   let url: string | undefined;
 
   // Check explicit seller label "Vendido por: TerabyteShop"
-  const soldByMatch = rawListing.match(/Vendido\s*(?:e\s*entregue)?\s*por:\s*([^\n\r,]+)/i);
+  const soldByMatch = rawListing.match(
+    /Vendido\s*(?:e\s*entregue)?\s*por:\s*([^\n\r,]+)/i,
+  );
   if (soldByMatch && soldByMatch[1]) {
     store = soldByMatch[1].trim();
   } else {
@@ -172,7 +189,9 @@ export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuD
   let priceInstallment: number | undefined;
 
   // Original price: e.g. "de R$ 5.176,46 por:" or "De: R$ 1.449,99 por:"
-  const origMatch = rawListing.match(/(?:de|de:)\s*R?\$?\s*([\d.]+(?:,\d{2})?)\s*por/i);
+  const origMatch = rawListing.match(
+    /(?:de|de:)\s*R?\$?\s*([\d.]+(?:,\d{2})?)\s*por/i,
+  );
   if (origMatch && origMatch[1]) {
     originalPrice = parsePriceString(origMatch[1]);
   }
@@ -186,7 +205,8 @@ export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuD
   }
   const foundPrices: FoundPrice[] = [];
 
-  const pricePattern = /(?:R\$\s*|(?<!\w))(\d{1,3}(?:\.\d{3})+,\d{2}|\d{3,6},\d{2}|\d{3,6}\.\d{2})\b/g;
+  const pricePattern =
+    /(?:R\$\s*|(?<!\w))(\d{1,3}(?:\.\d{3})+,\d{2}|\d{3,6},\d{2}|\d{3,6}\.\d{2})\b/g;
 
   lines.forEach((line, lineIdx) => {
     // Skip product title and bus width / pc points lines
@@ -210,8 +230,11 @@ export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuD
       lines[fp.lineIndex + 1] || '',
     ].join(' ');
 
-    const isInstallmentContext = /em\s*até|\d+x|cartão|sem\s*juros|ou\s*R\$/i.test(surrounding);
-    const isCashContext = /à\s*vista|a\s*vista|pix|no\s*pix|desconto/i.test(surrounding);
+    const isInstallmentContext =
+      /em\s*até|\d+x|cartão|sem\s*juros|ou\s*R\$/i.test(surrounding);
+    const isCashContext = /à\s*vista|a\s*vista|pix|no\s*pix|desconto/i.test(
+      surrounding,
+    );
 
     if (isCashContext && !priceCash) {
       priceCash = fp.value;
@@ -243,7 +266,9 @@ export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuD
   // Default active optimization price
   const activePrice = priceCash || priceInstallment || 0;
   if (activePrice <= 0) {
-    warnings.push('Could not detect a valid price. Please enter price manually.');
+    warnings.push(
+      'Could not detect a valid price. Please enter price manually.',
+    );
   }
 
   // 8. Performance specs (from benchmark database or estimated defaults)
@@ -285,7 +310,12 @@ export function parseSingleGpuListing(rawListing: string, index = 0): ParsedGpuD
 /**
  * Builds clean human-readable name from listing title.
  */
-function cleanGpuName(rawTitle: string, brand?: string, chip?: string, vramGb?: number): string {
+function cleanGpuName(
+  rawTitle: string,
+  brand?: string,
+  chip?: string,
+  vramGb?: number,
+): string {
   // If chip is identified, e.g. "PowerColor Radeon RX 9060 XT 16GB"
   if (chip && chip !== 'Unknown Chip') {
     const brandPrefix = brand ? `${brand} ` : '';
@@ -307,7 +337,7 @@ function buildDealNotes(
   store: string,
   priceCash?: number,
   priceInstallment?: number,
-  currency: 'BRL' | 'USD' = 'BRL'
+  currency: 'BRL' | 'USD' = 'BRL',
 ): string {
   const parts: string[] = [store];
   const symbol = currency === 'BRL' ? 'R$' : '$';

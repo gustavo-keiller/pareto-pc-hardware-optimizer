@@ -51,7 +51,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
   onToggleSelectGpu,
 }) => {
   const [subMode, setSubMode] = useState<'slices-2x2' | 'single-axis'>(
-    'slices-2x2'
+    'slices-2x2',
   );
   const [activeSingleAxis, setActiveSingleAxis] =
     useState<MetricKey>('rasterFps1440p');
@@ -61,26 +61,26 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
   // The 4 other metrics compared against `baseMetric` (which sits on the Bottom-Left -> Right X axis)
   const sliceMetrics = useMemo(
     () => ALL_METRIC_KEYS.filter((k) => k !== baseMetric),
-    [baseMetric]
+    [baseMetric],
   );
 
   // Ensure activeSingleAxis is distinct from baseMetric when baseMetric changes
   const effectiveSingleAxis =
     activeSingleAxis === baseMetric
-      ? sliceMetrics[0] ?? 'rasterFps1440p'
+      ? (sliceMetrics[0] ?? 'rasterFps1440p')
       : activeSingleAxis;
 
   // Build ECharts option for any 2D slice (baseMetric on Bottom-Left -> Right vs. yMetric on Bottom-Left -> Top)
   const buildSliceOption = (
     yMetric: MetricKey,
     accentColor: string,
-    isLargeInspector = false
+    isLargeInspector = false,
   ) => {
     const yDef = METRIC_DEFINITIONS[yMetric];
     const { frontierGpus, stepLineCoords } = get2DParetoFrontierCurve(
       gpus,
       baseMetric,
-      yMetric
+      yMetric,
     );
     const frontierIdSet = new Set(frontierGpus.map((g) => g.id));
 
@@ -88,7 +88,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
       gpus,
       baseMetric,
       yMetric,
-      extrapolation
+      extrapolation,
     );
     const belowMarginSet = new Set(extrapEval.belowMarginIds);
 
@@ -124,7 +124,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
           minX,
           maxX,
           minY,
-          maxY
+          maxY,
         )
       : [];
 
@@ -146,28 +146,28 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
             ? 22
             : 16
           : isHov || isSel
-          ? isLargeInspector
-            ? 19
-            : 14
-          : isOpt
-          ? isLargeInspector
-            ? 15
-            : 11
-          : isLargeInspector
-          ? 11
-          : 8,
+            ? isLargeInspector
+              ? 19
+              : 14
+            : isOpt
+              ? isLargeInspector
+                ? 15
+                : 11
+              : isLargeInspector
+                ? 11
+                : 8,
         itemStyle: {
           color: isWinner
             ? '#f59e0b'
             : isOpt
-            ? accentColor
-            : 'rgba(244, 63, 94, 0.55)',
+              ? accentColor
+              : 'rgba(244, 63, 94, 0.55)',
           borderColor:
             isWinner || isHov || isSel
               ? '#ffffff'
               : isOpt
-              ? '#a7f3d0'
-              : '#fb7185',
+                ? '#a7f3d0'
+                : '#fb7185',
           borderWidth: isWinner || isHov || isSel ? 2 : 1,
         },
       };
@@ -202,12 +202,12 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
               isOpt ? '#34d399' : '#fb7185'
             }">
               ${g.name.replace(' [TRAP]', '')} (${
-            isOpt ? 'Optimal on this Axis' : 'Unoptimized on this Axis'
-          })
+                isOpt ? 'Optimal on this Axis' : 'Unoptimized on this Axis'
+              })
             </div>
             <div>Base (${baseDef.shortLabel}): <b>${fmtBase(
-            g[baseMetric]
-          )}</b> • ${yDef.shortLabel}: <b>${g[yMetric]} ${yDef.unit}</b></div>
+              g[baseMetric],
+            )}</b> • ${yDef.shortLabel}: <b>${g[yMetric]} ${yDef.unit}</b></div>
             <div style="color:#38bdf8;margin-top:2px;">Rate: <b>${ratioStr}</b></div>
             ${
               extrapolation.enabled && diag
@@ -321,14 +321,14 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
     const { frontierGpus } = get2DParetoFrontierCurve(
       gpus,
       baseMetric,
-      effectiveSingleAxis
+      effectiveSingleAxis,
     );
     const frontierIds = new Set(frontierGpus.map((g) => g.id));
     const extrapEval = evaluateLinearExtrapolation(
       gpus,
       baseMetric,
       effectiveSingleAxis,
-      extrapolation
+      extrapolation,
     );
     const belowSet = new Set(extrapEval.belowMarginIds);
 
@@ -347,7 +347,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
       .sort((a, b) =>
         yDef.direction === 'max'
           ? a.costPerSpec - b.costPerSpec
-          : a.gpu[effectiveSingleAxis] - b.gpu[effectiveSingleAxis]
+          : a.gpu[effectiveSingleAxis] - b.gpu[effectiveSingleAxis],
       );
   }, [gpus, baseMetric, effectiveSingleAxis, extrapolation]);
 
@@ -363,7 +363,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
         if (id) onToggleSelectGpu(id);
       },
     }),
-    [onHoverGpu, onToggleSelectGpu]
+    [onHoverGpu, onToggleSelectGpu],
   );
 
   return (
@@ -405,7 +405,10 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
             <select
               aria-label="Personalizable Base Axis (Bottom-Left)"
               value={baseMetric}
-              onChange={(e) => isMetricKey(e.target.value) && onChangeBaseMetric(e.target.value)}
+              onChange={(e) =>
+                isMetricKey(e.target.value) &&
+                onChangeBaseMetric(e.target.value)
+              }
               className="bg-transparent font-bold text-emerald-300 focus:outline-none cursor-pointer"
             >
               {ALL_METRIC_KEYS.map((k) => (
@@ -442,9 +445,11 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
           </div>
         ) : (
           <span className="text-[11px] text-slate-400">
-            <strong>{baseDef.shortLabel} ({baseDef.unit})</strong> is anchored
-            at the <strong>Bottom-Left</strong> of every panel • Points repainted
-            per axis
+            <strong>
+              {baseDef.shortLabel} ({baseDef.unit})
+            </strong>{' '}
+            is anchored at the <strong>Bottom-Left</strong> of every panel •
+            Points repainted per axis
           </span>
         )}
       </div>
@@ -465,8 +470,8 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
               >
                 <div className="flex items-center justify-between px-1 pb-1">
                   <span className="text-xs font-bold text-slate-200">
-                    {baseDef.shortLabel} ({baseDef.unit}) vs. {mDef.shortLabel} (
-                    {mDef.unit})
+                    {baseDef.shortLabel} ({baseDef.unit}) vs. {mDef.shortLabel}{' '}
+                    ({mDef.unit})
                   </span>
                   <span className="text-[10px] font-mono text-emerald-400">
                     Bottom-Left: Min {baseDef.shortLabel} •{' '}
@@ -497,9 +502,9 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
           <div className="lg:col-span-8 flex flex-col rounded-xl border border-slate-800/90 bg-slate-950/60 p-3">
             <div className="flex items-center justify-between pb-1">
               <span className="text-xs font-bold text-white">
-                Base Axis: {baseDef.shortLabel} ({baseDef.unit}, Bottom-Left → Right) vs.{' '}
-                {METRIC_DEFINITIONS[effectiveSingleAxis].label} (Bottom-Left →
-                Top)
+                Base Axis: {baseDef.shortLabel} ({baseDef.unit}, Bottom-Left →
+                Right) vs. {METRIC_DEFINITIONS[effectiveSingleAxis].label}{' '}
+                (Bottom-Left → Top)
               </span>
               <span className="text-[11px] font-semibold text-emerald-400">
                 Repainted strictly for {baseDef.shortLabel} ×{' '}
@@ -511,7 +516,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
                 option={buildSliceOption(
                   effectiveSingleAxis,
                   ACCENT_PALETTE[effectiveSingleAxis],
-                  true
+                  true,
                 )}
                 style={{ height: '100%', width: '100%' }}
                 onEvents={onEvents}

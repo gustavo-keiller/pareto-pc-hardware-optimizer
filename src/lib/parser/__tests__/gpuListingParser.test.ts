@@ -74,7 +74,9 @@ R$ 1.635,28 em até 12x de R$ 136,27 sem juros no cartão`;
       expect(deal.brand).toBe('Gamer Ninja');
       expect(deal.vramGb).toBe(6);
       expect(deal.store).toBe('TerabyteShop');
-      expect(deal.url).toBe('https://www.terabyteshop.com.br/hardware/placas-de-video');
+      expect(deal.url).toBe(
+        'https://www.terabyteshop.com.br/hardware/placas-de-video',
+      );
       expect(deal.priceCash).toBe(1389.99);
       expect(deal.priceInstallment).toBe(1635.28);
       expect(deal.originalPrice).toBe(1449.99);
@@ -131,7 +133,7 @@ Performance de Próxima Geração: Eleve seu setup com a arquitetura NVIDIA Blac
       expect(deal.store).toBe('KaBuM!');
       expect(deal.rasterFps1440p).toBe(82);
       expect(deal.validationWarnings).toContain(
-        'Could not detect a valid price. Please enter price manually.'
+        'Could not detect a valid price. Please enter price manually.',
       );
     });
   });

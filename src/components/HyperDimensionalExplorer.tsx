@@ -22,7 +22,9 @@ export type HyperDimKey =
   | 'fpsPerWatt';
 
 /** Builds a record over every HyperDimKey (typed without an `as` cast). */
-function mapHyperDims<T>(init: (key: HyperDimKey) => T): Record<HyperDimKey, T> {
+function mapHyperDims<T>(
+  init: (key: HyperDimKey) => T,
+): Record<HyperDimKey, T> {
   return {
     price: init('price'),
     rasterFps1440p: init('rasterFps1440p'),
@@ -167,15 +169,17 @@ export function HyperDimensionalExplorer({
   });
 
   // Per-dimension gravity boost for RadViz (1x, 2x, 3x)
-  const [gravityBoost, setGravityBoost] = useState<Record<HyperDimKey, number>>({
-    price: 1,
-    rasterFps1440p: 1,
-    rtFps1440p: 1,
-    vramGb: 1,
-    tdpWatts: 1,
-    fpsPerDollar: 1,
-    fpsPerWatt: 1,
-  });
+  const [gravityBoost, setGravityBoost] = useState<Record<HyperDimKey, number>>(
+    {
+      price: 1,
+      rasterFps1440p: 1,
+      rtFps1440p: 1,
+      vramGb: 1,
+      tdpWatts: 1,
+      fpsPerDollar: 1,
+      fpsPerWatt: 1,
+    },
+  );
 
   // Pinned trap ID to demonstrate N-D dominance ribbon
   const [pinnedTrapId, setPinnedTrapId] = useState<string | null>(null);
@@ -185,7 +189,7 @@ export function HyperDimensionalExplorer({
 
   const activeDims = useMemo(
     () => HYPER_DIMENSIONS.filter((d) => activeDimKeys.includes(d.key)),
-    [activeDimKeys]
+    [activeDimKeys],
   );
 
   // Compute min/max bounds for all 7 dimensions
@@ -265,7 +269,7 @@ export function HyperDimensionalExplorer({
 
       // Check if gpu passes all active dimension gates
       const passesGates = activeDims.every(
-        (d) => u[d.key] * 100 + 1e-6 >= dimGates[d.key]
+        (d) => u[d.key] * 100 + 1e-6 >= dimGates[d.key],
       );
 
       // Average hyper-utility across active dimensions (weighted by gravityBoost)
@@ -291,11 +295,11 @@ export function HyperDimensionalExplorer({
 
   const ndOptimalList = useMemo(
     () => hyperEvaluated.filter((item) => item.isNDOptimal),
-    [hyperEvaluated]
+    [hyperEvaluated],
   );
   const ndTrapList = useMemo(
     () => hyperEvaluated.filter((item) => !item.isNDOptimal),
-    [hyperEvaluated]
+    [hyperEvaluated],
   );
 
   // Active inspected GPU (either hovered or pinned trap)
@@ -366,13 +370,17 @@ export function HyperDimensionalExplorer({
             <p className="mt-1 text-xs text-slate-300">
               In <strong>{activeDims.length}D space</strong>, a GPU is a trap{' '}
               <em>only</em> if another GPU beats it on{' '}
-              <strong>all {activeDims.length} selected dimensions at once</strong>:{' '}
+              <strong>
+                all {activeDims.length} selected dimensions at once
+              </strong>
+              :{' '}
               <span className="text-emerald-400 font-bold">
                 {ndOptimalList.length} {activeDims.length}D-Optimal Survivors
               </span>{' '}
               vs.{' '}
               <span className="text-rose-400 font-bold">
-                {ndTrapList.length} Strictly Dominated {activeDims.length}D Traps
+                {ndTrapList.length} Strictly Dominated {activeDims.length}D
+                Traps
               </span>
               .
             </p>
@@ -505,7 +513,7 @@ export function HyperDimensionalExplorer({
                   type="button"
                   onClick={() =>
                     setPinnedTrapId((prev) =>
-                      prev === trapItem.gpu.id ? null : trapItem.gpu.id
+                      prev === trapItem.gpu.id ? null : trapItem.gpu.id,
                     )
                   }
                   className={`rounded-md border px-2 py-0.5 text-[11px] font-bold transition ${
@@ -514,7 +522,9 @@ export function HyperDimensionalExplorer({
                       : 'border-rose-500/30 bg-slate-950/80 text-rose-300 hover:bg-rose-500/20'
                   }`}
                 >
-                  {trapItem.gpu.name.replace('GeForce ', '').replace('Radeon ', '')}{' '}
+                  {trapItem.gpu.name
+                    .replace('GeForce ', '')
+                    .replace('Radeon ', '')}{' '}
                   (${trapItem.gpu.price})
                 </button>
               );
@@ -531,8 +541,8 @@ export function HyperDimensionalExplorer({
             <div className="mb-2 flex items-center justify-between text-xs">
               <span className="font-bold text-slate-200 flex items-center gap-1.5">
                 <Sliders className="h-3.5 w-3.5 text-indigo-400" />
-                N-Dimensional Hypercube Gate Slicers (Set Minimum Standard on Any
-                Pillar):
+                N-Dimensional Hypercube Gate Slicers (Set Minimum Standard on
+                Any Pillar):
               </span>
               <span className="text-[11px] text-slate-400">
                 {hyperEvaluated.filter((i) => i.passesGates).length}/
@@ -575,23 +585,24 @@ export function HyperDimensionalExplorer({
           <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 p-3 shadow-inner">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-2 text-xs">
               <span className="text-slate-300">
-                <strong>How to read {activeDims.length}D Parallel Coordinates:</strong>{' '}
+                <strong>
+                  How to read {activeDims.length}D Parallel Coordinates:
+                </strong>{' '}
                 Every vertical pillar is oriented so{' '}
                 <strong className="text-emerald-400">
                   TOP (100%) = Best in Market
                 </strong>{' '}
                 and{' '}
-                <strong className="text-rose-400">
-                  BOTTOM (0%) = Worst
-                </strong>
-                . If Green Line A never dips below Red Line B on any pillar,{' '}
+                <strong className="text-rose-400">BOTTOM (0%) = Worst</strong>.
+                If Green Line A never dips below Red Line B on any pillar,{' '}
                 <strong>A strictly dominates B in {activeDims.length}D!</strong>
               </span>
               {inspectedItem && activeDominatorItem && (
                 <span className="flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-1 font-bold text-emerald-300">
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                  {activeDominatorItem.gpu.name} (${activeDominatorItem.gpu.price})
-                  is above {inspectedItem.gpu.name} (${inspectedItem.gpu.price}) on all{' '}
+                  {activeDominatorItem.gpu.name} ($
+                  {activeDominatorItem.gpu.price}) is above{' '}
+                  {inspectedItem.gpu.name} (${inspectedItem.gpu.price}) on all{' '}
                   {activeDims.length} pillars!
                 </span>
               )}
@@ -622,14 +633,12 @@ export function HyperDimensionalExplorer({
                     const y = getUtilityY(activeDominatorItem.utilities[d.key]);
                     return `${x.toFixed(1)},${y.toFixed(1)}`;
                   });
-                  const botPts = [...activeDims]
-                    .reverse()
-                    .map((d, revIdx) => {
-                      const i = K - 1 - revIdx;
-                      const x = getPillarX(i);
-                      const y = getUtilityY(inspectedItem.utilities[d.key]);
-                      return `${x.toFixed(1)},${y.toFixed(1)}`;
-                    });
+                  const botPts = [...activeDims].reverse().map((d, revIdx) => {
+                    const i = K - 1 - revIdx;
+                    const x = getPillarX(i);
+                    const y = getUtilityY(inspectedItem.utilities[d.key]);
+                    return `${x.toFixed(1)},${y.toFixed(1)}`;
+                  });
                   ribbonPoints = [...topPts, ...botPts].join(' ');
                 }
 
@@ -676,8 +685,7 @@ export function HyperDimensionalExplorer({
                     {hyperEvaluated.map((item) => {
                       if (effectiveHideTraps && !item.isNDOptimal) return null;
 
-                      const isInspected =
-                        inspectedItem?.gpu.id === item.gpu.id;
+                      const isInspected = inspectedItem?.gpu.id === item.gpu.id;
                       const isDominator =
                         activeDominatorItem?.gpu.id === item.gpu.id;
                       const isSelected = selectedGpuIds.includes(item.gpu.id);
@@ -741,7 +749,10 @@ export function HyperDimensionalExplorer({
                             strokeLinejoin="round"
                           />
                           {/* Vertex Dots on each Pillar */}
-                          {(isInspected || isDominator || isTop1 || isSelected) &&
+                          {(isInspected ||
+                            isDominator ||
+                            isTop1 ||
+                            isSelected) &&
                             activeDims.map((d, i) => {
                               const cx = getPillarX(i);
                               const cy = getUtilityY(item.utilities[d.key]);
@@ -890,7 +901,9 @@ export function HyperDimensionalExplorer({
         <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 p-3 shadow-inner">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-2 text-xs">
             <span className="text-slate-300">
-              <strong>How to read the {activeDims.length}D Star-Glyph Scatter:</strong>{' '}
+              <strong>
+                How to read the {activeDims.length}D Star-Glyph Scatter:
+              </strong>{' '}
               Each GPU is positioned at <strong>(Price $, 1440p FPS)</strong>,
               while its body is a{' '}
               <strong className="text-emerald-300">
@@ -936,7 +949,7 @@ export function HyperDimensionalExplorer({
                 cx: number,
                 cy: number,
                 utilities: Record<HyperDimKey, number>,
-                scale = 1
+                scale = 1,
               ) => {
                 return activeDims
                   .map((dim, idx) => {
@@ -963,11 +976,11 @@ export function HyperDimensionalExplorer({
                   {/* Grid Lines */}
                   {[0, 0.25, 0.5, 0.75, 1].map((t) => {
                     const yVal = Math.round(
-                      fBounds.min + t * (fBounds.max - fBounds.min)
+                      fBounds.min + t * (fBounds.max - fBounds.min),
                     );
                     const sy = toY(yVal);
                     const xVal = Math.round(
-                      pBounds.min + t * (pBounds.max - pBounds.min)
+                      pBounds.min + t * (pBounds.max - pBounds.min),
                     );
                     const sx = toX(xVal);
                     return (
@@ -1027,14 +1040,14 @@ export function HyperDimensionalExplorer({
                     const strokeColor = isTop1
                       ? '#fbbf24'
                       : item.isNDOptimal
-                      ? '#10b981'
-                      : '#f43f5e';
+                        ? '#10b981'
+                        : '#f43f5e';
 
                     const polyPts = buildGlyphPolygon(
                       cx,
                       cy,
                       item.utilities,
-                      isInspected || isTop1 ? 1.25 : 1.0
+                      isInspected || isTop1 ? 1.25 : 1.0,
                     );
 
                     return (
@@ -1058,8 +1071,7 @@ export function HyperDimensionalExplorer({
                         />
                         {/* Ray Spokes */}
                         {activeDims.map((dim, idx) => {
-                          const angle =
-                            -Math.PI / 2 + (idx * 2 * Math.PI) / K;
+                          const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / K;
                           const rx =
                             cx +
                             maxGlyphRadius *
@@ -1099,8 +1111,8 @@ export function HyperDimensionalExplorer({
                             isTop1
                               ? 'fill-amber-300'
                               : item.isNDOptimal
-                              ? 'fill-emerald-300'
-                              : 'fill-rose-300'
+                                ? 'fill-emerald-300'
+                                : 'fill-rose-300'
                           }`}
                         >
                           {item.gpu.name
@@ -1185,8 +1197,7 @@ export function HyperDimensionalExplorer({
 
                       const compassPts = activeDims
                         .map((dim, idx) => {
-                          const angle =
-                            -Math.PI / 2 + (idx * 2 * Math.PI) / K;
+                          const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / K;
                           const r =
                             (0.1 + 0.9 * target.utilities[dim.key]) * legendR;
                           return `${(legendCx + r * Math.cos(angle)).toFixed(1)},${(legendCy + r * Math.sin(angle)).toFixed(1)}`;
@@ -1263,7 +1274,8 @@ export function HyperDimensionalExplorer({
                 <strong className="text-amber-300">Gravity Anchors</strong>.
                 Every GPU is pulled by {activeDims.length} springs toward the
                 specs where it excels! Click any perimeter anchor below to boost
-                its gravity (<code className="text-amber-300">1× → 2× → 3×</code>
+                its gravity (
+                <code className="text-amber-300">1× → 2× → 3×</code>
                 ).
               </span>
             </div>
@@ -1298,7 +1310,8 @@ export function HyperDimensionalExplorer({
                   let sumW = 0;
                   for (const anc of anchors) {
                     const boost = gravityBoost[anc.dim.key] || 1;
-                    const pull = boost * (0.05 + 0.95 * item.utilities[anc.dim.key]);
+                    const pull =
+                      boost * (0.05 + 0.95 * item.utilities[anc.dim.key]);
                     sumWx += pull * Math.cos(anc.angle);
                     sumWy += pull * Math.sin(anc.angle);
                     sumW += pull;
@@ -1316,7 +1329,7 @@ export function HyperDimensionalExplorer({
                 });
 
                 const inspectedRadPoint = radvizPoints.find(
-                  (p) => p.gpu.id === (inspectedItem?.gpu.id ?? '')
+                  (p) => p.gpu.id === (inspectedItem?.gpu.id ?? ''),
                 );
 
                 return (
@@ -1351,8 +1364,7 @@ export function HyperDimensionalExplorer({
                     {/* Spring Tension Lines when Hovering/Inspecting a GPU */}
                     {inspectedRadPoint &&
                       anchors.map((anc) => {
-                        const u =
-                          inspectedRadPoint.utilities[anc.dim.key];
+                        const u = inspectedRadPoint.utilities[anc.dim.key];
                         return (
                           <g key={`spring-${anc.dim.key}`}>
                             <line
@@ -1419,14 +1431,14 @@ export function HyperDimensionalExplorer({
                     {radvizPoints.map((pt) => {
                       if (effectiveHideTraps && !pt.isNDOptimal) return null;
                       const isTop1 = pt.gpu.rank === 1;
-                      const isInspected =
-                        inspectedItem?.gpu.id === pt.gpu.id;
+                      const isInspected = inspectedItem?.gpu.id === pt.gpu.id;
                       const fill = isTop1
                         ? '#fbbf24'
                         : pt.isNDOptimal
-                        ? '#10b981'
-                        : '#f43f5e';
-                      const r = isTop1 || isInspected ? 11 : pt.isNDOptimal ? 8.5 : 6.5;
+                          ? '#10b981'
+                          : '#f43f5e';
+                      const r =
+                        isTop1 || isInspected ? 11 : pt.isNDOptimal ? 8.5 : 6.5;
 
                       return (
                         <g
@@ -1453,8 +1465,8 @@ export function HyperDimensionalExplorer({
                               isTop1
                                 ? 'fill-amber-300'
                                 : pt.isNDOptimal
-                                ? 'fill-emerald-200'
-                                : 'fill-rose-300'
+                                  ? 'fill-emerald-200'
+                                  : 'fill-rose-300'
                             }`}
                           >
                             {pt.gpu.name

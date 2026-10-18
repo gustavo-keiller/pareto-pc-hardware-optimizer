@@ -32,11 +32,11 @@ function zeroMetricRecord(): Record<MetricKey, number> {
  * If all sliders are set to 0, falls back to uniform weights (1 / k).
  */
 export function normalizeWeights(
-  weights: Partial<PreferenceWeights>
+  weights: Partial<PreferenceWeights>,
 ): PreferenceWeights {
   const sum = ALL_METRIC_KEYS.reduce(
     (acc, key) => acc + Math.max(0, weights[key] ?? 0),
-    0
+    0,
   );
 
   if (sum <= 0) {
@@ -75,7 +75,7 @@ export function normalizeWeights(
  */
 export function rankByTopsis(
   candidates: ParetoEvaluatedGpu[],
-  rawWeights: Partial<PreferenceWeights> = DEFAULT_PREFERENCE_WEIGHTS
+  rawWeights: Partial<PreferenceWeights> = DEFAULT_PREFERENCE_WEIGHTS,
 ): RankedGpu[] {
   if (candidates.length === 0) {
     return [];
@@ -160,7 +160,7 @@ export function rankByTopsis(
         rank: 0,
         frontierRank: null,
       };
-    }
+    },
   );
 
   // Sort descending by C_i (tie-breaker: Pareto optimal first, then lower price)

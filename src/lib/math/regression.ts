@@ -1,4 +1,9 @@
-import { GpuCandidate, GpuValuation, HedonicModelSummary, ValueTier } from './types';
+import {
+  GpuCandidate,
+  GpuValuation,
+  HedonicModelSummary,
+  ValueTier,
+} from './types';
 
 /**
  * Solves a linear system A * x = b of size k x k using Gaussian elimination
@@ -75,7 +80,7 @@ export function classifyValueTier(residualPct: number): ValueTier {
  * so collinear or small filtered subsets never produce NaN/Infinity.
  */
 export function computeHedonicRegression(
-  candidates: GpuCandidate[]
+  candidates: GpuCandidate[],
 ): HedonicModelSummary {
   if (candidates.length === 0) {
     return {
@@ -115,7 +120,7 @@ export function computeHedonicRegression(
 
   const p = 5; // [1, rasterFps1440p, rtFps1440p, vramGb, tdpWatts]
   const XtX: number[][] = Array.from({ length: p }, () =>
-    new Array<number>(p).fill(0)
+    new Array<number>(p).fill(0),
   );
   const Xty: number[] = new Array<number>(p).fill(0);
 

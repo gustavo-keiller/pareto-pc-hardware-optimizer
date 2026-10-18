@@ -2,9 +2,7 @@ import { GpuCandidate, METRIC_DEFINITIONS, MetricKey } from './types';
 
 export type ExtrapolationMode = 'gpu' | 'two-gpu' | 'custom';
 export type ExtrapolationScalingModel =
-  | 'linear-ratio'
-  | 'diminishing-power'
-  | 'two-point-line';
+  'linear-ratio' | 'diminishing-power' | 'two-point-line';
 
 const EXTRAPOLATION_SCALING_MODELS: readonly ExtrapolationScalingModel[] = [
   'linear-ratio',
@@ -79,7 +77,7 @@ export function evaluateLinearExtrapolation(
   candidates: GpuCandidate[],
   xMetric: MetricKey,
   yMetric: MetricKey,
-  config: ExtrapolationConfig
+  config: ExtrapolationConfig,
 ): ExtrapolationEvaluation {
   const xDef = METRIC_DEFINITIONS[xMetric];
   const yDef = METRIC_DEFINITIONS[yMetric];
@@ -119,7 +117,7 @@ export function evaluateLinearExtrapolation(
   if (candidates.length > 1) {
     const secondFound =
       candidates.find(
-        (c) => c.id === config.secondGpuId && c.id !== config.anchorGpuId
+        (c) => c.id === config.secondGpuId && c.id !== config.anchorGpuId,
       ) ??
       candidates.find((c) => c.id !== config.anchorGpuId) ??
       candidates[0];
@@ -128,7 +126,7 @@ export function evaluateLinearExtrapolation(
     if (config.mode === 'two-gpu' || scalingModel === 'two-point-line') {
       anchorLabel = `${anchorLabel} ↔ ${secondFound.name.replace(
         ' [TRAP]',
-        ''
+        '',
       )}`;
     }
   }
@@ -189,12 +187,14 @@ export function evaluateLinearExtrapolation(
         secantIntercept >= 0 ? '+' : '-'
       } ${Math.abs(secantIntercept).toFixed(1)}`
     : isPowerLaw
-    ? `Power Curve (α=${exponent.toFixed(2)}): y = ${anchorY}·(x/${anchorX})^${exponent.toFixed(
-        2
-      )}`
-    : `Linear Ratio: ${
-        xDef.unit === '$' ? `$${costPerUnit.toFixed(2)}` : costPerUnit.toFixed(2)
-      }/${yDef.unit}`;
+      ? `Power Curve (α=${exponent.toFixed(2)}): y = ${anchorY}·(x/${anchorX})^${exponent.toFixed(
+          2,
+        )}`
+      : `Linear Ratio: ${
+          xDef.unit === '$'
+            ? `$${costPerUnit.toFixed(2)}`
+            : costPerUnit.toFixed(2)
+        }/${yDef.unit}`;
 
   const belowMarginIds: string[] = [];
   const diagnostics: Record<string, GpuExtrapolationDiagnostic> = {};
@@ -305,7 +305,7 @@ export function getExtrapolationCurvePoints(
   xMax: number,
   yMin: number,
   yMax: number,
-  steps = 48
+  steps = 48,
 ): Array<[number, number]> {
   const pts: Array<[number, number]> = [];
   const dx = (xMax - xMin) / Math.max(1, steps);
@@ -336,7 +336,7 @@ export function getClippedExtrapolationLine(
   xMin: number,
   xMax: number,
   yMin: number,
-  yMax: number
+  yMax: number,
 ): [[number, number], [number, number]] {
   if (slope <= 0) {
     return [

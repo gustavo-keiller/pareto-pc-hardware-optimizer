@@ -86,7 +86,9 @@ export function GpuDealImporterModal({
   onClearCustomGpus,
   onSwitchToCustomDataset,
 }: GpuDealImporterModalProps) {
-  const [activeTab, setActiveTab] = useState<'paste' | 'validate' | 'database'>('paste');
+  const [activeTab, setActiveTab] = useState<'paste' | 'validate' | 'database'>(
+    'paste',
+  );
   const [rawText, setRawText] = useState<string>('');
   const [parsedDeals, setParsedDeals] = useState<ParsedGpuDeal[]>([]);
 
@@ -106,7 +108,10 @@ export function GpuDealImporterModal({
     setActiveTab('validate');
   };
 
-  const handleUpdateParsedDeal = (idx: number, patch: Partial<ParsedGpuDeal>) => {
+  const handleUpdateParsedDeal = (
+    idx: number,
+    patch: Partial<ParsedGpuDeal>,
+  ) => {
     setParsedDeals((prev) => {
       const copy = [...prev];
       copy[idx] = { ...copy[idx], ...patch };
@@ -189,7 +194,8 @@ export function GpuDealImporterModal({
                 </span>
               </h2>
               <p className="text-xs text-slate-400">
-                Paste raw product listings from Pichau, Terabyte, KaBuM, PCYes, Amazon, etc. We extract prices, VRAM, and link benchmark specs.
+                Paste raw product listings from Pichau, Terabyte, KaBuM, PCYes,
+                Amazon, etc. We extract prices, VRAM, and link benchmark specs.
               </p>
             </div>
           </div>
@@ -254,7 +260,10 @@ export function GpuDealImporterModal({
         {activeTab === 'paste' && (
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             <div>
-              <label htmlFor="raw-listing-textarea" className="block text-xs font-semibold text-slate-200 mb-1">
+              <label
+                htmlFor="raw-listing-textarea"
+                className="block text-xs font-semibold text-slate-200 mb-1"
+              >
                 Paste Raw Store Listing or Product Page Text:
               </label>
               <textarea
@@ -306,8 +315,7 @@ export function GpuDealImporterModal({
                 disabled={!rawText.trim()}
                 className="inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-500/25 hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
-                <Sparkles className="h-4 w-4" />
-                ⚡ Parse & Validate Listing(s)
+                <Sparkles className="h-4 w-4" />⚡ Parse & Validate Listing(s)
               </button>
             </div>
           </div>
@@ -321,7 +329,8 @@ export function GpuDealImporterModal({
                 <FileText className="h-10 w-10 text-slate-600 mb-2" />
                 <p className="text-sm font-semibold">No parsed listings yet</p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Paste listing copy in Tab 1 or click one of the example buttons.
+                  Paste listing copy in Tab 1 or click one of the example
+                  buttons.
                 </p>
                 <button
                   type="button"
@@ -335,7 +344,9 @@ export function GpuDealImporterModal({
               <>
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-300">
-                    Found {parsedDeals.length} Deal{parsedDeals.length > 1 ? 's' : ''} — Verify prices and benchmark links before saving:
+                    Found {parsedDeals.length} Deal
+                    {parsedDeals.length > 1 ? 's' : ''} — Verify prices and
+                    benchmark links before saving:
                   </span>
                   <button
                     type="button"
@@ -392,7 +403,9 @@ export function GpuDealImporterModal({
                             type="text"
                             value={deal.name}
                             onChange={(e) =>
-                              handleUpdateParsedDeal(idx, { name: e.target.value })
+                              handleUpdateParsedDeal(idx, {
+                                name: e.target.value,
+                              })
                             }
                             className="w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs text-white focus:border-indigo-400 focus:outline-none"
                           />
@@ -406,7 +419,9 @@ export function GpuDealImporterModal({
                             type="text"
                             value={deal.store}
                             onChange={(e) =>
-                              handleUpdateParsedDeal(idx, { store: e.target.value })
+                              handleUpdateParsedDeal(idx, {
+                                store: e.target.value,
+                              })
                             }
                             className="w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs text-white focus:border-indigo-400 focus:outline-none"
                           />
@@ -425,7 +440,9 @@ export function GpuDealImporterModal({
                             <button
                               type="button"
                               onClick={() =>
-                                handleUpdateParsedDeal(idx, { price: deal.priceCash })
+                                handleUpdateParsedDeal(idx, {
+                                  price: deal.priceCash,
+                                })
                               }
                               className={`rounded-lg border p-2 text-left transition ${
                                 deal.price === deal.priceCash
@@ -441,7 +458,11 @@ export function GpuDealImporterModal({
                               </div>
                               {deal.originalPrice && (
                                 <div className="text-[10px] text-slate-500 line-through">
-                                  Was: {formatCurrency(deal.originalPrice, deal.currency)}
+                                  Was:{' '}
+                                  {formatCurrency(
+                                    deal.originalPrice,
+                                    deal.currency,
+                                  )}
                                 </div>
                               )}
                             </button>
@@ -451,7 +472,9 @@ export function GpuDealImporterModal({
                             <button
                               type="button"
                               onClick={() =>
-                                handleUpdateParsedDeal(idx, { price: deal.priceInstallment })
+                                handleUpdateParsedDeal(idx, {
+                                  price: deal.priceInstallment,
+                                })
                               }
                               className={`rounded-lg border p-2 text-left transition ${
                                 deal.price === deal.priceInstallment
@@ -463,7 +486,10 @@ export function GpuDealImporterModal({
                                 Credit Card / Installments
                               </div>
                               <div className="text-sm font-mono font-bold">
-                                {formatCurrency(deal.priceInstallment, deal.currency)}
+                                {formatCurrency(
+                                  deal.priceInstallment,
+                                  deal.currency,
+                                )}
                               </div>
                             </button>
                           )}
@@ -476,7 +502,9 @@ export function GpuDealImporterModal({
                               type="number"
                               value={deal.price}
                               onChange={(e) =>
-                                handleUpdateParsedDeal(idx, { price: Number(e.target.value) })
+                                handleUpdateParsedDeal(idx, {
+                                  price: Number(e.target.value),
+                                })
                               }
                               className="w-full rounded border border-slate-700 bg-slate-900 px-2 py-0.5 text-xs font-mono font-bold text-emerald-400 focus:outline-none"
                             />
@@ -487,45 +515,61 @@ export function GpuDealImporterModal({
                       {/* Benchmark Specs Linkage */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                         <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-2">
-                          <span className="text-[10px] text-slate-400 block">VRAM</span>
+                          <span className="text-[10px] text-slate-400 block">
+                            VRAM
+                          </span>
                           <input
                             type="number"
                             value={deal.vramGb}
                             onChange={(e) =>
-                              handleUpdateParsedDeal(idx, { vramGb: Number(e.target.value) })
+                              handleUpdateParsedDeal(idx, {
+                                vramGb: Number(e.target.value),
+                              })
                             }
                             className="w-full bg-transparent font-bold text-sky-400 focus:outline-none"
                           />
                         </div>
                         <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-2">
-                          <span className="text-[10px] text-slate-400 block">1440p Raster FPS</span>
+                          <span className="text-[10px] text-slate-400 block">
+                            1440p Raster FPS
+                          </span>
                           <input
                             type="number"
                             value={deal.rasterFps1440p}
                             onChange={(e) =>
-                              handleUpdateParsedDeal(idx, { rasterFps1440p: Number(e.target.value) })
+                              handleUpdateParsedDeal(idx, {
+                                rasterFps1440p: Number(e.target.value),
+                              })
                             }
                             className="w-full bg-transparent font-bold text-emerald-400 focus:outline-none"
                           />
                         </div>
                         <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-2">
-                          <span className="text-[10px] text-slate-400 block">1440p Ray Tracing</span>
+                          <span className="text-[10px] text-slate-400 block">
+                            1440p Ray Tracing
+                          </span>
                           <input
                             type="number"
                             value={deal.rtFps1440p}
                             onChange={(e) =>
-                              handleUpdateParsedDeal(idx, { rtFps1440p: Number(e.target.value) })
+                              handleUpdateParsedDeal(idx, {
+                                rtFps1440p: Number(e.target.value),
+                              })
                             }
                             className="w-full bg-transparent font-bold text-white focus:outline-none"
                           />
                         </div>
                         <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-2">
-                          <span className="text-[10px] text-slate-400 block">Power Draw (TDP)</span>
+                          <span className="text-[10px] text-slate-400 block">
+                            Power Draw (TDP)
+                          </span>
                           <input
                             type="number"
                             value={deal.tdpWatts}
                             onChange={(e) =>
-                              handleUpdateParsedDeal(idx, { tdpWatts: Number(e.target.value) })
+                              handleUpdateParsedDeal(idx, {
+                                tdpWatts: Number(e.target.value),
+                              })
                             }
                             className="w-full bg-transparent font-bold text-slate-200 focus:outline-none"
                           />
@@ -542,7 +586,8 @@ export function GpuDealImporterModal({
                         ) : (
                           <div className="flex items-center gap-1.5 text-emerald-400 text-[11px]">
                             <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                            Benchmark specs linked to {deal.chip} ({deal.vendor})
+                            Benchmark specs linked to {deal.chip} ({deal.vendor}
+                            )
                           </div>
                         )}
 
@@ -572,7 +617,8 @@ export function GpuDealImporterModal({
                   My Saved GPU Deals ({customGpus.length})
                 </span>
                 <p className="text-[11px] text-slate-400">
-                  These custom items are evaluated across the Pareto frontier and TOPSIS ranking.
+                  These custom items are evaluated across the Pareto frontier
+                  and TOPSIS ranking.
                 </p>
               </div>
 
@@ -604,9 +650,12 @@ export function GpuDealImporterModal({
             {customGpus.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center text-slate-400">
                 <Store className="h-10 w-10 text-slate-600 mb-2" />
-                <p className="text-sm font-semibold">No custom deals saved yet</p>
+                <p className="text-sm font-semibold">
+                  No custom deals saved yet
+                </p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Use the Smart Paste tab to add GPU listings from your favorite stores.
+                  Use the Smart Paste tab to add GPU listings from your favorite
+                  stores.
                 </p>
                 <button
                   type="button"
@@ -658,7 +707,8 @@ export function GpuDealImporterModal({
                         </div>
                         {gpu.priceCash && gpu.priceInstallment && (
                           <div className="text-[10px] text-slate-400">
-                            PIX vs 12x: {formatCurrency(gpu.priceInstallment, gpu.currency)}
+                            PIX vs 12x:{' '}
+                            {formatCurrency(gpu.priceInstallment, gpu.currency)}
                           </div>
                         )}
                       </div>
