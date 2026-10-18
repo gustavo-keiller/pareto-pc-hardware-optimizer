@@ -22,4 +22,4 @@ Actively maintain a sharp, consistent domain vocabulary across math types, UI co
 ## Guidelines
 
 - **Never mix 2D Slice Optimality with N-Dimensional Optimality silently:** Name variables `frontier2D` vs. `paretoOptimalND` when both exist in scope.
-- **Update `CONTEXT.md` and `src/lib/math/types.ts` together** whenever a new metric or stage is introduced.
+- **Update `CONTEXT.md`, `src/lib/math/types.ts`, and [`.agents/GLOSSARY.md`](../../GLOSSARY.md) together** whenever a new metric, stage, or part category is introduced. The glossary holds the beginner and Pro wording for each term.

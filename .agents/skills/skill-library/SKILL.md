@@ -46,6 +46,7 @@ Read on-demand when specific deep-dive patterns are needed:
 
 | Topic | Reference Path |
 | :--- | :--- |
+| **Glossary: math term → beginner (en/pt-BR) → Pro wording** | [`.agents/GLOSSARY.md`](../../GLOSSARY.md) |
 | **21 Foundational Engineering Principles** | [`.agents/references/engineering-principles.md`](../../references/engineering-principles.md) |
 | **TypeScript Type Patterns (branded, narrowing, `satisfies`)** | [`.agents/references/patterns.md`](../../references/patterns.md) |
 | **Architecture Review & Deepening Guide** | [`.agents/references/architecture-review.md`](../../references/architecture-review.md) |

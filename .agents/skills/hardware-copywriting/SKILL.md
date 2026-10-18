@@ -29,19 +29,9 @@ Delete these words on sight:
 
 ---
 
-## 2. Project Dictionary: MCDM Math to PC Builder Language
+## 2. Project Dictionary: Math Term to PC Buyer Language
 
-Translate academic MCDM terminology into direct hardware-buyer meaning in tooltips and summaries:
-
-| Math / Internal Concept | What an AI Writes (BANNED) | What to Write Instead |
-| :--- | :--- | :--- |
-| `isParetoOptimal === true` | "Non-dominated pareto-efficient solution in objective space" | "**Frontier Pick:** No other card beats this on every metric at once." |
-| `isDominated === true` | "Strictly pareto-dominated suboptimal candidate" | "**Value Trap:** Another card is both cheaper and faster." |
-| `buildDominanceReason()` | "Dominated by candidate gpu-2 across active objective vector" | "**Skip Apex 3060 Legacy:** Vortex RX 760 is $35 cheaper and 11.5% faster in 1440p Raster." |
-| `topsisScorePct` ($C_i$) | "Euclidean relative closeness coefficient to Positive Ideal Solution" | "**Match Score (0–100%):** How closely this card fits your slider priorities." |
-| `filterByHardConstraints()` | "Feasible region step-function hyperplane pruning" | "**Dealbreakers:** Hide cards over your budget, PSU wattage, or below your minimum VRAM." |
-| Hedonic OLS Residual (Phase 2) | "Negative log-linear ordinary least squares price residual" | "**Undervalued (-$45 vs. fair market):** Priced below what its FPS and VRAM typically cost." |
-| Combinatorial Pre-Pruning (Phase 3) | "Intra-category pareto reduction prior to Cartesian product" | "Eliminates bad-value CPUs and GPUs first before testing full PC combinations." |
+The math-term → beginner → Pro dictionary (English and pt-BR) lives in [`.agents/GLOSSARY.md`](../../GLOSSARY.md). Use the beginner column in Simple mode and the Pro column in Explorer/Pro. Add a row there when you introduce a new term.
 
 ---
 
@@ -50,4 +40,5 @@ Translate academic MCDM terminology into direct hardware-buyer meaning in toolti
 Before finishing any UI or copy change:
 - [ ] Every trap diagnostic names the specific dominating card and the exact `$` / `FPS` / `GB` / `W` difference.
 - [ ] Zero banned AI vocabulary words appear in the diff.
+- [ ] Simple-mode text uses only the beginner wording from `.agents/GLOSSARY.md`.
 - [ ] Units are always explicit (`$`, `FPS`, `GB`, `W`, `mm`).
