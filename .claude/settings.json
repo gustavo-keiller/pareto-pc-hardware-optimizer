@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "autoCompactWindow": 300000,
+  "permissions": {
+    "allow": [
+      "Bash(npm run check *)",
+      "Bash(npm run check:docs *)",
+      "Bash(npm run sync:skills *)",
+      "Bash(npm run typecheck *)",
+      "Bash(npm run test *)",
+      "Bash(npm run build *)",
+      "Bash(npx vitest run *)",
+      "Bash(npx tsc --noEmit *)",
+      "Bash(node scripts/check-docs.cjs *)",
+      "Bash(node scripts/sync-claude-skills.cjs *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git grep *)",
+      "Bash(git ls-files *)",
+      "Bash(git blame *)",
+      "Bash(git rev-parse *)",
+      "Bash(git worktree list *)",
+      "PowerShell(npm run check *)",
+      "PowerShell(npm run check:docs *)",
+      "PowerShell(npm run sync:skills *)",
+      "PowerShell(npm run typecheck *)",
+      "PowerShell(npm run test *)",
+      "PowerShell(npm run build *)",
+      "PowerShell(npx vitest run *)",
+      "PowerShell(npx tsc --noEmit *)",
+      "PowerShell(node scripts/check-docs.cjs *)",
+      "PowerShell(node scripts/sync-claude-skills.cjs *)",
+      "PowerShell(git status *)",
+      "PowerShell(git diff *)",
+      "PowerShell(git log *)",
+      "PowerShell(git show *)",
+      "PowerShell(git grep *)",
+      "PowerShell(git ls-files *)",
+      "PowerShell(git blame *)",
+      "PowerShell(git rev-parse *)",
+      "PowerShell(git worktree list *)"
+    ]
+  },
+  "worktree": {
+    "baseRef": "head",
+    "symlinkDirectories": ["node_modules"]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.agents/scripts/block-dangerous-git.cjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.agents/scripts/context-budget.cjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

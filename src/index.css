@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/* Optimize complex layout regions per modern-web-guidance: interactions-in-complex-layouts */
+.dashboard-region {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px auto 640px;
+}
+
+@supports not (content-visibility: auto) {
+  .dashboard-region {
+    contain: layout style paint;
+  }
+}
+
+/* Custom subtle dark scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090d16;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}

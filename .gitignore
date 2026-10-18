@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build & TypeScript outputs
+dist/
+dist-ssr/
+*.tsbuildinfo
+
+# Local environment & logs
+.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+
+# Editor & OS files
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Agent worktrees & scratch
+.claude/worktrees/

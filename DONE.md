@@ -1,0 +1,18 @@
+# ParetoPC — Shipped Milestones (`DONE.md`)
+
+> Archive of completed features, math stages, and infrastructure milestones.
+
+---
+
+## 2026-10
+
+- **`[P2-03]` Value Residual Visualization & Interactive 3D Frontier Cloud (`src/components/ValueResidualsChart.tsx`, `src/components/Pareto3DCloud.tsx`):** Added ECharts diverging fair-value residual bar chart, interactive 3D rotatable Pareto cube (`Price × FPS × VRAM/RT`), and 5D Specialist diamond markers (`ParetoScatterPlot.tsx`) so users see exactly why cards like the RTX 4070 Super, RTX 4060, and RX 7600 XT survive in 5D mode despite sitting below the 2D Price/Raster staircase.
+- **`[P2-02]` Hedonic OLS Regression Engine (`src/lib/math/regression.ts`):** Implemented log-linear Ordinary Least Squares ($\ln(\text{Price})$ vs. performance specs) with Gaussian partial-pivoting solver, Ridge regularization, fair-market price prediction $\hat{P}_i$, dollar/percent residuals, and $R^2$ goodness-of-fit.
+- **`[P2-01]` Real-World GPU Benchmark Dataset (`src/data/realGpus.ts`):** Added 18 real-world desktop GPUs across NVIDIA, AMD, and Intel with normalized 1440p Raster/RT geomean FPS, VRAM capacity, TBP Watts, and street pricing, plus a header toggle to switch between Real GPUs (18) and the Phase 1 Synthetic Sandbox (10).
+- **`[ARCH-01]` & `[ARCH-02]` Deep Module Decomposition, Safe Storage Persistence & Simple/Pro UI Mode (`src/hooks/useOptimizerState.ts`, `src/components/GpuLeaderboardTable.tsx`):** Extracted state and `safeGetJSON`/`safeSetJSON` persistence into `useOptimizerState`, extracted `GpuLeaderboardTable`, and added a **Simple Guide** vs. **Pro Math Mode** toggle to keep the default experience approachable for normal hardware buyers while preserving full MCDM telemetry in Pro Mode.
+- **`[INFRA-01]` AI Agent Protocol, Skills & Verification Pipeline:** Added `AGENTS.md`, `CLAUDE.md`, `CODEMAP.md`, `.agents/AGENTS.md`, `.agents/CURRENT_STATE.md`, 15 skills in `.agents/skills/` (with `.claude/skills/` stub sync), `src/utils/storage.ts`, and `npm run check` / `npm run check:docs`.
+- **`[P1-05]` Multi-GPU Comparison Drawer (`src/components/ComparisonDrawer.tsx`):** Shipped ECharts Radar chart, normalized Parallel Coordinates view, and side-by-side delta table for 2–4 selected GPUs.
+- **`[P1-04]` Interactive 2D Pareto Scatter Plot (`src/components/ParetoScatterPlot.tsx`):** Built ECharts scatter plot with dynamic X/Y metric selectors, VRAM bubble sizing, step-function Pareto frontier staircase, shaded dominated region, and hover dominator links.
+- **`[P1-03]` Stage 3 TOPSIS Multi-Objective Ranking (`src/lib/math/topsis.ts`):** Implemented vector normalization, weighted normalized matrix, $A^+$/$A^-$ ideal solutions, Euclidean distance closeness $C_i \in [0, 1]$, and real-time preference sliders with 4 buyer preset profiles.
+- **`[P1-02]` Stage 1 & 2 Hard-Constraint Pruning & Pareto Dominance (`src/lib/math/pareto.ts`):** Implemented dealbreaker filtering, N-dimensional Pareto dominance evaluation, frontier extraction, and human-readable trap diagnostics (`buildDominanceReason`).
+- **`[P1-01]` Phase 1 Synthetic GPU Sandbox Dataset (`src/data/seedGpus.ts`):** Created 10 synthetic GPUs with verified Pareto anchors and dominated `[TRAP]` cards, backed by unit tests in `src/lib/math/__tests__/math.test.ts`.

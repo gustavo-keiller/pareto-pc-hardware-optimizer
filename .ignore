@@ -1,0 +1,8 @@
+# Search-only exclusions (ripgrep, and agent Grep/Glob tools built on it).
+# Git still tracks these; they can still be opened by path.
+
+# Generated Claude Code skill stubs (duplicates of .agents/skills/ frontmatter)
+.claude/skills/
+
+# Build output
+dist/

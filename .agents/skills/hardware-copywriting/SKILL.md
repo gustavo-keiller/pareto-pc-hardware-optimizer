@@ -1,0 +1,53 @@
+---
+name: hardware-copywriting
+description: Unslop and human-readable copywriting guidelines for ParetoPC. Use when writing ANY user-facing text, UI copy, trap diagnostics, slider labels, tooltips, preset descriptions, or READMEs. Eliminates AI buzzwords and translates MCDM math into clear PC-builder language.
+---
+
+# Hardware Copywriting & Unslop
+
+Write for PC builders and hardware buyers who want to spend their budget wisely without needing a degree in Operations Research. Keep the math rigorous under the hood, and make the UI explanations sharp, direct, and concrete.
+
+---
+
+## 1. The Unslop Rules
+
+Cut all robotic AI patterns, corporate pitch phrases, and empty filler.
+
+### Banned AI Vocabulary
+
+Delete these words on sight:
+- *boasts, crucial, delve, elevate, enduring, enhance, fostering, intricate, paramount, pivotal, seamless, silky-smooth, showcase, state-of-the-art, tapestry, testament, underscore, vibrant, cutting-edge, comprehensive suite, game-changer, empower, streamline, holistic, synergy.*
+
+### Banned Sentence Structures
+
+- **No superficial `-ing` phrases.** Never write *"empowering builders to make informed decisions"*. Write *"flags overpriced GPUs when a faster, cheaper card exists"*.
+- **No "Not only X, but Y".** State facts directly: *"TheRX 770 XT is $30 cheaper and has twice the VRAM"*, not *"Not only is the RX 770 XT cheaper, but it also boasts double the VRAM."*
+- **No vague adjectives without numbers.** Never write *"significantly better performance"* when you have the exact numbers: write *"11.5% faster (+7 FPS) and $35 cheaper"*.
+- **No em dashes in UI microcopy.** Use colons, periods, or commas.
+- **Sentence case headings.** Write *"Hard constraint dealbreakers"*, not *"Hard Constraint Dealbreakers"*.
+- **Straight quotes only.** Use `'` and `"`, never curly quotes.
+
+---
+
+## 2. Project Dictionary: MCDM Math to PC Builder Language
+
+Translate academic MCDM terminology into direct hardware-buyer meaning in tooltips and summaries:
+
+| Math / Internal Concept | What an AI Writes (BANNED) | What to Write Instead |
+| :--- | :--- | :--- |
+| `isParetoOptimal === true` | "Non-dominated pareto-efficient solution in objective space" | "**Frontier Pick:** No other card beats this on every metric at once." |
+| `isDominated === true` | "Strictly pareto-dominated suboptimal candidate" | "**Value Trap:** Another card is both cheaper and faster." |
+| `buildDominanceReason()` | "Dominated by candidate gpu-2 across active objective vector" | "**Skip Apex 3060 Legacy:** Vortex RX 760 is $35 cheaper and 11.5% faster in 1440p Raster." |
+| `topsisScorePct` ($C_i$) | "Euclidean relative closeness coefficient to Positive Ideal Solution" | "**Match Score (0–100%):** How closely this card fits your slider priorities." |
+| `filterByHardConstraints()` | "Feasible region step-function hyperplane pruning" | "**Dealbreakers:** Hide cards over your budget, PSU wattage, or below your minimum VRAM." |
+| Hedonic OLS Residual (Phase 2) | "Negative log-linear ordinary least squares price residual" | "**Undervalued (-$45 vs. fair market):** Priced below what its FPS and VRAM typically cost." |
+| Combinatorial Pre-Pruning (Phase 3) | "Intra-category pareto reduction prior to Cartesian product" | "Eliminates bad-value CPUs and GPUs first before testing full PC combinations." |
+
+---
+
+## 3. Verification Checklist
+
+Before finishing any UI or copy change:
+- [ ] Every trap diagnostic names the specific dominating card and the exact `$` / `FPS` / `GB` / `W` difference.
+- [ ] Zero banned AI vocabulary words appear in the diff.
+- [ ] Units are always explicit (`$`, `FPS`, `GB`, `W`, `mm`).
