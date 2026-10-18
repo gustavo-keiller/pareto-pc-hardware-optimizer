@@ -13,6 +13,8 @@ Pure TypeScript modules with zero React/DOM/ECharts dependencies:
 | Path | Purpose |
 | :--- | :--- |
 | `src/lib/math/types.ts` | **Domain Types & Metric Registry** — `GpuCandidate`, `MetricKey`, `OptimizationDirection` (`'min' \| 'max'`), `METRIC_DEFINITIONS`, `HardConstraints`, `PreferenceWeights`, `ParetoEvaluatedGpu`, `GpuValuation`, `HedonicModelSummary`, `RankedGpu` |
+| `src/lib/math/buildTypes.ts` | **Phase 3 Multi-Component Domain Schemas & Compatibility Engine** — `CpuCandidate`, `MotherboardCandidate`, `RamCandidate`, `PsuCandidate`, `PcBuild`, `checkBuildCompatibility`, `computeCpuGpuBottleneck`, `estimateGpuRequiredCpuScore`, `assemblePcBuild` |
+| `src/lib/math/__tests__/buildTypes.test.ts` | **Vitest Build Types & Multi-Component Suite** — 20 unit tests covering socket matching, RAM generation compatibility, PSU wattage safety headroom, bottleneck elasticity, and seed catalog integrity |
 | `src/lib/math/pareto.ts` | **Stages 1 & 2: Hard-Constraint Pruning & Pareto Dominance** — `filterByHardConstraints`, `dominates`, `buildDominanceReason` (human-readable trap diagnostics), `evaluateParetoFrontier`, `get2DParetoFrontierCurve` (staircase coordinates) |
 | `src/lib/math/topsis.ts` | **Stage 3: TOPSIS Multi-Objective Ranking** — `ALL_METRIC_KEYS`, `DEFAULT_PREFERENCE_WEIGHTS`, `normalizeWeights` (with uniform fallback when sum is 0), `rankByTopsis` (vector normalization, $A^+$/$A^-$ ideal solutions, Euclidean distances $d^+$/$d^-$, closeness $C_i \in [0, 1]$) |
 | `src/lib/math/regression.ts` | **Phase 2: Hedonic OLS Regression Engine** — `solveLinearSystem` (Gaussian elimination with partial pivoting), `classifyValueTier`, `computeHedonicRegression` ($\ln(\text{Price})$ vs. performance specs, fair market price $\hat{P}_i$, dollar/percent residuals, and $R^2$) |
@@ -23,6 +25,7 @@ Pure TypeScript modules with zero React/DOM/ECharts dependencies:
 | `src/lib/parser/__tests__/gpuListingParser.test.ts` | **Vitest Parser Suite** — comprehensive unit tests verifying tokenization and extraction across single and batch listings |
 | `src/data/knownGpuBenchmarks.ts` | **40+ Desktop GPU Benchmark Reference Database** — 1440p Ultra raster FPS, ray tracing FPS, TDP Watts, VRAM, and chip matching aliases (`matchKnownGpuChip`) |
 | `src/data/realGpus.ts` | **Phase 2 Real-World GPU Dataset** — 18 desktop GPUs (`REAL_WORLD_GPUS`) across NVIDIA, AMD, and Intel with 1440p Raster/RT geomean FPS, VRAM, TBP Watts, and retail street pricing |
+| `src/data/seedComponents.ts` | **Phase 3 Seed Component Catalogs** — typed real-world CPU, Motherboard, RAM, and PSU candidates (`SEED_CPUS`, `SEED_MOTHERBOARDS`, `SEED_RAM_KITS`, `SEED_PSUS`) across AM4, AM5, LGA1700, and LGA1851 platforms |
 | `src/data/seedGpus.ts` | **Phase 1 Seed Dataset** — 10 synthetic GPUs (`PHASE1_SEED_GPUS`) with known Pareto anchors and dominated `[TRAP]` cards for deterministic verification |
 | `src/utils/storage.ts` | **Safe LocalStorage Layer** — `safeGetJSON`, `safeSetJSON`, `safeGetInt`, `safeGetBool`, `safeGetString`, and versioned schema migrations (`runStorageMigrations`) |
 | `src/utils/currency.ts` | **Currency Formatter** — formats BRL (`R$ 3.899,99`) and USD (`$250`) |
