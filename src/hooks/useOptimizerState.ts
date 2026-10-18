@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { PHASE1_SEED_GPUS } from '../data/seedGpus';
 import { REAL_WORLD_GPUS } from '../data/realGpus';
 import {
+  GpuCandidate,
   HardConstraints,
   MetricKey,
   PreferenceWeights,
@@ -27,9 +28,88 @@ import {
   safeSetJSON,
 } from '../utils/storage';
 
-export type DatasetMode = 'real' | 'synthetic';
+export type DatasetMode = 'real' | 'custom' | 'synthetic';
 export type UiMode = 'simple' | 'explorer' | 'pro';
 export type ChartViewMode = '2d' | '3d' | 'hyper' | 'axes' | 'residuals';
+
+export const DEFAULT_CUSTOM_GPUS: GpuCandidate[] = [
+  {
+    id: 'deal-pichau-rx9060xt',
+    name: 'PowerColor Radeon RX 9060 XT 16GB',
+    chip: 'RX 9060 XT',
+    brand: 'PowerColor',
+    vendor: 'AMD',
+    store: 'Pichau',
+    price: 3899.99,
+    priceCash: 3899.99,
+    priceInstallment: 4588.22,
+    originalPrice: 5176.46,
+    currency: 'BRL',
+    vramGb: 16,
+    rasterFps1440p: 96,
+    rtFps1440p: 58,
+    tdpWatts: 200,
+    isCustom: true,
+    notes: 'Pichau · PIX: R$ 3.899,99 | 12x: R$ 4.588,22 (15% off PIX)',
+  },
+  {
+    id: 'deal-pcyes-rx7600xt',
+    name: 'AMD Radeon RX 7600 XT 16GB',
+    chip: 'RX 7600 XT',
+    brand: 'PCYes',
+    vendor: 'AMD',
+    store: 'PCYes',
+    url: 'https://www.pcyes.com.br/placa-de-video-amd-radeon-rx-7600xt-16gb-gddr6-128-bits-projeto-edge-pvr760016gbpedf',
+    price: 2944.05,
+    priceCash: 2944.05,
+    priceInstallment: 3099.0,
+    currency: 'BRL',
+    vramGb: 16,
+    rasterFps1440p: 70,
+    rtFps1440p: 37,
+    tdpWatts: 190,
+    isCustom: true,
+    notes: 'PCYes · PIX: R$ 2.944,05 | 10x: R$ 3.099,00 (5% off PIX)',
+  },
+  {
+    id: 'deal-terabyte-gtx1660s',
+    name: 'Gamer Ninja GeForce GTX 1660 Super 6GB',
+    chip: 'GTX 1660 Super',
+    brand: 'Gamer Ninja',
+    vendor: 'NVIDIA',
+    store: 'TerabyteShop',
+    url: 'https://www.terabyteshop.com.br/hardware/placas-de-video',
+    price: 1389.99,
+    priceCash: 1389.99,
+    priceInstallment: 1635.28,
+    originalPrice: 1449.99,
+    currency: 'BRL',
+    vramGb: 6,
+    rasterFps1440p: 34,
+    rtFps1440p: 0,
+    tdpWatts: 125,
+    isCustom: true,
+    notes: 'TerabyteShop · PIX: R$ 1.389,99 | 12x: R$ 1.635,28 (15% off PIX)',
+  },
+  {
+    id: 'deal-kabum-rtx5060',
+    name: 'Palit GeForce RTX 5060 8GB',
+    chip: 'RTX 5060',
+    brand: 'Palit',
+    vendor: 'NVIDIA',
+    store: 'KaBuM!',
+    price: 2499.0,
+    priceCash: 2499.0,
+    priceInstallment: 2899.0,
+    currency: 'BRL',
+    vramGb: 8,
+    rasterFps1440p: 82,
+    rtFps1440p: 60,
+    tdpWatts: 130,
+    isCustom: true,
+    notes: 'KaBuM! · Blackwell Architecture DLSS 4 Support',
+  },
+];
 
 export interface PresetProfile {
   id: string;
@@ -114,11 +194,18 @@ export function useOptimizerState() {
     runStorageMigrations();
   }, []);
 
-  // Dataset switcher: defaults to 'real' (18 real-world GPUs) or 'synthetic' (Phase 1 seed)
+  // Dataset switcher: defaults to 'real' (18 real-world GPUs), 'custom' (My Deals), or 'synthetic' (Phase 1 seed)
   const [datasetMode, setDatasetMode] = useState<DatasetMode>(() => {
     const saved = safeGetString('paretopc_dataset', 'real');
-    return saved === 'synthetic' ? 'synthetic' : 'real';
+    if (saved === 'custom' || saved === 'synthetic') return saved;
+    return 'real';
   });
+
+  // User Custom Deals Database (Stored safely in localStorage)
+  const [customGpus, setCustomGpus] = useState<GpuCandidate[]>(() =>
+    safeGetJSON('paretopc_custom_gpus', DEFAULT_CUSTOM_GPUS)
+  );
+  const [isDealImporterOpen, setIsDealImporterOpen] = useState<boolean>(false);
 
   // 3 Proportional UI Complexity Modes: 'simple' (Level 1) | 'explorer' (Level 2) | 'pro' (Level 3)
   const [uiMode, setUiMode] = useState<UiMode>(() => {
@@ -202,11 +289,25 @@ export function useOptimizerState() {
     safeSetJSON('paretopc_hide_traps', hideTrapsInTable);
   }, [hideTrapsInTable]);
 
+  useEffect(() => {
+    safeSetJSON('paretopc_custom_gpus', customGpus);
+  }, [customGpus]);
+
   // Raw catalog based on datasetMode
-  const rawCatalog = useMemo(
-    () => (datasetMode === 'real' ? REAL_WORLD_GPUS : PHASE1_SEED_GPUS),
-    [datasetMode]
-  );
+  const rawCatalog = useMemo(() => {
+    if (datasetMode === 'custom') {
+      return customGpus.length > 0 ? customGpus : DEFAULT_CUSTOM_GPUS;
+    }
+    return datasetMode === 'real' ? REAL_WORLD_GPUS : PHASE1_SEED_GPUS;
+  }, [datasetMode, customGpus]);
+
+  // Detected active currency ('BRL' or 'USD')
+  const activeCurrency = useMemo<'USD' | 'BRL'>(() => {
+    if (datasetMode === 'custom' && rawCatalog.some((g) => g.currency === 'BRL')) {
+      return 'BRL';
+    }
+    return 'USD';
+  }, [datasetMode, rawCatalog]);
 
   // Compute Hedonic OLS Regression across the full catalog so fair-value baselines remain anchored
   const olsModel = useMemo(
@@ -287,11 +388,54 @@ export function useOptimizerState() {
       setConstraints({ maxPrice: 1000, minVram: 8, maxWatts: 350 });
       setSelectedGpuIds(['gpu-4', 'gpu-6', 'gpu-7']);
       setExtrapolation((prev) => ({ ...prev, anchorGpuId: 'gpu-6' }));
+    } else if (mode === 'custom') {
+      const maxCustomPrice = Math.max(
+        6000,
+        ...(customGpus.length ? customGpus.map((g) => g.price) : [6000])
+      );
+      setConstraints({ maxPrice: maxCustomPrice, minVram: 6, maxWatts: 450 });
+      if (customGpus.length > 0) {
+        setSelectedGpuIds(customGpus.slice(0, 3).map((g) => g.id));
+        setExtrapolation((prev) => ({ ...prev, anchorGpuId: customGpus[0].id }));
+      }
     } else {
       setConstraints(DEFAULT_CONSTRAINTS_REAL);
       setSelectedGpuIds(['arc-b580', 'rx-7800-xt', 'rtx-4070-super']);
       setExtrapolation((prev) => ({ ...prev, anchorGpuId: 'arc-b580' }));
     }
+  };
+
+  const addCustomGpus = (newGpus: GpuCandidate[]) => {
+    setCustomGpus((prev) => {
+      const existingIds = new Set(prev.map((g) => g.id));
+      const filtered = newGpus.filter((g) => !existingIds.has(g.id));
+      return [...filtered, ...prev];
+    });
+    setDatasetMode('custom');
+    const maxCustomPrice = Math.max(
+      6000,
+      ...newGpus.map((g) => g.price),
+      ...(customGpus.length ? customGpus.map((g) => g.price) : [6000])
+    );
+    setConstraints((prev) => ({
+      ...prev,
+      maxPrice: Math.max(prev.maxPrice, maxCustomPrice),
+    }));
+  };
+
+  const updateCustomGpu = (updatedGpu: GpuCandidate) => {
+    setCustomGpus((prev) =>
+      prev.map((g) => (g.id === updatedGpu.id ? updatedGpu : g))
+    );
+  };
+
+  const removeCustomGpu = (id: string) => {
+    setCustomGpus((prev) => prev.filter((g) => g.id !== id));
+    setSelectedGpuIds((prev) => prev.filter((i) => i !== id));
+  };
+
+  const clearCustomGpus = () => {
+    setCustomGpus([]);
   };
 
   const handleApplyPreset = (preset: PresetProfile) => {
@@ -313,7 +457,16 @@ export function useOptimizerState() {
 
   const handleResetAll = () => {
     setConstraints(
-      datasetMode === 'real'
+      datasetMode === 'custom'
+        ? {
+            maxPrice: Math.max(
+              6000,
+              ...(customGpus.length ? customGpus.map((g) => g.price) : [6000])
+            ),
+            minVram: 6,
+            maxWatts: 450,
+          }
+        : datasetMode === 'real'
         ? DEFAULT_CONSTRAINTS_REAL
         : { maxPrice: 1000, minVram: 8, maxWatts: 350 }
     );
@@ -323,7 +476,12 @@ export function useOptimizerState() {
     setParetoMode('all-5d');
     setExtrapolation({
       ...DEFAULT_EXTRAPOLATION_CONFIG,
-      anchorGpuId: datasetMode === 'real' ? 'arc-b580' : 'gpu-6',
+      anchorGpuId:
+        datasetMode === 'custom' && customGpus.length > 0
+          ? customGpus[0].id
+          : datasetMode === 'real'
+          ? 'arc-b580'
+          : 'gpu-6',
     });
     setWeights(DEFAULT_PREFERENCE_WEIGHTS);
     setActivePresetId('balanced');
@@ -372,5 +530,13 @@ export function useOptimizerState() {
     handleApplyPreset,
     handleToggleSelectGpu,
     handleResetAll,
+    customGpus,
+    addCustomGpus,
+    updateCustomGpu,
+    removeCustomGpu,
+    clearCustomGpus,
+    isDealImporterOpen,
+    setIsDealImporterOpen,
+    activeCurrency,
   };
 }

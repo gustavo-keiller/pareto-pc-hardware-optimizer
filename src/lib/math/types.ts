@@ -1,7 +1,7 @@
 export interface GpuCandidate {
   id: string;
   name: string;
-  vendor?: 'NVIDIA' | 'AMD' | 'Intel' | 'Synthetic';
+  vendor?: 'NVIDIA' | 'AMD' | 'Intel' | 'Synthetic' | 'Other';
   price: number;
   rasterFps1440p: number;
   rtFps1440p: number;
@@ -10,6 +10,18 @@ export interface GpuCandidate {
   lengthMm?: number;
   computeScore?: number;
   notes?: string;
+
+  // Store & Deal Listing Metadata
+  store?: string;
+  url?: string;
+  currency?: 'USD' | 'BRL';
+  priceCash?: number;
+  priceInstallment?: number;
+  originalPrice?: number;
+  chip?: string;
+  brand?: string;
+  isCustom?: boolean;
+  isBenchmarkEstimated?: boolean;
 }
 
 export type MetricKey =

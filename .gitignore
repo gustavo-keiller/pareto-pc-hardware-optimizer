@@ -22,3 +22,9 @@ Thumbs.db
 
 # Agent worktrees & scratch
 .claude/worktrees/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+__pycache__/

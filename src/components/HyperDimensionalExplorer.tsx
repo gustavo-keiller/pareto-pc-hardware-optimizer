@@ -516,6 +516,52 @@ export function HyperDimensionalExplorer({
       {/* PROJECTION 1: N-DIMENSIONAL PARALLEL DOMINANCE COORDINATES */}
       {projection === 'parallel' && (
         <div className="space-y-3">
+          {/* Per-Dimension Gate Sliders (N-Dimensional Hypercube Slicing) */}
+          <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-3">
+            <div className="mb-2 flex items-center justify-between text-xs">
+              <span className="font-bold text-slate-200 flex items-center gap-1.5">
+                <Sliders className="h-3.5 w-3.5 text-indigo-400" />
+                N-Dimensional Hypercube Gate Slicers (Set Minimum Standard on Any
+                Pillar):
+              </span>
+              <span className="text-[11px] text-slate-400">
+                {hyperEvaluated.filter((i) => i.passesGates).length}/
+                {hyperEvaluated.length} GPUs Pass All {activeDims.length} Gates
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+              {activeDims.map((dim) => (
+                <div
+                  key={`gate-${dim.key}`}
+                  className="rounded-lg border border-slate-800 bg-slate-950/90 p-2"
+                >
+                  <div className="flex items-center justify-between text-[11px] mb-1">
+                    <span className="font-bold text-slate-200 truncate">
+                      {dim.shortLabel}
+                    </span>
+                    <span className="font-mono font-bold text-indigo-300">
+                      ≥{dimGates[dim.key]}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={80}
+                    step={10}
+                    value={dimGates[dim.key]}
+                    onChange={(e) =>
+                      setDimGates((prev) => ({
+                        ...prev,
+                        [dim.key]: Number(e.target.value),
+                      }))
+                    }
+                    className="w-full accent-indigo-400 cursor-pointer"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 p-3 shadow-inner">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-2 text-xs">
               <span className="text-slate-300">
@@ -825,52 +871,6 @@ export function HyperDimensionalExplorer({
                 );
               })()}
             </svg>
-          </div>
-
-          {/* Per-Dimension Gate Sliders (N-Dimensional Hypercube Slicing) */}
-          <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-3">
-            <div className="mb-2 flex items-center justify-between text-xs">
-              <span className="font-bold text-slate-200 flex items-center gap-1.5">
-                <Sliders className="h-3.5 w-3.5 text-indigo-400" />
-                N-Dimensional Hypercube Gate Slicers (Set Minimum Standard on Any
-                Pillar):
-              </span>
-              <span className="text-[11px] text-slate-400">
-                {hyperEvaluated.filter((i) => i.passesGates).length}/
-                {hyperEvaluated.length} GPUs Pass All {activeDims.length} Gates
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
-              {activeDims.map((dim) => (
-                <div
-                  key={`gate-${dim.key}`}
-                  className="rounded-lg border border-slate-800 bg-slate-950/90 p-2"
-                >
-                  <div className="flex items-center justify-between text-[11px] mb-1">
-                    <span className="font-bold text-slate-200 truncate">
-                      {dim.shortLabel}
-                    </span>
-                    <span className="font-mono font-bold text-indigo-300">
-                      ≥{dimGates[dim.key]}%
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={80}
-                    step={10}
-                    value={dimGates[dim.key]}
-                    onChange={(e) =>
-                      setDimGates((prev) => ({
-                        ...prev,
-                        [dim.key]: Number(e.target.value),
-                      }))
-                    }
-                    className="w-full accent-indigo-400 cursor-pointer"
-                  />
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       )}

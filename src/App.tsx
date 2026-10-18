@@ -14,6 +14,8 @@ import { ComparisonDrawer } from './components/ComparisonDrawer';
 import { GpuLeaderboardTable } from './components/GpuLeaderboardTable';
 import { SimpleParetoGuide } from './components/SimpleParetoGuide';
 import { HyperDimensionalExplorer } from './components/HyperDimensionalExplorer';
+import { GpuDealImporterModal } from './components/GpuDealImporterModal';
+import { formatCurrency } from './utils/currency';
 import {
   Award,
   Sliders,
@@ -38,6 +40,8 @@ import {
   Minimize2,
   Wrench,
   Compass,
+  Store,
+  PlusCircle,
 } from 'lucide-react';
 
 export function App() {
@@ -84,6 +88,13 @@ export function App() {
     handleApplyPreset,
     handleToggleSelectGpu,
     handleResetAll,
+    customGpus,
+    addCustomGpus,
+    removeCustomGpu,
+    clearCustomGpus,
+    isDealImporterOpen,
+    setIsDealImporterOpen,
+    activeCurrency,
   } = useOptimizerState();
 
   const [isChartExpanded, setIsChartExpanded] = useState<boolean>(false);
@@ -91,7 +102,12 @@ export function App() {
     useState<boolean>(true);
   const [hideDominatedNodes, setHideDominatedNodes] = useState<boolean>(false);
 
-  const maxBudgetBound = datasetMode === 'real' ? 1800 : 1000;
+  const maxBudgetBound =
+    datasetMode === 'custom'
+      ? Math.max(6000, ...(rawCatalog.length ? rawCatalog.map((g) => g.price) : [6000]))
+      : datasetMode === 'real'
+      ? 1800
+      : 1000;
   const maxWattsBound = datasetMode === 'real' ? 450 : 350;
 
   return (
@@ -126,36 +142,58 @@ export function App() {
             </div>
           </div>
 
-          {/* Right Controls: 3 Proportional Experience Modes + Dataset Switcher (Pro) + Reset */}
+          {/* Right Controls: 3 Proportional Experience Modes + Dataset Switcher + Import Deals + Reset */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            {/* Dataset Toggle (Only shown in Pro Mode or when Synthetic is active to keep normal UI clean) */}
-            {(uiMode === 'pro' || datasetMode === 'synthetic') && (
-              <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
-                <button
-                  type="button"
-                  onClick={() => handleSwitchDataset('real')}
-                  className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                    datasetMode === 'real'
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <Database className="h-3.5 w-3.5" />
-                  Real GPUs (18)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSwitchDataset('synthetic')}
-                  className={`rounded-md px-2.5 py-1.5 font-semibold transition ${
-                    datasetMode === 'synthetic'
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Sandbox (10)
-                </button>
-              </div>
-            )}
+            {/* Dataset Toggle */}
+            <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
+              <button
+                type="button"
+                onClick={() => handleSwitchDataset('real')}
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                  datasetMode === 'real'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Database className="h-3.5 w-3.5" />
+                Real GPUs (18)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSwitchDataset('custom')}
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                  datasetMode === 'custom'
+                    ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="View your custom imported deals from Pichau, Terabyte, KaBuM, etc."
+              >
+                <Store className="h-3.5 w-3.5" />
+                My Deals ({customGpus.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSwitchDataset('synthetic')}
+                className={`rounded-md px-2.5 py-1.5 font-semibold transition ${
+                  datasetMode === 'synthetic'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Sandbox (10)
+              </button>
+            </div>
+
+            {/* Import Deals Button */}
+            <button
+              type="button"
+              onClick={() => setIsDealImporterOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/20 px-3 py-1.5 font-bold text-indigo-300 hover:bg-indigo-500/30 hover:border-indigo-400 transition shadow-sm"
+              title="Paste listings from Pichau, Terabyte, KaBuM, PCYes, Amazon, etc."
+            >
+              <PlusCircle className="h-3.5 w-3.5" />
+              + Import Deals
+            </button>
 
             {/* 3 Proportional Experience Level Buttons */}
             <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
@@ -282,15 +320,15 @@ export function App() {
                         }`}
                       >
                         {topWinner.valuation.residualUsd <= 0
-                          ? `$${Math.abs(topWinner.valuation.residualUsd)} Below Fair Market Price ($${topWinner.valuation.fairPrice})`
-                          : `$${topWinner.valuation.residualUsd} Above Fair Market Price ($${topWinner.valuation.fairPrice})`}
+                          ? `${formatCurrency(Math.abs(topWinner.valuation.residualUsd), topWinner.currency)} Below Fair Market Price (${formatCurrency(topWinner.valuation.fairPrice, topWinner.currency)})`
+                          : `${formatCurrency(topWinner.valuation.residualUsd, topWinner.currency)} Above Fair Market Price (${formatCurrency(topWinner.valuation.fairPrice, topWinner.currency)})`}
                       </span>
                     )}
                   </div>
                   <h2 className="text-xl font-extrabold text-white mt-0.5">
                     {topWinner.name}{' '}
                     <span className="text-emerald-400 font-bold">
-                      — ${topWinner.price}
+                      — {formatCurrency(topWinner.price, topWinner.currency)}
                     </span>
                   </h2>
                   <p className="text-xs text-slate-300 mt-0.5">
@@ -367,15 +405,15 @@ export function App() {
                       Maximum Budget
                     </label>
                     <span className="font-mono font-bold text-emerald-400">
-                      ${constraints.maxPrice}
+                      {formatCurrency(constraints.maxPrice, activeCurrency)}
                     </span>
                   </div>
                   <input
                     id="max-budget-slider"
                     type="range"
-                    min={200}
+                    min={datasetMode === 'custom' ? 500 : 200}
                     max={maxBudgetBound}
-                    step={10}
+                    step={datasetMode === 'custom' ? 50 : 10}
                     value={Math.min(constraints.maxPrice, maxBudgetBound)}
                     onChange={(e) =>
                       setConstraints((prev) => ({
@@ -386,9 +424,21 @@ export function App() {
                     className="w-full accent-emerald-500 cursor-pointer"
                   />
                   <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
-                    <span>$200</span>
-                    <span>${Math.round(maxBudgetBound / 2)}</span>
-                    <span>${maxBudgetBound} (All)</span>
+                    <span>
+                      {formatCurrency(
+                        datasetMode === 'custom' ? 500 : 200,
+                        activeCurrency
+                      )}
+                    </span>
+                    <span>
+                      {formatCurrency(
+                        Math.round(maxBudgetBound / 2),
+                        activeCurrency
+                      )}
+                    </span>
+                    <span>
+                      {formatCurrency(maxBudgetBound, activeCurrency)} (All)
+                    </span>
                   </div>
                 </div>
 
@@ -720,44 +770,44 @@ export function App() {
                 </div>
               </div>
 
-              {/* Secondary Bar: Proportional Controls based on uiMode */}
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-800/80 bg-slate-950/60 px-3 py-2 text-xs">
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* Trap Rule 5D vs 2D only shown in Pro mode */}
-                  {uiMode === 'pro' && chartView !== 'hyper' && (
-                    <>
-                      <span className="text-slate-400 font-medium">
-                        Trap Rule:
-                      </span>
-                      <div className="inline-flex rounded-lg border border-slate-800 bg-slate-900 p-0.5">
-                        <button
-                          type="button"
-                          onClick={() => setParetoMode('all-5d')}
-                          className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition ${
-                            paretoMode === 'all-5d'
-                              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                              : 'text-slate-400 hover:text-slate-200'
-                          }`}
-                        >
-                          All 5 Specs (5D)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setParetoMode('2d-axes')}
-                          className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition ${
-                            paretoMode === '2d-axes'
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                              : 'text-slate-400 hover:text-slate-200'
-                          }`}
-                        >
-                          Strict 2D Axes
-                        </button>
-                      </div>
-                    </>
-                  )}
+              {/* Secondary Bar: 2D Frontier Controls (Trap Rule, Zone Mesh, Hide Traps, Base & Y-Axis) */}
+              {chartView === '2d' && (
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-800/80 bg-slate-950/60 px-3 py-2 text-xs">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Trap Rule 5D vs 2D only shown in Pro mode */}
+                    {uiMode === 'pro' && (
+                      <>
+                        <span className="text-slate-400 font-medium">
+                          Trap Rule:
+                        </span>
+                        <div className="inline-flex rounded-lg border border-slate-800 bg-slate-900 p-0.5">
+                          <button
+                            type="button"
+                            onClick={() => setParetoMode('all-5d')}
+                            className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition ${
+                              paretoMode === 'all-5d'
+                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                                : 'text-slate-400 hover:text-slate-200'
+                            }`}
+                          >
+                            All 5 Specs (5D)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setParetoMode('2d-axes')}
+                            className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition ${
+                              paretoMode === '2d-axes'
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                : 'text-slate-400 hover:text-slate-200'
+                            }`}
+                          >
+                            Strict 2D Axes
+                          </button>
+                        </div>
+                      </>
+                    )}
 
-                  {/* Paint Unoptimized Region Mesh Toggle */}
-                  {chartView !== 'residuals' && chartView !== 'hyper' && (
+                    {/* Paint Unoptimized Region Mesh Toggle */}
                     <button
                       type="button"
                       onClick={() =>
@@ -775,30 +825,26 @@ export function App() {
                         ? 'Shade Unoptimized Zone: ON'
                         : 'Shade Unoptimized Zone: OFF'}
                     </button>
-                  )}
 
-                  {/* Hide Trap Points Toggle */}
-                  <button
-                    type="button"
-                    onClick={() => setHideDominatedNodes((prev) => !prev)}
-                    className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition ${
-                      hideDominatedNodes
-                        ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
-                        : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-slate-200'
-                    }`}
-                    title="Make dominated trap points disappear from the graphic"
-                  >
-                    <EyeOff className="h-3.5 w-3.5" />
-                    {hideDominatedNodes
-                      ? `Traps Hidden (${trapCount})`
-                      : `Hide Trap Points (${trapCount})`}
-                  </button>
-                </div>
+                    {/* Hide Trap Points Toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setHideDominatedNodes((prev) => !prev)}
+                      className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition ${
+                        hideDominatedNodes
+                          ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
+                          : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-slate-200'
+                      }`}
+                      title="Make dominated trap points disappear from the graphic"
+                    >
+                      <EyeOff className="h-3.5 w-3.5" />
+                      {hideDominatedNodes
+                        ? `Traps Hidden (${trapCount})`
+                        : `Hide Trap Points (${trapCount})`}
+                    </button>
+                  </div>
 
-                {/* Custom Base & Y-Axis Selectors in Explorer/Pro Mode */}
-                {chartView !== 'residuals' &&
-                  chartView !== 'axes' &&
-                  chartView !== 'hyper' && (
+                  {/* Custom Base & Y-Axis Selectors */}
                   <div className="flex flex-wrap items-center gap-2">
                     <div className="flex items-center gap-1 rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-1">
                       <span className="text-emerald-300 font-medium">
@@ -846,11 +892,11 @@ export function App() {
                       </select>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
-              {/* Proportional Value Extrapolation Toolbar */}
-              {chartView !== 'residuals' && chartView !== 'hyper' && (
+              {/* Proportional Value Extrapolation Toolbar (Active for 2D views where lines/curves are plotted) */}
+              {(chartView === '2d' || chartView === 'axes') && (
                 <ExtrapolationToolbar
                   gpus={rankedGpus}
                   xMetric={xMetric}
@@ -1033,6 +1079,17 @@ export function App() {
           onHoverGpu={setHoveredGpuId}
           onToggleSelectGpu={handleToggleSelectGpu}
           onToggleHideTraps={setHideTrapsInTable}
+        />
+
+        {/* GPU Deal Importer & Custom Database Modal */}
+        <GpuDealImporterModal
+          isOpen={isDealImporterOpen}
+          onClose={() => setIsDealImporterOpen(false)}
+          customGpus={customGpus}
+          onAddCustomGpus={addCustomGpus}
+          onRemoveCustomGpu={removeCustomGpu}
+          onClearCustomGpus={clearCustomGpus}
+          onSwitchToCustomDataset={() => handleSwitchDataset('custom')}
         />
       </main>
     </div>

@@ -8,7 +8,9 @@ import {
   TrendingDown,
   TrendingUp,
   Award,
+  ExternalLink,
 } from 'lucide-react';
+import { formatCurrency } from '../utils/currency';
 
 interface GpuLeaderboardTableProps {
   gpus: RankedGpu[];
@@ -113,12 +115,29 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3">
-                    <div className="font-bold text-white flex items-center gap-1.5">
+                    <div className="font-bold text-white flex items-center gap-1.5 flex-wrap">
                       <span>{gpu.name}</span>
                       {gpu.vendor && gpu.vendor !== 'Synthetic' && (
                         <span className="rounded bg-slate-800 px-1.5 py-0.2 text-[10px] font-medium text-slate-300">
                           {gpu.vendor}
                         </span>
+                      )}
+                      {gpu.store && (
+                        <span className="rounded bg-indigo-500/20 border border-indigo-500/30 px-1.5 py-0.2 text-[10px] font-bold text-indigo-300">
+                          {gpu.store}
+                        </span>
+                      )}
+                      {gpu.url && (
+                        <a
+                          href={gpu.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-sky-400 hover:text-sky-300 p-0.5"
+                          title="Open Store Listing"
+                        >
+                          <ExternalLink className="h-3 w-3 inline" />
+                        </a>
                       )}
                     </div>
                     <div className="text-[11px] text-slate-400">
@@ -170,13 +189,15 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono font-bold text-white">
-                    ${gpu.price}
+                    {formatCurrency(gpu.price, gpu.currency)}
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono">
                     {val ? (
                       <div className="flex flex-col items-end">
-                        <span className="text-slate-200">${val.fairPrice}</span>
+                        <span className="text-slate-200">
+                          {formatCurrency(val.fairPrice, gpu.currency)}
+                        </span>
                         <span
                           className={`inline-flex items-center gap-0.5 text-[10px] font-semibold ${
                             val.residualUsd <= -15
@@ -189,12 +210,12 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                           {val.residualUsd <= 0 ? (
                             <>
                               <TrendingDown className="h-2.5 w-2.5" />
-                              -${Math.abs(val.residualUsd)}
+                              -{formatCurrency(Math.abs(val.residualUsd), gpu.currency)}
                             </>
                           ) : (
                             <>
                               <TrendingUp className="h-2.5 w-2.5" />
-                              +${val.residualUsd}
+                              +{formatCurrency(val.residualUsd, gpu.currency)}
                             </>
                           )}
                         </span>
