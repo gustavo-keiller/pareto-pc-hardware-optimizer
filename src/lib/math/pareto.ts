@@ -14,7 +14,7 @@ import {
  */
 export function filterByHardConstraints(
   candidates: GpuCandidate[],
-  constraints: Partial<HardConstraints>
+  constraints: Partial<HardConstraints>,
 ): GpuCandidate[] {
   const maxPrice = constraints.maxPrice ?? Infinity;
   const minVram = constraints.minVram ?? 0;
@@ -24,7 +24,7 @@ export function filterByHardConstraints(
     (gpu) =>
       gpu.price <= maxPrice &&
       gpu.vramGb >= minVram &&
-      gpu.tdpWatts <= maxWatts
+      gpu.tdpWatts <= maxWatts,
   );
 }
 
@@ -38,7 +38,7 @@ export function filterByHardConstraints(
 export function dominates(
   candidateA: GpuCandidate,
   candidateB: GpuCandidate,
-  activeObjectives: MetricKey[]
+  activeObjectives: MetricKey[],
 ): boolean {
   if (candidateA.id === candidateB.id || activeObjectives.length === 0) {
     return false;
@@ -79,10 +79,11 @@ export function dominates(
 export function buildDominanceReason(
   dominator: GpuCandidate,
   victim: GpuCandidate,
-  activeObjectives: MetricKey[]
+  activeObjectives: MetricKey[],
 ): DominanceReason {
   const priceSaved = victim.price - dominator.price;
-  const metricGains: Partial<Record<MetricKey, { diff: number; pct: number }>> = {};
+  const metricGains: Partial<Record<MetricKey, { diff: number; pct: number }>> =
+    {};
   const clauses: string[] = [];
 
   for (const metric of activeObjectives) {
@@ -92,7 +93,8 @@ export function buildDominanceReason(
 
     if (metric === 'price') {
       if (priceSaved > 0) {
-        const pct = vicVal > 0 ? Math.round((priceSaved / vicVal) * 1000) / 10 : 0;
+        const pct =
+          vicVal > 0 ? Math.round((priceSaved / vicVal) * 1000) / 10 : 0;
         metricGains.price = { diff: priceSaved, pct };
         clauses.push(`$${priceSaved} cheaper`);
       }
@@ -106,7 +108,9 @@ export function buildDominanceReason(
       if (metric === 'vramGb') {
         clauses.push(`+${diff} GB VRAM (${domVal} GB vs ${vicVal} GB)`);
       } else {
-        clauses.push(`${pct}% faster in ${def.shortLabel} (+${diff} ${def.unit})`);
+        clauses.push(
+          `${pct}% faster in ${def.shortLabel} (+${diff} ${def.unit})`,
+        );
       }
     } else if (def.direction === 'min' && domVal < vicVal) {
       const diff = vicVal - domVal;
@@ -138,7 +142,7 @@ export function buildDominanceReason(
  */
 export function evaluateParetoFrontier(
   candidates: GpuCandidate[],
-  activeObjectives: MetricKey[] = ['price', 'rasterFps1440p']
+  activeObjectives: MetricKey[] = ['price', 'rasterFps1440p'],
 ): ParetoEvaluatedGpu[] {
   // First pass: find all pairwise dominance relationships
   const allDominatorsMap = new Map<string, GpuCandidate[]>();
@@ -175,7 +179,7 @@ export function evaluateParetoFrontier(
     const effectiveDoms = paretoDoms.length > 0 ? paretoDoms : allDoms;
 
     const dominanceReasons = effectiveDoms.map((dom) =>
-      buildDominanceReason(dom, candidate, activeObjectives)
+      buildDominanceReason(dom, candidate, activeObjectives),
     );
 
     return {
@@ -196,7 +200,7 @@ export function evaluateParetoFrontier(
 export function get2DParetoFrontierCurve(
   candidates: GpuCandidate[],
   xMetric: MetricKey = 'price',
-  yMetric: MetricKey = 'rasterFps1440p'
+  yMetric: MetricKey = 'rasterFps1440p',
 ): {
   frontierGpus: GpuCandidate[];
   stepLineCoords: [number, number][];
@@ -213,7 +217,9 @@ export function get2DParetoFrontierCurve(
     .filter((g) => g.isParetoOptimal)
     .sort((a, b) => {
       if (a[xMetric] !== b[xMetric]) {
-        return xDir === 'min' ? a[xMetric] - b[xMetric] : b[xMetric] - a[xMetric];
+        return xDir === 'min'
+          ? a[xMetric] - b[xMetric]
+          : b[xMetric] - a[xMetric];
       }
       return a[yMetric] - b[yMetric];
     });

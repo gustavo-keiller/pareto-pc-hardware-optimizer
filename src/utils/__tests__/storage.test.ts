@@ -50,7 +50,9 @@ describe('safe storage utilities (src/utils/storage.ts)', () => {
   it('round-trips valid objects and arrays via safeSetJSON and safeGetJSON', () => {
     const weights = { price: 50, vramGb: 50 };
     safeSetJSON('user_weights', weights);
-    expect(safeGetJSON('user_weights', { price: 0, vramGb: 0 })).toEqual(weights);
+    expect(safeGetJSON('user_weights', { price: 0, vramGb: 0 })).toEqual(
+      weights,
+    );
 
     const compareIds = ['gpu-2', 'gpu-4'];
     safeSetJSON('compare_ids', compareIds);
@@ -82,6 +84,8 @@ describe('safe storage utilities (src/utils/storage.ts)', () => {
 
   it('runs schema migrations and stamps paretopc_schema_version', () => {
     runStorageMigrations();
-    expect(safeGetInt('paretopc_schema_version', 0)).toBe(CURRENT_SCHEMA_VERSION);
+    expect(safeGetInt('paretopc_schema_version', 0)).toBe(
+      CURRENT_SCHEMA_VERSION,
+    );
   });
 });

@@ -25,11 +25,7 @@ export interface GpuCandidate {
 }
 
 export type MetricKey =
-  | 'price'
-  | 'rasterFps1440p'
-  | 'rtFps1440p'
-  | 'vramGb'
-  | 'tdpWatts';
+  'price' | 'rasterFps1440p' | 'rtFps1440p' | 'vramGb' | 'tdpWatts';
 
 export type OptimizationDirection = 'min' | 'max';
 
@@ -87,6 +83,14 @@ export const METRIC_DEFINITIONS: Record<MetricKey, MetricDefinition> = {
     description: 'Lower is better. Thermal design power and PSU load.',
   },
 };
+
+/**
+ * Type guard for untrusted strings (e.g. `<select>` values) that must be a MetricKey.
+ * Use this instead of `value as MetricKey`.
+ */
+export function isMetricKey(value: string): value is MetricKey {
+  return Object.prototype.hasOwnProperty.call(METRIC_DEFINITIONS, value);
+}
 
 export interface HardConstraints {
   maxPrice: number;

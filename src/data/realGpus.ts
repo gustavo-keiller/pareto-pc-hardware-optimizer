@@ -32,7 +32,8 @@ export const REAL_WORLD_GPUS: GpuCandidate[] = [
     rtFps1440p: 52,
     vramGb: 12,
     tdpWatts: 190,
-    notes: 'Budget 12GB disruptor; dominates older $270-$300 8GB cards on Price/FPS/VRAM',
+    notes:
+      'Budget 12GB disruptor; dominates older $270-$300 8GB cards on Price/FPS/VRAM',
   },
   {
     id: 'rx-7600',
@@ -43,7 +44,8 @@ export const REAL_WORLD_GPUS: GpuCandidate[] = [
     rtFps1440p: 33,
     vramGb: 8,
     tdpWatts: 165,
-    notes: 'Dominated in 2D Price/Raster by Arc B580, but draws 25W less power in 5D',
+    notes:
+      'Dominated in 2D Price/Raster by Arc B580, but draws 25W less power in 5D',
   },
   {
     id: 'rtx-4060',
@@ -54,7 +56,8 @@ export const REAL_WORLD_GPUS: GpuCandidate[] = [
     rtFps1440p: 48,
     vramGb: 8,
     tdpWatts: 115,
-    notes: 'Dominated on 2D Price/Raster by Arc B580, but 5D Pareto-optimal due to ultra-low 115W power draw',
+    notes:
+      'Dominated on 2D Price/Raster by Arc B580, but 5D Pareto-optimal due to ultra-low 115W power draw',
   },
   {
     id: 'rtx-3060-12gb',
@@ -65,7 +68,8 @@ export const REAL_WORLD_GPUS: GpuCandidate[] = [
     rtFps1440p: 35,
     vramGb: 12,
     tdpWatts: 170,
-    notes: 'Legacy pricing trap: beaten by Arc B580 ($35 cheaper and +32% faster)',
+    notes:
+      'Legacy pricing trap: beaten by Arc B580 ($35 cheaper and +32% faster)',
   },
   {
     id: 'rx-6750-xt',
@@ -87,7 +91,8 @@ export const REAL_WORLD_GPUS: GpuCandidate[] = [
     rtFps1440p: 36,
     vramGb: 16,
     tdpWatts: 190,
-    notes: 'Dominated on 2D Price/Raster by Arc B580, but 5D-optimal as the cheapest 16GB VRAM card',
+    notes:
+      'Dominated on 2D Price/Raster by Arc B580, but 5D-optimal as the cheapest 16GB VRAM card',
   },
   {
     id: 'rtx-4060-ti-8gb',
@@ -98,7 +103,8 @@ export const REAL_WORLD_GPUS: GpuCandidate[] = [
     rtFps1440p: 62,
     vramGb: 8,
     tdpWatts: 160,
-    notes: 'Dominated on 2D Price/Raster by RX 6750 XT ($55 cheaper & faster); 5D niche for RT/Watt',
+    notes:
+      'Dominated on 2D Price/Raster by RX 6750 XT ($55 cheaper & faster); 5D niche for RT/Watt',
   },
   {
     id: 'rx-7700-xt',
@@ -120,7 +126,8 @@ export const REAL_WORLD_GPUS: GpuCandidate[] = [
     rtFps1440p: 64,
     vramGb: 16,
     tdpWatts: 165,
-    notes: 'Notorious retail value trap: costs $55 more than RX 7700 XT for 13% less raster FPS',
+    notes:
+      'Notorious retail value trap: costs $55 more than RX 7700 XT for 13% less raster FPS',
   },
   {
     id: 'rx-7800-xt',
@@ -153,7 +160,8 @@ export const REAL_WORLD_GPUS: GpuCandidate[] = [
     rtFps1440p: 102,
     vramGb: 12,
     tdpWatts: 220,
-    notes: 'Dominated on 2D Price/Raster by RX 7900 GRE, but 5D Pareto-optimal via +27% faster Ray Tracing & 40W lower power',
+    notes:
+      'Dominated on 2D Price/Raster by RX 7900 GRE, but 5D Pareto-optimal via +27% faster Ray Tracing & 40W lower power',
   },
   {
     id: 'rx-7900-xt',
@@ -175,7 +183,8 @@ export const REAL_WORLD_GPUS: GpuCandidate[] = [
     rtFps1440p: 120,
     vramGb: 16,
     tdpWatts: 285,
-    notes: 'Dominated on 2D Price/Raster by RX 7900 XT, but 5D Pareto-optimal for heavy 1440p/4K Ray Tracing',
+    notes:
+      'Dominated on 2D Price/Raster by RX 7900 XT, but 5D Pareto-optimal for heavy 1440p/4K Ray Tracing',
   },
   {
     id: 'rx-7900-xtx',
@@ -197,7 +206,8 @@ export const REAL_WORLD_GPUS: GpuCandidate[] = [
     rtFps1440p: 142,
     vramGb: 16,
     tdpWatts: 320,
-    notes: 'Dominated on 2D Price/Raster by RX 7900 XTX, but 5D Pareto-optimal for flagship Path Tracing & lower TBP',
+    notes:
+      'Dominated on 2D Price/Raster by RX 7900 XTX, but 5D Pareto-optimal for flagship Path Tracing & lower TBP',
   },
   {
     id: 'rtx-4090',

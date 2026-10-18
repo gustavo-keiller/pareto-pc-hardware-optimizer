@@ -22,16 +22,21 @@ export const DEFAULT_PREFERENCE_WEIGHTS: PreferenceWeights = {
   tdpWatts: 8,
 };
 
+/** A fresh all-zero record over every MetricKey (typed without an `as` cast). */
+function zeroMetricRecord(): Record<MetricKey, number> {
+  return { price: 0, rasterFps1440p: 0, rtFps1440p: 0, vramGb: 0, tdpWatts: 0 };
+}
+
 /**
  * Normalizes user slider weights w = [w_1, ..., w_k] so that sum(w_j) = 1.
  * If all sliders are set to 0, falls back to uniform weights (1 / k).
  */
 export function normalizeWeights(
-  weights: Partial<PreferenceWeights>
+  weights: Partial<PreferenceWeights>,
 ): PreferenceWeights {
   const sum = ALL_METRIC_KEYS.reduce(
     (acc, key) => acc + Math.max(0, weights[key] ?? 0),
-    0
+    0,
   );
 
   if (sum <= 0) {
@@ -70,7 +75,7 @@ export function normalizeWeights(
  */
 export function rankByTopsis(
   candidates: ParetoEvaluatedGpu[],
-  rawWeights: Partial<PreferenceWeights> = DEFAULT_PREFERENCE_WEIGHTS
+  rawWeights: Partial<PreferenceWeights> = DEFAULT_PREFERENCE_WEIGHTS,
 ): RankedGpu[] {
   if (candidates.length === 0) {
     return [];
@@ -79,13 +84,7 @@ export function rankByTopsis(
   const weights = normalizeWeights(rawWeights);
 
   // Step 1: Compute Euclidean column norms sqrt(sum x_ij^2)
-  const columnNorms: Record<MetricKey, number> = {
-    price: 0,
-    rasterFps1440p: 0,
-    rtFps1440p: 0,
-    vramGb: 0,
-    tdpWatts: 0,
-  };
+  const columnNorms = zeroMetricRecord();
 
   for (const metric of ALL_METRIC_KEYS) {
     const sumSq = candidates.reduce((acc, c) => acc + c[metric] * c[metric], 0);
@@ -94,8 +93,8 @@ export function rankByTopsis(
 
   // Step 1 & 2: Compute r_ij and v_ij = w_j * r_ij for each candidate
   const matrices = candidates.map((candidate) => {
-    const normalizedMetrics = {} as Record<MetricKey, number>;
-    const weightedMetrics = {} as Record<MetricKey, number>;
+    const normalizedMetrics = zeroMetricRecord();
+    const weightedMetrics = zeroMetricRecord();
 
     for (const metric of ALL_METRIC_KEYS) {
       const norm = columnNorms[metric];
@@ -112,8 +111,8 @@ export function rankByTopsis(
   });
 
   // Step 3: Determine Ideal Best (A^+) and Ideal Worst (A^-)
-  const idealBest = {} as Record<MetricKey, number>;
-  const idealWorst = {} as Record<MetricKey, number>;
+  const idealBest = zeroMetricRecord();
+  const idealWorst = zeroMetricRecord();
 
   for (const metric of ALL_METRIC_KEYS) {
     const values = matrices.map((m) => m.weightedMetrics[metric]);
@@ -161,7 +160,7 @@ export function rankByTopsis(
         rank: 0,
         frontierRank: null,
       };
-    }
+    },
   );
 
   // Sort descending by C_i (tie-breaker: Pareto optimal first, then lower price)

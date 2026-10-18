@@ -22,7 +22,9 @@ import {
   evaluateLinearExtrapolation,
   getClippedExtrapolationLine,
   getExtrapolationCurvePoints,
+  isExtrapolationScalingModel,
 } from '../extrapolation';
+import { METRIC_DEFINITIONS, isMetricKey } from '../types';
 import { GpuCandidate } from '../types';
 
 describe('Stage 1: Hard-Constraint Filtering (filterByHardConstraints)', () => {
@@ -90,17 +92,17 @@ describe('Stage 2: Pareto Dominance Engine (pareto.ts)', () => {
 
     expect(byId['gpu-3'].dominatedBy).toEqual(['gpu-2']);
     expect(byId['gpu-3'].dominanceReasons[0].summaryText).toContain(
-      'Vortex RX 760 is $35 cheaper'
+      'Vortex RX 760 is $35 cheaper',
     );
 
     expect(byId['gpu-5'].dominatedBy).toEqual(['gpu-4']);
     expect(byId['gpu-5'].dominanceReasons[0].summaryText).toContain(
-      'Vortex RX 770 XT is $30 cheaper'
+      'Vortex RX 770 XT is $30 cheaper',
     );
 
     expect(byId['gpu-8'].dominatedBy).toEqual(['gpu-7']);
     expect(byId['gpu-8'].dominanceReasons[0].summaryText).toContain(
-      'Apex 4075 Super is $30 cheaper'
+      'Apex 4075 Super is $30 cheaper',
     );
   });
 
@@ -138,9 +140,7 @@ describe('Stage 2: Pareto Dominance Engine (pareto.ts)', () => {
   it('handles edge cases in dominates() and buildDominanceReason()', () => {
     const gpuA = PHASE1_SEED_GPUS[0];
     expect(dominates(gpuA, gpuA, ['price', 'rasterFps1440p'])).toBe(false);
-    expect(
-      dominates(PHASE1_SEED_GPUS[1], PHASE1_SEED_GPUS[2], [])
-    ).toBe(false);
+    expect(dominates(PHASE1_SEED_GPUS[1], PHASE1_SEED_GPUS[2], [])).toBe(false);
 
     const cloneA: GpuCandidate = { ...gpuA, id: 'gpu-clone' };
     expect(dominates(gpuA, cloneA, ['price', 'rasterFps1440p'])).toBe(false);
@@ -148,14 +148,14 @@ describe('Stage 2: Pareto Dominance Engine (pareto.ts)', () => {
     const reason = buildDominanceReason(
       PHASE1_SEED_GPUS[3],
       PHASE1_SEED_GPUS[4],
-      ['price', 'rasterFps1440p', 'vramGb']
+      ['price', 'rasterFps1440p', 'vramGb'],
     );
     expect(reason.summaryText).toContain('+8 GB VRAM');
 
     const reasonWatts = buildDominanceReason(
       PHASE1_SEED_GPUS[1],
       PHASE1_SEED_GPUS[2],
-      ['tdpWatts']
+      ['tdpWatts'],
     );
     expect(reasonWatts.summaryText).toContain('25W lower Power (TBP)');
 
@@ -208,7 +208,7 @@ describe('Stage 2: Pareto Dominance Engine (pareto.ts)', () => {
     const curveMinX = get2DParetoFrontierCurve(
       PHASE1_SEED_GPUS,
       'price',
-      'rasterFps1440p'
+      'rasterFps1440p',
     );
     expect(curveMinX.frontierGpus).toHaveLength(7);
     expect(curveMinX.frontierGpus[0].id).toBe('gpu-1');
@@ -218,7 +218,7 @@ describe('Stage 2: Pareto Dominance Engine (pareto.ts)', () => {
     const curveMaxX = get2DParetoFrontierCurve(
       PHASE1_SEED_GPUS,
       'rasterFps1440p',
-      'rtFps1440p'
+      'rtFps1440p',
     );
     expect(curveMaxX.frontierGpus[0].id).toBe('gpu-10');
 
@@ -229,7 +229,7 @@ describe('Stage 2: Pareto Dominance Engine (pareto.ts)', () => {
     const tiedCurve = get2DParetoFrontierCurve(
       identicalXY,
       'price',
-      'rasterFps1440p'
+      'rasterFps1440p',
     );
     expect(tiedCurve.frontierGpus).toHaveLength(2);
   });
@@ -261,7 +261,7 @@ describe('Stage 3: TOPSIS Ranking Engine (topsis.ts)', () => {
         zeroNorm.rasterFps1440p +
         zeroNorm.rtFps1440p +
         zeroNorm.vramGb +
-        zeroNorm.tdpWatts
+        zeroNorm.tdpWatts,
     ).toBeCloseTo(1.0);
   });
 
@@ -281,7 +281,10 @@ describe('Stage 3: TOPSIS Ranking Engine (topsis.ts)', () => {
     expect(budgetRanked[0].id).toBe('gpu-1');
     expect(budgetRanked[0].topsisScore).toBeCloseTo(1.0, 5);
     expect(budgetRanked[budgetRanked.length - 1].id).toBe('gpu-10');
-    expect(budgetRanked[budgetRanked.length - 1].topsisScore).toBeCloseTo(0.0, 5);
+    expect(budgetRanked[budgetRanked.length - 1].topsisScore).toBeCloseTo(
+      0.0,
+      5,
+    );
 
     const flagshipRanked = rankByTopsis(evaluated, {
       price: 0,
@@ -352,7 +355,9 @@ describe('Phase 2: Hedonic OLS Regression Engine (regression.ts)', () => {
     expect(realModel.valuations['arc-b580'].valueTier).toBe('bargain');
 
     // RTX 4060 Ti 16GB ($445, 85 FPS) is overpriced relative to the 1440p market curve
-    expect(realModel.valuations['rtx-4060-ti-16gb'].residualUsd).toBeGreaterThan(0);
+    expect(
+      realModel.valuations['rtx-4060-ti-16gb'].residualUsd,
+    ).toBeGreaterThan(0);
   });
 
   it('handles degenerate empty, single-item, and singular matrix inputs safely', () => {
@@ -371,7 +376,7 @@ describe('Phase 2: Hedonic OLS Regression Engine (regression.ts)', () => {
         [1, 2],
         [2, 4],
       ],
-      [3, 6]
+      [3, 6],
     );
     expect(singular).toBeNull();
 
@@ -399,7 +404,7 @@ describe('Personalized Value Extrapolation Engine (extrapolation.ts)', () => {
         tolerancePct: 0,
         whatIfX: 600,
         enforceAsTrap: true,
-      }
+      },
     );
 
     // $1000 / 10 GB = $100 / GB
@@ -426,7 +431,7 @@ describe('Personalized Value Extrapolation Engine (extrapolation.ts)', () => {
         tolerancePct: 0,
         whatIfX: 600,
         enforceAsTrap: true,
-      }
+      },
     );
     expect(strictRes.costPerUnit).toBe(30);
     // gpu-5 ($410 for 8 GB = $51.25/GB) and gpu-10 ($950 for 24 GB = $39.58/GB) are worse than $30/GB
@@ -453,7 +458,7 @@ describe('Personalized Value Extrapolation Engine (extrapolation.ts)', () => {
         tolerancePct: 0,
         whatIfX: 500,
         enforceAsTrap: false,
-      }
+      },
     );
 
     expect(gpuAnchored.anchorX).toBe(380);
@@ -478,7 +483,7 @@ describe('Personalized Value Extrapolation Engine (extrapolation.ts)', () => {
         tolerancePct: -10,
         whatIfX: 760,
         enforceAsTrap: true,
-      }
+      },
     );
     // At 2x anchor price ($760), alpha = 0.7 predicts 94 * 2^0.7 = 152.7 FPS (cutoff = 0.9 * 152.7 = 137.4 FPS)
     expect(powerRes.whatIfAnchorY).toBeCloseTo(94 * Math.pow(2, 0.7), 1);
@@ -490,7 +495,7 @@ describe('Personalized Value Extrapolation Engine (extrapolation.ts)', () => {
       1000,
       40,
       200,
-      10
+      10,
     );
     expect(curvePts.length).toBeGreaterThan(2);
 
@@ -500,3 +505,19 @@ describe('Personalized Value Extrapolation Engine (extrapolation.ts)', () => {
   });
 });
 
+describe('Type guards for untrusted strings', () => {
+  it('isMetricKey accepts exactly the keys of METRIC_DEFINITIONS', () => {
+    for (const key of Object.keys(METRIC_DEFINITIONS)) {
+      expect(isMetricKey(key)).toBe(true);
+    }
+    for (const bad of ['', 'Price', 'toString', '__proto__', 'constructor']) {
+      expect(isMetricKey(bad)).toBe(false);
+    }
+  });
+
+  it('isExtrapolationScalingModel rejects unknown models', () => {
+    expect(isExtrapolationScalingModel('linear-ratio')).toBe(true);
+    expect(isExtrapolationScalingModel('two-point-line')).toBe(true);
+    expect(isExtrapolationScalingModel('cubic')).toBe(false);
+  });
+});

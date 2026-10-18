@@ -58,7 +58,9 @@ function orphanedStubs(expected) {
     .map((e) => e.name)
     .filter((name) => {
       const file = path.join(STUB_DIR, name, 'SKILL.md');
-      return fs.existsSync(file) && fs.readFileSync(file, 'utf-8').includes(MARKER);
+      return (
+        fs.existsSync(file) && fs.readFileSync(file, 'utf-8').includes(MARKER)
+      );
     });
 }
 
@@ -69,7 +71,8 @@ function diffStubs() {
   for (const [name, content] of expected) {
     const file = path.join(STUB_DIR, name, 'SKILL.md');
     if (!fs.existsSync(file)) missing.push(name);
-    else if (normalise(fs.readFileSync(file, 'utf-8')) !== content) stale.push(name);
+    else if (normalise(fs.readFileSync(file, 'utf-8')) !== content)
+      stale.push(name);
   }
   return { expected, missing, stale, orphaned: orphanedStubs(expected) };
 }
@@ -80,7 +83,7 @@ function sync() {
     fs.mkdirSync(path.join(STUB_DIR, name), { recursive: true });
     fs.writeFileSync(
       path.join(STUB_DIR, name, 'SKILL.md'),
-      expected.get(name).replace(/\n/g, '\r\n')
+      expected.get(name).replace(/\n/g, '\r\n'),
     );
   }
   for (const name of orphaned) {
@@ -88,7 +91,7 @@ function sync() {
   }
   console.log(
     `[sync-claude-skills] ${expected.size} skills: ${missing.length} added, ` +
-      `${stale.length} updated, ${orphaned.length} removed.`
+      `${stale.length} updated, ${orphaned.length} removed.`,
   );
 }
 

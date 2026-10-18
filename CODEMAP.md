@@ -54,7 +54,9 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 
 | Path | Purpose |
 | :--- | :--- |
-| `scripts/check-docs.cjs` | Validates `AGENTS.md` character cap (<12,000 chars), internal markdown links, `.agents/skills/` frontmatter, and `.claude/skills/` stub parity |
+| `scripts/check-docs.cjs` | Validates `AGENTS.md` character cap (<12,000 chars), internal markdown links, `.agents/skills/` frontmatter, `.claude/skills/` stub parity, and the 600/800-line file cap (with a shrink-only allowlist) |
+| `.github/workflows/check.yml` | CI: `npm ci`, `npm run check`, `npm run build` on every push to `main` and every PR |
+| `eslint.config.js` / `.prettierrc.json` | Lint (zero `any`, zero type assertions except `as const`, hooks rules) and formatting, both part of `npm run check` |
 | `scripts/sync-claude-skills.cjs` | Generates/updates `.claude/skills/<name>/SKILL.md` pointer stubs from `.agents/skills/` (`npm run sync:skills`) |
 | `.agents/scripts/block-dangerous-git.cjs` | PreToolUse hook blocking destructive git commands (`reset --hard`, `clean -f`, `checkout .`, force-push) |
 | `.agents/scripts/context-budget.cjs` | UserPromptSubmit hook warning when session context crosses 150K / 225K tokens or 8 / 24 hours |

@@ -4,7 +4,7 @@
 export function formatCurrency(
   val: number,
   currency: 'USD' | 'BRL' = 'USD',
-  showCents = false
+  showCents = false,
 ): string {
   if (isNaN(val)) return currency === 'BRL' ? 'R$ 0' : '$0';
 

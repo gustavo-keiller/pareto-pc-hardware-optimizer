@@ -1,10 +1,6 @@
 import React, { useMemo, useRef } from 'react';
 import ReactECharts from 'echarts-for-react';
-import {
-  METRIC_DEFINITIONS,
-  MetricKey,
-  RankedGpu,
-} from '../lib/math/types';
+import { METRIC_DEFINITIONS, MetricKey, RankedGpu } from '../lib/math/types';
 import { get2DParetoFrontierCurve } from '../lib/math/pareto';
 import {
   ExtrapolationConfig,
@@ -48,23 +44,23 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
 
   const { frontierGpus, stepLineCoords } = useMemo(
     () => get2DParetoFrontierCurve(gpus, xMetric, yMetric),
-    [gpus, xMetric, yMetric]
+    [gpus, xMetric, yMetric],
   );
 
   // Evaluate Linear Extrapolation Rule (e.g. $1000 for 10 GB = $100/GB)
   const extrapResult = useMemo(
     () => evaluateLinearExtrapolation(gpus, xMetric, yMetric, extrapolation),
-    [gpus, xMetric, yMetric, extrapolation]
+    [gpus, xMetric, yMetric, extrapolation],
   );
 
   const belowMarginSet = useMemo(
     () => new Set(extrapResult.belowMarginIds),
-    [extrapResult]
+    [extrapResult],
   );
 
   const frontier2DIdSet = useMemo(
     () => new Set(frontierGpus.map((g) => g.id)),
-    [frontierGpus]
+    [frontierGpus],
   );
 
   // Helper: Is a GPU optimal in the currently displayed 2D view?
@@ -85,12 +81,12 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
       gpus.find((g) => frontier2DIdSet.has(g.id)) ??
       gpus[0] ??
       null,
-    [gpus, frontier2DIdSet, extrapolation, belowMarginSet]
+    [gpus, frontier2DIdSet, extrapolation, belowMarginSet],
   );
 
   const hoveredGpu = useMemo(
     () => gpus.find((g) => g.id === hoveredGpuId) ?? null,
-    [gpus, hoveredGpuId]
+    [gpus, hoveredGpuId],
   );
 
   // Compute exact padded domain bounds
@@ -119,8 +115,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
   // Extend the 2D Pareto staircase to the worst X edge so the shaded region covers the entire unoptimized zone
   const extendedStepCoords = useMemo(() => {
     if (stepLineCoords.length === 0) return [];
-    const worstX =
-      xDef.direction === 'min' ? axisBounds.xMax : axisBounds.xMin;
+    const worstX = xDef.direction === 'min' ? axisBounds.xMax : axisBounds.xMin;
     const lastPt = stepLineCoords[stepLineCoords.length - 1];
     const coords = [...stepLineCoords];
     if (
@@ -140,7 +135,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
       axisBounds.xMin,
       axisBounds.xMax,
       axisBounds.yMin,
-      axisBounds.yMax
+      axisBounds.yMax,
     );
   }, [extrapolation.enabled, extrapResult, axisBounds]);
 
@@ -153,7 +148,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
       axisBounds.xMin,
       axisBounds.xMax,
       axisBounds.yMin,
-      axisBounds.yMax
+      axisBounds.yMax,
     );
   }, [
     extrapolation.enabled,
@@ -200,7 +195,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
                 (!extrapolation.enabled ||
                   !extrapolation.enforceAsTrap ||
                   !belowMarginSet.has(g.id))
-              )
+              ),
           )
           .map((g) => {
             const isSelected = selectedGpuIds.includes(g.id);
@@ -233,7 +228,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
                 g.isParetoOptimal &&
                 (!extrapolation.enabled ||
                   !extrapolation.enforceAsTrap ||
-                  !belowMarginSet.has(g.id))
+                  !belowMarginSet.has(g.id)),
             )
             .map((g) => {
               const isSelected = selectedGpuIds.includes(g.id);
@@ -247,9 +242,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
                   Math.max(16, g.vramGb * 1.2) +
                   (isHovered || isSelected ? 6 : 0),
                 itemStyle: {
-                  color: isSelected
-                    ? '#38bdf8'
-                    : 'rgba(6, 182, 212, 0.55)',
+                  color: isSelected ? '#38bdf8' : 'rgba(6, 182, 212, 0.55)',
                   borderColor: isHovered || isSelected ? '#ffffff' : '#22d3ee',
                   borderWidth: 2,
                 },
@@ -276,13 +269,13 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
             color: isDominatorHighlight
               ? '#34d399'
               : isSelected
-              ? '#38bdf8'
-              : '#10b981',
+                ? '#38bdf8'
+                : '#10b981',
             borderColor: isBelowLineWarning
               ? '#f59e0b'
               : isDominatorHighlight || isHovered || isSelected
-              ? '#ffffff'
-              : '#059669',
+                ? '#ffffff'
+                : '#059669',
             borderWidth:
               isDominatorHighlight || isHovered || isSelected ? 3 : 2,
             shadowBlur: isDominatorHighlight ? 18 : 8,
@@ -405,10 +398,10 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
             g.id === winnerGpu?.id && isGpuOptimalInView(g)
               ? `<span style="background:#f59e0b22;color:#fbbf24;border:1px solid #f59e0b66;padding:2px 6px;border-radius:4px;font-weight:700;font-size:10px;">#1 TOP MATCH</span>`
               : isGpuOptimalInView(g)
-              ? `<span style="background:#10b98122;color:#34d399;border:1px solid #10b98166;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">2D FRONTIER OPTIMAL</span>`
-              : g.isParetoOptimal && !is2DOpt
-              ? `<span style="background:#06b6d422;color:#22d3ee;border:1px solid #06b6d466;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">5D SPECIALIST (2D DOMINATED)</span>`
-              : `<span style="background:#f43f5e22;color:#fb7185;border:1px solid #f43f5e66;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">DOMINATED TRAP</span>`;
+                ? `<span style="background:#10b98122;color:#34d399;border:1px solid #10b98166;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">2D FRONTIER OPTIMAL</span>`
+                : g.isParetoOptimal && !is2DOpt
+                  ? `<span style="background:#06b6d422;color:#22d3ee;border:1px solid #06b6d466;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">5D SPECIALIST (2D DOMINATED)</span>`
+                  : `<span style="background:#f43f5e22;color:#fb7185;border:1px solid #f43f5e66;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">DOMINATED TRAP</span>`;
 
           const extrapHtml =
             extrapolation.enabled && extrapDiag
@@ -732,7 +725,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
         if (id) onToggleSelectGpu(id);
       },
     }),
-    [onHoverGpu, onToggleSelectGpu]
+    [onHoverGpu, onToggleSelectGpu],
   );
 
   const handleResetZoom = () => {

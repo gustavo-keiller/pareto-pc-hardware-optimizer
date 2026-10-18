@@ -53,7 +53,7 @@ npx vitest run            # Unit tests (~1s)
 Before declaring done:
 
 ```bash
-npm run check             # tsc + vitest + docs check
+npm run check             # tsc + eslint + prettier + vitest + docs/file-size check (CI runs this too)
 npm run check:docs        # AGENTS.md size cap, skill stubs, and markdown link integrity
 ```
 

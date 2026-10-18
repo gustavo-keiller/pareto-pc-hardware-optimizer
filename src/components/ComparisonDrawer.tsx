@@ -46,16 +46,18 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
         ((bounds.maxPrice - g.price) /
           Math.max(1, bounds.maxPrice - bounds.minPrice)) *
           85 +
-          15
+          15,
       );
-      const rasterUtility = Math.round((g.rasterFps1440p / bounds.maxRaster) * 100);
+      const rasterUtility = Math.round(
+        (g.rasterFps1440p / bounds.maxRaster) * 100,
+      );
       const rtUtility = Math.round((g.rtFps1440p / bounds.maxRt) * 100);
       const vramUtility = Math.round((g.vramGb / bounds.maxVram) * 100);
       const efficiencyUtility = Math.round(
         ((bounds.maxWatts - g.tdpWatts) /
           Math.max(1, bounds.maxWatts - bounds.minWatts)) *
           85 +
-          15
+          15,
       );
       const topsisUtility = Math.round(g.topsisScorePct);
 
@@ -210,11 +212,13 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
           <div className="flex items-center gap-2">
             <Layers className="h-5 w-5 text-sky-400" />
             <h2 className="text-lg font-bold text-white">
-              Multi-Dimensional Finalist Comparison ({selectedGpus.length}/4 Selected)
+              Multi-Dimensional Finalist Comparison ({selectedGpus.length}/4
+              Selected)
             </h2>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Overlaying 6 hardware dimensions simultaneously. Outer vertices / upper parallel tracks indicate superior value & performance.
+            Overlaying 6 hardware dimensions simultaneously. Outer vertices /
+            upper parallel tracks indicate superior value & performance.
           </p>
         </div>
 

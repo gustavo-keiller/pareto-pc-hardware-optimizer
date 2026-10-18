@@ -20,12 +20,17 @@ npm run check
 It runs in sequence and stops at the first failing step:
 
 1. **`npm run typecheck`** (`tsc --noEmit`) — zero TypeScript compiler or type errors.
-2. **`npm run test`** (`vitest run`) — all unit and mathematical property tests pass.
-3. **`npm run check:docs`** (`node scripts/check-docs.cjs`) — verifies:
+2. **`npm run lint`** (`eslint .`) — no explicit `any`, no type assertions other than `as const` outside tests (use a type guard such as `isMetricKey()`), React hooks rules.
+3. **`npm run format:check`** (`prettier --check .`) — run `npm run format` to fix.
+4. **`npm run test`** (`vitest run`) — all unit and mathematical property tests pass.
+5. **`npm run check:docs`** (`node scripts/check-docs.cjs`) — verifies:
    - `AGENTS.md` is under the 12,000-character limit.
    - Every skill in `.agents/skills/` has valid frontmatter, is indexed in `skill-library/SKILL.md`, and is synced to `.claude/skills/` (`npm run sync:skills`).
    - Every relative markdown link across root docs and `.agents/` resolves to an existing file.
    - Every `src/` module path listed in `CODEMAP.md` exists on disk.
+   - No `src/` file is over 800 lines (warning above 600). The legacy files in `OVERSIZED_FILE_ALLOWLIST` may only shrink.
+
+CI (`.github/workflows/check.yml`) runs `npm run check` and `npm run build` on every push to `main` and every PR.
 
 ---
 

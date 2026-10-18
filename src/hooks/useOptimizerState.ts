@@ -203,7 +203,7 @@ export function useOptimizerState() {
 
   // User Custom Deals Database (Stored safely in localStorage)
   const [customGpus, setCustomGpus] = useState<GpuCandidate[]>(() =>
-    safeGetJSON('paretopc_custom_gpus', DEFAULT_CUSTOM_GPUS)
+    safeGetJSON('paretopc_custom_gpus', DEFAULT_CUSTOM_GPUS),
   );
   const [isDealImporterOpen, setIsDealImporterOpen] = useState<boolean>(false);
 
@@ -219,7 +219,7 @@ export function useOptimizerState() {
 
   // Stage 1: Hard Constraints
   const [constraints, setConstraints] = useState<HardConstraints>(() =>
-    safeGetJSON('paretopc_constraints', DEFAULT_CONSTRAINTS_REAL)
+    safeGetJSON('paretopc_constraints', DEFAULT_CONSTRAINTS_REAL),
   );
 
   // Stage 2: Axes & Pareto Mode
@@ -232,14 +232,16 @@ export function useOptimizerState() {
   });
 
   // Linear & Non-Linear Value Extrapolation Tool
-  const [extrapolation, setExtrapolation] = useState<ExtrapolationConfig>(() => ({
-    ...DEFAULT_EXTRAPOLATION_CONFIG,
-    ...safeGetJSON('paretopc_extrapolation', DEFAULT_EXTRAPOLATION_CONFIG),
-  }));
+  const [extrapolation, setExtrapolation] = useState<ExtrapolationConfig>(
+    () => ({
+      ...DEFAULT_EXTRAPOLATION_CONFIG,
+      ...safeGetJSON('paretopc_extrapolation', DEFAULT_EXTRAPOLATION_CONFIG),
+    }),
+  );
 
   // Stage 3: TOPSIS Weights
   const [weights, setWeights] = useState<PreferenceWeights>(() =>
-    safeGetJSON('paretopc_weights', DEFAULT_PREFERENCE_WEIGHTS)
+    safeGetJSON('paretopc_weights', DEFAULT_PREFERENCE_WEIGHTS),
   );
   const [activePresetId, setActivePresetId] = useState<string>('balanced');
 
@@ -250,10 +252,10 @@ export function useOptimizerState() {
       'arc-b580',
       'rx-7800-xt',
       'rtx-4070-super',
-    ])
+    ]),
   );
   const [hideTrapsInTable, setHideTrapsInTable] = useState<boolean>(() =>
-    safeGetBool('paretopc_hide_traps', false)
+    safeGetBool('paretopc_hide_traps', false),
   );
 
   // Persist changes to localStorage
@@ -303,7 +305,10 @@ export function useOptimizerState() {
 
   // Detected active currency ('BRL' or 'USD')
   const activeCurrency = useMemo<'USD' | 'BRL'>(() => {
-    if (datasetMode === 'custom' && rawCatalog.some((g) => g.currency === 'BRL')) {
+    if (
+      datasetMode === 'custom' &&
+      rawCatalog.some((g) => g.currency === 'BRL')
+    ) {
       return 'BRL';
     }
     return 'USD';
@@ -312,13 +317,13 @@ export function useOptimizerState() {
   // Compute Hedonic OLS Regression across the full catalog so fair-value baselines remain anchored
   const olsModel = useMemo(
     () => computeHedonicRegression(rawCatalog),
-    [rawCatalog]
+    [rawCatalog],
   );
 
   // Stage 1: Hard Constraint Filtering
   const validGpus = useMemo(
     () => filterByHardConstraints(rawCatalog, constraints),
-    [rawCatalog, constraints]
+    [rawCatalog, constraints],
   );
 
   // Stage 2: Active Pareto Objectives
@@ -327,12 +332,12 @@ export function useOptimizerState() {
       paretoMode === '2d-axes'
         ? Array.from(new Set([xMetric, yMetric]))
         : ALL_METRIC_KEYS,
-    [paretoMode, xMetric, yMetric]
+    [paretoMode, xMetric, yMetric],
   );
 
   const paretoGpus = useMemo(
     () => evaluateParetoFrontier(validGpus, activeObjectives),
-    [validGpus, activeObjectives]
+    [validGpus, activeObjectives],
   );
 
   // Stage 3: TOPSIS Ranking + Attach Phase 2 OLS Valuations
@@ -344,33 +349,30 @@ export function useOptimizerState() {
     }));
   }, [paretoGpus, weights, olsModel]);
 
-  const normalizedWeights = useMemo(
-    () => normalizeWeights(weights),
-    [weights]
-  );
+  const normalizedWeights = useMemo(() => normalizeWeights(weights), [weights]);
 
   const topWinner = useMemo(
     () => rankedGpus.find((g) => g.isParetoOptimal) ?? rankedGpus[0] ?? null,
-    [rankedGpus]
+    [rankedGpus],
   );
 
   const hoveredGpu = useMemo(
     () => rankedGpus.find((g) => g.id === hoveredGpuId) ?? null,
-    [rankedGpus, hoveredGpuId]
+    [rankedGpus, hoveredGpuId],
   );
 
   const selectedGpus = useMemo(
     () => rankedGpus.filter((g) => selectedGpuIds.includes(g.id)),
-    [rankedGpus, selectedGpuIds]
+    [rankedGpus, selectedGpuIds],
   );
 
   const optimalCount = useMemo(
     () => rankedGpus.filter((g) => g.isParetoOptimal).length,
-    [rankedGpus]
+    [rankedGpus],
   );
   const trapCount = useMemo(
     () => rankedGpus.filter((g) => g.isDominated).length,
-    [rankedGpus]
+    [rankedGpus],
   );
 
   const displayedTableGpus = useMemo(
@@ -378,7 +380,7 @@ export function useOptimizerState() {
       hideTrapsInTable
         ? rankedGpus.filter((g) => g.isParetoOptimal)
         : rankedGpus,
-    [rankedGpus, hideTrapsInTable]
+    [rankedGpus, hideTrapsInTable],
   );
 
   const handleSwitchDataset = (mode: DatasetMode) => {
@@ -391,12 +393,15 @@ export function useOptimizerState() {
     } else if (mode === 'custom') {
       const maxCustomPrice = Math.max(
         6000,
-        ...(customGpus.length ? customGpus.map((g) => g.price) : [6000])
+        ...(customGpus.length ? customGpus.map((g) => g.price) : [6000]),
       );
       setConstraints({ maxPrice: maxCustomPrice, minVram: 6, maxWatts: 450 });
       if (customGpus.length > 0) {
         setSelectedGpuIds(customGpus.slice(0, 3).map((g) => g.id));
-        setExtrapolation((prev) => ({ ...prev, anchorGpuId: customGpus[0].id }));
+        setExtrapolation((prev) => ({
+          ...prev,
+          anchorGpuId: customGpus[0].id,
+        }));
       }
     } else {
       setConstraints(DEFAULT_CONSTRAINTS_REAL);
@@ -415,7 +420,7 @@ export function useOptimizerState() {
     const maxCustomPrice = Math.max(
       6000,
       ...newGpus.map((g) => g.price),
-      ...(customGpus.length ? customGpus.map((g) => g.price) : [6000])
+      ...(customGpus.length ? customGpus.map((g) => g.price) : [6000]),
     );
     setConstraints((prev) => ({
       ...prev,
@@ -425,7 +430,7 @@ export function useOptimizerState() {
 
   const updateCustomGpu = (updatedGpu: GpuCandidate) => {
     setCustomGpus((prev) =>
-      prev.map((g) => (g.id === updatedGpu.id ? updatedGpu : g))
+      prev.map((g) => (g.id === updatedGpu.id ? updatedGpu : g)),
     );
   };
 
@@ -461,14 +466,14 @@ export function useOptimizerState() {
         ? {
             maxPrice: Math.max(
               6000,
-              ...(customGpus.length ? customGpus.map((g) => g.price) : [6000])
+              ...(customGpus.length ? customGpus.map((g) => g.price) : [6000]),
             ),
             minVram: 6,
             maxWatts: 450,
           }
         : datasetMode === 'real'
-        ? DEFAULT_CONSTRAINTS_REAL
-        : { maxPrice: 1000, minVram: 8, maxWatts: 350 }
+          ? DEFAULT_CONSTRAINTS_REAL
+          : { maxPrice: 1000, minVram: 8, maxWatts: 350 },
     );
     setXMetric('price');
     setYMetric('rasterFps1440p');
@@ -480,8 +485,8 @@ export function useOptimizerState() {
         datasetMode === 'custom' && customGpus.length > 0
           ? customGpus[0].id
           : datasetMode === 'real'
-          ? 'arc-b580'
-          : 'gpu-6',
+            ? 'arc-b580'
+            : 'gpu-6',
     });
     setWeights(DEFAULT_PREFERENCE_WEIGHTS);
     setActivePresetId('balanced');

@@ -1,10 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import {
   ExtrapolationConfig,
-  ExtrapolationScalingModel,
+  isExtrapolationScalingModel,
   evaluateLinearExtrapolation,
 } from '../lib/math/extrapolation';
-import { METRIC_DEFINITIONS, MetricKey, RankedGpu } from '../lib/math/types';
+import {
+  METRIC_DEFINITIONS,
+  MetricKey,
+  RankedGpu,
+  isMetricKey,
+} from '../lib/math/types';
 import { ALL_METRIC_KEYS } from '../lib/math/topsis';
 import { UiMode } from '../hooks/useOptimizerState';
 import {
@@ -45,7 +50,7 @@ export const ExtrapolationToolbar: React.FC<ExtrapolationToolbarProps> = ({
   // In 'simple' mode, keep detailed customization collapsed unless the user clicks "Customize"
   const [isSimpleExpanded, setIsSimpleExpanded] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<LabTabId>(() =>
-    extrapolation.mode === 'custom' ? 'quick-rule' : 'gpu-benchmark'
+    extrapolation.mode === 'custom' ? 'quick-rule' : 'gpu-benchmark',
   );
 
   const xDef = METRIC_DEFINITIONS[xMetric];
@@ -53,7 +58,7 @@ export const ExtrapolationToolbar: React.FC<ExtrapolationToolbarProps> = ({
 
   const evalResult = useMemo(
     () => evaluateLinearExtrapolation(gpus, xMetric, yMetric, extrapolation),
-    [gpus, xMetric, yMetric, extrapolation]
+    [gpus, xMetric, yMetric, extrapolation],
   );
 
   // Multi-metric "What-If" projections across all specs at `extrapolation.whatIfX`
@@ -65,7 +70,7 @@ export const ExtrapolationToolbar: React.FC<ExtrapolationToolbarProps> = ({
         gpus,
         xMetric,
         targetKey,
-        extrapolation
+        extrapolation,
       );
       return {
         key: targetKey,
@@ -385,7 +390,8 @@ export const ExtrapolationToolbar: React.FC<ExtrapolationToolbarProps> = ({
                   aria-label="Rule Base Metric"
                   value={xMetric}
                   onChange={(e) =>
-                    onSelectAxes?.(e.target.value as MetricKey, yMetric)
+                    isMetricKey(e.target.value) &&
+                    onSelectAxes?.(e.target.value, yMetric)
                   }
                   className="rounded-lg border border-slate-700 bg-slate-900 px-2 py-1 font-bold text-emerald-400 focus:outline-none cursor-pointer"
                 >
@@ -415,7 +421,7 @@ export const ExtrapolationToolbar: React.FC<ExtrapolationToolbarProps> = ({
                         mode: 'custom',
                         customYValue: Math.max(
                           0.1,
-                          Number(e.target.value) || 1
+                          Number(e.target.value) || 1,
                         ),
                       }))
                     }
@@ -426,7 +432,8 @@ export const ExtrapolationToolbar: React.FC<ExtrapolationToolbarProps> = ({
                   aria-label="Rule Target Metric"
                   value={yMetric}
                   onChange={(e) =>
-                    onSelectAxes?.(xMetric, e.target.value as MetricKey)
+                    isMetricKey(e.target.value) &&
+                    onSelectAxes?.(xMetric, e.target.value)
                   }
                   className="rounded-lg border border-slate-700 bg-slate-900 px-2 py-1 font-bold text-sky-400 focus:outline-none cursor-pointer"
                 >
@@ -585,7 +592,8 @@ export const ExtrapolationToolbar: React.FC<ExtrapolationToolbarProps> = ({
                     aria-label="Extrapolation Mathematical Curve Law"
                     value={extrapolation.scalingModel}
                     onChange={(e) => {
-                      const model = e.target.value as ExtrapolationScalingModel;
+                      const model = e.target.value;
+                      if (!isExtrapolationScalingModel(model)) return;
                       onChangeExtrapolation((prev) => ({
                         ...prev,
                         scalingModel: model,
@@ -593,8 +601,8 @@ export const ExtrapolationToolbar: React.FC<ExtrapolationToolbarProps> = ({
                           model === 'two-point-line'
                             ? 'two-gpu'
                             : prev.mode === 'two-gpu'
-                            ? 'gpu'
-                            : prev.mode,
+                              ? 'gpu'
+                              : prev.mode,
                       }));
                     }}
                     className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 font-bold text-purple-300 focus:outline-none cursor-pointer"

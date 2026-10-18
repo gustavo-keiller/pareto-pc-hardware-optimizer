@@ -15,6 +15,9 @@ export function safeGetJSON<T>(key: string, defaultValue: T): T {
       return defaultValue;
     }
     const parsed: unknown = JSON.parse(raw);
+    // This file is the one trust boundary for localStorage: the shape checks below
+    // match `defaultValue`'s kind, then the result is handed back as T.
+    /* eslint-disable @typescript-eslint/consistent-type-assertions */
     if (parsed === null || parsed === undefined) {
       return defaultValue;
     }
@@ -29,6 +32,7 @@ export function safeGetJSON<T>(key: string, defaultValue: T): T {
       ) as T;
     }
     return parsed as T;
+    /* eslint-enable @typescript-eslint/consistent-type-assertions */
   } catch {
     return defaultValue;
   }
@@ -52,7 +56,7 @@ export function safeGetInt(
   key: string,
   defaultValue: number,
   min?: number,
-  max?: number
+  max?: number,
 ): number {
   try {
     const raw = localStorage.getItem(key);
@@ -99,7 +103,11 @@ export function safeGetString(key: string, defaultValue: string): string {
       return defaultValue;
     }
     const trimmed = raw.trim();
-    if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length >= 2) {
+    if (
+      trimmed.startsWith('"') &&
+      trimmed.endsWith('"') &&
+      trimmed.length >= 2
+    ) {
       try {
         const parsed: unknown = JSON.parse(trimmed);
         if (typeof parsed === 'string') return parsed;
@@ -121,7 +129,10 @@ export function runStorageMigrations(): void {
 
   if (currentVersion < 1) {
     try {
-      localStorage.setItem('paretopc_schema_version', String(CURRENT_SCHEMA_VERSION));
+      localStorage.setItem(
+        'paretopc_schema_version',
+        String(CURRENT_SCHEMA_VERSION),
+      );
     } catch {
       // Ignore quota or private-browsing storage errors
     }

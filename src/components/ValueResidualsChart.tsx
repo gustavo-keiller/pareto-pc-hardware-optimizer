@@ -27,7 +27,7 @@ export const ValueResidualsChart: React.FC<ValueResidualsChartProps> = ({
       : gpus;
     return [...filtered].sort(
       (a, b) =>
-        (a.valuation?.residualPct ?? 0) - (b.valuation?.residualPct ?? 0)
+        (a.valuation?.residualPct ?? 0) - (b.valuation?.residualPct ?? 0),
     );
   }, [gpus, hideDominatedNodes]);
 
@@ -43,11 +43,7 @@ export const ValueResidualsChart: React.FC<ValueResidualsChartProps> = ({
         value: pct,
         gpu: g,
         itemStyle: {
-          color: isBargain
-            ? '#10b981'
-            : isOverpriced
-            ? '#f43f5e'
-            : '#38bdf8',
+          color: isBargain ? '#10b981' : isOverpriced ? '#f43f5e' : '#38bdf8',
           borderRadius: pct < 0 ? [4, 0, 0, 4] : [0, 4, 4, 0],
         },
         label: {
@@ -55,11 +51,7 @@ export const ValueResidualsChart: React.FC<ValueResidualsChartProps> = ({
           position: pct <= 0 ? 'left' : 'right',
           formatter: () =>
             usd <= 0 ? `-$${Math.abs(usd)} (${pct}%)` : `+$${usd} (+${pct}%)`,
-          color: isBargain
-            ? '#34d399'
-            : isOverpriced
-            ? '#fb7185'
-            : '#cbd5e1',
+          color: isBargain ? '#34d399' : isOverpriced ? '#fb7185' : '#cbd5e1',
           fontSize: 10,
           fontWeight: 600,
         },
@@ -95,10 +87,10 @@ export const ValueResidualsChart: React.FC<ValueResidualsChartProps> = ({
                 <div>Price Delta: <strong style="color:${
                   isBargain ? '#34d399' : '#fb7185'
                 };">${
-            isBargain
-              ? `$${Math.abs(residualUsd)} Below Fair Value (${residualPct}%)`
-              : `$${residualUsd} Above Fair Value (+${residualPct}%)`
-          }</strong></div>
+                  isBargain
+                    ? `$${Math.abs(residualUsd)} Below Fair Value (${residualPct}%)`
+                    : `$${residualUsd} Above Fair Value (+${residualPct}%)`
+                }</strong></div>
               </div>
             </div>
           `;
@@ -146,7 +138,7 @@ export const ValueResidualsChart: React.FC<ValueResidualsChartProps> = ({
         if (id) onToggleSelectGpu(id);
       },
     }),
-    [onHoverGpu, onToggleSelectGpu]
+    [onHoverGpu, onToggleSelectGpu],
   );
 
   return (
@@ -156,7 +148,10 @@ export const ValueResidualsChart: React.FC<ValueResidualsChartProps> = ({
       } relative`}
     >
       <div className="absolute top-1 right-3 z-10 rounded-md border border-slate-800 bg-slate-950/90 px-2.5 py-1 text-[11px] text-slate-400">
-        Hedonic OLS Fit: <strong className="text-emerald-400">R² = {(rSquared * 100).toFixed(1)}%</strong>
+        Hedonic OLS Fit:{' '}
+        <strong className="text-emerald-400">
+          R² = {(rSquared * 100).toFixed(1)}%
+        </strong>
       </div>
       <ReactECharts
         option={option}
