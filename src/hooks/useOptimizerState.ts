@@ -28,8 +28,8 @@ import {
 } from '../utils/storage';
 
 export type DatasetMode = 'real' | 'synthetic';
-export type UiMode = 'simple' | 'pro';
-export type ChartViewMode = '2d' | '3d' | 'axes' | 'residuals';
+export type UiMode = 'simple' | 'explorer' | 'pro';
+export type ChartViewMode = '2d' | '3d' | 'hyper' | 'axes' | 'residuals';
 
 export interface PresetProfile {
   id: string;
@@ -120,10 +120,11 @@ export function useOptimizerState() {
     return saved === 'synthetic' ? 'synthetic' : 'real';
   });
 
-  // UI Complexity Mode: 'simple' (Guided Buyer Mode) vs 'pro' (Full MCDM Workbench)
+  // 3 Proportional UI Complexity Modes: 'simple' (Level 1) | 'explorer' (Level 2) | 'pro' (Level 3)
   const [uiMode, setUiMode] = useState<UiMode>(() => {
     const saved = safeGetString('paretopc_ui_mode', 'simple');
-    return saved === 'pro' ? 'pro' : 'simple';
+    if (saved === 'pro' || saved === 'explorer') return saved;
+    return 'simple';
   });
 
   // Chart View Mode: '2d' (Pareto Scatter), '3d' (3D Cube Cloud), 'residuals' (OLS Fair Value)

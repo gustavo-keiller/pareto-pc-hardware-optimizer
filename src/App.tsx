@@ -12,6 +12,8 @@ import { ExtrapolationToolbar } from './components/ExtrapolationToolbar';
 import { ValueResidualsChart } from './components/ValueResidualsChart';
 import { ComparisonDrawer } from './components/ComparisonDrawer';
 import { GpuLeaderboardTable } from './components/GpuLeaderboardTable';
+import { SimpleParetoGuide } from './components/SimpleParetoGuide';
+import { HyperDimensionalExplorer } from './components/HyperDimensionalExplorer';
 import {
   Award,
   Sliders,
@@ -35,6 +37,7 @@ import {
   Maximize2,
   Minimize2,
   Wrench,
+  Compass,
 } from 'lucide-react';
 
 export function App() {
@@ -83,10 +86,6 @@ export function App() {
     handleResetAll,
   } = useOptimizerState();
 
-  // New interactive visual controls:
-  // 1. Expand chart into full-width cinema mode (76vh)
-  // 2. Paint unoptimized/dominated zone with a translucent mesh/shade
-  // 3. Make dominated trap points disappear directly from the graphic
   const [isChartExpanded, setIsChartExpanded] = useState<boolean>(false);
   const [showDominatedZoneMesh, setShowDominatedZoneMesh] =
     useState<boolean>(true);
@@ -110,62 +109,95 @@ export function App() {
                   ParetoPC
                 </h1>
                 <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">
-                  {datasetMode === 'real'
-                    ? 'Phase 2: Real GPU Market'
-                    : 'Phase 1: Synthetic Sandbox'}
+                  {uiMode === 'simple'
+                    ? 'Level 1: Easy Buyer Guide'
+                    : uiMode === 'explorer'
+                    ? 'Level 2: Visual Axis Explorer'
+                    : 'Level 3: Pro MCDM Lab'}
                 </span>
               </div>
               <p className="text-xs text-slate-400">
                 {uiMode === 'simple'
-                  ? 'Smart GPU Buyer Guide — Automatically filters out overpriced value traps'
-                  : 'Multi-Objective Pareto Frontier, TOPSIS & Hedonic OLS Workbench'}
+                  ? 'Pick your budget and gaming style — overpriced value traps are filtered out automatically'
+                  : uiMode === 'explorer'
+                  ? 'Explore custom hardware axes, 3D views, 4D–7D Hyper-Graphs, and custom $/spec extrapolation rules'
+                  : 'Full 4D–7D Hyper-Space Frontier, TOPSIS Closeness, Non-Linear Extrapolation & Hedonic OLS Lab'}
               </p>
             </div>
           </div>
 
-          {/* Right Controls: Dataset Switcher + Simple/Pro Mode Toggle + Reset */}
+          {/* Right Controls: 3 Proportional Experience Modes + Dataset Switcher (Pro) + Reset */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            {/* Dataset Toggle */}
-            <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
-              <button
-                type="button"
-                onClick={() => handleSwitchDataset('real')}
-                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                  datasetMode === 'real'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Database className="h-3.5 w-3.5" />
-                Real GPUs (18)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSwitchDataset('synthetic')}
-                className={`rounded-md px-2.5 py-1.5 font-semibold transition ${
-                  datasetMode === 'synthetic'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                Sandbox (10)
-              </button>
-            </div>
+            {/* Dataset Toggle (Only shown in Pro Mode or when Synthetic is active to keep normal UI clean) */}
+            {(uiMode === 'pro' || datasetMode === 'synthetic') && (
+              <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
+                <button
+                  type="button"
+                  onClick={() => handleSwitchDataset('real')}
+                  className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                    datasetMode === 'real'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Database className="h-3.5 w-3.5" />
+                  Real GPUs (18)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSwitchDataset('synthetic')}
+                  className={`rounded-md px-2.5 py-1.5 font-semibold transition ${
+                    datasetMode === 'synthetic'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Sandbox (10)
+                </button>
+              </div>
+            )}
 
-            {/* Simple vs Pro UI Mode Toggle */}
+            {/* 3 Proportional Experience Level Buttons */}
             <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
               <button
                 type="button"
-                onClick={() => setUiMode('simple')}
+                onClick={() => {
+                  setUiMode('simple');
+                  if (
+                    chartView === 'residuals' ||
+                    chartView === 'axes' ||
+                    chartView === 'hyper'
+                  ) {
+                    setChartView('2d');
+                  }
+                }}
                 className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
                   uiMode === 'simple'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Level 1: Clean, simple guide for normal PC buyers"
+              >
+                <Eye className="h-3.5 w-3.5" />
+                1. Simple Guide
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUiMode('explorer');
+                  if (chartView === 'residuals') {
+                    setChartView('2d');
+                  }
+                }}
+                className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                  uiMode === 'explorer'
                     ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
-                title="Clean, guided interface for normal PC buyers"
+                title="Level 2: Unlock custom axis selectors, 4D-7D Hyper-Graph, 4-panel matrix, and guided value rules"
               >
-                <Eye className="h-3.5 w-3.5" />
-                Simple Guide
+                <Compass className="h-3.5 w-3.5" />
+                2. Explorer
               </button>
               <button
                 type="button"
@@ -175,10 +207,10 @@ export function App() {
                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
-                title="Full MCDM mathematical controls, custom axes, and OLS telemetry"
+                title="Level 3: Full MCDM math controls, non-linear curve laws, and Hedonic OLS regression"
               >
                 <Wrench className="h-3.5 w-3.5" />
-                Pro Math Mode
+                3. Pro Lab
               </button>
             </div>
 
@@ -196,25 +228,50 @@ export function App() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 pt-6 sm:px-6">
-        {/* Top #1 Winner Hero Banner */}
-        {topWinner && (
-          <div className="mb-6 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-slate-900 to-emerald-500/10 p-4 sm:p-5 shadow-xl">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-start sm:items-center gap-3.5">
+        {uiMode === 'simple' ? (
+          <SimpleParetoGuide
+            gpus={rankedGpus}
+            constraints={constraints}
+            onChangeConstraints={setConstraints}
+            xMetric={xMetric}
+            yMetric={yMetric}
+            zMetric={zMetric}
+            onSelectXMetric={setXMetric}
+            onSelectYMetric={setYMetric}
+            onSelectZMetric={setZMetric}
+            weights={weights}
+            onChangeWeights={setWeights}
+            selectedGpuIds={selectedGpuIds}
+            onToggleSelectGpu={handleToggleSelectGpu}
+            onSwitchToExplorer={() => setUiMode('explorer')}
+            onSwitchTo3D={() => {
+              setUiMode('explorer');
+              setChartView('3d');
+            }}
+            onSwitchToHyper={() => {
+              setUiMode('explorer');
+              setChartView('hyper');
+            }}
+            maxBudgetBound={maxBudgetBound}
+          />
+        ) : (
+          <>
+            {/* Top #1 Winner Hero Banner */}
+            {topWinner && (
+              <div className="mb-6 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-slate-900 to-emerald-500/10 p-4 sm:p-5 shadow-xl">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-start sm:items-center gap-3.5">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400">
                   <Award className="h-6 w-6" />
                 </div>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                      {uiMode === 'simple'
-                        ? '★ #1 Best GPU For Your Budget & Style'
-                        : 'Stage 3 Optimal Recommendation (#1 TOPSIS Match)'}
+                      Stage 3 Optimal Recommendation (#1 TOPSIS Match)
                     </span>
                     <span className="rounded bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-300 border border-amber-500/30">
-                      {uiMode === 'simple'
-                        ? `${topWinner.topsisScorePct.toFixed(1)}% Match`
-                        : `Closeness Cᵢ = ${topWinner.topsisScore.toFixed(3)} (${topWinner.topsisScorePct.toFixed(1)}%)`}
+                      Closeness Cᵢ = {topWinner.topsisScore.toFixed(3)} (
+                      {topWinner.topsisScorePct.toFixed(1)}%)
                     </span>
                     {topWinner.valuation && (
                       <span
@@ -290,9 +347,7 @@ export function App() {
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-emerald-400" />
                   <h2 className="text-sm font-bold uppercase tracking-wider text-white">
-                    {uiMode === 'simple'
-                      ? 'Step 1: Your Budget & Limits'
-                      : 'Stage 1: Hard Dealbreakers'}
+                    Stage 1: Hard Dealbreakers
                   </h2>
                 </div>
                 <span className="text-[11px] font-medium text-emerald-400">
@@ -414,9 +469,7 @@ export function App() {
                 <div className="flex items-center gap-2">
                   <Sliders className="h-4 w-4 text-amber-400" />
                   <h2 className="text-sm font-bold uppercase tracking-wider text-white">
-                    {uiMode === 'simple'
-                      ? 'Step 2: Pick Your Gaming Style'
-                      : 'Stage 3: TOPSIS Priority Weights'}
+                    Stage 3: TOPSIS Priority Weights
                   </h2>
                 </div>
                 {uiMode === 'pro' && (
@@ -430,9 +483,7 @@ export function App() {
               <div className="mt-3">
                 <div className="text-[11px] font-medium text-slate-400 mb-2 flex items-center gap-1">
                   <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-                  {uiMode === 'simple'
-                    ? 'Click a profile to rank the best GPUs for you:'
-                    : 'Quick Buyer Persona Presets:'}
+                  Quick Buyer Persona Presets:
                 </div>
                 <div className="grid grid-cols-1 gap-2">
                   {PRESET_PROFILES.map((preset) => {
@@ -467,63 +518,66 @@ export function App() {
                 </div>
               </div>
 
-              {/* Fine-Tune Sliders */}
+              {/* Individual Objective Weights */}
               <div className="mt-4 pt-3 border-t border-slate-800/80 space-y-3">
-                <div className="text-[11px] font-semibold text-slate-400">
-                  {uiMode === 'simple'
-                    ? 'Or fine-tune what matters most to you:'
-                    : 'Individual Objective Weights:'}
-                </div>
-                {ALL_METRIC_KEYS.map((metric) => {
-                  const def = METRIC_DEFINITIONS[metric];
-                  const rawVal = weights[metric];
-                  const normPct = Math.round(normalizedWeights[metric] * 100);
+                <span className="block text-[11px] font-semibold text-slate-400">
+                  Individual Objective Weights:
+                </span>
 
-                  return (
-                    <div key={metric}>
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <label
-                          htmlFor={`weight-${metric}`}
-                          className="font-medium text-slate-200 flex items-center gap-1.5"
-                        >
-                          <span>{def.shortLabel}</span>
-                          {uiMode === 'pro' && (
-                            <span
-                              className={`rounded px-1.5 py-0.2 text-[9px] font-semibold uppercase ${
-                                def.direction === 'min'
-                                  ? 'bg-emerald-500/15 text-emerald-400'
-                                  : 'bg-sky-500/15 text-sky-400'
-                              }`}
-                            >
-                              {def.direction}
+                <div className="space-y-3 pt-1">
+                  {ALL_METRIC_KEYS.map((metric) => {
+                    const def = METRIC_DEFINITIONS[metric];
+                    const rawVal = weights[metric];
+                    const normPct = Math.round(
+                      normalizedWeights[metric] * 100
+                    );
+
+                    return (
+                      <div key={metric}>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <label
+                            htmlFor={`weight-${metric}`}
+                            className="font-medium text-slate-200 flex items-center gap-1.5"
+                          >
+                            <span>{def.shortLabel}</span>
+                            {uiMode === 'pro' && (
+                              <span
+                                className={`rounded px-1.5 py-0.2 text-[9px] font-semibold uppercase ${
+                                  def.direction === 'min'
+                                    ? 'bg-emerald-500/15 text-emerald-400'
+                                    : 'bg-sky-500/15 text-sky-400'
+                                }`}
+                              >
+                                {def.direction}
+                              </span>
+                            )}
+                          </label>
+                          <div className="font-mono text-xs">
+                            <span className="text-amber-400 font-semibold">
+                              {normPct}%
                             </span>
-                          )}
-                        </label>
-                        <div className="font-mono text-xs">
-                          <span className="text-amber-400 font-semibold">
-                            {normPct}%
-                          </span>
+                          </div>
                         </div>
+                        <input
+                          id={`weight-${metric}`}
+                          type="range"
+                          min={0}
+                          max={100}
+                          step={5}
+                          value={rawVal}
+                          onChange={(e) => {
+                            setActivePresetId('custom');
+                            setWeights((prev) => ({
+                              ...prev,
+                              [metric]: Number(e.target.value),
+                            }));
+                          }}
+                          className="w-full accent-amber-400 cursor-pointer"
+                        />
                       </div>
-                      <input
-                        id={`weight-${metric}`}
-                        type="range"
-                        min={0}
-                        max={100}
-                        step={5}
-                        value={rawVal}
-                        onChange={(e) => {
-                          setActivePresetId('custom');
-                          setWeights((prev) => ({
-                            ...prev,
-                            [metric]: Number(e.target.value),
-                          }));
-                        }}
-                        className="w-full accent-amber-400 cursor-pointer"
-                      />
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </section>
           </div>
@@ -545,6 +599,8 @@ export function App() {
                         ? 'Price vs. Performance Frontier (Value Trap Detector)'
                         : chartView === '3d'
                         ? '3D Multi-Objective Frontier Cube (Price × FPS × VRAM/RT)'
+                        : chartView === 'hyper'
+                        ? '4D–7D Hyper-Space Explorer (N-Dimensional Pareto & Projections)'
                         : chartView === 'axes'
                         ? 'Multi-Axis & Individual Measurement Views'
                         : 'Phase 2: Fair Market Value vs. Street Price (Hedonic OLS)'}
@@ -556,7 +612,9 @@ export function App() {
                         ? 'Green circles = 2D Frontier. Cyan diamonds = 5D Specialists (cards saved by high VRAM, Ray Tracing, or low Watts). Red = Strictly Dominated Traps.'
                         : '2D Slice Mode: Every card below the green staircase is beaten on both axes simultaneously.'
                       : chartView === '3d'
-                      ? 'Unified 3D unoptimized volume hull + quick camera views for X×Y, Z×Y, and X×Z.'
+                      ? 'Exact 3D step-corner polyhedron + quick camera views for X×Y, Z×Y, and X×Z.'
+                      : chartView === 'hyper'
+                      ? 'Compare up to 7 hardware dimensions simultaneously via N-D Parallel Dominance, Star-Glyph Scatter, or RadViz Gravity Springs.'
                       : chartView === 'axes'
                       ? 'Inspect all 4 Price vs. Spec frontiers side-by-side or isolate each hardware measurement individually in 1D.'
                       : 'Green bars on the left are underpriced bargains relative to their benchmark specs; red bars on the right are overpriced.'}
@@ -565,7 +623,7 @@ export function App() {
 
                 {/* View Switcher + Expand Toggle */}
                 <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <div className="inline-flex rounded-lg border border-slate-800 bg-slate-950 p-1">
+                  <div className="inline-flex flex-wrap rounded-lg border border-slate-800 bg-slate-950 p-1">
                     <button
                       type="button"
                       onClick={() => setChartView('2d')}
@@ -592,6 +650,19 @@ export function App() {
                     </button>
                     <button
                       type="button"
+                      onClick={() => setChartView('hyper')}
+                      className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                        chartView === 'hyper'
+                          ? 'bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/40 shadow-sm shadow-fuchsia-500/20'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                      title="Compare 4 to 7 hardware dimensions at once (Parallel Dominance, Star-Glyphs & RadViz Gravity)"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" />
+                      4D–7D Hyper-Graph
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => setChartView('axes')}
                       className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
                         chartView === 'axes'
@@ -603,18 +674,20 @@ export function App() {
                       <LayoutGrid className="h-3.5 w-3.5" />
                       Axis Views
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setChartView('residuals')}
-                      className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                        chartView === 'residuals'
-                          ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
-                          : 'text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      <TrendingDown className="h-3.5 w-3.5" />
-                      Fair Value (OLS)
-                    </button>
+                    {uiMode === 'pro' && (
+                      <button
+                        type="button"
+                        onClick={() => setChartView('residuals')}
+                        className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                          chartView === 'residuals'
+                            ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                            : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        <TrendingDown className="h-3.5 w-3.5" />
+                        Fair Value (OLS)
+                      </button>
+                    )}
                   </div>
 
                   {/* Expand / Cinema Mode Button */}
@@ -647,39 +720,44 @@ export function App() {
                 </div>
               </div>
 
-              {/* Secondary Bar: 2D/5D Dominance Toggle + Unoptimized Mesh & Hide Traps Controls */}
+              {/* Secondary Bar: Proportional Controls based on uiMode */}
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-800/80 bg-slate-950/60 px-3 py-2 text-xs">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-slate-400 font-medium">
-                    Trap Rule:
-                  </span>
-                  <div className="inline-flex rounded-lg border border-slate-800 bg-slate-900 p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setParetoMode('all-5d')}
-                      className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition ${
-                        paretoMode === 'all-5d'
-                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                          : 'text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      All 5 Specs (5D)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setParetoMode('2d-axes')}
-                      className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition ${
-                        paretoMode === '2d-axes'
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                          : 'text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      Strict 2D Axes
-                    </button>
-                  </div>
+                  {/* Trap Rule 5D vs 2D only shown in Pro mode */}
+                  {uiMode === 'pro' && chartView !== 'hyper' && (
+                    <>
+                      <span className="text-slate-400 font-medium">
+                        Trap Rule:
+                      </span>
+                      <div className="inline-flex rounded-lg border border-slate-800 bg-slate-900 p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setParetoMode('all-5d')}
+                          className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition ${
+                            paretoMode === 'all-5d'
+                              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                              : 'text-slate-400 hover:text-slate-200'
+                          }`}
+                        >
+                          All 5 Specs (5D)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setParetoMode('2d-axes')}
+                          className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition ${
+                            paretoMode === '2d-axes'
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                              : 'text-slate-400 hover:text-slate-200'
+                          }`}
+                        >
+                          Strict 2D Axes
+                        </button>
+                      </div>
+                    </>
+                  )}
 
                   {/* Paint Unoptimized Region Mesh Toggle */}
-                  {chartView !== 'residuals' && (
+                  {chartView !== 'residuals' && chartView !== 'hyper' && (
                     <button
                       type="button"
                       onClick={() =>
@@ -717,11 +795,14 @@ export function App() {
                   </button>
                 </div>
 
-                {chartView !== 'residuals' && chartView !== 'axes' && (
+                {/* Custom Base & Y-Axis Selectors in Explorer/Pro Mode */}
+                {chartView !== 'residuals' &&
+                  chartView !== 'axes' &&
+                  chartView !== 'hyper' && (
                   <div className="flex flex-wrap items-center gap-2">
                     <div className="flex items-center gap-1 rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-1">
                       <span className="text-emerald-300 font-medium">
-                        ⚓ Base (Bottom-Left):
+                        Base Axis (Bottom-Left):
                       </span>
                       <select
                         aria-label="Base (Bottom-Left) Metric"
@@ -768,12 +849,13 @@ export function App() {
                 )}
               </div>
 
-              {/* Linear Value Extrapolation Tool Bar (e.g. $1000 for 10 GB = $100/GB margin) */}
-              {chartView !== 'residuals' && (
+              {/* Proportional Value Extrapolation Toolbar */}
+              {chartView !== 'residuals' && chartView !== 'hyper' && (
                 <ExtrapolationToolbar
                   gpus={rankedGpus}
                   xMetric={xMetric}
                   yMetric={yMetric}
+                  uiMode={uiMode}
                   extrapolation={extrapolation}
                   onChangeExtrapolation={setExtrapolation}
                   onSelectAxes={(x, y) => {
@@ -823,6 +905,16 @@ export function App() {
                     onChangeXMetric={setXMetric}
                     onChangeYMetric={setYMetric}
                     onChangeZMetric={setZMetric}
+                  />
+                ) : chartView === 'hyper' ? (
+                  <HyperDimensionalExplorer
+                    gpus={rankedGpus}
+                    hoveredGpuId={hoveredGpuId}
+                    selectedGpuIds={selectedGpuIds}
+                    isExpanded={isChartExpanded}
+                    hideDominatedNodes={hideDominatedNodes}
+                    onHoverGpu={setHoveredGpuId}
+                    onToggleSelectGpu={handleToggleSelectGpu}
                   />
                 ) : chartView === 'axes' ? (
                   <AxisViewsGrid
@@ -918,6 +1010,8 @@ export function App() {
             </section>
           </div>
         </div>
+          </>
+        )}
 
         {/* Multi-Metric Comparison Drawer (Radar & Parallel Coordinates) */}
         <ComparisonDrawer

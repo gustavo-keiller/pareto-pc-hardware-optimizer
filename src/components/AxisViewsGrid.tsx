@@ -220,7 +220,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
       },
       xAxis: {
         type: 'value',
-        name: `⚓ Base (Bottom-Left): ${baseDef.shortLabel} (${baseDef.unit}) →`,
+        name: `Base Axis (Bottom-Left): ${baseDef.shortLabel} (${baseDef.unit}) →`,
         nameLocation: 'middle',
         nameGap: isLargeInspector ? 30 : 22,
         min: minX,
@@ -441,7 +441,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
           </div>
         ) : (
           <span className="text-[11px] text-slate-400">
-            ⚓ <strong>{baseDef.shortLabel} ({baseDef.unit})</strong> is anchored
+            <strong>{baseDef.shortLabel} ({baseDef.unit})</strong> is anchored
             at the <strong>Bottom-Left</strong> of every panel • Points repainted
             per axis
           </span>
@@ -468,7 +468,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
                     {mDef.unit})
                   </span>
                   <span className="text-[10px] font-mono text-emerald-400">
-                    ⚓ Bottom-Left: Min {baseDef.shortLabel} •{' '}
+                    Bottom-Left: Min {baseDef.shortLabel} •{' '}
                     {mDef.direction === 'max'
                       ? 'Top-Left = Best'
                       : 'Bottom-Left = Best'}
@@ -496,7 +496,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
           <div className="lg:col-span-8 flex flex-col rounded-xl border border-slate-800/90 bg-slate-950/60 p-3">
             <div className="flex items-center justify-between pb-1">
               <span className="text-xs font-bold text-white">
-                ⚓ {baseDef.shortLabel} ({baseDef.unit}, Bottom-Left → Right) vs.{' '}
+                Base Axis: {baseDef.shortLabel} ({baseDef.unit}, Bottom-Left → Right) vs.{' '}
                 {METRIC_DEFINITIONS[effectiveSingleAxis].label} (Bottom-Left →
                 Top)
               </span>

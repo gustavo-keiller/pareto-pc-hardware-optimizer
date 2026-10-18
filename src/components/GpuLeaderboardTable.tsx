@@ -7,6 +7,7 @@ import {
   Plus,
   TrendingDown,
   TrendingUp,
+  Award,
 } from 'lucide-react';
 
 interface GpuLeaderboardTableProps {
@@ -16,7 +17,7 @@ interface GpuLeaderboardTableProps {
   selectedGpuIds: string[];
   hideTrapsInTable: boolean;
   trapCount: number;
-  uiMode: 'simple' | 'pro';
+  uiMode: 'simple' | 'explorer' | 'pro';
   onHoverGpu: (id: string | null) => void;
   onToggleSelectGpu: (id: string) => void;
   onToggleHideTraps: (hide: boolean) => void;
@@ -104,7 +105,7 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                   <td className="py-3 px-3 font-mono font-bold">
                     {isWinner ? (
                       <span className="inline-flex items-center gap-1 rounded bg-amber-500/20 px-2 py-0.5 text-amber-300 border border-amber-500/40">
-                        ★ #1
+                        <Award className="h-3 w-3" /> #1
                       </span>
                     ) : (
                       <span className="text-slate-400">#{gpu.rank}</span>

@@ -403,12 +403,12 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
 
           const statusBadge =
             g.id === winnerGpu?.id && isGpuOptimalInView(g)
-              ? `<span style="background:#f59e0b22;color:#fbbf24;border:1px solid #f59e0b66;padding:2px 6px;border-radius:4px;font-weight:700;font-size:10px;">★ #1 WINNER</span>`
+              ? `<span style="background:#f59e0b22;color:#fbbf24;border:1px solid #f59e0b66;padding:2px 6px;border-radius:4px;font-weight:700;font-size:10px;">#1 TOP MATCH</span>`
               : isGpuOptimalInView(g)
-              ? `<span style="background:#10b98122;color:#34d399;border:1px solid #10b98166;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">● 2D FRONTIER OPTIMAL</span>`
+              ? `<span style="background:#10b98122;color:#34d399;border:1px solid #10b98166;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">2D FRONTIER OPTIMAL</span>`
               : g.isParetoOptimal && !is2DOpt
-              ? `<span style="background:#06b6d422;color:#22d3ee;border:1px solid #06b6d466;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">◆ 5D SPECIALIST (2D DOMINATED)</span>`
-              : `<span style="background:#f43f5e22;color:#fb7185;border:1px solid #f43f5e66;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">▲ DOMINATED TRAP</span>`;
+              ? `<span style="background:#06b6d422;color:#22d3ee;border:1px solid #06b6d466;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">5D SPECIALIST (2D DOMINATED)</span>`
+              : `<span style="background:#f43f5e22;color:#fb7185;border:1px solid #f43f5e66;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;">DOMINATED TRAP</span>`;
 
           const extrapHtml =
             extrapolation.enabled && extrapDiag
@@ -439,7 +439,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
               ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid #334155;color:#fda4af;max-width:300px;white-space:normal;line-height:1.4;">
                   ${g.dominanceReasons
                     .slice(0, 2)
-                    .map((r) => `<div>⚠️ ${r.summaryText}</div>`)
+                    .map((r) => `<div>• ${r.summaryText}</div>`)
                     .join('')}
                 </div>`
               : '';
@@ -682,7 +682,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
           label: {
             show: true,
             position: 'top',
-            formatter: (p: { data: { name: string } }) => `★ ${p.data.name}`,
+            formatter: (p: { data: { name: string } }) => p.data.name,
             color: '#fbbf24',
             fontSize: 12,
             fontWeight: 700,

@@ -994,7 +994,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
             fontWeight="700"
             textAnchor="middle"
           >
-            ⚓ Origin (Bottom-Left): {fmtVal(xDef, bounds.x.min)}
+            Origin (Bottom-Left): {fmtVal(xDef, bounds.x.min)}
           </text>
 
           <circle
@@ -1011,7 +1011,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
             fontWeight="700"
             textAnchor="middle"
           >
-            ★ Ideal Utopia Corner
+            Ideal Benchmark Target
           </text>
 
           <circle
@@ -1161,7 +1161,7 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
                 fontWeight={isWinner || isViewOptimal ? '700' : '500'}
                 textAnchor="middle"
               >
-                {isWinner ? `★ ${gpu.name}` : gpu.name.replace(' [TRAP]', '')}
+                {gpu.name.replace(' [TRAP]', '')}
               </text>
             </g>
           );
