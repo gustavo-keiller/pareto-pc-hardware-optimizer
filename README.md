@@ -30,6 +30,8 @@ npm run format     # Auto-format with Prettier
 npm run test       # Run Vitest unit & mathematical property tests
 npm run check:docs # Verify AGENTS.md cap, skills, CODEMAP paths, links, math isolation, and file sizes
 npm run build      # Production build to dist/
+npm run test:e2e   # Playwright end-to-end test (first run: npx playwright install chromium)
+npm run snap       # Desktop + phone screenshots of each mode into snapshots/
 ```
 
 ---
