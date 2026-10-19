@@ -53,7 +53,7 @@ Explain mathematical results in plain, actionable hardware-buyer language (e.g.,
 
 ## 12. Verify Before Declaring Done
 
-After any change, run `npm run check` (`tsc --noEmit`, `vitest run`, `check:docs`) before handing code back. Codified in the `preflight` skill.
+After any change, run `npm run check` before handing code back (CI runs it on every PR too). What it covers and the extra UI checks live in the `preflight` skill.
 
 ## 13. Log Assumptions, Don't Block On Them
 
@@ -73,18 +73,6 @@ Every committed test in `__tests__/` must protect a durable mathematical or beha
 
 ---
 
-## Workflow Skills (read before the relevant action)
+## Workflow Skills
 
-- **Writing any new code (math, React, hooks)?** Read `.agents/skills/karpathy-guidelines/SKILL.md`.
-- **Working on Pareto, TOPSIS, OLS regression, or Combinatorial math?** Read `.agents/skills/mcdm-math-engine/SKILL.md`.
-- **Working on ECharts scatter, frontier staircase, radar, or parallel coordinates?** Read `.agents/skills/echarts-pareto-viz/SKILL.md`.
-- **Writing UI copy, tooltips, trap diagnostics, or docs?** Read `.agents/skills/hardware-copywriting/SKILL.md`.
-- **Diagnosing a bug?** Read `.agents/skills/diagnosing-bugs/SKILL.md` before hypothesizing.
-- **Reviewing completed work?** Read `.agents/skills/code-review/SKILL.md`.
-- **Evaluating risk or refactoring core logic?** Read `.agents/skills/blast-radius/SKILL.md`.
-- **Writing or editing TypeScript/React?** Read `.agents/skills/typescript-best-practices/SKILL.md`.
-- **Writing tests?** Read `.agents/skills/tdd/SKILL.md`.
-- **Finalizing any change?** Read `.agents/skills/preflight/SKILL.md`.
-- **Planning a multi-file feature?** Read `.agents/skills/to-spec/SKILL.md`.
-- **Handing off to another session?** Read `.agents/skills/handoff/SKILL.md`.
-- **Stress-testing a plan or decision?** Read `.agents/skills/grilling/SKILL.md`.
+Which skill to read before which action is listed once, in [`.agents/skills/skill-library/SKILL.md`](skills/skill-library/SKILL.md).

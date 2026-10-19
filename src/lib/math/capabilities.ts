@@ -214,7 +214,12 @@ export function inferGpuFeatures(gpu: Partial<GpuCandidate>): string[] {
         'AV1 Video Encode',
         'Hardware Ray Tracing',
       );
-    } else if (arch.includes('Ampere') || arch.includes('RTX')) {
+    } else if (
+      arch.includes('Ampere') ||
+      (arch === 'Turing' &&
+        /\brtx\b/i.test(`${gpu.chip ?? ''} ${gpu.name ?? ''}`))
+    ) {
+      // RTX 20 (Turing) has RT cores; GTX 16 (also Turing) does not.
       features.push('Hardware Ray Tracing');
     }
   } else if (vendor === 'AMD') {

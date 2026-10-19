@@ -54,11 +54,7 @@ type StoryStep = 1 | 2 | 3 | 4 | 5;
 
 /** Clamps any number into a valid StoryStep (1..5). */
 function toStoryStep(n: number): StoryStep {
-  if (n <= 1) return 1;
-  if (n === 2) return 2;
-  if (n === 3) return 3;
-  if (n === 4) return 4;
-  return 5;
+  return n <= 1 ? 1 : n === 2 ? 2 : n === 3 ? 3 : n === 4 ? 4 : 5;
 }
 
 /**
@@ -1981,6 +1977,7 @@ export function SimpleParetoGuide({
                 return (
                   <div
                     key={gpu.id}
+                    data-testid="top-choice"
                     className={`flex flex-col justify-between rounded-xl border-2 p-4 transition-all ${
                       idx === 0
                         ? 'border-amber-400 bg-gradient-to-b from-amber-500/15 via-slate-900 to-slate-950 shadow-lg shadow-amber-500/10'

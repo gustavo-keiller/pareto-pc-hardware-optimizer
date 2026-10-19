@@ -28,3 +28,8 @@ Thumbs.db
 venv/
 env/
 __pycache__/
+
+# Playwright & agent screenshots
+test-results/
+playwright-report/
+snapshots/

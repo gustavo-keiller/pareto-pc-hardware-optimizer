@@ -61,7 +61,10 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | Path | Purpose |
 | :--- | :--- |
 | `scripts/check-docs.cjs` | Validates `AGENTS.md` character cap (<12,000 chars), internal markdown links, `.agents/skills/` frontmatter, `.claude/skills/` stub parity, and the 600/800-line file cap (with a shrink-only allowlist) |
-| `.github/workflows/check.yml` | CI: `npm ci`, `npm run check`, `npm run build` on every push to `main` and every PR |
+| `.github/workflows/check.yml` | CI: `npm ci`, `npm run check`, `npm run build`, plus the Playwright e2e job, on every push to `main` and every PR |
+| `scripts/snap.mjs` | `npm run snap`: starts Vite and saves desktop + phone screenshots of each mode to `snapshots/` (gitignored) |
+| `src/__tests__/App.ui.test.tsx` | UI smoke tests (jsdom + Testing Library): each mode renders, budget changes the Simple top pick |
+| `e2e/beginner.spec.ts` | Playwright e2e (`npm run test:e2e`): "a beginner gets a recommendation" on desktop and phone |
 | `eslint.config.js` / `.prettierrc.json` | Lint (zero `any`, zero type assertions except `as const`, hooks rules) and formatting, both part of `npm run check` |
 | `scripts/sync-claude-skills.cjs` | Generates/updates `.claude/skills/<name>/SKILL.md` pointer stubs from `.agents/skills/` (`npm run sync:skills`) |
 | `.agents/scripts/block-dangerous-git.cjs` | PreToolUse hook blocking destructive git commands (`reset --hard`, `clean -f`, `checkout .`, force-push) |
