@@ -84,6 +84,55 @@ export interface Translations {
   mathGuideToggleHide: string;
   mathGuideHeading: string;
   mathGuideSubheading: string;
+
+  // Simple Mode Controls & Notices
+  showAllGpusButton: string;
+  hideAllGpusButton: string;
+  priceEstimatedNotice: string;
+
+  // Specs & Card Labels
+  specRasterFps: string;
+  specSmoothHighRefresh: string;
+  specRtFps: string;
+  specRtUltra: string;
+  specVramCapacity: string;
+  specFutureProof: string;
+  specPowerDraw: string;
+  specRatedPower: string;
+  specFpsPer100: string;
+  savePrefix: string;
+  moreSuffix: string;
+
+  // Table Headers & Verdicts
+  tableRank: string;
+  tableModel: string;
+  tableVerdict: string;
+  tableMatchScore: string;
+  tablePrice: string;
+  tableFairValue: string;
+  tableRaster: string;
+  tableRt: string;
+  tableVram: string;
+  tablePower: string;
+  tableCompare: string;
+  verdictSmartBuy: string;
+  verdictTrap: string;
+  verdictNiche: string;
+  verdictDominated: string;
+  tableHideTraps: string;
+
+  // Full Build & Hero Card
+  buildFullTitle: string;
+  buildFullSubtitle: string;
+  buildFullDescription: string;
+  buildMaxBudget: string;
+  buildTotalHardwareCost: string;
+  buildThroughput100: string;
+  buildCpuBottleneck: string;
+  buildRawGpuCapacity: string;
+  buildFedByCpu: string;
+  buildEstimatedPowerDraw: string;
+  buildPsuHeadroomWatts: string;
 }
 
 export const TRANSLATIONS: Record<AppLocale, Translations> = {
@@ -164,6 +213,52 @@ export const TRANSLATIONS: Record<AppLocale, Translations> = {
       'Quer entender como funciona? Guia de 5 Passos e Gráfico Interativo',
     mathGuideSubheading:
       'Veja como compradores inteligentes descartam peças superfaturadas e ajustam prioridades.',
+
+    showAllGpusButton: 'Ver Todas as Placas de Vídeo (Tabela Completa)',
+    hideAllGpusButton: 'Ocultar Tabela de Placas de Vídeo',
+    priceEstimatedNotice: 'Preço estimado (convertido de US$)',
+
+    specRasterFps: 'Desempenho 1440p',
+    specSmoothHighRefresh: 'Fluidez Alta Taxa',
+    specRtFps: 'Ray Tracing 1440p',
+    specRtUltra: '1440p Ultra RT',
+    specVramCapacity: 'Capacidade de VRAM',
+    specFutureProof: 'Margem para o Futuro',
+    specPowerDraw: 'Consumo de Energia',
+    specRatedPower: 'Consumo Típico da Placa',
+    specFpsPer100: 'FPS por',
+    savePrefix: 'Economize',
+    moreSuffix: 'a mais',
+
+    tableRank: 'Posição',
+    tableModel: 'Placa de Vídeo',
+    tableVerdict: 'Veredito',
+    tableMatchScore: 'Combina',
+    tablePrice: 'Preço',
+    tableFairValue: 'Preço Justo (OLS)',
+    tableRaster: '1440p Bruto',
+    tableRt: '1440p RT',
+    tableVram: 'VRAM',
+    tablePower: 'Consumo',
+    tableCompare: 'Comparar',
+    verdictSmartBuy: 'Compra Inteligente',
+    verdictTrap: 'Armadilha de Custo',
+    verdictNiche: 'Nicho 5D (Risco)',
+    verdictDominated: 'Desvantajosa',
+    tableHideTraps: 'Ocultar Placas com Custo Desvantajoso',
+
+    buildFullTitle: 'Montador Completo de PC',
+    buildFullSubtitle: 'PC Balanceado (8 Componentes)',
+    buildFullDescription:
+      'Montamos todos os 8 componentes essenciais (Processador, Placa de Vídeo, Placa-Mãe, Memória RAM, Armazenamento SSD, Fonte, Gabinete e Cooler), eliminamos incompatibilidades físicas e gargalos para entregar o melhor custo-benefício em builds completas.',
+    buildMaxBudget: 'Orçamento Máximo do Sistema',
+    buildTotalHardwareCost: 'Custo Total de Hardware',
+    buildThroughput100: '100% Desempenho GPU (0% Gargalo)',
+    buildCpuBottleneck: 'Gargalo de CPU',
+    buildRawGpuCapacity: 'Potencial Máximo GPU',
+    buildFedByCpu: 'Alimentado pela CPU',
+    buildEstimatedPowerDraw: 'Consumo Estimado',
+    buildPsuHeadroomWatts: 'Folga na Fonte',
   },
 
   'en-US': {
@@ -243,6 +338,52 @@ export const TRANSLATIONS: Record<AppLocale, Translations> = {
       'Want to see the math? 5-Step Value Guide & Interactive Graph',
     mathGuideSubheading:
       'Explore how smart buyers eliminate overpriced hardware traps and adjust priorities.',
+
+    showAllGpusButton: 'View All Graphics Cards (Complete Leaderboard)',
+    hideAllGpusButton: 'Hide Graphics Cards Table',
+    priceEstimatedNotice: 'Estimated price (converted from USD)',
+
+    specRasterFps: '1440p Raster FPS',
+    specSmoothHighRefresh: 'Smooth High-Refresh',
+    specRtFps: 'Ray Tracing FPS',
+    specRtUltra: '1440p Ultra RT',
+    specVramCapacity: 'VRAM Capacity',
+    specFutureProof: 'Future-Proof Buffer',
+    specPowerDraw: 'Power Consumption',
+    specRatedPower: 'Rated Board Power',
+    specFpsPer100: 'FPS per',
+    savePrefix: 'Save',
+    moreSuffix: 'More',
+
+    tableRank: 'Rank',
+    tableModel: 'GPU Model',
+    tableVerdict: 'Verdict',
+    tableMatchScore: 'Match Score',
+    tablePrice: 'Price',
+    tableFairValue: 'Fair Value (OLS)',
+    tableRaster: '1440p Raster',
+    tableRt: '1440p RT',
+    tableVram: 'VRAM',
+    tablePower: 'Power',
+    tableCompare: 'Compare',
+    verdictSmartBuy: 'Smart Buy',
+    verdictTrap: 'Bad Value Trap',
+    verdictNiche: '5D Niche (Trap Risk)',
+    verdictDominated: 'Bad Deal',
+    tableHideTraps: 'Hide Bad Value "Trap" GPUs',
+
+    buildFullTitle: 'Combinatorial Full-System Builder',
+    buildFullSubtitle: 'Balanced Build (8 Components)',
+    buildFullDescription:
+      'We assemble all 8 essential components (CPU + GPU + Motherboard + RAM + Storage + PSU + Case + Cooler), eliminate physical incompatibilities and bottlenecks to deliver the best value combinations for complete PC builds.',
+    buildMaxBudget: 'Maximum System Budget',
+    buildTotalHardwareCost: 'Total Hardware Cost',
+    buildThroughput100: '100% GPU Throughput (0% Bottleneck)',
+    buildCpuBottleneck: 'CPU Bottleneck',
+    buildRawGpuCapacity: 'Raw GPU Capacity',
+    buildFedByCpu: 'Fed by CPU',
+    buildEstimatedPowerDraw: 'Estimated Power Draw',
+    buildPsuHeadroomWatts: 'PSU Headroom',
   },
 };
 

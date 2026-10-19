@@ -44,20 +44,15 @@ import {
   BudgetPreset,
 } from '../data/budgetPresets';
 import {
-  SEED_CASES,
-  SEED_COOLERS,
-  SEED_CPUS,
-  SEED_MOTHERBOARDS,
-  SEED_PSUS,
-  SEED_RAM_KITS,
-  SEED_STORAGES,
-} from '../data/seedComponents';
-import {
   BuildFilterCriteria,
   optimizeFullSystemBuilds,
 } from '../lib/math/combinatorial';
-import { convertUsdToBrl, formatCurrency } from '../utils/currency';
-import { AppLocale } from '../utils/i18n';
+import {
+  formatCurrency,
+  getCurrencyAdjustedCatalogs,
+  getEstimatedPriceNotice,
+} from '../utils/currency';
+import { AppLocale, t } from '../utils/i18n';
 import { decodeBuildShareUrl } from '../utils/shareBuild';
 import { BuildHeroCard } from './BuildHeroCard';
 import { BuildLeaderboardTable } from './BuildLeaderboardTable';
@@ -131,58 +126,15 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     }
   }, [isBrl, maxBudget, initialShare]);
 
-  const activeCpus = useMemo(
-    () =>
-      isBrl
-        ? SEED_CPUS.map((c) => ({ ...c, price: convertUsdToBrl(c.price) }))
-        : SEED_CPUS,
-    [isBrl],
-  );
-  const activeMotherboards = useMemo(
-    () =>
-      isBrl
-        ? SEED_MOTHERBOARDS.map((m) => ({
-            ...m,
-            price: convertUsdToBrl(m.price),
-          }))
-        : SEED_MOTHERBOARDS,
-    [isBrl],
-  );
-  const activeRam = useMemo(
-    () =>
-      isBrl
-        ? SEED_RAM_KITS.map((r) => ({ ...r, price: convertUsdToBrl(r.price) }))
-        : SEED_RAM_KITS,
-    [isBrl],
-  );
-  const activePsus = useMemo(
-    () =>
-      isBrl
-        ? SEED_PSUS.map((p) => ({ ...p, price: convertUsdToBrl(p.price) }))
-        : SEED_PSUS,
-    [isBrl],
-  );
-  const activeStorages = useMemo(
-    () =>
-      isBrl
-        ? SEED_STORAGES.map((s) => ({ ...s, price: convertUsdToBrl(s.price) }))
-        : SEED_STORAGES,
-    [isBrl],
-  );
-  const activeCases = useMemo(
-    () =>
-      isBrl
-        ? SEED_CASES.map((c) => ({ ...c, price: convertUsdToBrl(c.price) }))
-        : SEED_CASES,
-    [isBrl],
-  );
-  const activeCoolers = useMemo(
-    () =>
-      isBrl
-        ? SEED_COOLERS.map((c) => ({ ...c, price: convertUsdToBrl(c.price) }))
-        : SEED_COOLERS,
-    [isBrl],
-  );
+  const {
+    cpus: activeCpus,
+    motherboards: activeMotherboards,
+    ramKits: activeRam,
+    psus: activePsus,
+    storages: activeStorages,
+    cases: activeCases,
+    coolers: activeCoolers,
+  } = useMemo(() => getCurrencyAdjustedCatalogs(currency), [currency]);
 
   // Compute Full Systems using combinatorial optimization
   const filterCriteria: BuildFilterCriteria = useMemo(() => {
@@ -250,11 +202,28 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
         allCompatibleBuilds.find((b) => b.id === selectedBuildId);
       if (match) return match;
     }
-    if (initialShare && (initialShare.cpuId || initialShare.gpuId)) {
+    if (
+      initialShare &&
+      (initialShare.cpuId ||
+        initialShare.gpuId ||
+        initialShare.moboId ||
+        initialShare.ramId ||
+        initialShare.psuId ||
+        initialShare.storageId ||
+        initialShare.caseId ||
+        initialShare.coolerId)
+    ) {
       const match = allCompatibleBuilds.find(
         (b) =>
           (!initialShare.cpuId || b.cpu.id === initialShare.cpuId) &&
-          (!initialShare.gpuId || b.gpu.id === initialShare.gpuId),
+          (!initialShare.gpuId || b.gpu.id === initialShare.gpuId) &&
+          (!initialShare.moboId || b.motherboard.id === initialShare.moboId) &&
+          (!initialShare.ramId || b.ram.id === initialShare.ramId) &&
+          (!initialShare.psuId || b.psu.id === initialShare.psuId) &&
+          (!initialShare.storageId ||
+            b.storage.id === initialShare.storageId) &&
+          (!initialShare.caseId || b.case.id === initialShare.caseId) &&
+          (!initialShare.coolerId || b.cooler.id === initialShare.coolerId),
       );
       if (match) return match;
     }
@@ -311,22 +280,14 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
                 <Layers className="h-4 w-4" />
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Combinatorial Full-System Builder
+                {t('buildFullTitle', locale)}
               </h2>
               <span className="rounded-full bg-indigo-500/10 border border-indigo-500/30 px-3 py-0.5 text-xs font-semibold text-indigo-300">
-                Mario Kart Mode
+                {t('buildFullSubtitle', locale)}
               </span>
             </div>
             <p className="mt-2 text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
-              We assemble all 5 critical components (
-              <span className="text-emerald-400 font-semibold">CPU</span> +{' '}
-              <span className="text-indigo-400 font-semibold">GPU</span> +{' '}
-              <span className="text-sky-400 font-semibold">RAM</span> +{' '}
-              <span className="text-amber-400 font-semibold">Motherboard</span>{' '}
-              + <span className="text-teal-400 font-semibold">PSU</span>
-              ), prune out inferior individual parts, eliminate physical
-              incompatibilities, and calculate CPU-GPU bottlenecks to deliver
-              the pure Pareto Frontier of complete PC builds.
+              {t('buildFullDescription', locale)}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -336,7 +297,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
                 onClick={onSwitchToSimple}
                 className="rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition"
               >
-                Simple Guide
+                {locale === 'pt-BR' ? 'Guia Simples' : 'Simple Guide'}
               </button>
             )}
             {onSwitchToExplorer && (
@@ -345,7 +306,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
                 onClick={onSwitchToExplorer}
                 className="rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition"
               >
-                GPU Explorer
+                {locale === 'pt-BR' ? 'Explorador de GPUs' : 'GPU Explorer'}
               </button>
             )}
             <button
@@ -490,11 +451,18 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
             <div className="flex items-center justify-between text-xs font-semibold">
               <span className="text-slate-300 flex items-center gap-1.5">
                 <DollarSign className="h-3.5 w-3.5 text-emerald-400" />
-                Maximum System Budget
+                {t('buildMaxBudget', locale)}
               </span>
-              <span className="text-base font-black text-emerald-400">
-                {formatCurrency(maxBudget, currency)}
-              </span>
+              <div className="text-right">
+                <span className="text-base font-black text-emerald-400">
+                  {formatCurrency(maxBudget, currency)}
+                </span>
+                {currency === 'BRL' && (
+                  <span className="block text-[10px] text-amber-300/80 font-normal">
+                    {getEstimatedPriceNotice(locale, currency)}
+                  </span>
+                )}
+              </div>
             </div>
             <input
               type="range"

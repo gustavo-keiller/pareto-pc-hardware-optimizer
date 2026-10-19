@@ -16,8 +16,8 @@ import {
   Check,
 } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
-import { formatCurrency } from '../utils/currency';
-import { AppLocale } from '../utils/i18n';
+import { formatCurrency, getEstimatedPriceNotice } from '../utils/currency';
+import { AppLocale, t } from '../utils/i18n';
 import { generateBuildShoppingReasons } from '../utils/shoppingReasons';
 import {
   copyTextToClipboard,
@@ -90,7 +90,9 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
-                #1 Recommended PC Build (Best Value)
+                {locale === 'pt-BR'
+                  ? '#1 PC Recomendado (Melhor Custo-Benefício)'
+                  : '#1 Recommended PC Build (Best Value)'}
               </span>
               <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
                 {build.workloadMetricLabel ?? 'Max FPS Under Budget'}
@@ -98,22 +100,29 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               {build.bottleneckPct === 0 ? (
                 <span className="rounded bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-xs font-semibold text-emerald-300 flex items-center gap-1">
                   <ShieldCheck className="h-3.5 w-3.5" />
-                  100% GPU Throughput (0% Bottleneck)
+                  {t('buildThroughput100', locale)}
                 </span>
               ) : (
                 <span className="rounded bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-xs font-semibold text-amber-300 flex items-center gap-1">
                   <AlertTriangle className="h-3.5 w-3.5" />
-                  {build.bottleneckPct}% CPU Bottleneck
+                  {build.bottleneckPct}% {t('buildCpuBottleneck', locale)}
                 </span>
               )}
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3 mt-1">
-              <h3 className="text-2xl sm:text-3xl font-black text-white">
-                {formatCurrency(build.totalPrice, currency)}{' '}
-                <span className="text-lg font-normal text-slate-400">
-                  Total Hardware Cost
-                </span>
-              </h3>
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-black text-white">
+                  {formatCurrency(build.totalPrice, currency)}{' '}
+                  <span className="text-lg font-normal text-slate-400">
+                    {t('buildTotalHardwareCost', locale)}
+                  </span>
+                </h3>
+                {currency === 'BRL' && (
+                  <div className="text-[10px] text-amber-300/80 font-normal mt-0.5">
+                    {getEstimatedPriceNotice(locale, currency)}
+                  </div>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -179,8 +188,12 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
             <div className="text-slate-400 font-medium">
               {build.workloadMetricLabel
-                ? 'Target Workload'
-                : 'Effective Gaming'}
+                ? locale === 'pt-BR'
+                  ? 'Alvo de Uso'
+                  : 'Target Workload'
+                : locale === 'pt-BR'
+                  ? 'Desempenho em Jogos'
+                  : 'Effective Gaming'}
             </div>
             <div className="text-xl font-black text-emerald-400">
               {build.workloadScore ?? build.effectiveFps1440p}{' '}
@@ -195,23 +208,26 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
             </div>
           </div>
           <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
-            <div className="text-slate-400 font-medium">Raw GPU Capacity</div>
+            <div className="text-slate-400 font-medium">
+              {t('buildRawGpuCapacity', locale)}
+            </div>
             <div className="text-xl font-black text-slate-200">
               {build.rawGpuFps1440p} FPS
             </div>
             <div className="text-[10px] text-slate-400">
-              {Math.round(build.bottleneckFactor * 100)}% Fed by CPU
+              {Math.round(build.bottleneckFactor * 100)}%{' '}
+              {t('buildFedByCpu', locale)}
             </div>
           </div>
           <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
             <div className="text-slate-400 font-medium">
-              Estimated Power Draw
+              {t('buildEstimatedPowerDraw', locale)}
             </div>
             <div className="text-xl font-black text-teal-400">
               {build.estimatedPowerDrawWatts} W
             </div>
             <div className="text-[10px] text-slate-400">
-              +{build.powerHeadroomWatts}W PSU Headroom
+              +{build.powerHeadroomWatts}W {t('buildPsuHeadroomWatts', locale)}
             </div>
           </div>
         </div>

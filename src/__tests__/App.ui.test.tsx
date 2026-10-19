@@ -198,8 +198,13 @@ describe('App modes', () => {
     ).toBeDefined();
   });
 
-  it('UX-12: no [TRAP] card in the leaderboard table is ever labeled "Smart Buy"', () => {
+  it('UX-12: no [TRAP] card in the leaderboard table is ever labeled "Smart Buy"', async () => {
+    const user = userEvent.setup();
     render(<App />);
+    const showAllBtn = screen.getByRole('button', {
+      name: /View All Graphics Cards|Ver Todas as Placas/i,
+    });
+    await user.click(showAllBtn);
     const trapRows = screen
       .getAllByRole('row')
       .filter((row) => row.textContent?.includes('[TRAP]'));
@@ -426,6 +431,46 @@ describe('App modes', () => {
     await user.click(closeBtn);
     expect(
       screen.queryByText(/Planejador de Upgrade|Upgrade Planner/i),
+    ).toBeNull();
+  });
+
+  it('starts with empty GPU selection and hides comparison drawer in Simple Guide (Review 3b)', () => {
+    localStorage.clear();
+    render(<App />);
+
+    // In Simple mode, comparison drawer is not rendered when no GPUs are selected
+    expect(
+      screen.queryByText(/Multi-Dimensional Finalist Comparison/i),
+    ).toBeNull();
+    expect(
+      screen.queryByText(/Comparativo Multidimensional dos Finalistas/i),
+    ).toBeNull();
+
+    // The full leaderboard table is tucked behind the toggle button
+    expect(
+      screen.getByRole('button', {
+        name: /Ver Todas as Placas de Vídeo|View All Graphics Cards/i,
+      }),
+    ).toBeDefined();
+  });
+
+  it('hides expert dataset controls in Full Builds mode (Review 3d)', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Switch to Full Builds mode
+    const buildsBtn = screen.getByRole('button', {
+      name: /4\. Full Builds|4\. Montar PC/i,
+    });
+    await user.click(buildsBtn);
+
+    // Verify expert dataset controls are not visible
+    expect(screen.queryByRole('button', { name: /Real GPUs/i })).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: /Combined Sandbox/i }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: /\+ Import Deals/i }),
     ).toBeNull();
   });
 });

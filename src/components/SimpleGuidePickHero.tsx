@@ -9,7 +9,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { RankedGpu } from '../lib/math/types';
-import { formatCurrency } from '../utils/currency';
+import { formatCurrency, getEstimatedPriceNotice } from '../utils/currency';
 import { AppLocale, t } from '../utils/i18n';
 import { generateGpuShoppingReasons } from '../utils/shoppingReasons';
 
@@ -97,8 +97,14 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
             <div className="text-2xl sm:text-3xl font-black text-emerald-400">
               {formatCurrency(topPick.price, currency)}
             </div>
+            {currency === 'BRL' && (
+              <div className="text-[10px] text-amber-300/80 font-normal">
+                {getEstimatedPriceNotice(locale, currency)}
+              </div>
+            )}
             <div className="text-xs text-slate-400 mt-0.5 font-medium">
-              {fpsPer100} FPS per {currency === 'BRL' ? 'R$ 100' : '$100'}
+              {fpsPer100} {t('specFpsPer100', locale)}{' '}
+              {currency === 'BRL' ? 'R$ 100' : '$100'}
             </div>
           </div>
         </div>
@@ -116,39 +122,47 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
         {/* Specs Grid */}
         <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-            <div className="text-slate-400 font-medium">1440p Raster FPS</div>
+            <div className="text-slate-400 font-medium">
+              {t('specRasterFps', locale)}
+            </div>
             <div className="text-lg font-black text-white mt-0.5">
               {topPick.rasterFps1440p} FPS
             </div>
             <div className="text-[11px] text-emerald-400 font-medium">
-              Smooth High-Refresh
+              {t('specSmoothHighRefresh', locale)}
             </div>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-            <div className="text-slate-400 font-medium">Ray Tracing FPS</div>
+            <div className="text-slate-400 font-medium">
+              {t('specRtFps', locale)}
+            </div>
             <div className="text-lg font-black text-sky-300 mt-0.5">
               {topPick.rtFps1440p} FPS
             </div>
             <div className="text-[11px] text-slate-400 font-medium">
-              1440p Ultra RT
+              {t('specRtUltra', locale)}
             </div>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-            <div className="text-slate-400 font-medium">VRAM Capacity</div>
+            <div className="text-slate-400 font-medium">
+              {t('specVramCapacity', locale)}
+            </div>
             <div className="text-lg font-black text-amber-300 mt-0.5">
               {topPick.vramGb} GB
             </div>
             <div className="text-[11px] text-slate-400 font-medium">
-              Future-Proof Buffer
+              {t('specFutureProof', locale)}
             </div>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-            <div className="text-slate-400 font-medium">Power Consumption</div>
+            <div className="text-slate-400 font-medium">
+              {t('specPowerDraw', locale)}
+            </div>
             <div className="text-lg font-black text-slate-200 mt-0.5">
               {topPick.tdpWatts} W
             </div>
             <div className="text-[11px] text-slate-400 font-medium">
-              Rated Board Power
+              {t('specRatedPower', locale)}
             </div>
           </div>
         </div>
@@ -214,7 +228,7 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
                   {t('heroStepDownTitle', locale)}
                 </span>
                 <span className="font-mono text-xs font-bold text-emerald-400">
-                  Save{' '}
+                  {t('savePrefix', locale)}{' '}
                   {formatCurrency(
                     Math.max(0, topPick.price - stepDownAlt.price),
                     currency,
@@ -273,7 +287,7 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
                     Math.max(0, stepUpAlt.price - topPick.price),
                     currency,
                   )}{' '}
-                  More
+                  {t('moreSuffix', locale)}
                 </span>
               </div>
               <div className="flex items-baseline justify-between">

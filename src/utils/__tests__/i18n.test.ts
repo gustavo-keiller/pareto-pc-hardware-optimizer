@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { t, TRANSLATIONS, DEFAULT_LOCALE } from '../i18n';
-import { formatCurrency } from '../currency';
+import { formatCurrency, getEstimatedPriceNotice } from '../currency';
 
 describe('i18n localization (src/utils/i18n.ts)', () => {
   it('defaults to pt-BR (Brazil-first)', () => {
@@ -47,5 +47,28 @@ describe('i18n localization (src/utils/i18n.ts)', () => {
   it('formats currency according to specified locale', () => {
     expect(formatCurrency(1200, 'USD', false, 'en-US')).toBe('$1,200');
     expect(formatCurrency(4500, 'BRL', false, 'pt-BR')).toBe('R$ 4.500');
+  });
+
+  it('provides honest estimated price notices when viewing BRL converted prices (Decision D-1)', () => {
+    expect(getEstimatedPriceNotice('pt-BR', 'BRL')).toBe(
+      'Preço estimado (convertido de US$)',
+    );
+    expect(getEstimatedPriceNotice('en-US', 'BRL')).toBe(
+      'Estimated price (converted from USD)',
+    );
+    expect(getEstimatedPriceNotice('pt-BR', 'USD')).toBe('');
+    expect(getEstimatedPriceNotice('en-US', 'USD')).toBe('');
+  });
+
+  it('translates full build and leaderboard keys cleanly in pt-BR', () => {
+    expect(t('buildTotalHardwareCost', 'pt-BR')).toBe(
+      'Custo Total de Hardware',
+    );
+    expect(t('tableVerdict', 'pt-BR')).toBe('Veredito');
+    expect(t('specRasterFps', 'pt-BR')).toBe('Desempenho 1440p');
+    expect(t('savePrefix', 'pt-BR')).toBe('Economize');
+    expect(t('moreSuffix', 'pt-BR')).toBe('a mais');
+    expect(t('verdictSmartBuy', 'pt-BR')).toBe('Compra Inteligente');
+    expect(t('verdictTrap', 'pt-BR')).toBe('Armadilha de Custo');
   });
 });

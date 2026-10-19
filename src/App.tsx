@@ -1,15 +1,15 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { METRIC_DEFINITIONS, isMetricKey } from './lib/math/types';
 import { ALL_METRIC_KEYS } from './lib/math/topsis';
-import { PRESET_PROFILES, useOptimizerState } from './hooks/useOptimizerState';
+import { useOptimizerState } from './hooks/useOptimizerState';
 import { ExtrapolationToolbar } from './components/ExtrapolationToolbar';
 import { GpuLeaderboardTable } from './components/GpuLeaderboardTable';
 import { SimpleParetoGuide } from './components/SimpleParetoGuide';
 import { DealbreakerFilterPanel } from './components/DealbreakerFilterPanel';
 import { TopWinnerBanner } from './components/TopWinnerBanner';
+import { TopsisWeightsPanel } from './components/TopsisWeightsPanel';
 import { t } from './utils/i18n';
 import {
-  Sliders,
   ShieldAlert,
   CheckCircle2,
   RotateCcw,
@@ -30,7 +30,12 @@ import {
   Compass,
   Store,
   PlusCircle,
+  ListFilter,
 } from 'lucide-react';
+import {
+  ChartLoadingFallback,
+  BuildExplorerLoadingFallback,
+} from './components/LoadingFallbacks';
 
 // Lazy-loaded heavy visualizers & mode views (PERF-01)
 const FullBuildExplorer = lazy(() =>
@@ -73,36 +78,6 @@ const GpuDealImporterModal = lazy(() =>
     default: m.GpuDealImporterModal,
   })),
 );
-
-function ChartLoadingFallback() {
-  return (
-    <div
-      data-testid="chart-loading-fallback"
-      className="flex h-96 w-full items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/60 p-8 shadow-xl"
-    >
-      <div className="flex flex-col items-center gap-3 text-slate-400">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-        <span className="text-xs font-medium">Carregando visualizador...</span>
-      </div>
-    </div>
-  );
-}
-
-function BuildExplorerLoadingFallback() {
-  return (
-    <div
-      data-testid="builds-loading-fallback"
-      className="flex h-96 w-full items-center justify-center rounded-3xl border border-slate-800 bg-slate-900/60 p-8 shadow-xl"
-    >
-      <div className="flex flex-col items-center gap-3 text-slate-400">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
-        <span className="text-xs font-medium">
-          Carregando montador de PC...
-        </span>
-      </div>
-    </div>
-  );
-}
 
 export function App() {
   const {
@@ -165,6 +140,8 @@ export function App() {
   const [showDominatedZoneMesh, setShowDominatedZoneMesh] =
     useState<boolean>(true);
   const [hideDominatedNodes, setHideDominatedNodes] = useState<boolean>(false);
+  const [showAllGpusInSimple, setShowAllGpusInSimple] =
+    useState<boolean>(false);
 
   // When switching away from Pro mode, gracefully fall back to 2D view if residuals was selected
   useEffect(() => {
@@ -321,8 +298,8 @@ export function App() {
               </button>
             </div>
 
-            {/* Expert Controls: Dataset Switcher + Import Deals (Visible in Explorer, Pro, and Full Builds) */}
-            {uiMode !== 'simple' && (
+            {/* Expert Controls: Dataset Switcher + Import Deals (Visible only in Explorer and Pro modes) */}
+            {(uiMode === 'explorer' || uiMode === 'pro') && (
               <div className="flex flex-wrap items-center gap-2">
                 {/* Dataset Toggle */}
                 <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
@@ -490,122 +467,15 @@ export function App() {
                 />
 
                 {/* Step 2: Gaming Priorities / Stage 3 TOPSIS Sliders */}
-                <section className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <div className="flex items-center gap-2">
-                      <Sliders className="h-4 w-4 text-amber-400" />
-                      <h2 className="text-sm font-bold uppercase tracking-wider text-white">
-                        Stage 3: TOPSIS Priority Weights
-                      </h2>
-                    </div>
-                    {uiMode === 'pro' && (
-                      <span className="text-[11px] text-slate-400">
-                        ∑ wⱼ = 100%
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Buyer Persona Cards */}
-                  <div className="mt-3">
-                    <div className="text-[11px] font-medium text-slate-400 mb-2 flex items-center gap-1">
-                      <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-                      Quick Buyer Persona Presets:
-                    </div>
-                    <div className="grid grid-cols-1 gap-2">
-                      {PRESET_PROFILES.map((preset) => {
-                        const isActive = activePresetId === preset.id;
-                        return (
-                          <button
-                            key={preset.id}
-                            type="button"
-                            onClick={() => handleApplyPreset(preset)}
-                            className={`rounded-xl border p-2.5 text-left transition ${
-                              isActive
-                                ? 'border-amber-500/60 bg-amber-500/15 text-white shadow-sm'
-                                : 'border-slate-800 bg-slate-950/90 text-slate-300 hover:border-slate-700 hover:text-white'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold">
-                                {preset.label}
-                              </span>
-                              {isActive && (
-                                <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
-                                  Active
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-slate-400 mt-0.5">
-                              {preset.shortDesc}
-                            </p>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Individual Objective Weights */}
-                  <div className="mt-4 pt-3 border-t border-slate-800/80 space-y-3">
-                    <span className="block text-[11px] font-semibold text-slate-400">
-                      Individual Objective Weights:
-                    </span>
-
-                    <div className="space-y-3 pt-1">
-                      {ALL_METRIC_KEYS.map((metric) => {
-                        const def = METRIC_DEFINITIONS[metric];
-                        const rawVal = weights[metric];
-                        const normPct = Math.round(
-                          normalizedWeights[metric] * 100,
-                        );
-
-                        return (
-                          <div key={metric}>
-                            <div className="flex items-center justify-between text-xs mb-1">
-                              <label
-                                htmlFor={`weight-${metric}`}
-                                className="font-medium text-slate-200 flex items-center gap-1.5"
-                              >
-                                <span>{def.shortLabel}</span>
-                                {uiMode === 'pro' && (
-                                  <span
-                                    className={`rounded px-1.5 py-0.2 text-[9px] font-semibold uppercase ${
-                                      def.direction === 'min'
-                                        ? 'bg-emerald-500/15 text-emerald-400'
-                                        : 'bg-sky-500/15 text-sky-400'
-                                    }`}
-                                  >
-                                    {def.direction}
-                                  </span>
-                                )}
-                              </label>
-                              <div className="font-mono text-xs">
-                                <span className="text-amber-400 font-semibold">
-                                  {normPct}%
-                                </span>
-                              </div>
-                            </div>
-                            <input
-                              id={`weight-${metric}`}
-                              type="range"
-                              min={0}
-                              max={100}
-                              step={5}
-                              value={rawVal}
-                              onChange={(e) => {
-                                setActivePresetId('custom');
-                                setWeights((prev) => ({
-                                  ...prev,
-                                  [metric]: Number(e.target.value),
-                                }));
-                              }}
-                              className="w-full accent-amber-400 cursor-pointer"
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </section>
+                <TopsisWeightsPanel
+                  weights={weights}
+                  normalizedWeights={normalizedWeights}
+                  activePresetId={activePresetId}
+                  uiMode={uiMode}
+                  onChangeWeights={setWeights}
+                  onApplyPreset={handleApplyPreset}
+                  onSelectCustomPreset={() => setActivePresetId('custom')}
+                />
               </div>
 
               {/* Right Column (8 cols normal, 12 cols when expanded): Interactive Visualizations */}
@@ -1050,14 +920,62 @@ export function App() {
           </>
         )}
 
-        {/* Multi-Metric Comparison Drawer & GPU Leaderboard Table (Hidden in Full Builds mode where Build Leaderboard is shown) */}
-        {uiMode !== 'builds' && (
+        {/* Simple Mode: Optional Expandable Complete GPU Table */}
+        {uiMode === 'simple' && (
+          <div className="mt-8 flex flex-col items-center">
+            <button
+              type="button"
+              onClick={() => setShowAllGpusInSimple((v) => !v)}
+              className="inline-flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-900/90 px-5 py-3 text-sm font-bold text-slate-200 hover:bg-slate-800 hover:text-white transition shadow-lg"
+            >
+              <ListFilter className="h-4 w-4 text-emerald-400" />
+              {showAllGpusInSimple
+                ? t('hideAllGpusButton', locale)
+                : t('showAllGpusButton', locale)}
+            </button>
+            {showAllGpusInSimple && (
+              <div className="w-full mt-4">
+                {selectedGpus.length > 0 && (
+                  <Suspense fallback={null}>
+                    <ComparisonDrawer
+                      selectedGpus={selectedGpus}
+                      allGpus={rankedGpus}
+                      currency={activeCurrency}
+                      locale={locale}
+                      onRemoveGpu={handleToggleSelectGpu}
+                      onClearAll={() => setSelectedGpuIds([])}
+                    />
+                  </Suspense>
+                )}
+                <GpuLeaderboardTable
+                  gpus={displayedTableGpus}
+                  topWinnerId={topWinner?.id ?? null}
+                  hoveredGpuId={hoveredGpuId}
+                  selectedGpuIds={selectedGpuIds}
+                  hideTrapsInTable={hideTrapsInTable}
+                  trapCount={trapCount}
+                  uiMode={uiMode}
+                  currency={activeCurrency}
+                  locale={locale}
+                  onHoverGpu={setHoveredGpuId}
+                  onToggleSelectGpu={handleToggleSelectGpu}
+                  onToggleHideTraps={setHideTrapsInTable}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Multi-Metric Comparison Drawer & GPU Leaderboard Table (Explorer & Pro modes) */}
+        {(uiMode === 'explorer' || uiMode === 'pro') && (
           <>
             {selectedGpus.length > 0 && (
               <Suspense fallback={null}>
                 <ComparisonDrawer
                   selectedGpus={selectedGpus}
                   allGpus={rankedGpus}
+                  currency={activeCurrency}
+                  locale={locale}
                   onRemoveGpu={handleToggleSelectGpu}
                   onClearAll={() => setSelectedGpuIds([])}
                 />
@@ -1073,6 +991,8 @@ export function App() {
               hideTrapsInTable={hideTrapsInTable}
               trapCount={trapCount}
               uiMode={uiMode}
+              currency={activeCurrency}
+              locale={locale}
               onHoverGpu={setHoveredGpuId}
               onToggleSelectGpu={handleToggleSelectGpu}
               onToggleHideTraps={setHideTrapsInTable}

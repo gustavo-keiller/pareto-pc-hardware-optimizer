@@ -27,7 +27,7 @@ const MAX_FILE_LINES = 800;
 // They may shrink but not grow: never raise a ceiling to make a change fit; split the file
 // instead (PERF-03). Lower a ceiling when a file shrinks; delete the entry once it is under 800.
 const OVERSIZED_FILE_ALLOWLIST = {
-  'src/App.tsx': 1122,
+  'src/App.tsx': 1024,
   'src/components/Pareto3DCloud.tsx': 1168,
   'src/components/HyperDimensionalExplorer.tsx': 1489,
 };
