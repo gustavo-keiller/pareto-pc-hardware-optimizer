@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   RotateCcw,
+  Wrench,
 } from 'lucide-react';
 import {
   BuildWorkloadProfile,
@@ -38,6 +39,11 @@ function parseVendorFilter(value: string): HardwareVendor | 'ALL' {
   return 'ALL';
 }
 import {
+  BUDGET_PRESETS_BRL,
+  BUDGET_PRESETS_USD,
+  BudgetPreset,
+} from '../data/budgetPresets';
+import {
   SEED_CASES,
   SEED_COOLERS,
   SEED_CPUS,
@@ -55,6 +61,7 @@ import { AppLocale } from '../utils/i18n';
 import { decodeBuildShareUrl } from '../utils/shareBuild';
 import { BuildHeroCard } from './BuildHeroCard';
 import { BuildLeaderboardTable } from './BuildLeaderboardTable';
+import { UpgradePlannerModal } from './UpgradePlannerModal';
 
 interface FullBuildExplorerProps {
   gpus: GpuCandidate[];
@@ -63,79 +70,6 @@ interface FullBuildExplorerProps {
   onSwitchToSimple?: () => void;
   onSwitchToExplorer?: () => void;
 }
-
-interface BudgetPreset {
-  id: string;
-  label: string;
-  budget: number;
-  shortDesc: string;
-}
-
-const BUDGET_PRESETS_USD: BudgetPreset[] = [
-  {
-    id: 'entry-750',
-    label: '$750 Entry',
-    budget: 750,
-    shortDesc: 'Smooth 1080p / 1440p entry gaming',
-  },
-  {
-    id: 'sweet-1000',
-    label: '$1,000 Sweet Spot',
-    budget: 1000,
-    shortDesc: 'Maximum value-per-dollar 1440p',
-  },
-  {
-    id: 'high-1500',
-    label: '$1,500 High-FPS',
-    budget: 1500,
-    shortDesc: 'High-refresh 1440p & modern Ray Tracing',
-  },
-  {
-    id: 'enthusiast-2200',
-    label: '$2,200 Enthusiast',
-    budget: 2200,
-    shortDesc: 'Ryzen 7800X3D + Tier-1 GPU powerhouse',
-  },
-  {
-    id: 'extreme-3200',
-    label: '$3,200 Extreme',
-    budget: 3200,
-    shortDesc: 'Unconstrained 4K / high-fps flagship setup',
-  },
-];
-
-const BUDGET_PRESETS_BRL: BudgetPreset[] = [
-  {
-    id: 'entry-4500',
-    label: 'R$ 4.500 Entrada',
-    budget: 4500,
-    shortDesc: '1080p / 1440p econômico balanceado',
-  },
-  {
-    id: 'sweet-6000',
-    label: 'R$ 6.000 Ponto Ideal',
-    budget: 6000,
-    shortDesc: 'Melhor custo-benefício em 1440p',
-  },
-  {
-    id: 'high-8500',
-    label: 'R$ 8.500 Alto FPS',
-    budget: 8500,
-    shortDesc: 'Alto FPS 1440p e Ray Tracing',
-  },
-  {
-    id: 'enthusiast-12000',
-    label: 'R$ 12.000 Entusiasta',
-    budget: 12000,
-    shortDesc: 'Ryzen 7800X3D + GPU topo de linha',
-  },
-  {
-    id: 'extreme-18000',
-    label: 'R$ 18.000 Extremo',
-    budget: 18000,
-    shortDesc: 'Máximo 4K e alto FPS sem concessões',
-  },
-];
 
 export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   gpus,
@@ -184,6 +118,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   const [selectedBuildId, setSelectedBuildId] = useState<string | null>(
     () => initialShare?.buildId ?? null,
   );
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
   useEffect(() => {
     if (initialShare?.budget) return;
@@ -413,6 +348,16 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
                 GPU Explorer
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => setIsUpgradeModalOpen(true)}
+              className="flex items-center gap-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-300 hover:bg-amber-500/20 hover:border-amber-500/60 transition shadow-sm"
+            >
+              <Wrench className="h-3.5 w-3.5" />
+              <span>
+                {locale === 'pt-BR' ? 'Modo Upgrade' : 'Upgrade Mode'}
+              </span>
+            </button>
           </div>
         </div>
 
@@ -773,6 +718,29 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
         currency={currency}
         onSelectBuild={(buildId) => setSelectedBuildId(buildId)}
       />
+
+      {isUpgradeModalOpen && (
+        <UpgradePlannerModal
+          catalogs={{
+            cpus: activeCpus,
+            gpus,
+            motherboards: activeMotherboards,
+            ramKits: activeRam,
+            psus: activePsus,
+            storages: activeStorages,
+            cases: activeCases,
+            coolers: activeCoolers,
+          }}
+          currency={currency}
+          locale={locale}
+          workloadProfile={selectedWorkload}
+          onClose={() => setIsUpgradeModalOpen(false)}
+          onSelectBuild={(build) => {
+            setSelectedBuildId(build.id);
+            setIsUpgradeModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };

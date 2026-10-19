@@ -392,4 +392,40 @@ describe('App modes', () => {
     // Leaderboard table and comparison drawer are rendered
     expect(screen.getAllByRole('table').length).toBeGreaterThanOrEqual(1);
   });
+
+  it('BLD-06: opens Upgrade Mode modal and evaluates upgrade path for owned parts', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Switch to Full Builds mode
+    const buildsBtn = screen.getByRole('button', { name: /4\. Full Builds/i });
+    await user.click(buildsBtn);
+
+    // Verify Upgrade Mode button exists
+    const upgradeModeBtn = await screen.findByRole('button', {
+      name: /Modo Upgrade|Upgrade Mode/i,
+    });
+    expect(upgradeModeBtn).toBeDefined();
+
+    // Click to open Upgrade Planner modal
+    await user.click(upgradeModeBtn);
+
+    // Verify modal content
+    expect(
+      await screen.findByText(/Planejador de Upgrade|Upgrade Planner/i),
+    ).toBeDefined();
+    expect(
+      screen.getByText(
+        /#1 (Melhor Rota de Upgrade|Top Recommended Upgrade Path)/i,
+      ),
+    ).toBeDefined();
+    expect(screen.getByText(/Custo do Upgrade|Upgrade Cost/i)).toBeDefined();
+
+    // Close modal
+    const closeBtn = screen.getByRole('button', { name: /Close modal/i });
+    await user.click(closeBtn);
+    expect(
+      screen.queryByText(/Planejador de Upgrade|Upgrade Planner/i),
+    ).toBeNull();
+  });
 });

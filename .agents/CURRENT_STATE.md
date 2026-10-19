@@ -4,13 +4,20 @@
 
 ## 🔴 In Flight
 
-- `[BLD-06]` Upgrade Mode ("I Already Have...") — allow users to lock owned components with $0 new cost, preserve socket/RAM/PSU/case physical compatibility, and evaluate the Pareto frontier of upgrade paths to recommend the highest performance jump per dollar.
+- `[BLD-08]` Optional Constraints for Enthusiasts (SFF, Cooler Type, RGB & Brand Ecosystems) — add enthusiast-grade filtering criteria across form factor (Mini-ITX/Micro-ATX vs ATX), cooling preference (Quiet Air Cooling vs AIO Liquid Cooler), aesthetics (Stealth Blackout / No-RGB vs RGB Lighting), and CPU vendor ecosystem (AMD Ryzen vs Intel Core).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Upgrade Mode ("I Already Have...") (`[BLD-06]`, 2026-10-19):**
+  - Shipped dedicated pure math engine in `src/lib/math/upgradeOptimizer.ts` enabling hardware owners to lock existing components with $0 new cost towards their upgrade budget.
+  - Enforced physical compatibility (AM4/AM5/LGA1700 socket retention, RAM generation match, PSU wattage headroom rejecting unsafe GPU pairings on 550W PSUs, and compact case clearance).
+  - Evaluated the 2D Pareto frontier of upgrade paths (net upgrade cost vs. workload performance), calculating baseline scores, +FPS leaps, and component action breakdowns ("KEEP ($0)" vs "BUY NEW").
+  - Extracted budget presets into `src/data/budgetPresets.ts` and delivered interactive `UpgradePlannerModal.tsx` in `FullBuildExplorer.tsx`.
+  - Backed by 9 durable Vitest property tests in `src/lib/math/__tests__/upgradeOptimizer.test.ts` and UI integration tests in `src/__tests__/App.ui.test.tsx` (146 total tests passing).
 
 - **Save & Share Builds via URL Encoding & Copy Parts List (`[BLD-07]`, 2026-10-19):**
   - Shipped pure URL encoding/decoding engine in `src/utils/shareBuild.ts` serializing all 8 component IDs, budget ceiling, workload profile, and active currency into URL search parameters.
