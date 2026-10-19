@@ -34,6 +34,7 @@ Pure TypeScript modules with zero React/DOM/ECharts dependencies:
 | `src/utils/currency.ts` | **Currency Formatter & Converter** — formats BRL (`R$ 3.899,99`) and USD (`$250`), plus bidirectional USD/BRL conversion (`convertUsdToBrl`, `convertBrlToUsd`) |
 | `src/utils/i18n.ts` | **Lightweight Localization Dictionary (`[UX-06]`)** — type-safe translation helper supporting Brazil-first (`pt-BR`) and English (`en-US`) with plain-language, unslop copywriting |
 | `src/utils/shoppingReasons.ts` | **Plain-Language Shopping Rationale Engine (`[UX-04]`)** — generates unslop shopping reasons with exact price savings, FPS percentages, VRAM longevity, and 8-component build breakdowns in `pt-BR` and `en-US` |
+| `src/utils/shareBuild.ts` | **Save & Share Build Engine (`[BLD-07]`)** — encodes/decodes full 8-component PC build IDs, budget, and workload profile into URL query parameters, plus generates unslop markdown/plain-text parts lists for Discord, Reddit, and WhatsApp with safe clipboard copying |
 
 ---
 
@@ -48,7 +49,7 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | `src/App.tsx` | **Main Optimizer Workspace (`[PERF-01]`)** — responsive layout shell with 4-tier experience switcher (`1. Simple Guide`, `2. Explorer`, `3. Pro Lab`, `4. Full Builds`), dataset switcher (Real GPUs, My Deals, Combined Sandbox with live USD/BRL rate, Synthetic Sandbox), + Import Deals modal trigger, Step 1/2 controls, chart view switcher, and `React.lazy` mode-based code splitting for heavy visualizers and modals |
 | `src/components/TopWinnerBanner.tsx` | **#1 TOPSIS Winner Banner** — top showcase banner for highest scoring GPU under active constraints and weights |
 | `src/components/FullBuildExplorer.tsx` | **Phase 3 Full-Build Pareto Explorer UI ("Mario Kart Mode")** — interactive complete PC build optimizer with budget presets, custom budget slider, platform/socket filters, RAM generation filters, GPU vendor filters, hero card, trade-off alternatives, and leaderboard |
-| `src/components/BuildHeroCard.tsx` | **Top Recommended Build Hero Card** — full 8-component breakdown (CPU, GPU, Motherboard, RAM, Storage, Cooler, Case, PSU), total price, effective FPS, bottleneck telemetry, power load & headroom, and visual budget distribution bar |
+| `src/components/BuildHeroCard.tsx` | **Top Recommended Build Hero Card** — full 8-component breakdown (CPU, GPU, Motherboard, RAM, Storage, Cooler, Case, PSU), total price, effective FPS, bottleneck telemetry, power load & headroom, visual budget distribution bar, and 1-click URL share / forum parts list copy |
 | `src/components/BuildLeaderboardTable.tsx` | **Pareto Build Leaderboard Table** — complete table of Pareto-optimal and candidate full PC builds with component specs, bottleneck telemetry, and select/inspect actions |
 | `src/components/GpuDealImporterModal.tsx` | **Interactive GPU Deal Importer & Validator Modal** — 3-tab modal featuring Smart Paste (with one-click templates for Pichau, Terabyte, KaBuM, PCYes), Inspect & Validate card previews (cash/PIX vs. installment selector, benchmark links, editable specs), and My Deals database manager |
 | `src/components/HardwareFilterPanel.tsx` | **Brand & Ecosystem Technology Filters** — multi-select brand chips (`NVIDIA`, `AMD`, `Intel`) and proprietary technology toggles (`DLSS 3+ Frame Gen`, `FSR 3 Frame Gen`, `AV1 Video Encode`, `Hardware Ray Tracing`, `CUDA / OptiX AI & 3D`) with live candidate counts |
@@ -82,7 +83,8 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | `scripts/check-docs.cjs` | Validates `AGENTS.md` character cap (<12,000 chars), internal markdown links, `.agents/skills/` frontmatter, `.claude/skills/` stub parity, and the 600/800-line file cap (with a shrink-only allowlist) |
 | `.github/workflows/check.yml` | CI: `npm ci`, `npm run check`, `npm run build`, plus the Playwright e2e job, on every push to `main` and every PR |
 | `scripts/snap.mjs` | `npm run snap`: starts Vite and saves desktop + phone screenshots of each mode to `snapshots/` (gitignored) |
-| `src/__tests__/App.ui.test.tsx` | UI smoke tests (jsdom + Testing Library): each mode renders, budget changes the Simple top pick |
+| `src/__tests__/App.ui.test.tsx` | UI smoke tests (jsdom + Testing Library): each mode renders, budget changes the Simple top pick, share buttons copy links and feedback badges |
+| `src/utils/__tests__/shareBuild.test.ts` | Unit tests for build share URL encoding/decoding, parameter sanitization, and plain-text clipboard formatting |
 | `src/utils/__tests__/plainLanguage.test.tsx` | Plain-language buyer copy regression tests ([`UX-03`]): asserts zero forbidden math jargon in Simple mode in pt-BR and en-US |
 | `e2e/beginner.spec.ts` | Playwright e2e (`npm run test:e2e`): "a beginner gets a recommendation" on desktop and phone |
 | `eslint.config.js` / `.prettierrc.json` | Lint (zero `any`, zero type assertions except `as const`, hooks rules) and formatting, both part of `npm run check` |

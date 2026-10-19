@@ -4,13 +4,20 @@
 
 ## 🔴 In Flight
 
-- `[BLD-07]` Save & Share Builds (URL Encoding & Copy Parts List) — shareable URL parameters, 1-click clipboard summary for Discord/Reddit/WhatsApp with 8 components, total cost, power, and workload FPS.
+- `[BLD-06]` Upgrade Mode ("I Already Have...") — allow users to lock owned components with $0 new cost, preserve socket/RAM/PSU/case physical compatibility, and evaluate the Pareto frontier of upgrade paths to recommend the highest performance jump per dollar.
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Save & Share Builds via URL Encoding & Copy Parts List (`[BLD-07]`, 2026-10-19):**
+  - Shipped pure URL encoding/decoding engine in `src/utils/shareBuild.ts` serializing all 8 component IDs, budget ceiling, workload profile, and active currency into URL search parameters.
+  - Implemented 1-click clipboard export utilities generating unslop, human-readable parts list summaries formatted cleanly for Discord, Reddit, and WhatsApp with power draw and workload score in `pt-BR` and `en-US`.
+  - Added "Share Link" and "Copy List" buttons with 2-second visual confirmation feedback to `BuildHeroCard.tsx`.
+  - Initialized `FullBuildExplorer.tsx` and `useOptimizerState.ts` directly from URL search params on mount.
+  - Backed by 5 Vitest unit tests in `src/utils/__tests__/shareBuild.test.ts` and UI smoke tests in `src/__tests__/App.ui.test.tsx` (136 total tests passing).
 
 - **Performance Model Per Use Case (`[BLD-03]`, 2026-10-19):**
   - Extended continuous bottleneck formula and combinatorial optimization engine to evaluate workload-specific performance across 4 target profiles: 1080p Esports ($\alpha = 0.70$), 1440p Sweet Spot ($\alpha = 0.50$), 4K RT Enthusiast ($\alpha = 0.30$ + VRAM overflow penalty), and Creator & AI (32GB+ RAM, 16GB+ VRAM, NVIDIA CUDA/Tensor bonus, multi-core CPU).

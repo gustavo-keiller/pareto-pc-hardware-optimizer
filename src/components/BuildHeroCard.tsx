@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Award,
   ShieldCheck,
@@ -11,11 +11,19 @@ import {
   HardDrive,
   Wind,
   Box,
+  Share2,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
 import { formatCurrency } from '../utils/currency';
 import { AppLocale } from '../utils/i18n';
 import { generateBuildShoppingReasons } from '../utils/shoppingReasons';
+import {
+  copyTextToClipboard,
+  encodeBuildShareUrl,
+  formatBuildShareText,
+} from '../utils/shareBuild';
 
 interface BuildHeroCardProps {
   build: PcBuild;
@@ -28,9 +36,46 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
   currency = 'USD',
   locale = 'pt-BR',
 }) => {
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedSpecs, setCopiedSpecs] = useState(false);
+
   const reasons = useMemo(() => {
     return generateBuildShoppingReasons(build, currency, locale);
   }, [build, currency, locale]);
+
+  const shareUrl = useMemo(() => {
+    return encodeBuildShareUrl({
+      cpuId: build.cpu.id,
+      gpuId: build.gpu.id,
+      moboId: build.motherboard.id,
+      ramId: build.ram.id,
+      psuId: build.psu.id,
+      storageId: build.storage.id,
+      caseId: build.case.id,
+      coolerId: build.cooler.id,
+      budget: build.totalPrice,
+      workload: build.workloadProfile,
+      currency,
+      buildId: build.id,
+    });
+  }, [build, currency]);
+
+  const handleCopyLink = async () => {
+    const ok = await copyTextToClipboard(shareUrl);
+    if (ok) {
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
+
+  const handleCopySpecs = async () => {
+    const formatted = formatBuildShareText(build, shareUrl, currency, locale);
+    const ok = await copyTextToClipboard(formatted);
+    if (ok) {
+      setCopiedSpecs(true);
+      setTimeout(() => setCopiedSpecs(false), 2000);
+    }
+  };
   return (
     <section
       data-testid="top-build-card"
@@ -62,12 +107,70 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
                 </span>
               )}
             </div>
-            <h3 className="text-2xl sm:text-3xl font-black text-white mt-1">
-              {formatCurrency(build.totalPrice, currency)}{' '}
-              <span className="text-lg font-normal text-slate-400">
-                Total Hardware Cost
-              </span>
-            </h3>
+            <div className="flex flex-wrap items-center justify-between gap-3 mt-1">
+              <h3 className="text-2xl sm:text-3xl font-black text-white">
+                {formatCurrency(build.totalPrice, currency)}{' '}
+                <span className="text-lg font-normal text-slate-400">
+                  Total Hardware Cost
+                </span>
+              </h3>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-bold text-slate-200 hover:text-white hover:border-slate-600 transition shadow-sm"
+                  title={
+                    locale === 'pt-BR'
+                      ? 'Copiar link desta build'
+                      : 'Copy shareable build link'
+                  }
+                >
+                  {copiedLink ? (
+                    <>
+                      <Check className="h-3.5 w-3.5 text-emerald-400" />
+                      <span className="text-emerald-400">
+                        {locale === 'pt-BR' ? 'Link Copiado!' : 'Link Copied!'}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="h-3.5 w-3.5 text-sky-400" />
+                      <span>
+                        {locale === 'pt-BR' ? 'Compartilhar' : 'Share Link'}
+                      </span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopySpecs}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-bold text-slate-200 hover:text-white hover:border-slate-600 transition shadow-sm"
+                  title={
+                    locale === 'pt-BR'
+                      ? 'Copiar lista de peças para Discord / WhatsApp / Reddit'
+                      : 'Copy parts list for Discord / Reddit'
+                  }
+                >
+                  {copiedSpecs ? (
+                    <>
+                      <Check className="h-3.5 w-3.5 text-emerald-400" />
+                      <span className="text-emerald-400">
+                        {locale === 'pt-BR'
+                          ? 'Lista Copiada!'
+                          : 'Specs Copied!'}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>
+                        {locale === 'pt-BR' ? 'Copiar Peças' : 'Copy List'}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

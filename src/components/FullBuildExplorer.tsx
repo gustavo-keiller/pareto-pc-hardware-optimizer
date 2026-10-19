@@ -52,6 +52,7 @@ import {
 } from '../lib/math/combinatorial';
 import { convertUsdToBrl, formatCurrency } from '../utils/currency';
 import { AppLocale } from '../utils/i18n';
+import { decodeBuildShareUrl } from '../utils/shareBuild';
 import { BuildHeroCard } from './BuildHeroCard';
 import { BuildLeaderboardTable } from './BuildLeaderboardTable';
 
@@ -150,9 +151,18 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   const stepSlider = isBrl ? 250 : 50;
 
   // State
-  const [maxBudget, setMaxBudget] = useState<number>(() =>
-    isBrl ? 6000 : 1000,
-  );
+  const initialShare = useMemo(() => {
+    if (typeof window !== 'undefined' && window.location.search) {
+      return decodeBuildShareUrl(window.location.search);
+    }
+    return null;
+  }, []);
+
+  const [maxBudget, setMaxBudget] = useState<number>(() => {
+    if (initialShare?.budget && initialShare.budget > 0)
+      return initialShare.budget;
+    return isBrl ? 6000 : 1000;
+  });
   const [selectedSocket, setSelectedSocket] = useState<CpuSocket | 'ALL'>(
     'ALL',
   );
@@ -164,13 +174,19 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   >('ALL');
   const [minEffectiveFps, setMinEffectiveFps] = useState<number>(0);
   const [selectedWorkload, setSelectedWorkload] =
-    useState<BuildWorkloadProfile>('sweetspot-1440p');
-  const [activePresetId, setActivePresetId] = useState<string>(() =>
-    isBrl ? 'sweet-6000' : 'sweet-1000',
+    useState<BuildWorkloadProfile>(
+      () => initialShare?.workload ?? 'sweetspot-1440p',
+    );
+  const [activePresetId, setActivePresetId] = useState<string>(() => {
+    if (initialShare?.budget) return '';
+    return isBrl ? 'sweet-6000' : 'sweet-1000';
+  });
+  const [selectedBuildId, setSelectedBuildId] = useState<string | null>(
+    () => initialShare?.buildId ?? null,
   );
-  const [selectedBuildId, setSelectedBuildId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initialShare?.budget) return;
     if (isBrl && maxBudget < 3500) {
       setMaxBudget(6000);
       setActivePresetId('sweet-6000');
@@ -178,7 +194,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
       setMaxBudget(1000);
       setActivePresetId('sweet-1000');
     }
-  }, [isBrl, maxBudget]);
+  }, [isBrl, maxBudget, initialShare]);
 
   const activeCpus = useMemo(
     () =>
@@ -293,14 +309,24 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
 
   // If user clicked a specific build, inspect that; otherwise inspect top build
   const activeBuild = useMemo(() => {
-    if (!selectedBuildId) return topBuildUnderBudget;
-    return (
-      optimalBuilds.find((b) => b.id === selectedBuildId) ??
-      allCompatibleBuilds.find((b) => b.id === selectedBuildId) ??
-      topBuildUnderBudget
-    );
+    if (selectedBuildId) {
+      const match =
+        optimalBuilds.find((b) => b.id === selectedBuildId) ??
+        allCompatibleBuilds.find((b) => b.id === selectedBuildId);
+      if (match) return match;
+    }
+    if (initialShare && (initialShare.cpuId || initialShare.gpuId)) {
+      const match = allCompatibleBuilds.find(
+        (b) =>
+          (!initialShare.cpuId || b.cpu.id === initialShare.cpuId) &&
+          (!initialShare.gpuId || b.gpu.id === initialShare.gpuId),
+      );
+      if (match) return match;
+    }
+    return topBuildUnderBudget;
   }, [
     selectedBuildId,
+    initialShare,
     topBuildUnderBudget,
     optimalBuilds,
     allCompatibleBuilds,

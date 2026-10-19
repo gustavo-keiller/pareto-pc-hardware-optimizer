@@ -19,8 +19,8 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (Reprioritized from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[BLD-07]` Save & Share Builds (URL Encoding & Copy Parts List):**
-  Encode active build selection and custom filter configuration into shareable URL parameters (or hash), allowing users to share their dream build with friends or save it without requiring a server backend. Include a 1-click "Copy Build Summary" button formatted cleanly for Discord, Reddit, and WhatsApp (listing all 8 components, total price in active currency, power draw, and target workload FPS).
-  - **Files likely touched:** `src/utils/shareBuild.ts`, `src/components/BuildHeroCard.tsx`, `src/components/FullBuildExplorer.tsx`, `src/hooks/useOptimizerState.ts`, `CODEMAP.md`
-  - **Done when:** clicking "Share Build" copies a direct URL and markdown/text summary, and navigating to the URL recreates the exact build selection.
-  - **Test to add:** unit tests in `src/utils/__tests__/shareBuild.test.ts` verifying encoding/decoding and clipboard string generation.
+- **`[BLD-06]` Upgrade Mode ("I Already Have..."):**
+  Allow users to lock components they already own (e.g., existing AM4 motherboard, DDR4 RAM, 550W PSU, or GPU), treating owned components as $0 cost towards the upgrade budget. The optimizer verifies full physical compatibility (socket retention, RAM generation, PSU wattage headroom, case clearances) and evaluates the Pareto frontier of upgrade paths to recommend the highest performance leap per dollar spent.
+  - **Files likely touched:** `src/lib/math/upgradeOptimizer.ts`, `src/lib/math/combinatorial.ts`, `src/components/FullBuildExplorer.tsx`, `src/components/UpgradePlannerModal.tsx`, `CODEMAP.md`
+  - **Done when:** user can select owned components, set an upgrade budget, and receive compatible upgrade combinations with net cost and performance gains.
+  - **Test to add:** unit tests in `src/lib/math/__tests__/upgradeOptimizer.test.ts` verifying component locking, budget subtraction/zero-cost accounting, compatibility constraints, and Pareto ranking of upgrades.

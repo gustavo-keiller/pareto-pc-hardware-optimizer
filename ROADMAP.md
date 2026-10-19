@@ -83,7 +83,7 @@
 - [ ] **`[BLD-04]` (engine done, < 50 ms on 38 parts; not yet in a Web Worker) Pre-pruned combination engine** (= P3-02) running in a **Web Worker**, with a time budget test (e.g. full catalog < 300 ms) so the UI never freezes.
 - [ ] **`[BLD-05]` (Pro version done as "Full Builds"; beginner version is UX-11) Build results UI** (= P3-03): beginner sees "Your build" as a parts list with total price and one reason per part; Explorer/Pro sees the full-build frontier (total price vs effective FPS) and can swap any part and see the effect.
 - [ ] **`[BLD-06]` Upgrade mode:** "I already have…" — lock existing parts, recommend the best upgrade for the money.
-- [ ] **`[BLD-07]` Save & share builds:** state in the URL (no backend needed), plus copy-as-list and print/PDF.
+- [x] **`[BLD-07]` Save & share builds:** state in the URL (no backend needed), plus 1-click clean clipboard export for Discord, Reddit, and WhatsApp with 8-component parts list, active currency pricing, power draw, and workload scores. _Done 2026-10-19._
 - [ ] **`[BLD-08]` Optional constraints for enthusiasts:** small form factor, noise, looks (RGB/no RGB), brand preferences.
 
 ---

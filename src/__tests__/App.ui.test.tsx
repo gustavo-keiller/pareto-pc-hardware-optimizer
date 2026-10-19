@@ -291,6 +291,36 @@ describe('App modes', () => {
     );
   });
 
+  it('BLD-07: Build hero card renders share link and copy specs buttons with visual feedback', async () => {
+    localStorage.clear();
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Switch to whole PC build
+    await user.click(
+      screen.getByRole('button', { name: /A Whole PC Build|Um PC Completo/i }),
+    );
+    expect(screen.getByTestId('full-build-pick-hero')).toBeDefined();
+
+    // Check share link and copy specs buttons exist
+    const shareBtn = screen.getByRole('button', {
+      name: /Compartilhar|Share Link/i,
+    });
+    const copySpecsBtn = screen.getByRole('button', {
+      name: /Copiar Peças|Copy List/i,
+    });
+    expect(shareBtn).toBeDefined();
+    expect(copySpecsBtn).toBeDefined();
+
+    // Click copy link and check feedback
+    await user.click(shareBtn);
+    expect(screen.getByText(/Link Copiado!|Link Copied!/i)).toBeDefined();
+
+    // Click copy specs and check feedback
+    await user.click(copySpecsBtn);
+    expect(screen.getByText(/Lista Copiada!|Specs Copied!/i)).toBeDefined();
+  });
+
   it('UX-06: defaults to pt-BR and BRL when fresh, and toggles cleanly between Portuguese and English', async () => {
     localStorage.clear();
     const user = userEvent.setup();

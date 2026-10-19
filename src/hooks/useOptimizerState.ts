@@ -260,6 +260,18 @@ export function useOptimizerState() {
 
   // 4 Proportional UI Complexity Modes: 'simple' (Level 1) | 'explorer' (Level 2) | 'pro' (Level 3) | 'builds' (Level 4 Mario Kart)
   const [uiMode, setUiMode] = useState<UiMode>(() => {
+    if (typeof window !== 'undefined' && window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      const urlMode = params.get('mode');
+      if (
+        urlMode === 'pro' ||
+        urlMode === 'explorer' ||
+        urlMode === 'builds' ||
+        urlMode === 'simple'
+      ) {
+        return urlMode;
+      }
+    }
     const saved = safeGetString('paretopc_ui_mode', 'simple');
     if (saved === 'pro' || saved === 'explorer' || saved === 'builds')
       return saved;
