@@ -61,8 +61,8 @@
 
 ## Phase 1 — Simple for beginners, deep for experts
 
-- [ ] **`[UX-12]` Fix the "Smart Buy" labels.** A card is only a smart buy if nothing cheaper is at least as good *on what the user said they care about* (the 2 or 3 metrics their answers pick), not on all 5 metrics. Never show "Smart Buy" on a card the data marks as a trap. Add a test: every `[TRAP]` card in the real dataset is not labelled smart buy under default settings.
-- [ ] **`[UX-13]` Sensible default budget.** No "All" by default; ask, or start from a middle budget, so the first pick isn't the most expensive card.
+- [x] **`[UX-12]` Fix the "Smart Buy" labels.** A card is only a smart buy if nothing cheaper is at least as good *on what the user said they care about* (the 2 or 3 metrics their answers pick), not on all 5 metrics. Never show "Smart Buy" on a card the data marks as a trap. _Done 2026-10-19 in 563a410._
+- [x] **`[UX-13]` Sensible default budget.** No "All" by default; ask, or start from a middle budget, so the first pick isn't the most expensive card. _Done 2026-10-19 in 563a410._
 - [ ] **`[UX-01]` Answer-first beginner flow.** Three questions: *What will you do?* (games by name/genre, streaming, editing, AI, office) → *What monitor/resolution?* (with "I don't know" = 1080p) → *Budget* (in your currency). Then show **one recommended pick + 2 alternatives** with a one-line reason each. The current 5-step tutorial becomes an optional "Why this pick?" section below. Done when, on a phone, the recommendation is on the first screen after the questions.
 - [ ] **`[UX-02]` Hide expert controls in Simple mode.** Dataset switcher, Sandbox, Import Deals and "Pro MCDM Lab" wording only appear in Explorer/Pro. Simple mode always uses real data.
 - [ ] **`[UX-03]` Plain-language pass on Simple mode** using AI-07: no "Pareto/frontier/utility/dominated/TOPSIS" in Simple mode text. Pro keeps the real terms, with hover definitions.
