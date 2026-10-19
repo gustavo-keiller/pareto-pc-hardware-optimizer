@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- `[BLD-03]` Performance model per use case (CPU↔GPU balance per resolution; separate scoring and TOPSIS weight profiles for 1080p Esports, 1440p Sweet Spot, 4K RT, and Creator & AI).
+- `[BLD-07]` Save & Share Builds (URL Encoding & Copy Parts List) — shareable URL parameters, 1-click clipboard summary for Discord/Reddit/WhatsApp with 8 components, total cost, power, and workload FPS.
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Performance Model Per Use Case (`[BLD-03]`, 2026-10-19):**
+  - Extended continuous bottleneck formula and combinatorial optimization engine to evaluate workload-specific performance across 4 target profiles: 1080p Esports ($\alpha = 0.70$), 1440p Sweet Spot ($\alpha = 0.50$), 4K RT Enthusiast ($\alpha = 0.30$ + VRAM overflow penalty), and Creator & AI (32GB+ RAM, 16GB+ VRAM, NVIDIA CUDA/Tensor bonus, multi-core CPU).
+  - Connected beginner Step 2 intake choice and Full Build selector pills directly into `optimizeFullSystemBuilds`.
+  - Updated telemetry in hero cards, leaderboard tables, and trade-off comparison cards with dynamic score labels and units.
+  - Backed by 9 property tests in `src/lib/math/__tests__/workloadModels.test.ts` and UI integration tests in `src/__tests__/App.ui.test.tsx` (130 total tests passing).
 
 - **Slim ECharts Tree-Shaking (`[PERF-02]`, 2026-10-19):**
   - Replaced monolithic `echarts-for-react` imports with centralized, tree-shaken `EChartsRenderer.tsx` using `echarts-for-react/lib/core` and `echarts/core`.

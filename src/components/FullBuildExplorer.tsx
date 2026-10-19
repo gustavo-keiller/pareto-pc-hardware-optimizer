@@ -8,6 +8,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import {
+  BuildWorkloadProfile,
   CpuSocket,
   isCpuSocket,
   isRamGeneration,
@@ -162,6 +163,8 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     HardwareVendor | 'ALL'
   >('ALL');
   const [minEffectiveFps, setMinEffectiveFps] = useState<number>(0);
+  const [selectedWorkload, setSelectedWorkload] =
+    useState<BuildWorkloadProfile>('sweetspot-1440p');
   const [activePresetId, setActivePresetId] = useState<string>(() =>
     isBrl ? 'sweet-6000' : 'sweet-1000',
   );
@@ -240,6 +243,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
       preferredGpuVendor:
         selectedGpuVendor === 'ALL' ? undefined : selectedGpuVendor,
       minEffectiveFps: minEffectiveFps > 0 ? minEffectiveFps : undefined,
+      workloadProfile: selectedWorkload,
     };
   }, [
     maxBudget,
@@ -247,6 +251,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     selectedRamGen,
     selectedGpuVendor,
     minEffectiveFps,
+    selectedWorkload,
   ]);
 
   const optimizationResult = useMemo(() => {
@@ -328,6 +333,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     setSelectedSocket('ALL');
     setSelectedRamGen('ALL');
     setSelectedGpuVendor('ALL');
+    setSelectedWorkload('sweetspot-1440p');
     setMinEffectiveFps(0);
     setActivePresetId(isBrl ? 'sweet-6000' : 'sweet-1000');
     setSelectedBuildId(null);
@@ -381,6 +387,97 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
                 GPU Explorer
               </button>
             )}
+          </div>
+        </div>
+
+        {/* Performance Target & Workload Presets */}
+        <div className="mt-6 border-t border-slate-800/80 pt-5">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
+            <span>
+              {locale === 'pt-BR'
+                ? 'Objetivo de Desempenho'
+                : 'Performance Target'}
+            </span>
+            <span className="text-[11px] text-slate-400 font-normal">
+              {selectedWorkload === 'esports-1080p' &&
+                (locale === 'pt-BR'
+                  ? 'Foco em CPU e taxa de quadros competitiva'
+                  : 'CPU-bound high-refresh esports')}
+              {selectedWorkload === 'sweetspot-1440p' &&
+                (locale === 'pt-BR'
+                  ? 'Equilíbrio ideal entre GPU e CPU em 1440p'
+                  : 'Optimal 1440p raster and 12GB+ VRAM')}
+              {selectedWorkload === 'enthusiast-4k' &&
+                (locale === 'pt-BR'
+                  ? 'Carga pesada de GPU, Ray Tracing e 16GB+ VRAM'
+                  : 'Heavy GPU/RT throughput and 16GB+ VRAM')}
+              {selectedWorkload === 'creator-ai' &&
+                (locale === 'pt-BR'
+                  ? 'Aceleração CUDA/Tensor e 32GB de RAM para IA e criação'
+                  : 'CUDA/Tensor acceleration & 32GB RAM for creator/AI')}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {[
+              {
+                id: 'sweetspot-1440p' as const,
+                label: '1440p Sweet Spot',
+                icon: '🎯',
+                desc:
+                  locale === 'pt-BR'
+                    ? 'Equilibrado (Custo-Benefício)'
+                    : 'Balanced Value',
+              },
+              {
+                id: 'esports-1080p' as const,
+                label: '1080p Esports',
+                icon: '⚡',
+                desc:
+                  locale === 'pt-BR'
+                    ? 'Alto FPS / Foco em CPU'
+                    : 'High Refresh / CPU Bound',
+              },
+              {
+                id: 'enthusiast-4k' as const,
+                label: '4K RT Enthusiast',
+                icon: '💎',
+                desc:
+                  locale === 'pt-BR'
+                    ? 'Ray Tracing & 16GB+ VRAM'
+                    : 'Ray Tracing & 16GB+ VRAM',
+              },
+              {
+                id: 'creator-ai' as const,
+                label: 'Creator & AI',
+                icon: '🧠',
+                desc:
+                  locale === 'pt-BR'
+                    ? 'CUDA / Tensor + 32GB RAM'
+                    : 'CUDA / Tensor + 32GB RAM',
+              },
+            ].map((wl) => (
+              <button
+                key={wl.id}
+                type="button"
+                onClick={() => {
+                  setSelectedWorkload(wl.id);
+                  setSelectedBuildId(null);
+                }}
+                className={`rounded-xl border p-2.5 text-left transition ${
+                  selectedWorkload === wl.id
+                    ? 'border-emerald-500 bg-emerald-500/15 shadow-md shadow-emerald-500/10'
+                    : 'border-slate-800 bg-slate-950/60 hover:border-slate-700 hover:bg-slate-900/60'
+                }`}
+              >
+                <div className="flex items-center gap-1.5 text-xs font-black text-white">
+                  <span>{wl.icon}</span>
+                  <span>{wl.label}</span>
+                </div>
+                <div className="text-[10px] text-slate-400 mt-1 line-clamp-1">
+                  {wl.desc}
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 

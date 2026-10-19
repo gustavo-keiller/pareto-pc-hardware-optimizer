@@ -68,6 +68,12 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
           {/* Step-Down Build */}
           {stepDownBuild &&
             (() => {
+              const topScore =
+                topBuild.workloadScore ?? topBuild.effectiveFps1440p;
+              const stepDownScore =
+                stepDownBuild.workloadScore ?? stepDownBuild.effectiveFps1440p;
+              const unit =
+                topBuild.workloadProfile === 'creator-ai' ? 'pts' : 'FPS';
               const savings = Math.max(
                 0,
                 topBuild.totalPrice - stepDownBuild.totalPrice,
@@ -77,12 +83,8 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
                   ? Math.round((savings / topBuild.totalPrice) * 100)
                   : 0;
               const pctSpeed =
-                topBuild.effectiveFps1440p > 0
-                  ? Math.round(
-                      (stepDownBuild.effectiveFps1440p /
-                        topBuild.effectiveFps1440p) *
-                        100,
-                    )
+                topScore > 0
+                  ? Math.round((stepDownScore / topScore) * 100)
                   : 100;
               return (
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 space-y-2">
@@ -115,8 +117,8 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">
                     {locale === 'pt-BR'
-                      ? `Economize ${formatCurrency(savings, currency, false, locale)} (${pctSavings}% a menos), mantendo ${stepDownBuild.effectiveFps1440p} FPS (${pctSpeed}% do desempenho da primeira opção).`
-                      : `Save ${formatCurrency(savings, currency, false, locale)} (${pctSavings}% less) while keeping ${stepDownBuild.effectiveFps1440p} FPS (${pctSpeed}% speed of the top build).`}
+                      ? `Economize ${formatCurrency(savings, currency, false, locale)} (${pctSavings}% a menos), mantendo ${stepDownScore} ${unit} (${pctSpeed}% do desempenho da primeira opção).`
+                      : `Save ${formatCurrency(savings, currency, false, locale)} (${pctSavings}% less) while keeping ${stepDownScore} ${unit} (${pctSpeed}% speed of the top build).`}
                   </p>
                   <button
                     type="button"
@@ -134,18 +136,19 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
           {/* Step-Up Build */}
           {stepUpBuild &&
             (() => {
+              const topScore =
+                topBuild.workloadScore ?? topBuild.effectiveFps1440p;
+              const stepUpScore =
+                stepUpBuild.workloadScore ?? stepUpBuild.effectiveFps1440p;
+              const unit =
+                topBuild.workloadProfile === 'creator-ai' ? 'pts' : 'FPS';
               const extraPrice = Math.max(
                 0,
                 stepUpBuild.totalPrice - topBuild.totalPrice,
               );
-              const fpsDiff = Math.max(
-                0,
-                stepUpBuild.effectiveFps1440p - topBuild.effectiveFps1440p,
-              );
-              const pctFps =
-                topBuild.effectiveFps1440p > 0
-                  ? Math.round((fpsDiff / topBuild.effectiveFps1440p) * 100)
-                  : 0;
+              const scoreDiff = Math.max(0, stepUpScore - topScore);
+              const pctScore =
+                topScore > 0 ? Math.round((scoreDiff / topScore) * 100) : 0;
               return (
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 space-y-2">
                   <div className="flex items-center justify-between text-xs">
@@ -177,8 +180,8 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">
                     {locale === 'pt-BR'
-                      ? `Entrega +${fpsDiff} FPS (+${pctFps}%) chegando a ${stepUpBuild.effectiveFps1440p} FPS por +${formatCurrency(extraPrice, currency, false, locale)} adicionais.`
-                      : `Delivers +${fpsDiff} FPS (+${pctFps}%) reaching ${stepUpBuild.effectiveFps1440p} FPS for +${formatCurrency(extraPrice, currency, false, locale)} more.`}
+                      ? `Entrega +${scoreDiff} ${unit} (+${pctScore}%) chegando a ${stepUpScore} ${unit} por +${formatCurrency(extraPrice, currency, false, locale)} adicionais.`
+                      : `Delivers +${scoreDiff} ${unit} (+${pctScore}%) reaching ${stepUpScore} ${unit} for +${formatCurrency(extraPrice, currency, false, locale)} more.`}
                   </p>
                   <button
                     type="button"

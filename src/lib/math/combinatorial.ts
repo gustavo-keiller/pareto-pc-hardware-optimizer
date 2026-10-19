@@ -1,5 +1,6 @@
 import {
   assemblePcBuild,
+  BuildWorkloadProfile,
   calculateEstimatedPowerDraw,
   calculateRecommendedPsuWattage,
   CaseCandidate,
@@ -304,7 +305,7 @@ export interface ComponentCatalogs {
  */
 export function generateCompatibleBuilds(
   catalogs: ComponentCatalogs,
-  options?: { elasticity?: number },
+  options?: { elasticity?: number; profile?: BuildWorkloadProfile },
 ): PcBuild[] {
   const { cpus, gpus, motherboards, ramKits, psus } = catalogs;
   const storages =
@@ -334,6 +335,7 @@ export function generateCompatibleBuilds(
   }
 
   const elasticity = options?.elasticity ?? 0.5;
+  const profile = options?.profile ?? 'sweetspot-1440p';
   const compatibleBuilds: PcBuild[] = [];
 
   for (const cpu of cpus) {
@@ -415,6 +417,7 @@ export function generateCompatibleBuilds(
                       pcCase,
                       cooler,
                       elasticity,
+                      profile,
                     ),
                   );
                 }
@@ -430,12 +433,15 @@ export function generateCompatibleBuilds(
 }
 
 /**
- * 2D Pareto frontier evaluation for complete PC builds (Total Price vs. Effective FPS).
+ * 2D Pareto frontier evaluation for complete PC builds (Total Price vs. Effective Workload Performance).
  * Build A dominates Build B iff:
- * 1. A.totalPrice <= B.totalPrice AND A.effectiveFps1440p >= B.effectiveFps1440p
+ * 1. A.totalPrice <= B.totalPrice AND A.score >= B.score
  * 2. At least one inequality is strictly better.
  */
-export function evaluateBuildParetoFrontier(builds: readonly PcBuild[]): {
+export function evaluateBuildParetoFrontier(
+  builds: readonly PcBuild[],
+  _profile?: BuildWorkloadProfile,
+): {
   optimalBuilds: PcBuild[];
   dominatedBuilds: PcBuild[];
 } {
@@ -451,20 +457,21 @@ export function evaluateBuildParetoFrontier(builds: readonly PcBuild[]): {
 
   for (let i = 0; i < builds.length; i++) {
     const candidate = builds[i];
+    const candidateScore =
+      candidate.workloadScore ?? candidate.effectiveFps1440p;
     let isDominated = false;
 
     for (let j = 0; j < builds.length; j++) {
       if (i === j) continue;
       const other = builds[j];
+      const otherScore = other.workloadScore ?? other.effectiveFps1440p;
 
       const priceBetterOrEqual = other.totalPrice <= candidate.totalPrice;
-      const fpsBetterOrEqual =
-        other.effectiveFps1440p >= candidate.effectiveFps1440p;
+      const scoreBetterOrEqual = otherScore >= candidateScore;
       const atLeastOneStrict =
-        other.totalPrice < candidate.totalPrice ||
-        other.effectiveFps1440p > candidate.effectiveFps1440p;
+        other.totalPrice < candidate.totalPrice || otherScore > candidateScore;
 
-      if (priceBetterOrEqual && fpsBetterOrEqual && atLeastOneStrict) {
+      if (priceBetterOrEqual && scoreBetterOrEqual && atLeastOneStrict) {
         isDominated = true;
         break;
       }
@@ -477,10 +484,12 @@ export function evaluateBuildParetoFrontier(builds: readonly PcBuild[]): {
     }
   }
 
-  // Sort optimal builds by price ascending, breaking ties by higher effective FPS
+  // Sort optimal builds by price ascending, breaking ties by higher workload score
   optimalBuilds.sort((a, b) => {
     if (a.totalPrice !== b.totalPrice) return a.totalPrice - b.totalPrice;
-    return b.effectiveFps1440p - a.effectiveFps1440p;
+    const aScore = a.workloadScore ?? a.effectiveFps1440p;
+    const bScore = b.workloadScore ?? b.effectiveFps1440p;
+    return bScore - aScore;
   });
 
   return { optimalBuilds, dominatedBuilds };
@@ -496,6 +505,7 @@ export interface BuildFilterCriteria {
   preferredSocket?: CpuSocket;
   preferredRamGeneration?: RamGeneration;
   preferredGpuVendor?: HardwareVendor;
+  workloadProfile?: BuildWorkloadProfile;
 }
 
 export interface OptimizationResult {
@@ -519,8 +529,8 @@ export interface OptimizationResult {
  * End-to-end full system optimizer pipeline:
  * 1. Intra-category Pareto pre-pruning to eliminate inferior individual parts across all 8 categories.
  * 2. Backtracking constraint-propagating generation of physically valid systems.
- * 3. Filter by user budget and platform preferences.
- * 4. Multi-objective Pareto evaluation across total price vs. effective FPS.
+ * 3. Filter by user budget, workload profile, and platform preferences.
+ * 4. Multi-objective Pareto evaluation across total price vs. effective workload performance.
  */
 export function optimizeFullSystemBuilds(
   catalogs: ComponentCatalogs,
@@ -553,8 +563,10 @@ export function optimizeFullSystemBuilds(
     coolers: prunedCoolers,
   };
 
-  // Step 2: Generate compatible builds
-  const allCompatible = generateCompatibleBuilds(prunedCatalogs);
+  const profile = criteria?.workloadProfile ?? 'sweetspot-1440p';
+
+  // Step 2: Generate compatible builds with active workload profile
+  const allCompatible = generateCompatibleBuilds(prunedCatalogs, { profile });
 
   // Step 3: Filter builds according to user criteria
   let filteredBuilds = allCompatible;
@@ -572,9 +584,10 @@ export function optimizeFullSystemBuilds(
       ) {
         return false;
       }
+      const score = build.workloadScore ?? build.effectiveFps1440p;
       if (
         typeof criteria.minEffectiveFps === 'number' &&
-        build.effectiveFps1440p < criteria.minEffectiveFps
+        score < criteria.minEffectiveFps
       ) {
         return false;
       }
@@ -601,8 +614,10 @@ export function optimizeFullSystemBuilds(
   }
 
   // Step 4: Pareto frontier extraction
-  const { optimalBuilds, dominatedBuilds } =
-    evaluateBuildParetoFrontier(filteredBuilds);
+  const { optimalBuilds, dominatedBuilds } = evaluateBuildParetoFrontier(
+    filteredBuilds,
+    profile,
+  );
 
   return {
     optimalBuilds,

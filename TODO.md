@@ -19,8 +19,8 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (Reprioritized from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[BLD-03]` Performance model per use case:**
-  Extend the continuous bottleneck formula and scoring engine to support distinct multi-objective weighting and CPU/GPU balance curves for the 4 beginner workloads: 1080p Esports (CPU-bound high-refresh), 1440p Sweet Spot (balanced raster/VRAM), 4K RT Enthusiast (GPU/RT-bound heavy load), and Creator & AI (high RAM, VRAM capacity, multi-core CPU). Connect the intake choice from Step 2 directly to full-system TOPSIS weights.
-  - **Files likely touched:** `src/lib/math/combinatorial.ts`, `src/lib/math/buildTypes.ts`, `src/hooks/useOptimizerState.ts`, `src/components/FullBuildExplorer.tsx`
-  - **Done when:** selecting "Creator & AI" prioritizes 32GB+ RAM, 16GB+ VRAM, and high multi-core CPUs in full PC builds, and 1080p Esports prioritizes high single-core CPU throughput.
-  - **Test to add:** unit tests in `src/lib/math/__tests__/combinatorial.test.ts` verifying build scores shift according to use case profiles.
+- **`[BLD-07]` Save & Share Builds (URL Encoding & Copy Parts List):**
+  Encode active build selection and custom filter configuration into shareable URL parameters (or hash), allowing users to share their dream build with friends or save it without requiring a server backend. Include a 1-click "Copy Build Summary" button formatted cleanly for Discord, Reddit, and WhatsApp (listing all 8 components, total price in active currency, power draw, and target workload FPS).
+  - **Files likely touched:** `src/utils/shareBuild.ts`, `src/components/BuildHeroCard.tsx`, `src/components/FullBuildExplorer.tsx`, `src/hooks/useOptimizerState.ts`, `CODEMAP.md`
+  - **Done when:** clicking "Share Build" copies a direct URL and markdown/text summary, and navigating to the URL recreates the exact build selection.
+  - **Test to add:** unit tests in `src/utils/__tests__/shareBuild.test.ts` verifying encoding/decoding and clipboard string generation.

@@ -39,7 +39,9 @@ export const BuildLeaderboardTable: React.FC<BuildLeaderboardTableProps> = ({
           <thead className="border-b border-slate-800 bg-slate-950/50 text-slate-400 uppercase tracking-wider">
             <tr>
               <th className="py-2.5 px-3">Price</th>
-              <th className="py-2.5 px-3">Effective FPS</th>
+              <th className="py-2.5 px-3">
+                {optimalBuilds[0]?.workloadMetricLabel ?? 'Effective FPS'}
+              </th>
               <th className="py-2.5 px-3">CPU</th>
               <th className="py-2.5 px-3">GPU</th>
               <th className="py-2.5 px-3">Memory</th>
@@ -74,7 +76,12 @@ export const BuildLeaderboardTable: React.FC<BuildLeaderboardTableProps> = ({
                     )}
                   </td>
                   <td className="py-2.5 px-3 font-extrabold text-emerald-400">
-                    {build.effectiveFps1440p} FPS
+                    {build.workloadScore ?? build.effectiveFps1440p}{' '}
+                    {build.workloadScore != null
+                      ? build.workloadProfile === 'creator-ai'
+                        ? 'pts'
+                        : 'FPS'
+                      : 'FPS'}
                     {build.bottleneckPct > 0 && (
                       <span className="ml-1 text-[10px] text-amber-400 font-normal">
                         (-{build.bottleneckPct}%)

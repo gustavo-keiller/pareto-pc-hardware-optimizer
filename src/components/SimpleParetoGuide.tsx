@@ -258,12 +258,13 @@ export function SimpleParetoGuide({
         cases: effectiveCases,
         coolers: effectiveCoolers,
       },
-      { maxBudget: effectiveMaxBudget },
+      { maxBudget: effectiveMaxBudget, workloadProfile: beginnerUseCase },
     );
   }, [
     rawCatalog,
     gpus,
     beginnerGoal,
+    beginnerUseCase,
     constraints.maxPrice,
     currency,
     effectiveCpus,

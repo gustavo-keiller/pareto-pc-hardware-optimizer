@@ -271,6 +271,26 @@ describe('App modes', () => {
     ).toBeDefined();
   });
 
+  it('BLD-03: selecting a workload profile (e.g. Creator & AI) in beginner build mode evaluates and labels workload performance', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Switch to whole PC build
+    await user.click(screen.getByRole('button', { name: /A Whole PC Build/i }));
+    expect(screen.getByTestId('full-build-pick-hero')).toBeDefined();
+
+    // Default workload is 1440p
+    expect(screen.getAllByText(/1440p Ultra/i).length).toBeGreaterThan(0);
+
+    // Select Creator & AI workload
+    await user.click(screen.getByText(/Creator & AI Workloads/i));
+
+    // Telemetry updates to Creator & AI Index
+    expect(screen.getAllByText(/Creator & AI Index/i).length).toBeGreaterThan(
+      0,
+    );
+  });
+
   it('UX-06: defaults to pt-BR and BRL when fresh, and toggles cleanly between Portuguese and English', async () => {
     localStorage.clear();
     const user = userEvent.setup();
