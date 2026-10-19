@@ -32,6 +32,7 @@ Pure TypeScript modules with zero React/DOM/ECharts dependencies:
 | `src/utils/storage.ts` | **Safe LocalStorage Layer** — `safeGetJSON`, `safeSetJSON`, `safeGetInt`, `safeGetBool`, `safeGetString`, and versioned schema migrations (`runStorageMigrations`) |
 | `src/utils/currency.ts` | **Currency Formatter & Converter** — formats BRL (`R$ 3.899,99`) and USD (`$250`), plus bidirectional USD/BRL conversion (`convertUsdToBrl`, `convertBrlToUsd`) |
 | `src/utils/i18n.ts` | **Lightweight Localization Dictionary (`[UX-06]`)** — type-safe translation helper supporting Brazil-first (`pt-BR`) and English (`en-US`) with plain-language, unslop copywriting |
+| `src/utils/shoppingReasons.ts` | **Plain-Language Shopping Rationale Engine (`[UX-04]`)** — generates unslop shopping reasons with exact price savings, FPS percentages, VRAM longevity, and 8-component build breakdowns in `pt-BR` and `en-US` |
 
 ---
 

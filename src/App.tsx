@@ -353,6 +353,7 @@ export function App() {
           <FullBuildExplorer
             gpus={rawCatalog}
             currency={activeCurrency}
+            locale={locale}
             onSwitchToSimple={() => setUiMode('simple')}
             onSwitchToExplorer={() => setUiMode('explorer')}
           />

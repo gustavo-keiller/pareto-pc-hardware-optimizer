@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- `[UX-04]` Reasons people trust (generate plain shopping rationale per recommended GPU card and build component in shopping terms without algorithmic jargon).
+- `[UX-07]` Smooth step-up between levels: "See the math behind this" / "Ver a matemática" transition button from Simple Guide pick to Explorer/Pro with identical budget/constraints and GPU highlighted.
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Plain-Language Shopping Reasons for Picks & Builds (`[UX-04]`, 2026-10-19):**
+  - Shipped pure shopping rationale engine in `src/utils/shoppingReasons.ts` generating unslop, plain shopping arguments without algorithmic jargon for both GPU recommendations and 8-component full PC builds in `pt-BR` and `en-US`.
+  - GPU hero card (`SimpleGuidePickHero.tsx`) renders concrete comparative savings (e.g. "Economize R$ 313 (22% a menos) com a Radeon RX 6600 8GB, mantendo 51 FPS (69% da velocidade)"), FPS deltas, and VRAM longevity notes.
+  - Complete PC build hero card (`BuildHeroCard.tsx`) renders personalized hardware rationales across all 8 component cards (CPU throughput & 0% bottleneck confirmation, GPU 1440p raster output, motherboard socket & M.2 slots, dual-channel RAM bandwidth, NVMe read speeds, PSU wattage & safety headroom, case clearance, and cooler TDP margin).
+  - Backed by unit tests in `src/utils/__tests__/shoppingReasons.test.ts` (119 total tests passing across 11 suites).
 
 - **Mobile Layout & Responsive Polish (`[UX-05]`, 2026-10-19):**
   - Redesigned top header navigation into a responsive 2-row layout on mobile phones (< 640px) featuring a compact brand row with instant language and reset controls, and an overflow-safe horizontal level navigation bar, shrinking mobile header height from ~280px to ~75px.

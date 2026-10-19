@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Award,
   ArrowDownRight,
@@ -10,6 +10,7 @@ import {
 import { RankedGpu } from '../lib/math/types';
 import { formatCurrency } from '../utils/currency';
 import { AppLocale, t } from '../utils/i18n';
+import { generateGpuShoppingReasons } from '../utils/shoppingReasons';
 
 export interface SimpleGuidePickHeroProps {
   topPick: RankedGpu | null;
@@ -32,7 +33,18 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
   onToggleSelectGpu,
   onOpenAccordion,
 }) => {
-  if (!topPick) {
+  const shoppingReasons = useMemo(() => {
+    if (!topPick) return null;
+    return generateGpuShoppingReasons({
+      topPick,
+      stepDownAlt,
+      stepUpAlt,
+      currency,
+      locale,
+    });
+  }, [topPick, stepDownAlt, stepUpAlt, currency, locale]);
+
+  if (!topPick || !shoppingReasons) {
     return (
       <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-8 text-center text-slate-400">
         <p className="text-sm font-semibold">
@@ -86,6 +98,16 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
               {fpsPer100} FPS per {currency === 'BRL' ? 'R$ 100' : '$100'}
             </div>
           </div>
+        </div>
+
+        {/* Shopping Rationale (UX-04) */}
+        <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-200/90 leading-relaxed">
+          <p className="font-semibold text-white">
+            {shoppingReasons.topPickSummary}
+          </p>
+          <p className="text-[11px] text-amber-300/80 mt-1">
+            {shoppingReasons.vramLongevity}
+          </p>
         </div>
 
         {/* Specs Grid */}
@@ -190,9 +212,8 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
                   {formatCurrency(stepDownAlt.price, currency)}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Delivers {stepDownAlt.rasterFps1440p} FPS ({stepDownAlt.vramGb}{' '}
-                GB VRAM) for budget-conscious builders.
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {shoppingReasons.stepDownReason}
               </p>
               <button
                 type="button"
@@ -234,13 +255,8 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
                   {formatCurrency(stepUpAlt.price, currency)}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Boosts performance to {stepUpAlt.rasterFps1440p} FPS (+
-                {Math.max(
-                  0,
-                  stepUpAlt.rasterFps1440p - topPick.rasterFps1440p,
-                )}{' '}
-                FPS) with {stepUpAlt.vramGb} GB VRAM.
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {shoppingReasons.stepUpReason}
               </p>
               <button
                 type="button"

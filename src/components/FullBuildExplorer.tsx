@@ -50,12 +50,14 @@ import {
   optimizeFullSystemBuilds,
 } from '../lib/math/combinatorial';
 import { convertUsdToBrl, formatCurrency } from '../utils/currency';
+import { AppLocale } from '../utils/i18n';
 import { BuildHeroCard } from './BuildHeroCard';
 import { BuildLeaderboardTable } from './BuildLeaderboardTable';
 
 interface FullBuildExplorerProps {
   gpus: GpuCandidate[];
   currency?: 'USD' | 'BRL';
+  locale?: AppLocale;
   onSwitchToSimple?: () => void;
   onSwitchToExplorer?: () => void;
 }
@@ -136,6 +138,7 @@ const BUDGET_PRESETS_BRL: BudgetPreset[] = [
 export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   gpus,
   currency = 'USD',
+  locale = 'pt-BR',
   onSwitchToSimple,
   onSwitchToExplorer,
 }) => {
@@ -527,7 +530,11 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
 
       {/* Main Hero Build Recommendation */}
       {activeBuild ? (
-        <BuildHeroCard build={activeBuild} currency={currency} />
+        <BuildHeroCard
+          build={activeBuild}
+          currency={currency}
+          locale={locale}
+        />
       ) : (
         <div className="rounded-3xl border border-dashed border-slate-800 bg-slate-900/40 p-12 text-center text-slate-400">
           <AlertTriangle className="h-8 w-8 text-amber-400 mx-auto mb-2" />

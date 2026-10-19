@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Award,
   ShieldCheck,
@@ -14,16 +14,23 @@ import {
 } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
 import { formatCurrency } from '../utils/currency';
+import { AppLocale } from '../utils/i18n';
+import { generateBuildShoppingReasons } from '../utils/shoppingReasons';
 
 interface BuildHeroCardProps {
   build: PcBuild;
   currency?: 'USD' | 'BRL';
+  locale?: AppLocale;
 }
 
 export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
   build,
   currency = 'USD',
+  locale = 'pt-BR',
 }) => {
+  const reasons = useMemo(() => {
+    return generateBuildShoppingReasons(build, currency, locale);
+  }, [build, currency, locale]);
   return (
     <section
       data-testid="top-build-card"
@@ -137,6 +144,9 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </span>
             </div>
           </div>
+          <p className="text-[11px] text-emerald-300/90 border-t border-slate-800/80 pt-1.5 leading-snug">
+            {reasons.cpu}
+          </p>
         </div>
 
         {/* GPU Card */}
@@ -176,6 +186,9 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </span>
             </div>
           </div>
+          <p className="text-[11px] text-indigo-300/90 border-t border-slate-800/80 pt-1.5 leading-snug">
+            {reasons.gpu}
+          </p>
         </div>
 
         {/* Motherboard Card */}
@@ -211,6 +224,9 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </span>
             </div>
           </div>
+          <p className="text-[11px] text-amber-300/90 border-t border-slate-800/80 pt-1.5 leading-snug">
+            {reasons.motherboard}
+          </p>
         </div>
 
         {/* RAM Card */}
@@ -246,6 +262,9 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </span>
             </div>
           </div>
+          <p className="text-[11px] text-sky-300/90 border-t border-slate-800/80 pt-1.5 leading-snug">
+            {reasons.ram}
+          </p>
         </div>
 
         {/* Storage Card */}
@@ -285,6 +304,9 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </div>
             )}
           </div>
+          <p className="text-[11px] text-purple-300/90 border-t border-slate-800/80 pt-1.5 leading-snug">
+            {reasons.storage}
+          </p>
         </div>
 
         {/* Cooler Card */}
@@ -320,6 +342,9 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </span>
             </div>
           </div>
+          <p className="text-[11px] text-cyan-300/90 border-t border-slate-800/80 pt-1.5 leading-snug">
+            {reasons.cooler}
+          </p>
         </div>
 
         {/* Case Card */}
@@ -355,6 +380,9 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </span>
             </div>
           </div>
+          <p className="text-[11px] text-rose-300/90 border-t border-slate-800/80 pt-1.5 leading-snug">
+            {reasons.casePart}
+          </p>
         </div>
 
         {/* PSU Card */}
@@ -390,6 +418,9 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </span>
             </div>
           </div>
+          <p className="text-[11px] text-teal-300/90 border-t border-slate-800/80 pt-1.5 leading-snug">
+            {reasons.psu}
+          </p>
         </div>
       </div>
 
