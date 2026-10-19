@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { EChartsRenderer, EChartsInstanceRef } from './EChartsRenderer';
 import { METRIC_DEFINITIONS, MetricKey, RankedGpu } from '../lib/math/types';
 import { get2DParetoFrontierCurve } from '../lib/math/pareto';
@@ -64,15 +64,21 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
   );
 
   // Helper: Is a GPU optimal in the currently displayed 2D view?
-  const isGpuOptimalInView = (g: RankedGpu): boolean => {
-    const passesExtrap =
-      !extrapolation.enabled ||
-      !extrapolation.enforceAsTrap ||
-      !belowMarginSet.has(g.id);
-    // To prevent green points from ever appearing inside the red 2D staircase cloud,
-    // a point is painted green on the 2D chart only if it lies on the 2D [xMetric, yMetric] frontier!
-    return frontier2DIdSet.has(g.id) && passesExtrap;
-  };
+  const isGpuOptimalInView = useCallback(
+    (g: RankedGpu): boolean => {
+      const passesExtrap =
+        !extrapolation.enabled ||
+        !extrapolation.enforceAsTrap ||
+        !belowMarginSet.has(g.id);
+      return frontier2DIdSet.has(g.id) && passesExtrap;
+    },
+    [
+      extrapolation.enabled,
+      extrapolation.enforceAsTrap,
+      belowMarginSet,
+      frontier2DIdSet,
+    ],
+  );
 
   // Identify #1 TOPSIS winner among GPUs that are optimal on this 2D view
   const winnerGpu = useMemo(
@@ -81,7 +87,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
       gpus.find((g) => frontier2DIdSet.has(g.id)) ??
       gpus[0] ??
       null,
-    [gpus, frontier2DIdSet, extrapolation, belowMarginSet],
+    [gpus, frontier2DIdSet, isGpuOptimalInView],
   );
 
   const hoveredGpu = useMemo(
@@ -709,6 +715,8 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
     selectedGpuIds,
     hideDominatedNodes,
     showDominatedZoneMesh,
+    extrapAnchorCoords,
+    isGpuOptimalInView,
   ]);
 
   const onEvents = useMemo(

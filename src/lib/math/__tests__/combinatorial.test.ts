@@ -6,6 +6,7 @@ import {
   pruneDominatedCases,
   pruneDominatedCoolers,
   pruneDominatedCpus,
+  pruneDominatedGpus,
   pruneDominatedMotherboards,
   pruneDominatedPsus,
   pruneDominatedRam,
@@ -269,6 +270,37 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
       const pruned = pruneDominatedCoolers(coolers);
       expect(pruned.some((c) => c.id === 'cooler-trap')).toBe(false);
       expect(pruned.some((c) => c.id === 'cooler-good')).toBe(true);
+    });
+
+    it('prunes dominated GPUs within vendor partition', () => {
+      const gpus: GpuCandidate[] = [
+        {
+          id: 'gpu-good',
+          name: 'Fast Efficient GPU',
+          vendor: 'AMD',
+          price: 250,
+          rasterFps1440p: 80,
+          rtFps1440p: 45,
+          vramGb: 12,
+          tdpWatts: 160,
+          lengthMm: 240,
+        },
+        {
+          id: 'gpu-trap',
+          name: 'Overpriced Slow Power-Hungry GPU',
+          vendor: 'AMD',
+          price: 300,
+          rasterFps1440p: 60,
+          rtFps1440p: 30,
+          vramGb: 8,
+          tdpWatts: 200,
+          lengthMm: 300,
+        },
+      ];
+
+      const pruned = pruneDominatedGpus(gpus, true);
+      expect(pruned.some((g) => g.id === 'gpu-trap')).toBe(false);
+      expect(pruned.some((g) => g.id === 'gpu-good')).toBe(true);
     });
   });
 
@@ -608,6 +640,34 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
         expect(prunedResult.optimalBuilds[i].effectiveFps1440p).toBe(
           unprunedOptimal[i].effectiveFps1440p,
         );
+      }
+    });
+
+    it('executes full 8-component seed catalog under highest budget preset ($3,200) in under 200ms', () => {
+      const startTime = performance.now();
+
+      const result = optimizeFullSystemBuilds(
+        {
+          cpus: SEED_CPUS,
+          gpus: REAL_WORLD_GPUS,
+          motherboards: SEED_MOTHERBOARDS,
+          ramKits: SEED_RAM_KITS,
+          psus: SEED_PSUS,
+          storages: SEED_STORAGES,
+          cases: SEED_CASES,
+          coolers: SEED_COOLERS,
+        },
+        {
+          maxBudget: 3200,
+        },
+      );
+
+      const durationMs = performance.now() - startTime;
+
+      expect(durationMs).toBeLessThan(200);
+      expect(result.optimalBuilds.length).toBeGreaterThan(0);
+      for (const build of result.optimalBuilds) {
+        expect(build.totalPrice).toBeLessThanOrEqual(3200);
       }
     });
   });

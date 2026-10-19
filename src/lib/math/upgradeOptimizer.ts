@@ -168,44 +168,33 @@ export function evaluateUpgradeParetoFrontier(
 ): UpgradeBuild[] {
   if (upgrades.length <= 1) return [...upgrades];
 
-  const optimalUpgrades: UpgradeBuild[] = [];
-
-  for (let i = 0; i < upgrades.length; i++) {
-    const candidate = upgrades[i];
-    const candidateScore =
-      candidate.build.workloadScore ?? candidate.build.effectiveFps1440p;
-    let isDominated = false;
-
-    for (let j = 0; j < upgrades.length; j++) {
-      if (i === j) continue;
-      const other = upgrades[j];
-      const otherScore =
-        other.build.workloadScore ?? other.build.effectiveFps1440p;
-
-      const costBetterOrEqual = other.upgradeCost <= candidate.upgradeCost;
-      const scoreBetterOrEqual = otherScore >= candidateScore;
-      const atLeastOneStrict =
-        other.upgradeCost < candidate.upgradeCost ||
-        otherScore > candidateScore;
-
-      if (costBetterOrEqual && scoreBetterOrEqual && atLeastOneStrict) {
-        isDominated = true;
-        break;
-      }
-    }
-
-    if (!isDominated) {
-      optimalUpgrades.push(candidate);
-    }
-  }
-
-  // Sort optimal upgrades by upgrade cost ascending, breaking ties by higher score
-  optimalUpgrades.sort((a, b) => {
+  // O(n log n) 2D Pareto sweep: sort by upgradeCost ascending; tie-break by workload score descending
+  const sorted = [...upgrades].sort((a, b) => {
     if (a.upgradeCost !== b.upgradeCost) return a.upgradeCost - b.upgradeCost;
     const aScore = a.build.workloadScore ?? a.build.effectiveFps1440p;
     const bScore = b.build.workloadScore ?? b.build.effectiveFps1440p;
-    return bScore - aScore;
+    if (aScore !== bScore) return bScore - aScore;
+    return a.build.id.localeCompare(b.build.id);
   });
+
+  const optimalUpgrades: UpgradeBuild[] = [];
+  let maxScore = -Infinity;
+
+  for (const upgrade of sorted) {
+    const score =
+      upgrade.build.workloadScore ?? upgrade.build.effectiveFps1440p;
+    if (score > maxScore) {
+      optimalUpgrades.push(upgrade);
+      maxScore = score;
+    } else if (
+      optimalUpgrades.length > 0 &&
+      score === maxScore &&
+      upgrade.upgradeCost ===
+        optimalUpgrades[optimalUpgrades.length - 1].upgradeCost
+    ) {
+      optimalUpgrades.push(upgrade);
+    }
+  }
 
   return optimalUpgrades;
 }
