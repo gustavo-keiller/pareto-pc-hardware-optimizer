@@ -50,6 +50,7 @@ interface SimpleParetoGuideProps {
   selectedGpuIds: string[];
   onToggleSelectGpu: (id: string) => void;
   onSwitchToExplorer: () => void;
+  onInspectInExplorer?: (id: string) => void;
   onSwitchTo3D: () => void;
   onSwitchToHyper: () => void;
   onSwitchToBuilds?: () => void;
@@ -73,6 +74,7 @@ export function SimpleParetoGuide({
   selectedGpuIds,
   onToggleSelectGpu,
   onSwitchToExplorer,
+  onInspectInExplorer,
   onSwitchTo3D,
   onSwitchToHyper,
   onSwitchToBuilds,
@@ -321,6 +323,7 @@ export function SimpleParetoGuide({
           selectedGpuIds={selectedGpuIds}
           onToggleSelectGpu={onToggleSelectGpu}
           onOpenAccordion={() => setShowDeepMath(true)}
+          onInspectInExplorer={onInspectInExplorer}
         />
       ) : (
         <FullBuildPickHero

@@ -50,7 +50,7 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
       {/* Primary Action Button */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-900/90 px-5 py-3.5">
         <div className="text-xs text-slate-300">
-          Want to swap components or check alternative sockets/wattages?
+          {t('buildInspectPrompt', locale)}
         </div>
         <button
           type="button"

@@ -68,8 +68,7 @@
 - [x] **`[UX-03]` Plain-language pass on Simple mode** using AI-07: no "Pareto/frontier/utility/dominated/TOPSIS" in Simple mode text. Pro keeps the real terms, with hover definitions. _Done 2026-10-19 in 2a5c32c._
 - [x] **`[UX-04]` Reasons people trust:** each recommended card says why in shopping terms ("Same speed as RTX 4060 Ti for R$400 less", "16 GB, enough for the next few years"). _Done 2026-10-19._
 - [x] **`[UX-05]` Mobile layout fix:** compact header (one menu), chart labels that don't overlap, recommendation cards before charts. _Done 2026-10-19._
-- [x] **`[UX-06]` Country-agnostic money & language (D-1).** Region setting (BR first) picks currency, stores and price file; formatting via `Intl.NumberFormat`; pt-BR + English via a small i18n layer. Adding a country = adding a price file + translations, no code changes. _Done 2026-10-19 in 71bedf0._
-- [ ] **`[UX-07]` Smooth step-up between levels.** "See the math behind this" button on any pick opens the same item in Explorer/Pro with the same filters, so a beginner can grow into the deep views.
+- [x] **`[UX-07]` Smooth step-up between levels.** "See the math behind this" button on any pick opens the same item in Explorer/Pro with the same filters, so a beginner can grow into the deep views. _Done 2026-10-19._
 - [ ] **`[UX-08]` Pro-mode extras:** save/load named weight profiles, export results (CSV/JSON), show the full score breakdown per item.
 - [ ] **`[UX-09]` Accessibility:** keyboard navigation, contrast, and a table alternative for every chart (charts are invisible to screen readers).
 - [x] **`[UX-11]` One beginner flow that ends in a whole PC.** The three UX-01 questions lead to either "Just a graphics card" or "A whole PC", and the whole-PC answer uses the builder engine, shown as a plain parts list with a total and one reason per part. "Full Builds" stops being Level 4; the current Mario Kart view stays as the expert view of the same result. _Done 2026-10-19 in 7083b0f._

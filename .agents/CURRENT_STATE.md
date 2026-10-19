@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- `[UX-07]` Smooth step-up between levels: "See the math behind this" / "Ver a matemática" transition button from Simple Guide pick to Explorer/Pro with identical budget/constraints and GPU highlighted.
+- `[PERF-01]` Code-split by mode & Lazy Loading (lazy-load Explorer/Pro views, 3D cloud, hyper explorer, deal importer, and full build explorer via `React.lazy` and `Suspense` to reduce initial bundle size for beginners).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Smooth Step-Up Between Levels ("See Math in 2D Explorer") (`[UX-07]`, 2026-10-19):**
+  - Added a prominent "See Math in 2D Explorer →" / "Ver Cálculo no Explorador 2D →" transition button on the #1 recommended GPU hero card and quick-inspect compass buttons on both Step-Down Bargain and Step-Up Upgrade alternatives (`SimpleGuidePickHero.tsx`).
+  - Seamlessly transitions user to Level 2 (Explorer mode), preserves active budget limits, and selects the chosen GPU so it is instantly highlighted with golden borders in the ECharts 2D scatter plot, TOPSIS leaderboard table, and multi-GPU comparison drawer.
+  - Added localized prompt to Full Build hero card (`FullBuildPickHero.tsx`).
+  - Backed by UI integration tests in `src/__tests__/App.ui.test.tsx` (120 tests passing across 11 suites).
 
 - **Plain-Language Shopping Reasons for Picks & Builds (`[UX-04]`, 2026-10-19):**
   - Shipped pure shopping rationale engine in `src/utils/shoppingReasons.ts` generating unslop, plain shopping arguments without algorithmic jargon for both GPU recommendations and 8-component full PC builds in `pt-BR` and `en-US`.

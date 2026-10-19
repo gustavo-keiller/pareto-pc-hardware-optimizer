@@ -52,7 +52,11 @@ export interface Translations {
   heroStepUpTag: string;
   heroWhyThisPick: string;
   heroWhyThisPickInspect: string;
+  heroSeeMathInExplorer: string;
+  heroSeeMathTooltip: string;
   heroExploreBuild: string;
+  buildInspectPrompt: string;
+  buildInspectButton: string;
   heroGoodDealBadge: string;
   heroMatchScore: string;
   heroCompareSpecs: string;
@@ -127,7 +131,12 @@ export const TRANSLATIONS: Record<AppLocale, Translations> = {
     heroWhyThisPick: 'Por que recomendamos:',
     heroWhyThisPickInspect:
       'Por que esta escolha? Ver a curva de valor e opções',
+    heroSeeMathInExplorer: 'Ver Cálculo no Explorador 2D →',
+    heroSeeMathTooltip:
+      'Abre o gráfico 2D de custo-benefício e ranking completo com esta placa selecionada',
     heroExploreBuild: 'Inspecionar & Trocar Peças no Montador →',
+    buildInspectPrompt: 'Quer trocar componentes ou comparar sockets e fontes?',
+    buildInspectButton: 'Abrir Explorador de PCs',
     heroGoodDealBadge: 'Bom Negócio',
     heroMatchScore: 'Combina',
     heroCompareSpecs: '+ Comparar',
@@ -200,7 +209,13 @@ export const TRANSLATIONS: Record<AppLocale, Translations> = {
     heroWhyThisPick: 'Why we recommend this:',
     heroWhyThisPickInspect:
       'Why this pick? Inspect the value curve and trade-offs',
+    heroSeeMathInExplorer: 'See Math in 2D Explorer →',
+    heroSeeMathTooltip:
+      'Opens the 2D value curve and full ranking with this GPU selected',
     heroExploreBuild: 'Inspect & Swap Parts in Full Build Explorer →',
+    buildInspectPrompt:
+      'Want to swap components or check alternative platforms and wattages?',
+    buildInspectButton: 'Open Full Build Explorer',
     heroGoodDealBadge: 'Good Deal',
     heroMatchScore: 'Match',
     heroCompareSpecs: '+ Compare',

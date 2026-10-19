@@ -109,6 +109,12 @@ export function App() {
     }
   }, [uiMode, chartView, setChartView]);
 
+  const handleInspectGpuInExplorer = (gpuId: string) => {
+    setSelectedGpuIds((prev) => (prev.includes(gpuId) ? prev : [gpuId]));
+    setUiMode('explorer');
+    setChartView('2d');
+  };
+
   const maxBudgetBound =
     datasetMode === 'real'
       ? 1800
@@ -376,6 +382,7 @@ export function App() {
             selectedGpuIds={selectedGpuIds}
             onToggleSelectGpu={handleToggleSelectGpu}
             onSwitchToExplorer={() => setUiMode('explorer')}
+            onInspectInExplorer={handleInspectGpuInExplorer}
             onSwitchTo3D={() => {
               setUiMode('explorer');
               setChartView('3d');

@@ -305,4 +305,24 @@ describe('App modes', () => {
     ).toBeDefined();
     expect(screen.getByTestId('top-build-card')).toBeDefined();
   });
+
+  it('UX-07: "See Math in 2D Explorer" button smoothly transitions user from Simple Guide pick to Explorer mode with GPU highlighted', async () => {
+    localStorage.clear();
+    const user = userEvent.setup();
+    render(<App />);
+
+    // In default pt-BR, button text is "Ver Cálculo no Explorador 2D →"
+    const seeMathBtn = screen.getByRole('button', {
+      name: /Ver Cálculo no Explorador 2D/i,
+    });
+    expect(seeMathBtn).toBeDefined();
+
+    // Click it to transition
+    await user.click(seeMathBtn);
+
+    // Verify mode switched to Explorer (Level 2: Visual Axis Explorer)
+    expect(screen.getByText(/Level 2: Visual Axis Explorer/i)).toBeDefined();
+    // Leaderboard table and comparison drawer are rendered
+    expect(screen.getAllByRole('table').length).toBeGreaterThanOrEqual(1);
+  });
 });

@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   Check,
   ChevronDown,
+  Compass,
   ShieldCheck,
 } from 'lucide-react';
 import { RankedGpu } from '../lib/math/types';
@@ -21,6 +22,7 @@ export interface SimpleGuidePickHeroProps {
   selectedGpuIds: string[];
   onToggleSelectGpu: (id: string) => void;
   onOpenAccordion: () => void;
+  onInspectInExplorer?: (id: string) => void;
 }
 
 export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
@@ -32,6 +34,7 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
   selectedGpuIds,
   onToggleSelectGpu,
   onOpenAccordion,
+  onInspectInExplorer,
 }) => {
   const shoppingReasons = useMemo(() => {
     if (!topPick) return null;
@@ -161,24 +164,38 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
             {t('heroWhyThisPickInspect', locale)}
           </button>
 
-          <button
-            type="button"
-            onClick={() => onToggleSelectGpu(topPick.id)}
-            className={`inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-xs font-bold transition ${
-              isSelected
-                ? 'border-amber-400 bg-amber-400/20 text-amber-300'
-                : 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white'
-            }`}
-          >
-            {isSelected ? (
-              <>
-                <Check className="h-4 w-4 text-amber-300" />
-                {t('heroSelectedComparison', locale)}
-              </>
-            ) : (
-              t('heroCompareSpecs', locale)
+          <div className="flex flex-wrap items-center gap-2">
+            {onInspectInExplorer && (
+              <button
+                type="button"
+                onClick={() => onInspectInExplorer(topPick.id)}
+                title={t('heroSeeMathTooltip', locale)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/50 bg-indigo-500/20 px-3.5 py-2 text-xs font-bold text-indigo-300 hover:bg-indigo-500/30 transition shadow-sm"
+              >
+                <Compass className="h-4 w-4" />
+                {t('heroSeeMathInExplorer', locale)}
+              </button>
             )}
-          </button>
+
+            <button
+              type="button"
+              onClick={() => onToggleSelectGpu(topPick.id)}
+              className={`inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-xs font-bold transition ${
+                isSelected
+                  ? 'border-amber-400 bg-amber-400/20 text-amber-300'
+                  : 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white'
+              }`}
+            >
+              {isSelected ? (
+                <>
+                  <Check className="h-4 w-4 text-amber-300" />
+                  {t('heroSelectedComparison', locale)}
+                </>
+              ) : (
+                t('heroCompareSpecs', locale)
+              )}
+            </button>
+          </div>
         </div>
       </section>
 
@@ -215,15 +232,27 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
               <p className="text-xs text-slate-300 leading-relaxed">
                 {shoppingReasons.stepDownReason}
               </p>
-              <button
-                type="button"
-                onClick={() => onToggleSelectGpu(stepDownAlt.id)}
-                className="w-full rounded-lg border border-slate-800 bg-slate-950 py-1.5 text-xs font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition"
-              >
-                {selectedGpuIds.includes(stepDownAlt.id)
-                  ? t('heroInComparison', locale)
-                  : t('heroCompareSpecs', locale)}
-              </button>
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => onToggleSelectGpu(stepDownAlt.id)}
+                  className="flex-1 rounded-lg border border-slate-800 bg-slate-950 py-1.5 text-xs font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition"
+                >
+                  {selectedGpuIds.includes(stepDownAlt.id)
+                    ? t('heroInComparison', locale)
+                    : t('heroCompareSpecs', locale)}
+                </button>
+                {onInspectInExplorer && (
+                  <button
+                    type="button"
+                    onClick={() => onInspectInExplorer(stepDownAlt.id)}
+                    title={t('heroSeeMathTooltip', locale)}
+                    className="inline-flex items-center justify-center rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/20 transition"
+                  >
+                    <Compass className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
@@ -258,15 +287,27 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
               <p className="text-xs text-slate-300 leading-relaxed">
                 {shoppingReasons.stepUpReason}
               </p>
-              <button
-                type="button"
-                onClick={() => onToggleSelectGpu(stepUpAlt.id)}
-                className="w-full rounded-lg border border-slate-800 bg-slate-950 py-1.5 text-xs font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition"
-              >
-                {selectedGpuIds.includes(stepUpAlt.id)
-                  ? t('heroInComparison', locale)
-                  : t('heroCompareSpecs', locale)}
-              </button>
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => onToggleSelectGpu(stepUpAlt.id)}
+                  className="flex-1 rounded-lg border border-slate-800 bg-slate-950 py-1.5 text-xs font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition"
+                >
+                  {selectedGpuIds.includes(stepUpAlt.id)
+                    ? t('heroInComparison', locale)
+                    : t('heroCompareSpecs', locale)}
+                </button>
+                {onInspectInExplorer && (
+                  <button
+                    type="button"
+                    onClick={() => onInspectInExplorer(stepUpAlt.id)}
+                    title={t('heroSeeMathTooltip', locale)}
+                    className="inline-flex items-center justify-center rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/20 transition"
+                  >
+                    <Compass className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>
