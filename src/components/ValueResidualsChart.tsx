@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
+import { EChartsRenderer } from './EChartsRenderer';
 import { RankedGpu } from '../lib/math/types';
 
 interface ValueResidualsChartProps {
@@ -153,7 +153,7 @@ export const ValueResidualsChart: React.FC<ValueResidualsChartProps> = ({
           R² = {(rSquared * 100).toFixed(1)}%
         </strong>
       </div>
-      <ReactECharts
+      <EChartsRenderer
         option={option}
         style={{ height: '100%', width: '100%' }}
         onEvents={onEvents}

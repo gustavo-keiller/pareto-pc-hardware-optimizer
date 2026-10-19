@@ -103,7 +103,7 @@
 ## Phase 4 — Code optimization & performance
 
 - [x] **`[PERF-01]` Code-split by mode.** `React.lazy` for Explorer/Pro views, 3D cloud, hyper explorer, full-build explorer, comparison drawer, and deal importer; Simple mode loads only what it shows (initial bundle reduced from 1,548 kB to 367 kB, 101 kB gzipped). _Done 2026-10-19._
-- [ ] **`[PERF-02]` Import only the ECharts parts used** (`echarts/core` + the specific charts/components, via `echarts-for-react/lib/core`).
+- [x] **`[PERF-02]` Import only the ECharts parts used** (`echarts/core` + the specific charts/components, via `echarts-for-react/lib/core`). Shipped centralized `EChartsRenderer.tsx` registering only required charts (`Scatter`, `EffectScatter`, `Line`, `Lines`, `Bar`, `Radar`, `Parallel`) and components, reducing vendor chunk by 392 kB. _Done 2026-10-19._
 - [ ] **`[PERF-03]` Split the oversized files** (`SimpleParetoGuide`, `HyperDimensionalExplorer`, `Pareto3DCloud`, `App`, and `useOptimizerState` into per-mode slices). Pure calculations that live inside components move into `src/lib/` with tests.
 - [ ] **`[PERF-04]` Remove dead code** with `knip` (unused exports/files/deps) and add it to CI.
 - [ ] **`[PERF-05]` Performance budget in CI:** bundle size limit and a Lighthouse score floor on the built site.

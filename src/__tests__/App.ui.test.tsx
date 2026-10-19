@@ -11,7 +11,24 @@ import userEvent from '@testing-library/user-event';
 import App from '../App';
 import { REAL_WORLD_GPUS } from '../data/realGpus';
 
+vi.mock('../components/EChartsRenderer', () => ({
+  default: forwardRef<HTMLDivElement>(function EChartsPlaceholder(_props, ref) {
+    return <div ref={ref} data-testid="echarts-placeholder" />;
+  }),
+  EChartsRenderer: forwardRef<HTMLDivElement>(
+    function EChartsPlaceholder(_props, ref) {
+      return <div ref={ref} data-testid="echarts-placeholder" />;
+    },
+  ),
+}));
+
 vi.mock('echarts-for-react', () => ({
+  default: forwardRef<HTMLDivElement>(function EChartsPlaceholder(_props, ref) {
+    return <div ref={ref} data-testid="echarts-placeholder" />;
+  }),
+}));
+
+vi.mock('echarts-for-react/lib/core', () => ({
   default: forwardRef<HTMLDivElement>(function EChartsPlaceholder(_props, ref) {
     return <div ref={ref} data-testid="echarts-placeholder" />;
   }),

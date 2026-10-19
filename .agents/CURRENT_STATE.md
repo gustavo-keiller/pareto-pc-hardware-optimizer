@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- `[PERF-02]` Slim ECharts tree-shaking (Import only specific ECharts modules used via `echarts-for-react/lib/core` instead of monolithic 1MB+ bundle).
+- `[BLD-03]` Performance model per use case (CPU↔GPU balance per resolution; separate scoring and TOPSIS weight profiles for 1080p Esports, 1440p Sweet Spot, 4K RT, and Creator & AI).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Slim ECharts Tree-Shaking (`[PERF-02]`, 2026-10-19):**
+  - Replaced monolithic `echarts-for-react` imports with centralized, tree-shaken `EChartsRenderer.tsx` using `echarts-for-react/lib/core` and `echarts/core`.
+  - Selectively registered only required charts (`Scatter`, `EffectScatter`, `Line`, `Lines`, `Bar`, `Radar`, `Parallel`) and components (`Tooltip`, `Grid`, `Legend`, `DataZoom`, `MarkLine`, `MarkArea`, `Parallel`, `Radar`, `AxisPointer`, `LabelLayout`, `CanvasRenderer`).
+  - Reduced ECharts vendor chunk size by 392 kB minified (1,054 kB → 662 kB) and by 130 kB gzipped (350 kB → 220 kB).
+  - Backed by 120 Vitest unit/UI tests and 4 Playwright browser e2e tests.
 
 - **Code-Split by Mode & Lazy Loading (`[PERF-01]`, 2026-10-19):**
   - Lazy-loaded heavy visualizers, 3D WebGL charts, 7D hyper-dimensional views, full-build explorer, comparison drawer, and deal importer modals (`ParetoScatterPlot`, `Pareto3DCloud`, `AxisViewsGrid`, `ValueResidualsChart`, `HyperDimensionalExplorer`, `ComparisonDrawer`, `GpuDealImporterModal`, `FullBuildExplorer`) via `React.lazy` and `<Suspense>`.

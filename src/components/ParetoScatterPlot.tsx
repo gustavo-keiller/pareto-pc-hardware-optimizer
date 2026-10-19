@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from 'react';
-import ReactECharts from 'echarts-for-react';
+import { EChartsRenderer, EChartsInstanceRef } from './EChartsRenderer';
 import { METRIC_DEFINITIONS, MetricKey, RankedGpu } from '../lib/math/types';
 import { get2DParetoFrontierCurve } from '../lib/math/pareto';
 import {
@@ -38,7 +38,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
   onHoverGpu,
   onToggleSelectGpu,
 }) => {
-  const chartRef = useRef<ReactECharts | null>(null);
+  const chartRef = useRef<EChartsInstanceRef | null>(null);
   const xDef = METRIC_DEFINITIONS[xMetric];
   const yDef = METRIC_DEFINITIONS[yMetric];
 
@@ -761,7 +761,7 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
         </button>
       </div>
 
-      <ReactECharts
+      <EChartsRenderer
         ref={chartRef}
         option={option}
         style={{ height: '100%', width: '100%' }}

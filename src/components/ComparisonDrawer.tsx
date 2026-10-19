@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import ReactECharts from 'echarts-for-react';
+import { EChartsRenderer } from './EChartsRenderer';
 import { RankedGpu } from '../lib/math/types';
 import { Layers, Activity, X, Trash2 } from 'lucide-react';
 
@@ -264,7 +264,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
       {/* Selected GPU Pills + Side-by-Side Spec Matrix */}
       <div className="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
         <div className="lg:col-span-6 h-[340px]">
-          <ReactECharts
+          <EChartsRenderer
             option={chartType === 'radar' ? radarOption : parallelOption}
             style={{ height: '100%', width: '100%' }}
             notMerge={true}

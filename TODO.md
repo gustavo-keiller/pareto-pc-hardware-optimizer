@@ -19,8 +19,8 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (Reprioritized from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[PERF-02]` Slim ECharts tree-shaking:**
-  Import only the specific ECharts modules used (`echarts/core`, `ScatterChart`, `RadarChart`, `ParallelChart`, `BarChart`, `GridComponent`, `TooltipComponent`, `CanvasRenderer`) via `echarts-for-react/lib/core` instead of importing the monolithic 1MB+ `echarts` bundle.
-  - **Files likely touched:** `src/components/ParetoScatterPlot.tsx`, `src/components/ComparisonDrawer.tsx`, `src/components/ValueResidualsChart.tsx`
-  - **Done when:** monolithic `echarts` import is replaced with selective tree-shaken components and `npm run check` passes.
-  - **Test to add:** verify all charts render without missing module runtime errors in `npm run test` and `npm run test:e2e`.
+- **`[BLD-03]` Performance model per use case:**
+  Extend the continuous bottleneck formula and scoring engine to support distinct multi-objective weighting and CPU/GPU balance curves for the 4 beginner workloads: 1080p Esports (CPU-bound high-refresh), 1440p Sweet Spot (balanced raster/VRAM), 4K RT Enthusiast (GPU/RT-bound heavy load), and Creator & AI (high RAM, VRAM capacity, multi-core CPU). Connect the intake choice from Step 2 directly to full-system TOPSIS weights.
+  - **Files likely touched:** `src/lib/math/combinatorial.ts`, `src/lib/math/buildTypes.ts`, `src/hooks/useOptimizerState.ts`, `src/components/FullBuildExplorer.tsx`
+  - **Done when:** selecting "Creator & AI" prioritizes 32GB+ RAM, 16GB+ VRAM, and high multi-core CPUs in full PC builds, and 1080p Esports prioritizes high single-core CPU throughput.
+  - **Test to add:** unit tests in `src/lib/math/__tests__/combinatorial.test.ts` verifying build scores shift according to use case profiles.

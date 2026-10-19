@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import ReactECharts from 'echarts-for-react';
+import { EChartsRenderer } from './EChartsRenderer';
 import {
   METRIC_DEFINITIONS,
   MetricKey,
@@ -481,7 +481,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
                   </span>
                 </div>
                 <div className="flex-1 min-h-[195px]">
-                  <ReactECharts
+                  <EChartsRenderer
                     option={buildSliceOption(metricKey, color, false)}
                     style={{ height: '100%', width: '100%' }}
                     onEvents={onEvents}
@@ -512,7 +512,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
               </span>
             </div>
             <div className="flex-1 min-h-[380px]">
-              <ReactECharts
+              <EChartsRenderer
                 option={buildSliceOption(
                   effectiveSingleAxis,
                   ACCENT_PALETTE[effectiveSingleAxis],
