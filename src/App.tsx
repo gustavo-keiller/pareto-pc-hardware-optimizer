@@ -94,6 +94,8 @@ export function App() {
     isDealImporterOpen,
     setIsDealImporterOpen,
     activeCurrency,
+    exchangeRateUsdToBrl,
+    setExchangeRateUsdToBrl,
   } = useOptimizerState();
 
   const [isChartExpanded, setIsChartExpanded] = useState<boolean>(false);
@@ -109,10 +111,10 @@ export function App() {
   }, [uiMode, chartView, setChartView]);
 
   const maxBudgetBound =
-    datasetMode === 'custom'
+    datasetMode === 'custom' || datasetMode === 'combined'
       ? Math.max(
-          6000,
-          ...(rawCatalog.length ? rawCatalog.map((g) => g.price) : [6000]),
+          15000,
+          ...(rawCatalog.length ? rawCatalog.map((g) => g.price) : [15000]),
         )
       : datasetMode === 'real'
         ? 1800
@@ -186,16 +188,54 @@ export function App() {
               </button>
               <button
                 type="button"
+                onClick={() => handleSwitchDataset('combined')}
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                  datasetMode === 'combined'
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Combined Sandbox: Compare live store deals directly against converted US benchmark baselines in BRL"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Combined Sandbox
+              </button>
+              <button
+                type="button"
                 onClick={() => handleSwitchDataset('synthetic')}
                 className={`rounded-md px-2.5 py-1.5 font-semibold transition ${
                   datasetMode === 'synthetic'
                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
+                title="Synthetic testbed with mathematically verified anchors and trap cards"
               >
-                Sandbox (10)
+                Synthetic (10)
               </button>
             </div>
+
+            {/* Exchange Rate Control for Combined Sandbox Mode */}
+            {datasetMode === 'combined' && (
+              <div className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-xs">
+                <span className="text-slate-400 font-medium">USD/BRL:</span>
+                <span className="font-mono font-bold text-amber-300">
+                  $1 = R$
+                </span>
+                <input
+                  aria-label="USD to BRL Exchange Rate"
+                  type="number"
+                  min={1}
+                  max={20}
+                  step={0.1}
+                  value={exchangeRateUsdToBrl}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    if (!isNaN(val) && val > 0) setExchangeRateUsdToBrl(val);
+                  }}
+                  className="w-14 rounded bg-slate-900 px-1 py-0.5 text-center font-mono font-bold text-amber-300 focus:outline-none border border-slate-700"
+                  title="Exchange rate used to convert US benchmark MSRP to BRL"
+                />
+              </div>
+            )}
 
             {/* Import Deals Button */}
             <button

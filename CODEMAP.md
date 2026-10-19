@@ -30,7 +30,7 @@ Pure TypeScript modules with zero React/DOM/ECharts dependencies:
 | `src/data/seedComponents.ts` | **Phase 3 Seed Component Catalogs** — typed real-world CPU, Motherboard, RAM, and PSU candidates (`SEED_CPUS`, `SEED_MOTHERBOARDS`, `SEED_RAM_KITS`, `SEED_PSUS`) across AM4, AM5, LGA1700, and LGA1851 platforms |
 | `src/data/seedGpus.ts` | **Phase 1 Seed Dataset** — 10 synthetic GPUs (`PHASE1_SEED_GPUS`) with known Pareto anchors and dominated `[TRAP]` cards for deterministic verification |
 | `src/utils/storage.ts` | **Safe LocalStorage Layer** — `safeGetJSON`, `safeSetJSON`, `safeGetInt`, `safeGetBool`, `safeGetString`, and versioned schema migrations (`runStorageMigrations`) |
-| `src/utils/currency.ts` | **Currency Formatter** — formats BRL (`R$ 3.899,99`) and USD (`$250`) |
+| `src/utils/currency.ts` | **Currency Formatter & Converter** — formats BRL (`R$ 3.899,99`) and USD (`$250`), plus bidirectional USD/BRL conversion (`convertUsdToBrl`, `convertBrlToUsd`) |
 
 ---
 
@@ -41,8 +41,8 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | Path | Purpose |
 | :--- | :--- |
 | `src/main.tsx` | React DOM entry point mounting `<App />` |
-| `src/hooks/useOptimizerState.ts` | **Central Optimizer State & Persistence Hook** — manages dataset mode (`'real' \| 'custom' \| 'synthetic'`), UI mode (`'simple' \| 'explorer' \| 'pro' \| 'builds'`), chart view (`'2d' \| '3d' \| 'hyper' \| 'axes' \| 'residuals'`), Stage 1–3 state, non-linear/linear extrapolation config, Hedonic OLS valuation attachment, user custom GPU database (`customGpus`), and `localStorage` persistence |
-| `src/App.tsx` | **Main Optimizer Workspace** — responsive layout shell with 4-tier experience switcher (`1. Simple Guide`, `2. Explorer`, `3. Pro Lab`, `4. Full Builds`), dataset switcher with My Deals, + Import Deals modal trigger, Step 1/2 controls, and chart view switcher |
+| `src/hooks/useOptimizerState.ts` | **Central Optimizer State & Persistence Hook** — manages dataset mode (`'real' \| 'custom' \| 'combined' \| 'synthetic'`), USD/BRL exchange rate (`exchangeRateUsdToBrl`), UI mode (`'simple' \| 'explorer' \| 'pro' \| 'builds'`), chart view (`'2d' \| '3d' \| 'hyper' \| 'axes' \| 'residuals'`), Stage 1–3 state, non-linear/linear extrapolation config, Hedonic OLS valuation attachment, user custom GPU database (`customGpus`), unified combined sandbox catalog merging, and `localStorage` persistence |
+| `src/App.tsx` | **Main Optimizer Workspace** — responsive layout shell with 4-tier experience switcher (`1. Simple Guide`, `2. Explorer`, `3. Pro Lab`, `4. Full Builds`), dataset switcher (Real GPUs, My Deals, Combined Sandbox with live USD/BRL rate, Synthetic Sandbox), + Import Deals modal trigger, Step 1/2 controls, and chart view switcher |
 | `src/components/TopWinnerBanner.tsx` | **#1 TOPSIS Winner Banner** — top showcase banner for highest scoring GPU under active constraints and weights |
 | `src/components/FullBuildExplorer.tsx` | **Phase 3 Full-Build Pareto Explorer UI ("Mario Kart Mode")** — interactive complete PC build optimizer with budget presets, custom budget slider, platform/socket filters, RAM generation filters, GPU vendor filters, hero card, trade-off alternatives, and leaderboard |
 | `src/components/BuildHeroCard.tsx` | **Top Recommended Build Hero Card** — full component breakdown (CPU, GPU, RAM, Motherboard, PSU), total price, effective FPS, bottleneck telemetry, power load & headroom, and visual budget distribution bar |

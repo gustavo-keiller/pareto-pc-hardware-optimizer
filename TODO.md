@@ -19,4 +19,4 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks
 
-_All Phase 1, Phase 2, and Phase 3 roadmap milestones are complete! See [`DONE.md`](DONE.md) for shipped milestones. Copy future backlog items here when ready to start._
+*(None currently active. Pull the next task from the long-range roadmap when ready.)*

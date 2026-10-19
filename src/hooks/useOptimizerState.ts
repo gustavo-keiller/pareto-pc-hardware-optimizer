@@ -23,12 +23,14 @@ import { ExtrapolationConfig } from '../lib/math/extrapolation';
 import {
   runStorageMigrations,
   safeGetBool,
+  safeGetInt,
   safeGetJSON,
   safeGetString,
   safeSetJSON,
 } from '../utils/storage';
+import { DEFAULT_USD_TO_BRL_RATE, convertUsdToBrl } from '../utils/currency';
 
-export type DatasetMode = 'real' | 'custom' | 'synthetic';
+export type DatasetMode = 'real' | 'custom' | 'synthetic' | 'combined';
 export type UiMode = 'simple' | 'explorer' | 'pro' | 'builds';
 export type ChartViewMode = '2d' | '3d' | 'hyper' | 'axes' | 'residuals';
 
@@ -197,12 +199,24 @@ export function useOptimizerState() {
     runStorageMigrations();
   }, []);
 
-  // Dataset switcher: defaults to 'real' (18 real-world GPUs), 'custom' (My Deals), or 'synthetic' (Phase 1 seed)
+  // Dataset switcher: defaults to 'real' (18 real-world GPUs), 'custom' (My Deals), 'synthetic' (Phase 1 seed), or 'combined' (Unified Sandbox)
   const [datasetMode, setDatasetMode] = useState<DatasetMode>(() => {
     const saved = safeGetString('paretopc_dataset', 'real');
-    if (saved === 'custom' || saved === 'synthetic') return saved;
+    if (saved === 'custom' || saved === 'synthetic' || saved === 'combined')
+      return saved;
     return 'real';
   });
+
+  // USD to BRL exchange rate for converting US baseline MSRP into Brazilian Reais in Combined Sandbox
+  const [exchangeRateUsdToBrl, setExchangeRateUsdToBrl] = useState<number>(
+    () => {
+      const saved = safeGetInt(
+        'paretopc_usd_to_brl',
+        Math.round(DEFAULT_USD_TO_BRL_RATE * 100),
+      );
+      return saved > 0 ? saved / 100 : DEFAULT_USD_TO_BRL_RATE;
+    },
+  );
 
   // User Custom Deals Database (Stored safely in localStorage)
   const [customGpus, setCustomGpus] = useState<GpuCandidate[]>(() =>
@@ -300,16 +314,40 @@ export function useOptimizerState() {
     safeSetJSON('paretopc_custom_gpus', customGpus);
   }, [customGpus]);
 
+  useEffect(() => {
+    safeSetJSON('paretopc_usd_to_brl', Math.round(exchangeRateUsdToBrl * 100));
+  }, [exchangeRateUsdToBrl]);
+
   // Raw catalog based on datasetMode
   const rawCatalog = useMemo(() => {
     if (datasetMode === 'custom') {
       return customGpus.length > 0 ? customGpus : DEFAULT_CUSTOM_GPUS;
     }
+    if (datasetMode === 'combined') {
+      const deals = customGpus.length > 0 ? customGpus : DEFAULT_CUSTOM_GPUS;
+      // Convert real GPUs to BRL so both live store deals and US benchmarks share the same currency
+      const convertedBaselineGpus: GpuCandidate[] = REAL_WORLD_GPUS.map(
+        (g) => ({
+          ...g,
+          id: `ref-${g.id}`,
+          name: `${g.name} (Ref)`,
+          originalUsdPrice: g.price,
+          price: convertUsdToBrl(g.price, exchangeRateUsdToBrl),
+          currency: 'BRL',
+          isBenchmarkRef: true,
+          notes: `US Baseline Ref: $${g.price} × R$ ${exchangeRateUsdToBrl.toFixed(2)} | ${g.notes ?? ''}`,
+        }),
+      );
+      return [...deals, ...convertedBaselineGpus];
+    }
     return datasetMode === 'real' ? REAL_WORLD_GPUS : PHASE1_SEED_GPUS;
-  }, [datasetMode, customGpus]);
+  }, [datasetMode, customGpus, exchangeRateUsdToBrl]);
 
   // Detected active currency ('BRL' or 'USD')
   const activeCurrency = useMemo<'USD' | 'BRL'>(() => {
+    if (datasetMode === 'combined') {
+      return 'BRL';
+    }
     if (
       datasetMode === 'custom' &&
       rawCatalog.some((g) => g.currency === 'BRL')
@@ -422,6 +460,25 @@ export function useOptimizerState() {
           anchorGpuId: customGpus[0].id,
         }));
       }
+    } else if (mode === 'combined') {
+      const maxCombinedPrice = 15000;
+      setConstraints({
+        maxPrice: maxCombinedPrice,
+        minVram: 6,
+        maxWatts: 450,
+        selectedVendors: [],
+        selectedArchitectures: [],
+        requiredFeatures: [],
+      });
+      setSelectedGpuIds([
+        'deal-pichau-rx9060xt',
+        'ref-arc-b580',
+        'ref-rtx-4070-super',
+      ]);
+      setExtrapolation((prev) => ({
+        ...prev,
+        anchorGpuId: 'ref-arc-b580',
+      }));
     } else {
       setConstraints(DEFAULT_CONSTRAINTS_REAL);
       setSelectedGpuIds(['arc-b580', 'rx-7800-xt', 'rtx-4070-super']);
@@ -572,5 +629,7 @@ export function useOptimizerState() {
     isDealImporterOpen,
     setIsDealImporterOpen,
     activeCurrency,
+    exchangeRateUsdToBrl,
+    setExchangeRateUsdToBrl,
   };
 }

@@ -27,3 +27,32 @@ export function formatCurrency(
 export function getCurrencySymbol(currency: 'USD' | 'BRL' = 'USD'): string {
   return currency === 'BRL' ? 'R$' : '$';
 }
+
+/**
+ * Standard default exchange rate for BRL conversion when evaluating USD benchmarks against Brazilian deals.
+ */
+export const DEFAULT_USD_TO_BRL_RATE = 5.7;
+
+/**
+ * Converts a USD amount to Brazilian Real (BRL) rounded to the nearest integer.
+ */
+export function convertUsdToBrl(
+  amountUsd: number,
+  rate = DEFAULT_USD_TO_BRL_RATE,
+): number {
+  if (isNaN(amountUsd) || amountUsd <= 0) return 0;
+  const effectiveRate = rate > 0 ? rate : DEFAULT_USD_TO_BRL_RATE;
+  return Math.round(amountUsd * effectiveRate);
+}
+
+/**
+ * Converts a BRL amount to US Dollars (USD), guarded against divide-by-zero.
+ */
+export function convertBrlToUsd(
+  amountBrl: number,
+  rate = DEFAULT_USD_TO_BRL_RATE,
+): number {
+  if (isNaN(amountBrl) || amountBrl <= 0) return 0;
+  if (rate <= 0) return amountBrl;
+  return Math.round((amountBrl / rate) * 100) / 100;
+}

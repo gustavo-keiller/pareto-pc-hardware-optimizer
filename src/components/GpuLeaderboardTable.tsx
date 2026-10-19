@@ -139,6 +139,14 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                           {gpu.store}
                         </span>
                       )}
+                      {gpu.isBenchmarkRef && (
+                        <span className="rounded bg-teal-500/20 border border-teal-500/30 px-1.5 py-0.2 text-[10px] font-bold text-teal-300">
+                          US Baseline Ref
+                          {gpu.originalUsdPrice
+                            ? ` ($${gpu.originalUsdPrice})`
+                            : ''}
+                        </span>
+                      )}
                       {gpu.url && (
                         <a
                           href={gpu.url}

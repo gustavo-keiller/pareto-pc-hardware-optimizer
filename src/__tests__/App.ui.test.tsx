@@ -126,4 +126,25 @@ describe('App modes', () => {
       screen.queryByRole('button', { name: /Fair Value \(OLS\)/i }),
     ).toBeNull();
   });
+
+  it('switching to Combined Sandbox shows both real baseline references and live store deals in BRL', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Switch to Combined Sandbox
+    await user.click(screen.getByRole('button', { name: /Combined Sandbox/i }));
+
+    // Verify USD to BRL exchange rate input is visible
+    const rateInput = screen.getByLabelText(/USD to BRL Exchange Rate/i);
+    expect(rateInput).toBeDefined();
+
+    // Verify both live store deals and converted US reference benchmarks appear
+    expect(screen.getAllByText(/US Baseline Ref/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/PowerColor Radeon RX 9060 XT 16GB/i).length,
+    ).toBeGreaterThan(0);
+
+    // Prices should be rendered in BRL (R$)
+    expect(screen.getAllByText(/R\$/i).length).toBeGreaterThan(0);
+  });
 });

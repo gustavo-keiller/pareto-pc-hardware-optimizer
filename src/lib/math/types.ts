@@ -27,6 +27,8 @@ export interface GpuCandidate {
   brand?: string;
   isCustom?: boolean;
   isBenchmarkEstimated?: boolean;
+  isBenchmarkRef?: boolean;
+  originalUsdPrice?: number;
 }
 
 export type MetricKey =
