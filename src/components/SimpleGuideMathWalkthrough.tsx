@@ -61,6 +61,7 @@ export const SimpleGuideMathWalkthrough: React.FC<
   SimpleGuideMathWalkthroughProps
 > = ({
   gpus,
+  currency = 'USD',
   constraints,
   onChangeConstraints,
   xMetric,
@@ -451,6 +452,7 @@ export const SimpleGuideMathWalkthrough: React.FC<
         <div className="space-y-6 lg:col-span-7">
           <SimpleGuideScatterPlot
             gpus={gpus}
+            currency={currency}
             activeStep={activeStep}
             setActiveStep={setActiveStep}
             toStoryStep={toStoryStep}

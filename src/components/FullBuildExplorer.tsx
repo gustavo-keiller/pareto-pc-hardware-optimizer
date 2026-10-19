@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Layers,
   AlertTriangle,
@@ -49,7 +49,7 @@ import {
   BuildFilterCriteria,
   optimizeFullSystemBuilds,
 } from '../lib/math/combinatorial';
-import { formatCurrency } from '../utils/currency';
+import { convertUsdToBrl, formatCurrency } from '../utils/currency';
 import { BuildHeroCard } from './BuildHeroCard';
 import { BuildLeaderboardTable } from './BuildLeaderboardTable';
 
@@ -63,40 +63,73 @@ interface FullBuildExplorerProps {
 interface BudgetPreset {
   id: string;
   label: string;
-  budgetUsd: number;
+  budget: number;
   shortDesc: string;
 }
 
-const BUDGET_PRESETS: BudgetPreset[] = [
+const BUDGET_PRESETS_USD: BudgetPreset[] = [
   {
     id: 'entry-750',
     label: '$750 Entry',
-    budgetUsd: 750,
+    budget: 750,
     shortDesc: 'Smooth 1080p / 1440p entry gaming',
   },
   {
     id: 'sweet-1000',
     label: '$1,000 Sweet Spot',
-    budgetUsd: 1000,
+    budget: 1000,
     shortDesc: 'Maximum value-per-dollar 1440p',
   },
   {
     id: 'high-1500',
     label: '$1,500 High-FPS',
-    budgetUsd: 1500,
+    budget: 1500,
     shortDesc: 'High-refresh 1440p & modern Ray Tracing',
   },
   {
     id: 'enthusiast-2200',
     label: '$2,200 Enthusiast',
-    budgetUsd: 2200,
+    budget: 2200,
     shortDesc: 'Ryzen 7800X3D + Tier-1 GPU powerhouse',
   },
   {
     id: 'extreme-3200',
     label: '$3,200 Extreme',
-    budgetUsd: 3200,
+    budget: 3200,
     shortDesc: 'Unconstrained 4K / high-fps flagship setup',
+  },
+];
+
+const BUDGET_PRESETS_BRL: BudgetPreset[] = [
+  {
+    id: 'entry-4500',
+    label: 'R$ 4.500 Entrada',
+    budget: 4500,
+    shortDesc: '1080p / 1440p econômico balanceado',
+  },
+  {
+    id: 'sweet-6000',
+    label: 'R$ 6.000 Ponto Ideal',
+    budget: 6000,
+    shortDesc: 'Melhor custo-benefício em 1440p',
+  },
+  {
+    id: 'high-8500',
+    label: 'R$ 8.500 Alto FPS',
+    budget: 8500,
+    shortDesc: 'Alto FPS 1440p e Ray Tracing',
+  },
+  {
+    id: 'enthusiast-12000',
+    label: 'R$ 12.000 Entusiasta',
+    budget: 12000,
+    shortDesc: 'Ryzen 7800X3D + GPU topo de linha',
+  },
+  {
+    id: 'extreme-18000',
+    label: 'R$ 18.000 Extremo',
+    budget: 18000,
+    shortDesc: 'Máximo 4K e alto FPS sem concessões',
   },
 ];
 
@@ -106,8 +139,16 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   onSwitchToSimple,
   onSwitchToExplorer,
 }) => {
+  const isBrl = currency === 'BRL';
+  const budgetPresets = isBrl ? BUDGET_PRESETS_BRL : BUDGET_PRESETS_USD;
+  const minSlider = isBrl ? 3500 : 600;
+  const maxSlider = isBrl ? 22000 : 3500;
+  const stepSlider = isBrl ? 250 : 50;
+
   // State
-  const [maxBudget, setMaxBudget] = useState<number>(1000);
+  const [maxBudget, setMaxBudget] = useState<number>(() =>
+    isBrl ? 6000 : 1000,
+  );
   const [selectedSocket, setSelectedSocket] = useState<CpuSocket | 'ALL'>(
     'ALL',
   );
@@ -118,8 +159,73 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     HardwareVendor | 'ALL'
   >('ALL');
   const [minEffectiveFps, setMinEffectiveFps] = useState<number>(0);
-  const [activePresetId, setActivePresetId] = useState<string>('sweet-1000');
+  const [activePresetId, setActivePresetId] = useState<string>(() =>
+    isBrl ? 'sweet-6000' : 'sweet-1000',
+  );
   const [selectedBuildId, setSelectedBuildId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isBrl && maxBudget < 3500) {
+      setMaxBudget(6000);
+      setActivePresetId('sweet-6000');
+    } else if (!isBrl && maxBudget > 3500) {
+      setMaxBudget(1000);
+      setActivePresetId('sweet-1000');
+    }
+  }, [isBrl, maxBudget]);
+
+  const activeCpus = useMemo(
+    () =>
+      isBrl
+        ? SEED_CPUS.map((c) => ({ ...c, price: convertUsdToBrl(c.price) }))
+        : SEED_CPUS,
+    [isBrl],
+  );
+  const activeMotherboards = useMemo(
+    () =>
+      isBrl
+        ? SEED_MOTHERBOARDS.map((m) => ({
+            ...m,
+            price: convertUsdToBrl(m.price),
+          }))
+        : SEED_MOTHERBOARDS,
+    [isBrl],
+  );
+  const activeRam = useMemo(
+    () =>
+      isBrl
+        ? SEED_RAM_KITS.map((r) => ({ ...r, price: convertUsdToBrl(r.price) }))
+        : SEED_RAM_KITS,
+    [isBrl],
+  );
+  const activePsus = useMemo(
+    () =>
+      isBrl
+        ? SEED_PSUS.map((p) => ({ ...p, price: convertUsdToBrl(p.price) }))
+        : SEED_PSUS,
+    [isBrl],
+  );
+  const activeStorages = useMemo(
+    () =>
+      isBrl
+        ? SEED_STORAGES.map((s) => ({ ...s, price: convertUsdToBrl(s.price) }))
+        : SEED_STORAGES,
+    [isBrl],
+  );
+  const activeCases = useMemo(
+    () =>
+      isBrl
+        ? SEED_CASES.map((c) => ({ ...c, price: convertUsdToBrl(c.price) }))
+        : SEED_CASES,
+    [isBrl],
+  );
+  const activeCoolers = useMemo(
+    () =>
+      isBrl
+        ? SEED_COOLERS.map((c) => ({ ...c, price: convertUsdToBrl(c.price) }))
+        : SEED_COOLERS,
+    [isBrl],
+  );
 
   // Compute Full Systems using combinatorial optimization
   const filterCriteria: BuildFilterCriteria = useMemo(() => {
@@ -143,18 +249,28 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   const optimizationResult = useMemo(() => {
     return optimizeFullSystemBuilds(
       {
-        cpus: SEED_CPUS,
+        cpus: activeCpus,
         gpus,
-        motherboards: SEED_MOTHERBOARDS,
-        ramKits: SEED_RAM_KITS,
-        psus: SEED_PSUS,
-        storages: SEED_STORAGES,
-        cases: SEED_CASES,
-        coolers: SEED_COOLERS,
+        motherboards: activeMotherboards,
+        ramKits: activeRam,
+        psus: activePsus,
+        storages: activeStorages,
+        cases: activeCases,
+        coolers: activeCoolers,
       },
       filterCriteria,
     );
-  }, [gpus, filterCriteria]);
+  }, [
+    activeCpus,
+    gpus,
+    activeMotherboards,
+    activeRam,
+    activePsus,
+    activeStorages,
+    activeCases,
+    activeCoolers,
+    filterCriteria,
+  ]);
 
   const { optimalBuilds, allCompatibleBuilds, totalCompatibleBuilds } =
     optimizationResult;
@@ -200,17 +316,17 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
 
   const handleApplyPreset = (preset: BudgetPreset) => {
     setActivePresetId(preset.id);
-    setMaxBudget(preset.budgetUsd);
+    setMaxBudget(preset.budget);
     setSelectedBuildId(null);
   };
 
   const handleResetFilters = () => {
-    setMaxBudget(1000);
+    setMaxBudget(isBrl ? 6000 : 1000);
     setSelectedSocket('ALL');
     setSelectedRamGen('ALL');
     setSelectedGpuVendor('ALL');
     setMinEffectiveFps(0);
-    setActivePresetId('sweet-1000');
+    setActivePresetId(isBrl ? 'sweet-6000' : 'sweet-1000');
     setSelectedBuildId(null);
   };
 
@@ -243,7 +359,6 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
               the pure Pareto Frontier of complete PC builds.
             </p>
           </div>
-
           <div className="flex items-center gap-2">
             {onSwitchToSimple && (
               <button
@@ -275,13 +390,13 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
             </span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
-            {BUDGET_PRESETS.map((preset) => (
+            {budgetPresets.map((preset) => (
               <button
                 key={preset.id}
                 type="button"
                 onClick={() => handleApplyPreset(preset)}
                 className={`rounded-xl border p-3 text-left transition ${
-                  activePresetId === preset.id && maxBudget === preset.budgetUsd
+                  activePresetId === preset.id && maxBudget === preset.budget
                     ? 'border-emerald-500 bg-emerald-500/15 shadow-md shadow-emerald-500/10'
                     : 'border-slate-800 bg-slate-950/60 hover:border-slate-700 hover:bg-slate-900/60'
                 }`}
@@ -312,9 +427,9 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
             </div>
             <input
               type="range"
-              min={600}
-              max={3500}
-              step={25}
+              min={minSlider}
+              max={maxSlider}
+              step={stepSlider}
               value={maxBudget}
               onChange={(e) => {
                 setMaxBudget(Number(e.target.value));
@@ -324,9 +439,14 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
               className="w-full accent-emerald-500 h-2 rounded-lg bg-slate-800 cursor-pointer"
             />
             <div className="flex justify-between text-[11px] text-slate-400">
-              <span>$600 Budget</span>
-              <span>$1,500 High-End</span>
-              <span>$3,500 Flagship</span>
+              <span>{formatCurrency(minSlider, currency)}</span>
+              <span>
+                {formatCurrency(
+                  Math.round((minSlider + maxSlider) / 2),
+                  currency,
+                )}
+              </span>
+              <span>{formatCurrency(maxSlider, currency)}</span>
             </div>
           </div>
 

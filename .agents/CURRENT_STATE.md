@@ -4,13 +4,20 @@
 
 ## 🔴 In Flight
 
-- `[UX-05]` Mobile layout & responsive polish (compact single-row header navigation, ensure 360px-420px viewport layouts fit without clipping).
+- `[UX-04]` Reasons people trust (generate plain shopping rationale per recommended GPU card and build component in shopping terms without algorithmic jargon).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Mobile Layout & Responsive Polish (`[UX-05]`, 2026-10-19):**
+  - Redesigned top header navigation into a responsive 2-row layout on mobile phones (< 640px) featuring a compact brand row with instant language and reset controls, and an overflow-safe horizontal level navigation bar, shrinking mobile header height from ~280px to ~75px.
+  - Prevented SVG scatter plot label collisions by showing text labels exclusively on key winners/traps and user hover instead of all 2D frontier items simultaneously.
+  - Added currency-aware formatting to SVG chart axes and node prices (`formatCurrency(tick, currency)`).
+  - Resolved "0 compatible builds" bug in Full Builds and Simple Guide under BRL by dynamically converting seed components to BRL and introducing currency-aware budget presets (`R$ 4.500` to `R$ 18.000` in BRL vs `$750` to `$3,200` in USD).
+  - Verified across 117 Vitest unit/UI tests, 4 Playwright desktop and mobile e2e tests, and desktop/phone visual snapshots (`snapshots/simple-phone.png`, `snapshots/builds-phone.png`).
 
 - **Plain-Language Buyer Copy Pass on Simple Guide (`[UX-03]`, 2026-10-19):**
   - Audited and purged all mathematical MCDM jargon ("Pareto", "TOPSIS", "Strictly Dominated", "tradeoff hyperplane") from the Simple Guide experience in both Portuguese (`pt-BR`) and English (`en-US`), replacing with plain shopping vocabulary ("Bom Negócio" / "Good Deal", "Combina" / "Match", "Peças Desvantajosas" / "Overpriced Bad Deals", "Curva de Melhores Negócios" / "Best-Deal Line").

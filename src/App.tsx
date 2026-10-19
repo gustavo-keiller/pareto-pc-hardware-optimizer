@@ -121,43 +121,139 @@ export function App() {
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-16">
       {/* Top Header Bar */}
       <header className="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20">
-              <Cpu className="h-5 w-5 text-slate-950 stroke-[2.5]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-extrabold tracking-tight text-white">
-                  ParetoPC
-                </h1>
-                <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">
-                  {uiMode === 'simple'
-                    ? 'Level 1: Easy Buyer Guide'
-                    : uiMode === 'explorer'
-                      ? 'Level 2: Visual Axis Explorer'
-                      : uiMode === 'builds'
-                        ? 'Level 4: Mario Kart Full-Build Explorer'
-                        : 'Level 3: Pro MCDM Lab'}
-                </span>
+        <div className="mx-auto max-w-7xl px-4 py-2.5 sm:px-6">
+          {/* Top Row: Brand & Quick Language/Reset Actions */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20">
+                <Cpu className="h-5 w-5 text-slate-950 stroke-[2.5]" />
               </div>
-              <p className="text-xs text-slate-400">
-                {uiMode === 'simple'
-                  ? 'Pick your budget and gaming style — overpriced value traps are filtered out automatically'
-                  : uiMode === 'explorer'
-                    ? 'Explore custom hardware axes, 3D views, 4D–7D Hyper-Graphs, and custom $/spec extrapolation rules'
-                    : uiMode === 'builds'
-                      ? 'Assemble CPU, GPU, RAM, Motherboard, and PSU into Pareto-optimal complete PC systems'
-                      : 'Full 4D–7D Hyper-Space Frontier, TOPSIS Closeness, Non-Linear Extrapolation & Hedonic OLS Lab'}
-              </p>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-base sm:text-lg font-extrabold tracking-tight text-white">
+                    ParetoPC
+                  </h1>
+                  <span className="hidden sm:inline-flex rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400 truncate">
+                    {uiMode === 'simple'
+                      ? 'Level 1: Easy Buyer Guide'
+                      : uiMode === 'explorer'
+                        ? 'Level 2: Visual Axis Explorer'
+                        : uiMode === 'builds'
+                          ? 'Level 4: Mario Kart Full-Build Explorer'
+                          : 'Level 3: Pro MCDM Lab'}
+                  </span>
+                </div>
+                <p className="hidden md:block text-xs text-slate-400 truncate max-w-xl">
+                  {uiMode === 'simple'
+                    ? 'Pick your budget and gaming style — overpriced value traps are filtered out automatically'
+                    : uiMode === 'explorer'
+                      ? 'Explore custom hardware axes, 3D views, 4D–7D Hyper-Graphs, and custom $/spec extrapolation rules'
+                      : uiMode === 'builds'
+                        ? 'Assemble CPU, GPU, RAM, Motherboard, and PSU into Pareto-optimal complete PC systems'
+                        : 'Full 4D–7D Hyper-Space Frontier, TOPSIS Closeness, Non-Linear Extrapolation & Hedonic OLS Lab'}
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Actions: Language Toggle + Reset Button */}
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 text-xs">
+              {/* Language / Currency Toggle (UX-06) */}
+              <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
+                <button
+                  type="button"
+                  onClick={() => handleToggleLocale('pt-BR')}
+                  className={`flex items-center gap-1 rounded-md px-2 py-1 font-bold transition ${
+                    locale === 'pt-BR'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Mudar para Português (Preços em Reais R$)"
+                >
+                  🇧🇷 PT
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleToggleLocale('en-US')}
+                  className={`flex items-center gap-1 rounded-md px-2 py-1 font-bold transition ${
+                    locale === 'en-US'
+                      ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Switch to English (Prices in USD $)"
+                >
+                  🇺🇸 EN
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleResetAll}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 px-2 sm:px-2.5 py-1 sm:py-1.5 font-medium text-slate-300 hover:border-slate-700 hover:text-white transition"
+                title="Reset filters and weights to defaults"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Reset</span>
+              </button>
             </div>
           </div>
 
-          {/* Right Controls: 3 Proportional Experience Modes + Dataset Switcher + Import Deals + Reset */}
-          <div className="flex flex-wrap items-center gap-2 text-xs">
+          {/* Navigation & Controls Bar: Level Buttons + Expert Controls */}
+          <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-slate-800/60 pt-2 text-xs">
+            {/* 4 Proportional Experience Level Buttons */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-0.5 max-w-full rounded-lg border border-slate-800 bg-slate-900 p-0.5">
+              <button
+                type="button"
+                onClick={() => setUiMode('simple')}
+                className={`flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                  uiMode === 'simple'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Eye className="h-3.5 w-3.5" />
+                {t('modeSimple', locale)}
+              </button>
+              <button
+                type="button"
+                onClick={() => setUiMode('explorer')}
+                className={`flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                  uiMode === 'explorer'
+                    ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Compass className="h-3.5 w-3.5" />
+                {t('modeExplorer', locale)}
+              </button>
+              <button
+                type="button"
+                onClick={() => setUiMode('pro')}
+                className={`flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                  uiMode === 'pro'
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Wrench className="h-3.5 w-3.5" />
+                {t('modePro', locale)}
+              </button>
+              <button
+                type="button"
+                onClick={() => setUiMode('builds')}
+                className={`flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                  uiMode === 'builds'
+                    ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Layers className="h-3.5 w-3.5" />
+                {t('modeBuilds', locale)}
+              </button>
+            </div>
+
             {/* Expert Controls: Dataset Switcher + Import Deals (Visible in Explorer, Pro, and Full Builds) */}
             {uiMode !== 'simple' && (
-              <>
+              <div className="flex flex-wrap items-center gap-2">
                 {/* Dataset Toggle */}
                 <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
                   <button
@@ -246,98 +342,8 @@ export function App() {
                 >
                   <PlusCircle className="h-3.5 w-3.5" />+ Import Deals
                 </button>
-              </>
+              </div>
             )}
-
-            {/* Language / Currency Toggle (UX-06) */}
-            <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
-              <button
-                type="button"
-                onClick={() => handleToggleLocale('pt-BR')}
-                className={`flex items-center gap-1 rounded-md px-2 py-1 font-bold transition ${
-                  locale === 'pt-BR'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-                title="Mudar para Português (Preços em Reais R$)"
-              >
-                🇧🇷 PT
-              </button>
-              <button
-                type="button"
-                onClick={() => handleToggleLocale('en-US')}
-                className={`flex items-center gap-1 rounded-md px-2 py-1 font-bold transition ${
-                  locale === 'en-US'
-                    ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-                title="Switch to English (Prices in USD $)"
-              >
-                🇺🇸 EN
-              </button>
-            </div>
-
-            {/* 4 Proportional Experience Level Buttons */}
-            <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
-              <button
-                type="button"
-                onClick={() => setUiMode('simple')}
-                className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                  uiMode === 'simple'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Eye className="h-3.5 w-3.5" />
-                {t('modeSimple', locale)}
-              </button>
-              <button
-                type="button"
-                onClick={() => setUiMode('explorer')}
-                className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                  uiMode === 'explorer'
-                    ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Compass className="h-3.5 w-3.5" />
-                {t('modeExplorer', locale)}
-              </button>
-              <button
-                type="button"
-                onClick={() => setUiMode('pro')}
-                className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                  uiMode === 'pro'
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Wrench className="h-3.5 w-3.5" />
-                {t('modePro', locale)}
-              </button>
-              <button
-                type="button"
-                onClick={() => setUiMode('builds')}
-                className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                  uiMode === 'builds'
-                    ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Layers className="h-3.5 w-3.5" />
-                {t('modeBuilds', locale)}
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleResetAll}
-              className="inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1.5 font-medium text-slate-300 hover:border-slate-700 hover:text-white transition"
-              title="Reset filters and weights to defaults"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-              Reset
-            </button>
           </div>
         </div>
       </header>

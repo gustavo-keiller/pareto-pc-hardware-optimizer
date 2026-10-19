@@ -51,14 +51,14 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
       {/* #1 Top Pick Hero Card */}
       <section
         data-testid="top-choice"
-        className="rounded-3xl border-2 border-amber-400/60 bg-gradient-to-br from-amber-500/15 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-2xl relative overflow-hidden"
+        className="rounded-3xl border-2 border-amber-400/60 bg-gradient-to-br from-amber-500/15 via-slate-900 to-slate-950 p-5 sm:p-8 shadow-2xl relative overflow-hidden"
       >
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400/20 text-amber-300 border border-amber-400/40 shadow-lg shadow-amber-500/10">
-              <Award className="h-6 w-6" />
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-400/20 text-amber-300 border border-amber-400/40 shadow-lg shadow-amber-500/10">
+              <Award className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-md bg-amber-400 px-2 py-0.5 text-xs font-black uppercase text-slate-950">
                   {t('heroTopPickBadge', locale)}
@@ -72,13 +72,13 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
                   {t('heroGoodDealBadge', locale)}
                 </span>
               </div>
-              <h4 className="text-2xl sm:text-3xl font-black text-white mt-1">
+              <h4 className="text-xl sm:text-3xl font-black text-white mt-1 break-words">
                 {topPick.name}
               </h4>
             </div>
           </div>
 
-          <div className="text-right">
+          <div className="w-full sm:w-auto text-left sm:text-right">
             <div className="text-2xl sm:text-3xl font-black text-emerald-400">
               {formatCurrency(topPick.price, currency)}
             </div>

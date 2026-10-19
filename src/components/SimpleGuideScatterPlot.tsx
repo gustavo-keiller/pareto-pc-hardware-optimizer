@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
 import { Sparkles, ArrowLeft, ArrowRight } from 'lucide-react';
 import { MetricDefinition, MetricKey, RankedGpu } from '../lib/math/types';
+import { formatCurrency } from '../utils/currency';
 
 export type StoryStep = 1 | 2 | 3 | 4 | 5;
 
 export interface SimpleGuideScatterPlotProps {
   gpus: RankedGpu[];
+  currency?: 'USD' | 'BRL';
   activeStep: StoryStep;
   setActiveStep: (s: StoryStep | ((prev: StoryStep) => StoryStep)) => void;
   toStoryStep: (n: number) => StoryStep;
@@ -34,6 +36,7 @@ export interface SimpleGuideScatterPlotProps {
 
 export const SimpleGuideScatterPlot: React.FC<SimpleGuideScatterPlotProps> = ({
   gpus,
+  currency = 'USD',
   activeStep,
   setActiveStep,
   toStoryStep,
@@ -221,7 +224,9 @@ export const SimpleGuideScatterPlot: React.FC<SimpleGuideScatterPlotProps> = ({
                       textAnchor="middle"
                       className="fill-slate-400 font-mono text-[10px]"
                     >
-                      {xDef.unit === '$' ? `$${tick}` : tick}
+                      {xDef.unit === '$'
+                        ? formatCurrency(tick, currency)
+                        : tick}
                     </text>
                   </g>
                 );
@@ -427,8 +432,7 @@ export const SimpleGuideScatterPlot: React.FC<SimpleGuideScatterPlotProps> = ({
               isStep1Top ||
               isSpotlightTrap ||
               isSpotlightDom ||
-              hoveredId === gpu.id ||
-              (activeStep >= 4 && is2DFrontier);
+              hoveredId === gpu.id;
 
             return (
               <g
@@ -468,8 +472,8 @@ export const SimpleGuideScatterPlot: React.FC<SimpleGuideScatterPlotProps> = ({
                           : 'fill-slate-200'
                     }`}
                   >
-                    {gpu.name.replace('GeForce ', '').replace('Radeon ', '')} ($
-                    {gpu.price})
+                    {gpu.name.replace('GeForce ', '').replace('Radeon ', '')} (
+                    {formatCurrency(gpu.price, currency)})
                   </text>
                 )}
               </g>

@@ -26,6 +26,7 @@ import {
   SEED_STORAGES,
 } from '../data/seedComponents';
 import { AppLocale, t } from '../utils/i18n';
+import { convertUsdToBrl } from '../utils/currency';
 
 interface SimpleParetoGuideProps {
   gpus: RankedGpu[];
@@ -181,6 +182,60 @@ export function SimpleParetoGuide({
   }, [gpus, constraints.maxPrice]);
 
   // Combinatorial PC build optimization for Whole PC Goal (UX-11)
+  const isBrl = currency === 'BRL';
+  const effectiveCpus = useMemo(
+    () =>
+      isBrl
+        ? SEED_CPUS.map((c) => ({ ...c, price: convertUsdToBrl(c.price) }))
+        : SEED_CPUS,
+    [isBrl],
+  );
+  const effectiveMotherboards = useMemo(
+    () =>
+      isBrl
+        ? SEED_MOTHERBOARDS.map((m) => ({
+            ...m,
+            price: convertUsdToBrl(m.price),
+          }))
+        : SEED_MOTHERBOARDS,
+    [isBrl],
+  );
+  const effectiveRam = useMemo(
+    () =>
+      isBrl
+        ? SEED_RAM_KITS.map((r) => ({ ...r, price: convertUsdToBrl(r.price) }))
+        : SEED_RAM_KITS,
+    [isBrl],
+  );
+  const effectivePsus = useMemo(
+    () =>
+      isBrl
+        ? SEED_PSUS.map((p) => ({ ...p, price: convertUsdToBrl(p.price) }))
+        : SEED_PSUS,
+    [isBrl],
+  );
+  const effectiveStorages = useMemo(
+    () =>
+      isBrl
+        ? SEED_STORAGES.map((s) => ({ ...s, price: convertUsdToBrl(s.price) }))
+        : SEED_STORAGES,
+    [isBrl],
+  );
+  const effectiveCases = useMemo(
+    () =>
+      isBrl
+        ? SEED_CASES.map((c) => ({ ...c, price: convertUsdToBrl(c.price) }))
+        : SEED_CASES,
+    [isBrl],
+  );
+  const effectiveCoolers = useMemo(
+    () =>
+      isBrl
+        ? SEED_COOLERS.map((c) => ({ ...c, price: convertUsdToBrl(c.price) }))
+        : SEED_COOLERS,
+    [isBrl],
+  );
+
   const pcBuildsResult = useMemo(() => {
     const catalog = rawCatalog ?? gpus;
     const effectiveMaxBudget =
@@ -192,18 +247,31 @@ export function SimpleParetoGuide({
         : constraints.maxPrice;
     return optimizeFullSystemBuilds(
       {
-        cpus: SEED_CPUS,
+        cpus: effectiveCpus,
         gpus: catalog,
-        motherboards: SEED_MOTHERBOARDS,
-        ramKits: SEED_RAM_KITS,
-        psus: SEED_PSUS,
-        storages: SEED_STORAGES,
-        cases: SEED_CASES,
-        coolers: SEED_COOLERS,
+        motherboards: effectiveMotherboards,
+        ramKits: effectiveRam,
+        psus: effectivePsus,
+        storages: effectiveStorages,
+        cases: effectiveCases,
+        coolers: effectiveCoolers,
       },
       { maxBudget: effectiveMaxBudget },
     );
-  }, [rawCatalog, gpus, beginnerGoal, constraints.maxPrice, currency]);
+  }, [
+    rawCatalog,
+    gpus,
+    beginnerGoal,
+    constraints.maxPrice,
+    currency,
+    effectiveCpus,
+    effectiveMotherboards,
+    effectiveRam,
+    effectivePsus,
+    effectiveStorages,
+    effectiveCases,
+    effectiveCoolers,
+  ]);
 
   const { topBuild, stepDownBuild, stepUpBuild } = useMemo(() => {
     const { optimalBuilds } = pcBuildsResult;

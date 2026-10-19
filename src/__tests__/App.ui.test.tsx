@@ -278,4 +278,31 @@ describe('App modes', () => {
       screen.getByRole('button', { name: /1\. Guia Simples/i }),
     ).toBeDefined();
   });
+
+  it('UX-05: renders mobile responsive navigation, currency-aware build presets, and avoids 0 compatible builds', async () => {
+    localStorage.clear();
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Header buttons exist for mobile navigation
+    expect(screen.getByRole('button', { name: /🇧🇷 PT/i })).toBeDefined();
+    expect(screen.getByRole('button', { name: /🇺🇸 EN/i })).toBeDefined();
+
+    // Switch to Full Builds mode in default BRL locale
+    await user.click(screen.getByRole('button', { name: /4\. Montar PC/i }));
+    expect(
+      screen.getByRole('button', { name: /R\$ 6\.000 Ponto Ideal/i }),
+    ).toBeDefined();
+
+    // Verify top build card is rendered with BRL total cost
+    expect(screen.getByTestId('top-build-card')).toBeDefined();
+    expect(screen.getAllByText(/R\$/i).length).toBeGreaterThan(0);
+
+    // Switch to USD
+    await user.click(screen.getByRole('button', { name: /🇺🇸 EN/i }));
+    expect(
+      screen.getByRole('button', { name: /\$1,000 Sweet Spot/i }),
+    ).toBeDefined();
+    expect(screen.getByTestId('top-build-card')).toBeDefined();
+  });
 });

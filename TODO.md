@@ -19,8 +19,8 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (Reprioritized from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[UX-05]` Mobile layout & responsive polish:**
-  Improve mobile phone layout: compact single-row header navigation, ensure SVG plot labels and recommendation cards render cleanly without overflow or clipping on 360px–420px viewport widths.
-  - **Files likely touched:** `src/App.tsx`, `src/components/SimpleGuideScatterPlot.tsx`, `src/components/SimpleGuidePickHero.tsx`, `src/components/FullBuildPickHero.tsx`
-  - **Done when:** mobile viewport test runs cleanly without horizontal overflow and hero cards/scatter plots fit within standard mobile screens.
-  - **Test to add:** Playwright / Vitest UI smoke assertions at mobile breakpoint.
+- **`[UX-04]` Reasons people trust (plain shopping reasons per pick):**
+  Generate plain-English and Portuguese buyer rationale per recommended GPU card and build component in shopping terms (e.g. "Same speed as RTX 4060 Ti for R$400 less", "16 GB, enough for modern textures", "Top 1440p value in its price bracket") without algorithmic jargon.
+  - **Files likely touched:** `src/components/SimpleGuidePickHero.tsx`, `src/components/FullBuildPickHero.tsx`, `src/utils/i18n.ts`, `src/lib/math/types.ts`
+  - **Done when:** the top pick and alternatives display dynamic plain shopping reasons highlighting exact dollar savings, VRAM longevity, or performance parity.
+  - **Test to add:** unit tests in `src/utils/__tests__/` asserting plain shopping reasons generated for recommended picks.
