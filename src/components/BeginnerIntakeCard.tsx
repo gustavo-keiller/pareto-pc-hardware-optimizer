@@ -82,6 +82,15 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
         ? GPU_BUDGET_PRESETS_BRL
         : GPU_BUDGET_PRESETS_USD;
 
+  const handleSelectGoal = (newGoal: 'gpu' | 'pc') => {
+    onSelectGoal(newGoal);
+    if (newGoal === 'pc' && budget < (isBrl ? 4500 : 750)) {
+      onSelectBudget(isBrl ? 6000 : 1000);
+    } else if (newGoal === 'gpu' && budget > (isBrl ? 8000 : 1200)) {
+      onSelectBudget(isBrl ? 3500 : 550);
+    }
+  };
+
   return (
     <section
       data-testid="beginner-intake"
@@ -100,7 +109,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <button
             type="button"
-            onClick={() => onSelectGoal('gpu')}
+            onClick={() => handleSelectGoal('gpu')}
             className={`flex items-center gap-3 rounded-2xl border p-3.5 text-left transition ${
               goal === 'gpu'
                 ? 'border-emerald-500/60 bg-emerald-500/15 text-white shadow-md shadow-emerald-500/10'
@@ -126,7 +135,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
 
           <button
             type="button"
-            onClick={() => onSelectGoal('pc')}
+            onClick={() => handleSelectGoal('pc')}
             className={`flex items-center gap-3 rounded-2xl border p-3.5 text-left transition ${
               goal === 'pc'
                 ? 'border-emerald-500/60 bg-emerald-500/15 text-white shadow-md shadow-emerald-500/10'

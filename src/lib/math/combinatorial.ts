@@ -2,14 +2,20 @@ import {
   assemblePcBuild,
   calculateEstimatedPowerDraw,
   calculateRecommendedPsuWattage,
+  CaseCandidate,
+  CoolerCandidate,
   CpuCandidate,
   CpuSocket,
+  DEFAULT_CASE,
+  DEFAULT_COOLER,
+  DEFAULT_STORAGE,
   MotherboardCandidate,
   PcBuild,
   PsuCandidate,
   PsuEfficiencyRating,
   RamCandidate,
   RamGeneration,
+  StorageCandidate,
 } from './buildTypes';
 import { GpuCandidate, HardwareVendor } from './types';
 
@@ -165,6 +171,120 @@ export function pruneDominatedPsus(
 }
 
 /**
+ * Prunes strictly dominated Storage SSDs.
+ * An SSD is dominated if another SSD is cheaper or equal in price,
+ * has greater or equal capacity, and higher or equal read speed, with at least one strictly better.
+ */
+export function pruneDominatedStorage(
+  storages: readonly StorageCandidate[],
+): StorageCandidate[] {
+  if (storages.length <= 1) return [...storages];
+
+  return storages.filter((candidate) => {
+    return !storages.some((other) => {
+      if (other.id === candidate.id) return false;
+
+      const otherSpeed = other.readSpeedMbps ?? 0;
+      const candSpeed = candidate.readSpeedMbps ?? 0;
+
+      const priceBetterOrEqual = other.price <= candidate.price;
+      const capBetterOrEqual = other.capacityGb >= candidate.capacityGb;
+      const speedBetterOrEqual = otherSpeed >= candSpeed;
+      const atLeastOneStrict =
+        other.price < candidate.price ||
+        other.capacityGb > candidate.capacityGb ||
+        otherSpeed > candSpeed;
+
+      return (
+        priceBetterOrEqual &&
+        capBetterOrEqual &&
+        speedBetterOrEqual &&
+        atLeastOneStrict
+      );
+    });
+  });
+}
+
+/**
+ * Prunes strictly dominated PC Cases.
+ * A case is dominated if another case has lower or equal price,
+ * supports a superset of form factors, and has greater or equal GPU and cooler clearances.
+ */
+export function pruneDominatedCases(
+  cases: readonly CaseCandidate[],
+): CaseCandidate[] {
+  if (cases.length <= 1) return [...cases];
+
+  return cases.filter((candidate) => {
+    return !cases.some((other) => {
+      if (other.id === candidate.id) return false;
+
+      const formFactorsSuperset = candidate.supportedFormFactors.every((f) =>
+        other.supportedFormFactors.includes(f),
+      );
+      if (!formFactorsSuperset) return false;
+
+      const priceBetterOrEqual = other.price <= candidate.price;
+      const gpuBetterOrEqual = other.maxGpuLengthMm >= candidate.maxGpuLengthMm;
+      const coolerBetterOrEqual =
+        other.maxCpuCoolerHeightMm >= candidate.maxCpuCoolerHeightMm;
+      const atLeastOneStrict =
+        other.price < candidate.price ||
+        other.maxGpuLengthMm > candidate.maxGpuLengthMm ||
+        other.maxCpuCoolerHeightMm > candidate.maxCpuCoolerHeightMm ||
+        other.supportedFormFactors.length >
+          candidate.supportedFormFactors.length;
+
+      return (
+        priceBetterOrEqual &&
+        gpuBetterOrEqual &&
+        coolerBetterOrEqual &&
+        atLeastOneStrict
+      );
+    });
+  });
+}
+
+/**
+ * Prunes strictly dominated CPU Coolers.
+ * A cooler is dominated if another cooler has lower or equal price,
+ * greater or equal cooling TDP, lower or equal height (easier case fit),
+ * and supports a superset of CPU sockets.
+ */
+export function pruneDominatedCoolers(
+  coolers: readonly CoolerCandidate[],
+): CoolerCandidate[] {
+  if (coolers.length <= 1) return [...coolers];
+
+  return coolers.filter((candidate) => {
+    return !coolers.some((other) => {
+      if (other.id === candidate.id) return false;
+
+      const socketsSuperset = candidate.supportedSockets.every((s) =>
+        other.supportedSockets.includes(s),
+      );
+      if (!socketsSuperset) return false;
+
+      const priceBetterOrEqual = other.price <= candidate.price;
+      const tdpBetterOrEqual = other.maxTdpWatts >= candidate.maxTdpWatts;
+      const heightBetterOrEqual = other.heightMm <= candidate.heightMm;
+      const atLeastOneStrict =
+        other.price < candidate.price ||
+        other.maxTdpWatts > candidate.maxTdpWatts ||
+        other.heightMm < candidate.heightMm ||
+        other.supportedSockets.length > candidate.supportedSockets.length;
+
+      return (
+        priceBetterOrEqual &&
+        tdpBetterOrEqual &&
+        heightBetterOrEqual &&
+        atLeastOneStrict
+      );
+    });
+  });
+}
+
+/**
  * Component Catalogs input container.
  */
 export interface ComponentCatalogs {
@@ -173,23 +293,42 @@ export interface ComponentCatalogs {
   motherboards: readonly MotherboardCandidate[];
   ramKits: readonly RamCandidate[];
   psus: readonly PsuCandidate[];
+  storages?: readonly StorageCandidate[];
+  cases?: readonly CaseCandidate[];
+  coolers?: readonly CoolerCandidate[];
 }
 
 /**
- * Generates all physically compatible PC build tuples using constraint propagation
- * (backtracking search) to discard invalid combinations at each nesting tier.
+ * Generates all physically compatible PC build tuples across all 8 components
+ * using constraint propagation (backtracking search) to discard invalid combinations.
  */
 export function generateCompatibleBuilds(
   catalogs: ComponentCatalogs,
   options?: { elasticity?: number },
 ): PcBuild[] {
   const { cpus, gpus, motherboards, ramKits, psus } = catalogs;
+  const storages =
+    catalogs.storages && catalogs.storages.length > 0
+      ? catalogs.storages
+      : [DEFAULT_STORAGE];
+  const cases =
+    catalogs.cases && catalogs.cases.length > 0
+      ? catalogs.cases
+      : [DEFAULT_CASE];
+  const coolers =
+    catalogs.coolers && catalogs.coolers.length > 0
+      ? catalogs.coolers
+      : [DEFAULT_COOLER];
+
   if (
     cpus.length === 0 ||
     gpus.length === 0 ||
     motherboards.length === 0 ||
     ramKits.length === 0 ||
-    psus.length === 0
+    psus.length === 0 ||
+    storages.length === 0 ||
+    cases.length === 0 ||
+    coolers.length === 0
   ) {
     return [];
   }
@@ -198,12 +337,19 @@ export function generateCompatibleBuilds(
   const compatibleBuilds: PcBuild[] = [];
 
   for (const cpu of cpus) {
-    // Level 1 Pruning: Socket match
+    // Level 1 Pruning: Socket match for motherboards & coolers
     const matchingMobos = motherboards.filter((m) => m.socket === cpu.socket);
     if (matchingMobos.length === 0) continue;
 
+    const matchingCoolers = coolers.filter((c) => {
+      if (!c.supportedSockets.includes(cpu.socket)) return false;
+      if (c.maxTdpWatts < cpu.tdpWatts) return false;
+      return true;
+    });
+    if (matchingCoolers.length === 0) continue;
+
     for (const mobo of matchingMobos) {
-      // Level 2 Pruning: RAM generation and slot count
+      // Level 2 Pruning: RAM generation and slot count, plus M.2 storage match
       const matchingRams = ramKits.filter((ram) => {
         if (ram.generation !== mobo.ramGeneration) return false;
         if (ram.modulesCount > mobo.ramSlots) return false;
@@ -218,21 +364,62 @@ export function generateCompatibleBuilds(
       });
       if (matchingRams.length === 0) continue;
 
-      for (const ram of matchingRams) {
-        for (const gpu of gpus) {
-          // Level 3 Pruning: PSU wattage headroom
-          const systemLoad = calculateEstimatedPowerDraw(
-            cpu.tdpWatts,
-            gpu.tdpWatts,
-          );
-          const minPsuWattage = calculateRecommendedPsuWattage(systemLoad);
-          const matchingPsus = psus.filter((p) => p.wattage >= minPsuWattage);
-          if (matchingPsus.length === 0) continue;
+      const matchingStorages = storages.filter((storage) => {
+        const moboM2 = mobo.m2Slots ?? 1;
+        if (storage.type === 'NVMe M.2' && moboM2 < 1) return false;
+        return true;
+      });
+      if (matchingStorages.length === 0) continue;
 
-          for (const psu of matchingPsus) {
-            compatibleBuilds.push(
-              assemblePcBuild(cpu, gpu, ram, mobo, psu, elasticity),
+      // Filter cases that fit motherboard form factor
+      const moboCases = cases.filter((c) =>
+        c.supportedFormFactors.includes(mobo.formFactor),
+      );
+      if (moboCases.length === 0) continue;
+
+      for (const ram of matchingRams) {
+        for (const storage of matchingStorages) {
+          for (const gpu of gpus) {
+            // Level 3 Pruning: PSU wattage headroom & GPU case length clearance
+            const systemLoad = calculateEstimatedPowerDraw(
+              cpu.tdpWatts,
+              gpu.tdpWatts,
             );
+            const minPsuWattage = calculateRecommendedPsuWattage(systemLoad);
+            const matchingPsus = psus.filter((p) => p.wattage >= minPsuWattage);
+            if (matchingPsus.length === 0) continue;
+
+            const gpuLength = gpu.lengthMm ?? 260;
+            const gpuCases = moboCases.filter(
+              (c) => c.maxGpuLengthMm >= gpuLength,
+            );
+            if (gpuCases.length === 0) continue;
+
+            for (const cooler of matchingCoolers) {
+              // Level 4 Pruning: Cooler height clearance in case
+              const validCases = gpuCases.filter(
+                (c) => c.maxCpuCoolerHeightMm >= cooler.heightMm,
+              );
+              if (validCases.length === 0) continue;
+
+              for (const pcCase of validCases) {
+                for (const psu of matchingPsus) {
+                  compatibleBuilds.push(
+                    assemblePcBuild(
+                      cpu,
+                      gpu,
+                      ram,
+                      mobo,
+                      psu,
+                      storage,
+                      pcCase,
+                      cooler,
+                      elasticity,
+                    ),
+                  );
+                }
+              }
+            }
           }
         }
       }
@@ -322,12 +509,15 @@ export interface OptimizationResult {
     motherboards: number;
     ramKits: number;
     psus: number;
+    storages?: number;
+    cases?: number;
+    coolers?: number;
   };
 }
 
 /**
  * End-to-end full system optimizer pipeline:
- * 1. Intra-category Pareto pre-pruning to eliminate inferior individual parts.
+ * 1. Intra-category Pareto pre-pruning to eliminate inferior individual parts across all 8 categories.
  * 2. Backtracking constraint-propagating generation of physically valid systems.
  * 3. Filter by user budget and platform preferences.
  * 4. Multi-objective Pareto evaluation across total price vs. effective FPS.
@@ -342,6 +532,15 @@ export function optimizeFullSystemBuilds(
   const prunedMobos = pruneDominatedMotherboards(catalogs.motherboards);
   const prunedPsus = pruneDominatedPsus(catalogs.psus);
   const prunedGpus = [...catalogs.gpus];
+  const prunedStorages = catalogs.storages
+    ? pruneDominatedStorage(catalogs.storages)
+    : [DEFAULT_STORAGE];
+  const prunedCases = catalogs.cases
+    ? pruneDominatedCases(catalogs.cases)
+    : [DEFAULT_CASE];
+  const prunedCoolers = catalogs.coolers
+    ? pruneDominatedCoolers(catalogs.coolers)
+    : [DEFAULT_COOLER];
 
   const prunedCatalogs: ComponentCatalogs = {
     cpus: prunedCpus,
@@ -349,6 +548,9 @@ export function optimizeFullSystemBuilds(
     motherboards: prunedMobos,
     ramKits: prunedRam,
     psus: prunedPsus,
+    storages: prunedStorages,
+    cases: prunedCases,
+    coolers: prunedCoolers,
   };
 
   // Step 2: Generate compatible builds
@@ -413,6 +615,9 @@ export function optimizeFullSystemBuilds(
       motherboards: prunedMobos.length,
       ramKits: prunedRam.length,
       psus: prunedPsus.length,
+      storages: prunedStorages.length,
+      cases: prunedCases.length,
+      coolers: prunedCoolers.length,
     },
   };
 }

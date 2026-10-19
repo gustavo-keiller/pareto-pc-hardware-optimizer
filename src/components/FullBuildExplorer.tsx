@@ -37,10 +37,13 @@ function parseVendorFilter(value: string): HardwareVendor | 'ALL' {
   return 'ALL';
 }
 import {
+  SEED_CASES,
+  SEED_COOLERS,
   SEED_CPUS,
   SEED_MOTHERBOARDS,
   SEED_PSUS,
   SEED_RAM_KITS,
+  SEED_STORAGES,
 } from '../data/seedComponents';
 import {
   BuildFilterCriteria,
@@ -145,6 +148,9 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
         motherboards: SEED_MOTHERBOARDS,
         ramKits: SEED_RAM_KITS,
         psus: SEED_PSUS,
+        storages: SEED_STORAGES,
+        cases: SEED_CASES,
+        coolers: SEED_COOLERS,
       },
       filterCriteria,
     );

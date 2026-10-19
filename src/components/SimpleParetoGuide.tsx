@@ -38,10 +38,13 @@ import { FullBuildPickHero } from './FullBuildPickHero';
 import { SimpleGuideScatterPlot, StoryStep } from './SimpleGuideScatterPlot';
 import { optimizeFullSystemBuilds } from '../lib/math/combinatorial';
 import {
+  SEED_CASES,
+  SEED_COOLERS,
   SEED_CPUS,
   SEED_MOTHERBOARDS,
   SEED_PSUS,
   SEED_RAM_KITS,
+  SEED_STORAGES,
 } from '../data/seedComponents';
 
 interface SimpleParetoGuideProps {
@@ -428,6 +431,13 @@ export function SimpleParetoGuide({
   // Combinatorial PC build optimization for Whole PC Goal (UX-11)
   const pcBuildsResult = useMemo(() => {
     const catalog = rawCatalog ?? gpus;
+    const effectiveMaxBudget =
+      beginnerGoal === 'pc' &&
+      constraints.maxPrice < (currency === 'BRL' ? 4500 : 750)
+        ? currency === 'BRL'
+          ? 6000
+          : 1000
+        : constraints.maxPrice;
     return optimizeFullSystemBuilds(
       {
         cpus: SEED_CPUS,
@@ -435,10 +445,13 @@ export function SimpleParetoGuide({
         motherboards: SEED_MOTHERBOARDS,
         ramKits: SEED_RAM_KITS,
         psus: SEED_PSUS,
+        storages: SEED_STORAGES,
+        cases: SEED_CASES,
+        coolers: SEED_COOLERS,
       },
-      { maxBudget: constraints.maxPrice },
+      { maxBudget: effectiveMaxBudget },
     );
-  }, [rawCatalog, gpus, constraints.maxPrice]);
+  }, [rawCatalog, gpus, beginnerGoal, constraints.maxPrice, currency]);
 
   const { topBuild, stepDownBuild, stepUpBuild } = useMemo(() => {
     const { optimalBuilds } = pcBuildsResult;

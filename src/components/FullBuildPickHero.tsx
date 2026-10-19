@@ -26,7 +26,10 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
 }) => {
   if (!topBuild) {
     return (
-      <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-8 text-center text-slate-400">
+      <div
+        data-testid="full-build-pick-hero"
+        className="rounded-3xl border border-slate-800 bg-slate-900/80 p-8 text-center text-slate-400"
+      >
         <ShieldAlert className="h-8 w-8 text-rose-400 mx-auto mb-2" />
         <p className="text-sm font-semibold">
           No compatible complete PC builds found under your selected budget. Try

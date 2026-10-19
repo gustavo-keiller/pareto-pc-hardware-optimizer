@@ -1,8 +1,11 @@
 import {
+  CaseCandidate,
+  CoolerCandidate,
   CpuCandidate,
   MotherboardCandidate,
   PsuCandidate,
   RamCandidate,
+  StorageCandidate,
 } from '../lib/math/buildTypes';
 
 /**
@@ -497,6 +500,120 @@ export const SEED_PSUS: PsuCandidate[] = [
 ];
 
 /**
+ * Phase 3 Seed Storage Catalog.
+ */
+export const SEED_STORAGES: StorageCandidate[] = [
+  {
+    id: 'storage-kingston-nv2-1tb',
+    name: 'Kingston NV2 1TB M.2 NVMe',
+    vendor: 'Kingston',
+    price: 60,
+    type: 'NVMe M.2',
+    formFactor: 'M.2-2280',
+    capacityGb: 1000,
+    readSpeedMbps: 3500,
+    notes: 'Value king PCIe 4.0 NVMe SSD for fast boot and game loading.',
+  },
+  {
+    id: 'storage-wd-sn770-1tb',
+    name: 'WD Black SN770 1TB M.2 NVMe',
+    vendor: 'Western Digital',
+    price: 75,
+    type: 'NVMe M.2',
+    formFactor: 'M.2-2280',
+    capacityGb: 1000,
+    readSpeedMbps: 5150,
+    notes: 'High-speed PCIe 4.0 DRAM-less champion with sustained reads.',
+  },
+  {
+    id: 'storage-wd-sn850x-2tb',
+    name: 'WD Black SN850X 2TB M.2 NVMe',
+    vendor: 'Western Digital',
+    price: 155,
+    type: 'NVMe M.2',
+    formFactor: 'M.2-2280',
+    capacityGb: 2000,
+    readSpeedMbps: 7300,
+    notes: 'Flagship enthusiast PCIe 4.0 with dedicated DRAM cache.',
+  },
+];
+
+/**
+ * Phase 3 Seed PC Case Catalog.
+ */
+export const SEED_CASES: CaseCandidate[] = [
+  {
+    id: 'case-deepcool-cc560',
+    name: 'DeepCool CC560 V2 Mid-Tower',
+    vendor: 'DeepCool',
+    price: 55,
+    supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
+    maxGpuLengthMm: 370,
+    maxCpuCoolerHeightMm: 163,
+    notes: 'High-airflow value mid-tower with 4 pre-installed fans.',
+  },
+  {
+    id: 'case-montech-air903',
+    name: 'Montech Air 903 Base Mid-Tower',
+    vendor: 'Montech',
+    price: 65,
+    supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
+    maxGpuLengthMm: 400,
+    maxCpuCoolerHeightMm: 180,
+    notes: 'Massive clearance mesh case fitting all GPU and cooler sizes.',
+  },
+  {
+    id: 'case-nzxt-h5-flow',
+    name: 'NZXT H5 Flow Compact ATX',
+    vendor: 'NZXT',
+    price: 89,
+    supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
+    maxGpuLengthMm: 365,
+    maxCpuCoolerHeightMm: 165,
+    notes: 'Clean modern aesthetic with dedicated bottom GPU intake fan.',
+  },
+];
+
+/**
+ * Phase 3 Seed CPU Cooler Catalog.
+ */
+export const SEED_COOLERS: CoolerCandidate[] = [
+  {
+    id: 'cooler-wraith-stealth',
+    name: 'AMD Wraith Stealth (Stock)',
+    vendor: 'AMD',
+    price: 15,
+    supportedSockets: ['AM4', 'AM5'],
+    heightMm: 54,
+    maxTdpWatts: 65,
+    type: 'Air',
+    notes: 'Compact stock cooler suitable for 65W TDP processors.',
+  },
+  {
+    id: 'cooler-thermalright-assassin-x',
+    name: 'Thermalright Assassin X 120 SE',
+    vendor: 'Thermalright',
+    price: 20,
+    supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
+    heightMm: 148,
+    maxTdpWatts: 180,
+    type: 'Air',
+    notes: 'Budget single-tower benchmark champ, cools up to 180W CPUs.',
+  },
+  {
+    id: 'cooler-thermalright-peerless-assassin',
+    name: 'Thermalright Peerless Assassin 120 SE',
+    vendor: 'Thermalright',
+    price: 35,
+    supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
+    heightMm: 155,
+    maxTdpWatts: 245,
+    type: 'Air',
+    notes: 'Dual-tower champion, handles 7800X3D and Core i7 effortlessly.',
+  },
+];
+
+/**
  * All seed components bundled by hardware category.
  */
 export const SEED_COMPONENTS = {
@@ -504,4 +621,7 @@ export const SEED_COMPONENTS = {
   motherboards: SEED_MOTHERBOARDS,
   ramKits: SEED_RAM_KITS,
   psus: SEED_PSUS,
+  storages: SEED_STORAGES,
+  cases: SEED_CASES,
+  coolers: SEED_COOLERS,
 } as const;

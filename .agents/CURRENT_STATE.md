@@ -3,16 +3,23 @@
 > Snapshot of active work. Update **only** when 🔴 In Flight or 🔶 Decisions change (Rule 15).
 
 ## 🔴 In Flight
- 
-- `[BLD-01]`, `[BLD-02]` Complete 8-component PC build data model (Storage NVMe, Case, CPU Cooler) and physical clearance compatibility engine.
- 
- ## 🔶 Decisions Made Without Validation
- 
- - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`) and the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs) so normal users immediately get an approachable experience, while **Pro Math Mode** and the **Phase 1 Synthetic Sandbox (10 GPUs)** are one click away in the top header.
- 
- ## 🟡 Recently Completed
- 
- - **Answer-First Beginner Flow & Unified Whole-PC Journey (`[UX-01]`, `[UX-02]`, `[UX-11]`, 2026-10-19):**
+
+- `[UX-06]` Country-agnostic money & language layer (Brazil-first testing, R$/pt-BR default with USD/en-US toggle).
+
+## 🔶 Decisions Made Without Validation
+
+- Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`) and the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs) so normal users immediately get an approachable experience, while **Pro Math Mode** and the **Phase 1 Synthetic Sandbox (10 GPUs)** are one click away in the top header.
+
+## 🟡 Recently Completed
+
+- **Complete 8-Component PC Build Data Model & Physical Clearance Compatibility Engine (`[BLD-01]`, `[BLD-02]`, 2026-10-19):**
+  - Expanded full PC build tuple to 8 components (`StorageCandidate`, `CaseCandidate`, `CoolerCandidate`).
+  - Added physical clearance checks: Case form factor, GPU length clearance, cooler height clearance, cooler socket brackets, cooler thermal TDP headroom, and M.2 NVMe slot availability with millimeter-precise rejection reasons.
+  - Added intra-category pruning for storage, cases, and coolers maintaining sub-20ms combinatorial search.
+  - Updated `BuildHeroCard` with 8-part grid and full budget distribution breakdown.
+  - Backed by 27 `buildTypes` tests, 16 `combinatorial` tests (106 total Vitest tests passing).
+
+- **Answer-First Beginner Flow & Unified Whole-PC Journey (`[UX-01]`, `[UX-02]`, `[UX-11]`, 2026-10-19):**
    - Transformed Simple Guide into an answer-first flow with `BeginnerIntakeCard.tsx` (Goal, Resolution, Budget), displaying #1 GPU hero card with plain-language shopping reasons (`SimpleGuidePickHero.tsx`) and 2 trade-off alternative cards (`Step-Down Bargain` and `Step-Up Upgrade`).
    - For users choosing "A Whole PC Build", directly embeds the top Pareto complete build under budget (`FullBuildPickHero.tsx`) with 5-component bill of materials, bottleneck telemetry, total hardware cost, and 2 alternative builds.
    - Hid expert controls (dataset switcher, USD/BRL currency conversion input, Import Deals) in Simple Guide mode header.

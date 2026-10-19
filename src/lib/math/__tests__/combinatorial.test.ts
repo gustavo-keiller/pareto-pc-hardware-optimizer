@@ -3,23 +3,32 @@ import {
   evaluateBuildParetoFrontier,
   generateCompatibleBuilds,
   optimizeFullSystemBuilds,
+  pruneDominatedCases,
+  pruneDominatedCoolers,
   pruneDominatedCpus,
   pruneDominatedMotherboards,
   pruneDominatedPsus,
   pruneDominatedRam,
+  pruneDominatedStorage,
 } from '../combinatorial';
 import {
+  CaseCandidate,
+  CoolerCandidate,
   CpuCandidate,
   MotherboardCandidate,
   PsuCandidate,
   RamCandidate,
+  StorageCandidate,
 } from '../buildTypes';
 import { GpuCandidate } from '../types';
 import {
+  SEED_CASES,
+  SEED_COOLERS,
   SEED_CPUS,
   SEED_MOTHERBOARDS,
   SEED_PSUS,
   SEED_RAM_KITS,
+  SEED_STORAGES,
 } from '../../../data/seedComponents';
 import { REAL_WORLD_GPUS } from '../../../data/realGpus';
 
@@ -184,6 +193,83 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
       expect(pruned.some((p) => p.id === 'psu-trap')).toBe(false);
       expect(pruned.some((p) => p.id === 'psu-good')).toBe(true);
     });
+
+    it('prunes dominated storage SSDs', () => {
+      const storages: StorageCandidate[] = [
+        {
+          id: 'storage-fast',
+          name: '1TB Fast NVMe',
+          price: 60,
+          type: 'NVMe M.2',
+          formFactor: 'M.2-2280',
+          capacityGb: 1000,
+          readSpeedMbps: 5000,
+        },
+        {
+          id: 'storage-trap',
+          name: '1TB Slow Overpriced NVMe',
+          price: 75, // More expensive
+          type: 'NVMe M.2',
+          formFactor: 'M.2-2280',
+          capacityGb: 1000, // Same capacity
+          readSpeedMbps: 3500, // Slower read speed
+        },
+      ];
+
+      const pruned = pruneDominatedStorage(storages);
+      expect(pruned.some((s) => s.id === 'storage-trap')).toBe(false);
+      expect(pruned.some((s) => s.id === 'storage-fast')).toBe(true);
+    });
+
+    it('prunes dominated PC cases', () => {
+      const cases: CaseCandidate[] = [
+        {
+          id: 'case-good',
+          name: 'High Airflow Mid-Tower',
+          price: 65,
+          supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
+          maxGpuLengthMm: 400,
+          maxCpuCoolerHeightMm: 180,
+        },
+        {
+          id: 'case-trap',
+          name: 'Overpriced Cramped Case',
+          price: 85, // More expensive
+          supportedFormFactors: ['ATX', 'Micro-ATX'], // Fewer form factors
+          maxGpuLengthMm: 330, // Worse GPU clearance
+          maxCpuCoolerHeightMm: 155, // Worse cooler clearance
+        },
+      ];
+
+      const pruned = pruneDominatedCases(cases);
+      expect(pruned.some((c) => c.id === 'case-trap')).toBe(false);
+      expect(pruned.some((c) => c.id === 'case-good')).toBe(true);
+    });
+
+    it('prunes dominated CPU coolers', () => {
+      const coolers: CoolerCandidate[] = [
+        {
+          id: 'cooler-good',
+          name: 'High Performance Tower',
+          price: 25,
+          supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
+          heightMm: 150,
+          maxTdpWatts: 200,
+        },
+        {
+          id: 'cooler-trap',
+          name: 'Overpriced Weak Cooler',
+          price: 35, // More expensive
+          supportedSockets: ['AM4', 'AM5'], // Fewer sockets
+          heightMm: 160, // Taller (harder to fit)
+          maxTdpWatts: 150, // Less cooling capacity
+        },
+      ];
+
+      const pruned = pruneDominatedCoolers(coolers);
+      expect(pruned.some((c) => c.id === 'cooler-trap')).toBe(false);
+      expect(pruned.some((c) => c.id === 'cooler-good')).toBe(true);
+    });
   });
 
   describe('Constraint-Propagating Build Generation', () => {
@@ -272,6 +358,61 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
           build.recommendedPsuWattage,
         );
       }
+    });
+
+    it('filters out combinations violating physical clearances (GPU length or cooler height)', () => {
+      const cpus = [cpuAM4_SweetSpot];
+      const mobos = [SEED_MOTHERBOARDS[0]]; // AM4 mATX
+      const ramKits = [SEED_RAM_KITS[0]]; // DDR4
+      const psus = [SEED_PSUS[0]]; // 550W
+
+      const shortGpu: GpuCandidate = {
+        id: 'gpu-short',
+        name: 'Short Dual-Fan GPU',
+        price: 250,
+        rasterFps1440p: 60,
+        rtFps1440p: 30,
+        vramGb: 8,
+        tdpWatts: 130,
+        lengthMm: 240,
+      };
+
+      const longGpu: GpuCandidate = {
+        id: 'gpu-long',
+        name: 'Long Triple-Fan GPU',
+        price: 600,
+        rasterFps1440p: 120,
+        rtFps1440p: 80,
+        vramGb: 16,
+        tdpWatts: 250,
+        lengthMm: 350,
+      };
+
+      const tightCase: CaseCandidate = {
+        id: 'case-tight',
+        name: 'Tight Case',
+        price: 50,
+        supportedFormFactors: ['Micro-ATX', 'Mini-ITX'],
+        maxGpuLengthMm: 300, // Long GPU (350mm) cannot fit!
+        maxCpuCoolerHeightMm: 160,
+      };
+
+      const builds = generateCompatibleBuilds({
+        cpus,
+        gpus: [shortGpu, longGpu],
+        motherboards: mobos,
+        ramKits,
+        psus,
+        cases: [tightCase],
+        coolers: [SEED_COOLERS[0]],
+        storages: [SEED_STORAGES[0]],
+      });
+
+      // Only the short GPU can fit in tightCase!
+      expect(builds).toHaveLength(1);
+      expect(builds[0].gpu.id).toBe('gpu-short');
+      expect(builds[0].case.id).toBe('case-tight');
+      expect(builds[0].isCompatible).toBe(true);
     });
 
     it('returns empty array when any component catalog is empty', () => {
@@ -436,6 +577,9 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
         motherboards: [SEED_MOTHERBOARDS[0], SEED_MOTHERBOARDS[1]],
         ramKits: [SEED_RAM_KITS[0]],
         psus: [SEED_PSUS[0]],
+        storages: SEED_STORAGES,
+        cases: SEED_CASES,
+        coolers: SEED_COOLERS,
       };
 
       // Unpruned generation
@@ -450,6 +594,10 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
       expect(
         unprunedOptimal.some((b) => b.cpu.id === 'cpu-3600-overpriced'),
       ).toBe(false);
+
+      expect(prunedResult.prunedPartCounts.cases).toBeDefined();
+      expect(prunedResult.prunedPartCounts.coolers).toBeDefined();
+      expect(prunedResult.prunedPartCounts.storages).toBeDefined();
 
       // The optimal frontier prices and FPS must match identically
       expect(prunedResult.optimalBuilds).toHaveLength(unprunedOptimal.length);

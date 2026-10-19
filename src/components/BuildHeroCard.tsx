@@ -8,6 +8,9 @@ import {
   Layers,
   Zap,
   CheckCircle2,
+  HardDrive,
+  Wind,
+  Box,
 } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
 import { formatCurrency } from '../utils/currency';
@@ -95,8 +98,8 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
         </div>
       </div>
 
-      {/* 5-Component Bill of Materials Cards */}
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+      {/* 8-Component Bill of Materials Cards */}
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* CPU Card */}
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
           <div className="flex items-center justify-between text-xs">
@@ -245,6 +248,115 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           </div>
         </div>
 
+        {/* Storage Card */}
+        <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+              <HardDrive className="h-3.5 w-3.5" /> Storage
+            </span>
+            <span className="font-black text-white">
+              {formatCurrency(build.storage.price, currency)}
+            </span>
+          </div>
+          <div className="text-sm font-bold text-white leading-tight">
+            {build.storage.name}
+          </div>
+          <div className="text-[11px] text-slate-400 space-y-0.5">
+            <div>
+              Capacity:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.storage.capacityGb >= 1000
+                  ? `${build.storage.capacityGb / 1000} TB`
+                  : `${build.storage.capacityGb} GB`}
+              </span>
+            </div>
+            <div>
+              Type:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.storage.type}
+              </span>
+            </div>
+            {build.storage.readSpeedMbps && (
+              <div>
+                Read Speed:{' '}
+                <span className="text-slate-200 font-medium">
+                  {build.storage.readSpeedMbps} MB/s
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Cooler Card */}
+        <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+              <Wind className="h-3.5 w-3.5" /> CPU Cooler
+            </span>
+            <span className="font-black text-white">
+              {formatCurrency(build.cooler.price, currency)}
+            </span>
+          </div>
+          <div className="text-sm font-bold text-white leading-tight">
+            {build.cooler.name}
+          </div>
+          <div className="text-[11px] text-slate-400 space-y-0.5">
+            <div>
+              Cooling TDP:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.cooler.maxTdpWatts} W
+              </span>
+            </div>
+            <div>
+              Height:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.cooler.heightMm} mm
+              </span>
+            </div>
+            <div>
+              Type:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.cooler.type ?? 'Air'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Case Card */}
+        <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+              <Box className="h-3.5 w-3.5" /> PC Case
+            </span>
+            <span className="font-black text-white">
+              {formatCurrency(build.case.price, currency)}
+            </span>
+          </div>
+          <div className="text-sm font-bold text-white leading-tight">
+            {build.case.name}
+          </div>
+          <div className="text-[11px] text-slate-400 space-y-0.5">
+            <div>
+              Max GPU:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.case.maxGpuLengthMm} mm
+              </span>
+            </div>
+            <div>
+              Max Cooler:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.case.maxCpuCoolerHeightMm} mm
+              </span>
+            </div>
+            <div>
+              Supports:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.case.supportedFormFactors.join(', ')}
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* PSU Card */}
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
           <div className="flex items-center justify-between text-xs">
@@ -290,9 +402,9 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <span>
             GPU: {Math.round((build.gpu.price / build.totalPrice) * 100)}% ·
             CPU: {Math.round((build.cpu.price / build.totalPrice) * 100)}% ·
-            Platform:{' '}
+            Other Parts:{' '}
             {Math.round(
-              ((build.motherboard.price + build.ram.price + build.psu.price) /
+              ((build.totalPrice - build.gpu.price - build.cpu.price) /
                 build.totalPrice) *
                 100,
             )}
@@ -327,6 +439,27 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
             }}
             className="bg-sky-500"
             title={`RAM: $${build.ram.price}`}
+          />
+          <div
+            style={{
+              width: `${(build.storage.price / build.totalPrice) * 100}%`,
+            }}
+            className="bg-purple-500"
+            title={`Storage: $${build.storage.price}`}
+          />
+          <div
+            style={{
+              width: `${(build.cooler.price / build.totalPrice) * 100}%`,
+            }}
+            className="bg-cyan-500"
+            title={`Cooler: $${build.cooler.price}`}
+          />
+          <div
+            style={{
+              width: `${(build.case.price / build.totalPrice) * 100}%`,
+            }}
+            className="bg-rose-500"
+            title={`Case: $${build.case.price}`}
           />
           <div
             style={{

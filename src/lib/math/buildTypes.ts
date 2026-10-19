@@ -114,6 +114,7 @@ export interface MotherboardCandidate {
   ramSlots: number;
   formFactor: MotherboardFormFactor;
   pcieGeneration?: number;
+  m2Slots?: number;
   notes?: string;
 }
 
@@ -130,6 +131,55 @@ export interface RamCandidate {
   speedMhz: number;
   casLatency?: number;
   modulesCount: number;
+  notes?: string;
+}
+
+/**
+ * Storage candidate schema (NVMe M.2 or SATA SSD).
+ */
+export type StorageType = 'NVMe M.2' | 'SATA 2.5"';
+export type StorageFormFactor = 'M.2-2280' | '2.5-inch';
+
+export interface StorageCandidate {
+  id: string;
+  name: string;
+  price: number;
+  vendor?: string;
+  type: StorageType;
+  formFactor: StorageFormFactor;
+  capacityGb: number;
+  readSpeedMbps?: number;
+  notes?: string;
+}
+
+/**
+ * PC Case candidate schema with form factor compatibility and physical clearance limits.
+ */
+export interface CaseCandidate {
+  id: string;
+  name: string;
+  price: number;
+  vendor?: string;
+  supportedFormFactors: MotherboardFormFactor[];
+  maxGpuLengthMm: number;
+  maxCpuCoolerHeightMm: number;
+  notes?: string;
+}
+
+/**
+ * CPU Cooler candidate schema with socket bracket support, height, and cooling TDP.
+ */
+export type CoolerType = 'Air' | 'AIO';
+
+export interface CoolerCandidate {
+  id: string;
+  name: string;
+  price: number;
+  vendor?: string;
+  supportedSockets: CpuSocket[];
+  heightMm: number;
+  maxTdpWatts: number;
+  type?: CoolerType;
   notes?: string;
 }
 
@@ -162,7 +212,13 @@ export type CompatibilityViolationCode =
   | 'RAM_GENERATION_MISMATCH'
   | 'CPU_RAM_MISMATCH'
   | 'INSUFFICIENT_PSU_WATTAGE'
-  | 'EXCESSIVE_RAM_MODULES';
+  | 'EXCESSIVE_RAM_MODULES'
+  | 'CASE_FORM_FACTOR_MISMATCH'
+  | 'GPU_LENGTH_EXCEEDS_CASE'
+  | 'COOLER_HEIGHT_EXCEEDS_CASE'
+  | 'COOLER_SOCKET_MISMATCH'
+  | 'INSUFFICIENT_COOLER_TDP'
+  | 'INSUFFICIENT_M2_SLOTS';
 
 export interface CompatibilityViolation {
   code: CompatibilityViolationCode;
@@ -173,6 +229,41 @@ export interface CompatibilityCheckResult {
   isCompatible: boolean;
   violations: CompatibilityViolation[];
 }
+
+/**
+ * Baseline default components used when storage, case, or cooler are omitted.
+ */
+export const DEFAULT_STORAGE: StorageCandidate = {
+  id: 'storage-nvme-1tb',
+  name: '1TB NVMe PCIe 4.0 SSD',
+  price: 65,
+  type: 'NVMe M.2',
+  formFactor: 'M.2-2280',
+  capacityGb: 1000,
+  readSpeedMbps: 5000,
+  notes: 'High-speed mainstream PCIe 4.0 NVMe SSD.',
+};
+
+export const DEFAULT_CASE: CaseCandidate = {
+  id: 'case-mid-tower-airflow',
+  name: 'Mid-Tower Airflow Case',
+  price: 70,
+  supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
+  maxGpuLengthMm: 360,
+  maxCpuCoolerHeightMm: 165,
+  notes: 'High-airflow mesh mid-tower case fitting standard hardware.',
+};
+
+export const DEFAULT_COOLER: CoolerCandidate = {
+  id: 'cooler-tower-air',
+  name: 'Tower Air Cooler 180W',
+  price: 35,
+  supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
+  heightMm: 155,
+  maxTdpWatts: 180,
+  type: 'Air',
+  notes: 'Dual-heatpipe tower cooler for mainstream processors.',
+};
 
 /**
  * Estimates the minimum CPU gaming score (0–100) needed to avoid bottlenecking a given GPU at 1440p.
@@ -253,9 +344,21 @@ export function checkBuildCompatibility(components: {
   ram: RamCandidate;
   motherboard: MotherboardCandidate;
   psu: PsuCandidate;
+  storage?: StorageCandidate;
+  case?: CaseCandidate;
+  cooler?: CoolerCandidate;
 }): CompatibilityCheckResult {
   const violations: CompatibilityViolation[] = [];
-  const { cpu, gpu, ram, motherboard, psu } = components;
+  const {
+    cpu,
+    gpu,
+    ram,
+    motherboard,
+    psu,
+    storage,
+    case: pcCase,
+    cooler,
+  } = components;
 
   // 1. Socket match
   if (cpu.socket !== motherboard.socket) {
@@ -303,6 +406,72 @@ export function checkBuildCompatibility(components: {
     });
   }
 
+  // 6. Case motherboard form factor compatibility
+  if (
+    pcCase &&
+    pcCase.supportedFormFactors &&
+    !pcCase.supportedFormFactors.includes(motherboard.formFactor)
+  ) {
+    violations.push({
+      code: 'CASE_FORM_FACTOR_MISMATCH',
+      message: `Motherboard form factor (${motherboard.formFactor}) is not supported by case (${pcCase.name}, supports: ${pcCase.supportedFormFactors.join(', ')}).`,
+    });
+  }
+
+  // 7. Case GPU length clearance
+  const gpuLength = gpu.lengthMm ?? 260;
+  if (pcCase && pcCase.maxGpuLengthMm && gpuLength > pcCase.maxGpuLengthMm) {
+    const diff = gpuLength - pcCase.maxGpuLengthMm;
+    violations.push({
+      code: 'GPU_LENGTH_EXCEEDS_CASE',
+      message: `GPU length (${gpuLength}mm) exceeds case max GPU clearance (${pcCase.maxGpuLengthMm}mm) by ${diff}mm.`,
+    });
+  }
+
+  // 8. Case CPU cooler height clearance
+  if (
+    pcCase &&
+    cooler &&
+    cooler.heightMm &&
+    pcCase.maxCpuCoolerHeightMm &&
+    cooler.heightMm > pcCase.maxCpuCoolerHeightMm
+  ) {
+    const diff = cooler.heightMm - pcCase.maxCpuCoolerHeightMm;
+    violations.push({
+      code: 'COOLER_HEIGHT_EXCEEDS_CASE',
+      message: `CPU cooler height (${cooler.heightMm}mm) exceeds case max cooler clearance (${pcCase.maxCpuCoolerHeightMm}mm) by ${diff}mm.`,
+    });
+  }
+
+  // 9. CPU cooler socket bracket support
+  if (
+    cooler &&
+    cooler.supportedSockets &&
+    !cooler.supportedSockets.includes(cpu.socket)
+  ) {
+    violations.push({
+      code: 'COOLER_SOCKET_MISMATCH',
+      message: `CPU cooler bracket does not support ${cpu.socket} socket (supports: ${cooler.supportedSockets.join(', ')}).`,
+    });
+  }
+
+  // 10. CPU cooler thermal dissipation capacity vs. CPU TDP
+  if (cooler && cooler.maxTdpWatts && cooler.maxTdpWatts < cpu.tdpWatts) {
+    violations.push({
+      code: 'INSUFFICIENT_COOLER_TDP',
+      message: `CPU cooler capacity (${cooler.maxTdpWatts}W) is insufficient for CPU TDP (${cpu.tdpWatts}W).`,
+    });
+  }
+
+  // 11. Motherboard M.2 slots for NVMe storage
+  const moboM2Slots = motherboard.m2Slots ?? 1;
+  if (storage && storage.type === 'NVMe M.2' && moboM2Slots < 1) {
+    violations.push({
+      code: 'INSUFFICIENT_M2_SLOTS',
+      message: `Motherboard (${motherboard.name}) has no M.2 slots for NVMe SSD (${storage.name}).`,
+    });
+  }
+
   return {
     isCompatible: violations.length === 0,
     violations,
@@ -310,7 +479,7 @@ export function checkBuildCompatibility(components: {
 }
 
 /**
- * System Build Tuple representing a complete assembled PC.
+ * System Build Tuple representing a complete assembled PC with all 8 components.
  */
 export interface PcBuild {
   id: string;
@@ -320,6 +489,9 @@ export interface PcBuild {
   ram: RamCandidate;
   motherboard: MotherboardCandidate;
   psu: PsuCandidate;
+  storage: StorageCandidate;
+  case: CaseCandidate;
+  cooler: CoolerCandidate;
 
   // Financial & Performance Aggregates
   totalPrice: number;
@@ -337,7 +509,7 @@ export interface PcBuild {
 }
 
 /**
- * Assembles 5 components into a fully evaluated PcBuild tuple.
+ * Assembles 8 components into a fully evaluated PcBuild tuple.
  */
 export function assemblePcBuild(
   cpu: CpuCandidate,
@@ -345,14 +517,34 @@ export function assemblePcBuild(
   ram: RamCandidate,
   motherboard: MotherboardCandidate,
   psu: PsuCandidate,
-  elasticity = 0.5,
+  storageOrElasticity?: StorageCandidate | number,
+  pcCase?: CaseCandidate,
+  cooler?: CoolerCandidate,
+  elasticityArg?: number,
 ): PcBuild {
+  let storage = DEFAULT_STORAGE;
+  let pcCaseActual = DEFAULT_CASE;
+  let coolerActual = DEFAULT_COOLER;
+  let elasticity = 0.5;
+
+  if (typeof storageOrElasticity === 'number') {
+    elasticity = storageOrElasticity;
+  } else {
+    if (storageOrElasticity) storage = storageOrElasticity;
+    if (pcCase) pcCaseActual = pcCase;
+    if (cooler) coolerActual = cooler;
+    if (typeof elasticityArg === 'number') elasticity = elasticityArg;
+  }
+
   const compatibility = checkBuildCompatibility({
     cpu,
     gpu,
     ram,
     motherboard,
     psu,
+    storage,
+    case: pcCaseActual,
+    cooler: coolerActual,
   });
   const requiredCpuScore = estimateGpuRequiredCpuScore(gpu);
   const { bottleneckFactor, bottleneckPct } = computeCpuGpuBottleneck(
@@ -365,7 +557,14 @@ export function assemblePcBuild(
   const effectiveFps1440p =
     Math.round(rawGpuFps1440p * bottleneckFactor * 10) / 10;
   const totalPrice =
-    cpu.price + gpu.price + ram.price + motherboard.price + psu.price;
+    cpu.price +
+    gpu.price +
+    ram.price +
+    motherboard.price +
+    psu.price +
+    storage.price +
+    pcCaseActual.price +
+    coolerActual.price;
   const estimatedPowerDrawWatts = calculateEstimatedPowerDraw(
     cpu.tdpWatts,
     gpu.tdpWatts,
@@ -375,7 +574,7 @@ export function assemblePcBuild(
   );
   const powerHeadroomWatts = psu.wattage - estimatedPowerDrawWatts;
 
-  const id = `build-${cpu.id}-${gpu.id}-${ram.id}-${motherboard.id}-${psu.id}`;
+  const id = `build-${cpu.id}-${gpu.id}-${ram.id}-${motherboard.id}-${psu.id}-${storage.id}-${pcCaseActual.id}-${coolerActual.id}`;
 
   return {
     id,
@@ -384,6 +583,9 @@ export function assemblePcBuild(
     ram,
     motherboard,
     psu,
+    storage,
+    case: pcCaseActual,
+    cooler: coolerActual,
     totalPrice,
     rawGpuFps1440p,
     effectiveFps1440p,

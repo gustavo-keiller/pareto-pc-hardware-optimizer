@@ -1,17 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import {
   assemblePcBuild,
-  checkBuildCompatibility,
-  computeCpuGpuBottleneck,
-  estimateGpuRequiredCpuScore,
   calculateEstimatedPowerDraw,
   calculateRecommendedPsuWattage,
+  CaseCandidate,
+  checkBuildCompatibility,
+  computeCpuGpuBottleneck,
+  CoolerCandidate,
+  CpuCandidate,
+  estimateGpuRequiredCpuScore,
   isCpuSocket,
   isRamGeneration,
-  CpuCandidate,
   MotherboardCandidate,
-  RamCandidate,
   PsuCandidate,
+  RamCandidate,
+  StorageCandidate,
 } from '../buildTypes';
 import { GpuCandidate } from '../types';
 
@@ -131,6 +134,55 @@ describe('buildTypes & Phase 3 Multi-Component Math Engine', () => {
     rtFps1440p: 118,
     vramGb: 16,
     tdpWatts: 320,
+    lengthMm: 304,
+  };
+
+  const mockCaseATX: CaseCandidate = {
+    id: 'case-atx',
+    name: 'Mid-Tower ATX Case',
+    price: 65,
+    supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
+    maxGpuLengthMm: 360,
+    maxCpuCoolerHeightMm: 165,
+  };
+
+  const mockCaseMiniITX: CaseCandidate = {
+    id: 'case-itx',
+    name: 'Compact Mini-ITX Case',
+    price: 90,
+    supportedFormFactors: ['Mini-ITX'],
+    maxGpuLengthMm: 310,
+    maxCpuCoolerHeightMm: 75,
+  };
+
+  const mockCoolerTower: CoolerCandidate = {
+    id: 'cooler-tower',
+    name: 'Tower Air Cooler',
+    price: 35,
+    supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
+    heightMm: 155,
+    maxTdpWatts: 200,
+    type: 'Air',
+  };
+
+  const mockCoolerLowProfile: CoolerCandidate = {
+    id: 'cooler-low-profile',
+    name: 'Low Profile 65W Cooler',
+    price: 25,
+    supportedSockets: ['AM4', 'AM5'],
+    heightMm: 45,
+    maxTdpWatts: 65,
+    type: 'Air',
+  };
+
+  const mockStorageNvme: StorageCandidate = {
+    id: 'storage-nvme-1tb',
+    name: '1TB NVMe SSD',
+    price: 60,
+    type: 'NVMe M.2',
+    formFactor: 'M.2-2280',
+    capacityGb: 1000,
+    readSpeedMbps: 5000,
   };
 
   describe('Compatibility Rules (Stage 1 / Hard Constraints)', () => {
@@ -292,6 +344,136 @@ describe('buildTypes & Phase 3 Multi-Component Math Engine', () => {
         result.violations.some((v) => v.code === 'EXCESSIVE_RAM_MODULES'),
       ).toBe(true);
     });
+
+    it('rejects ATX motherboard when paired with Mini-ITX case', () => {
+      const result = checkBuildCompatibility({
+        cpu: mockCpuAM4,
+        gpu: mockGpuMid,
+        ram: mockRamDdr4,
+        motherboard: mockMoboAM4, // ATX
+        psu: mockPsu550,
+        case: mockCaseMiniITX, // Mini-ITX only
+      });
+
+      expect(result.isCompatible).toBe(false);
+      const violation = result.violations.find(
+        (v) => v.code === 'CASE_FORM_FACTOR_MISMATCH',
+      );
+      expect(violation).toBeDefined();
+      expect(violation?.message).toContain('ATX');
+      expect(violation?.message).toContain('Compact Mini-ITX Case');
+    });
+
+    it('rejects GPU whose length exceeds case clearance with exact delta in message', () => {
+      const longGpu: GpuCandidate = {
+        ...mockGpuTop,
+        lengthMm: 340,
+      };
+      const result = checkBuildCompatibility({
+        cpu: mockCpuAM4,
+        gpu: longGpu,
+        ram: mockRamDdr4,
+        motherboard: mockMoboAM4,
+        psu: mockPsu850,
+        case: mockCaseMiniITX, // max 310mm
+      });
+
+      expect(result.isCompatible).toBe(false);
+      const violation = result.violations.find(
+        (v) => v.code === 'GPU_LENGTH_EXCEEDS_CASE',
+      );
+      expect(violation).toBeDefined();
+      expect(violation?.message).toContain('340mm');
+      expect(violation?.message).toContain('310mm');
+      expect(violation?.message).toContain('by 30mm');
+    });
+
+    it('rejects CPU cooler whose height exceeds case cooler clearance with delta in message', () => {
+      const result = checkBuildCompatibility({
+        cpu: mockCpuAM4,
+        gpu: mockGpuMid,
+        ram: mockRamDdr4,
+        motherboard: mockMoboAM4,
+        psu: mockPsu550,
+        case: mockCaseMiniITX, // max 75mm cooler
+        cooler: mockCoolerTower, // 155mm
+      });
+
+      expect(result.isCompatible).toBe(false);
+      const violation = result.violations.find(
+        (v) => v.code === 'COOLER_HEIGHT_EXCEEDS_CASE',
+      );
+      expect(violation).toBeDefined();
+      expect(violation?.message).toContain('155mm');
+      expect(violation?.message).toContain('75mm');
+      expect(violation?.message).toContain('by 80mm');
+    });
+
+    it('rejects CPU cooler bracket that does not support CPU socket', () => {
+      const result = checkBuildCompatibility({
+        cpu: mockCpuIntel13, // LGA1700
+        gpu: mockGpuMid,
+        ram: mockRamDdr4,
+        motherboard: {
+          ...mockMoboAM4,
+          socket: 'LGA1700',
+        },
+        psu: mockPsu550,
+        cooler: mockCoolerLowProfile, // AM4/AM5 only
+      });
+
+      expect(result.isCompatible).toBe(false);
+      const violation = result.violations.find(
+        (v) => v.code === 'COOLER_SOCKET_MISMATCH',
+      );
+      expect(violation).toBeDefined();
+      expect(violation?.message).toContain('LGA1700');
+    });
+
+    it('rejects CPU cooler whose TDP capacity is insufficient for high-TDP CPU', () => {
+      const highTdpCpu: CpuCandidate = {
+        ...mockCpuAM4,
+        tdpWatts: 105,
+      };
+      const result = checkBuildCompatibility({
+        cpu: highTdpCpu,
+        gpu: mockGpuMid,
+        ram: mockRamDdr4,
+        motherboard: mockMoboAM4,
+        psu: mockPsu550,
+        cooler: mockCoolerLowProfile, // 65W max TDP
+      });
+
+      expect(result.isCompatible).toBe(false);
+      const violation = result.violations.find(
+        (v) => v.code === 'INSUFFICIENT_COOLER_TDP',
+      );
+      expect(violation).toBeDefined();
+      expect(violation?.message).toContain('65W');
+      expect(violation?.message).toContain('105W');
+    });
+
+    it('rejects NVMe SSD when motherboard has no M.2 slots', () => {
+      const moboNoM2: MotherboardCandidate = {
+        ...mockMoboAM4,
+        m2Slots: 0,
+      };
+      const result = checkBuildCompatibility({
+        cpu: mockCpuAM4,
+        gpu: mockGpuMid,
+        ram: mockRamDdr4,
+        motherboard: moboNoM2,
+        psu: mockPsu550,
+        storage: mockStorageNvme,
+      });
+
+      expect(result.isCompatible).toBe(false);
+      const violation = result.violations.find(
+        (v) => v.code === 'INSUFFICIENT_M2_SLOTS',
+      );
+      expect(violation).toBeDefined();
+      expect(violation?.message).toContain('no M.2 slots');
+    });
   });
 
   describe('Power Calculations', () => {
@@ -371,12 +553,37 @@ describe('buildTypes & Phase 3 Multi-Component Math Engine', () => {
       );
 
       expect(build.id).toContain('cpu-5600');
-      expect(build.totalPrice).toBe(130 + 260 + 35 + 110 + 55); // 590
+      // 130 + 260 + 35 + 110 + 55 + defaultStorage(65) + defaultCase(70) + defaultCooler(35) = 760
+      expect(build.totalPrice).toBe(130 + 260 + 35 + 110 + 55 + 65 + 70 + 35); // 760
       expect(build.rawGpuFps1440p).toBe(64);
       expect(build.effectiveFps1440p).toBeGreaterThan(0);
       expect(build.effectiveFps1440p).toBeLessThanOrEqual(build.rawGpuFps1440p);
       expect(build.estimatedPowerDrawWatts).toBe(65 + 165 + 75); // 305W
       expect(build.powerHeadroomWatts).toBe(550 - 305); // 245W
+      expect(build.storage).toBeDefined();
+      expect(build.case).toBeDefined();
+      expect(build.cooler).toBeDefined();
+      expect(build.isCompatible).toBe(true);
+    });
+
+    it('assembles with custom storage, case, and cooler candidates explicitly', () => {
+      const build = assemblePcBuild(
+        mockCpuAM4,
+        mockGpuMid,
+        mockRamDdr4,
+        mockMoboAM4,
+        mockPsu550,
+        mockStorageNvme,
+        mockCaseATX,
+        mockCoolerTower,
+      );
+
+      expect(build.storage.id).toBe('storage-nvme-1tb');
+      expect(build.case.id).toBe('case-atx');
+      expect(build.cooler.id).toBe('cooler-tower');
+      expect(build.totalPrice).toBe(
+        130 + 260 + 35 + 110 + 55 + 60 + 65 + 35, // 750
+      );
       expect(build.isCompatible).toBe(true);
     });
   });
