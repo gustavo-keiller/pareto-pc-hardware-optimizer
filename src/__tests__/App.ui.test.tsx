@@ -131,6 +131,9 @@ describe('App modes', () => {
     const user = userEvent.setup();
     render(<App />);
 
+    // Switch to Explorer mode first because expert dataset controls are hidden in Simple Guide mode (UX-02)
+    await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
+
     // Switch to Combined Sandbox
     await user.click(screen.getByRole('button', { name: /Combined Sandbox/i }));
 
@@ -146,6 +149,32 @@ describe('App modes', () => {
 
     // Prices should be rendered in BRL (R$)
     expect(screen.getAllByText(/R\$/i).length).toBeGreaterThan(0);
+  });
+
+  it('UX-02: hides expert dataset switchers and deal importer in Simple Guide mode, shows them in Explorer mode', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // In Simple Guide (default), dataset switchers and deal importer should not be in the header
+    expect(screen.queryByRole('button', { name: /Real GPUs/i })).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: /Combined Sandbox/i }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: /\+ Import Deals/i }),
+    ).toBeNull();
+
+    // Switch to Explorer mode
+    await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
+
+    // Now expert dataset switchers and deal importer must be visible
+    expect(screen.getByRole('button', { name: /Real GPUs/i })).toBeDefined();
+    expect(
+      screen.getByRole('button', { name: /Combined Sandbox/i }),
+    ).toBeDefined();
+    expect(
+      screen.getByRole('button', { name: /\+ Import Deals/i }),
+    ).toBeDefined();
   });
 
   it('UX-12: no [TRAP] card in the leaderboard table is ever labeled "Smart Buy"', () => {
@@ -172,5 +201,52 @@ describe('App modes', () => {
     // Button for <= $550 should be active
     const btn550 = screen.getByRole('button', { name: '≤ $550' });
     expect(btn550.className).toContain('bg-emerald-500/20');
+  });
+
+  it('UX-01: Answer-first beginner flow presents 3 intake questions and immediate 1 top pick + 2 alternatives above the fold', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Intake questions must be visible immediately
+    expect(screen.getByTestId('beginner-intake')).toBeDefined();
+    expect(screen.getByText(/Step 1 • What Are You Building\?/i)).toBeDefined();
+    expect(screen.getByText(/Step 2 • Gaming Style & Workload/i)).toBeDefined();
+    expect(screen.getByText(/Step 3 • Maximum Budget Limit/i)).toBeDefined();
+
+    // Immediate answer above the fold: 1 Hero + 2 Alternatives
+    expect(screen.getByTestId('simple-pick-hero')).toBeDefined();
+    expect(screen.getByText(/#1 Top Recommended GPU/i)).toBeDefined();
+    expect(screen.getByText(/Step-Down Bargain/i)).toBeDefined();
+    expect(screen.getByText(/Step-Up Upgrade/i)).toBeDefined();
+
+    // Selecting a different use case updates priorities
+    await user.click(screen.getByText(/1080p Esports \/ Budget/i));
+    expect(screen.getByTestId('simple-pick-hero')).toBeDefined();
+  });
+
+  it('UX-11: Selecting "A Whole PC Build" in beginner flow embeds complete Pareto build and provides 1-click explorer transition', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Click "A Whole PC Build"
+    await user.click(screen.getByRole('button', { name: /A Whole PC Build/i }));
+
+    // Should render the complete PC build hero directly inside Simple Guide
+    expect(screen.getByTestId('full-build-pick-hero')).toBeDefined();
+    expect(screen.getByText(/#1 Recommended PC Build/i)).toBeDefined();
+    expect(screen.getAllByText(/Total Hardware Cost/i).length).toBeGreaterThan(
+      0,
+    );
+
+    // Click "Inspect & Swap Parts in Full Build Explorer →"
+    const inspectBtn = screen.getByRole('button', {
+      name: /Inspect & Swap Parts in Full Build Explorer/i,
+    });
+    await user.click(inspectBtn);
+
+    // Verifies transition to Full Builds mode
+    expect(
+      screen.getByText(/Level 4: Mario Kart Full-Build Explorer/i),
+    ).toBeDefined();
   });
 });

@@ -111,14 +111,11 @@ export function App() {
   }, [uiMode, chartView, setChartView]);
 
   const maxBudgetBound =
-    datasetMode === 'custom' || datasetMode === 'combined'
-      ? Math.max(
-          15000,
-          ...(rawCatalog.length ? rawCatalog.map((g) => g.price) : [15000]),
-        )
-      : datasetMode === 'real'
-        ? 1800
-        : 1000;
+    datasetMode === 'real'
+      ? 1800
+      : datasetMode === 'synthetic'
+        ? 1000
+        : Math.max(15000, ...rawCatalog.map((g) => g.price), 0);
   const maxWattsBound = datasetMode === 'real' ? 450 : 350;
 
   return (
@@ -159,93 +156,99 @@ export function App() {
 
           {/* Right Controls: 3 Proportional Experience Modes + Dataset Switcher + Import Deals + Reset */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            {/* Dataset Toggle */}
-            <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
-              <button
-                type="button"
-                onClick={() => handleSwitchDataset('real')}
-                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                  datasetMode === 'real'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Database className="h-3.5 w-3.5" />
-                Real GPUs (18)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSwitchDataset('custom')}
-                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                  datasetMode === 'custom'
-                    ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-                title="View your custom imported deals from Pichau, Terabyte, KaBuM, etc."
-              >
-                <Store className="h-3.5 w-3.5" />
-                My Deals ({customGpus.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSwitchDataset('combined')}
-                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                  datasetMode === 'combined'
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-                title="Combined Sandbox: Compare live store deals directly against converted US benchmark baselines in BRL"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                Combined Sandbox
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSwitchDataset('synthetic')}
-                className={`rounded-md px-2.5 py-1.5 font-semibold transition ${
-                  datasetMode === 'synthetic'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-                title="Synthetic testbed with mathematically verified anchors and trap cards"
-              >
-                Synthetic (10)
-              </button>
-            </div>
+            {/* Expert Controls: Dataset Switcher + Import Deals (Visible in Explorer, Pro, and Full Builds) */}
+            {uiMode !== 'simple' && (
+              <>
+                {/* Dataset Toggle */}
+                <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchDataset('real')}
+                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                      datasetMode === 'real'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    <Database className="h-3.5 w-3.5" />
+                    Real GPUs (18)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchDataset('custom')}
+                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                      datasetMode === 'custom'
+                        ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                    title="View your custom imported deals from Pichau, Terabyte, KaBuM, etc."
+                  >
+                    <Store className="h-3.5 w-3.5" />
+                    My Deals ({customGpus.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchDataset('combined')}
+                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                      datasetMode === 'combined'
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                    title="Combined Sandbox: Compare live store deals directly against converted US benchmark baselines in BRL"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Combined Sandbox
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchDataset('synthetic')}
+                    className={`rounded-md px-2.5 py-1.5 font-semibold transition ${
+                      datasetMode === 'synthetic'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                    title="Synthetic testbed with mathematically verified anchors and trap cards"
+                  >
+                    Synthetic (10)
+                  </button>
+                </div>
 
-            {/* Exchange Rate Control for Combined Sandbox Mode */}
-            {datasetMode === 'combined' && (
-              <div className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-xs">
-                <span className="text-slate-400 font-medium">USD/BRL:</span>
-                <span className="font-mono font-bold text-amber-300">
-                  $1 = R$
-                </span>
-                <input
-                  aria-label="USD to BRL Exchange Rate"
-                  type="number"
-                  min={1}
-                  max={20}
-                  step={0.1}
-                  value={exchangeRateUsdToBrl}
-                  onChange={(e) => {
-                    const val = parseFloat(e.target.value);
-                    if (!isNaN(val) && val > 0) setExchangeRateUsdToBrl(val);
-                  }}
-                  className="w-14 rounded bg-slate-900 px-1 py-0.5 text-center font-mono font-bold text-amber-300 focus:outline-none border border-slate-700"
-                  title="Exchange rate used to convert US benchmark MSRP to BRL"
-                />
-              </div>
+                {/* Exchange Rate Control for Combined Sandbox Mode */}
+                {datasetMode === 'combined' && (
+                  <div className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-xs">
+                    <span className="text-slate-400 font-medium">USD/BRL:</span>
+                    <span className="font-mono font-bold text-amber-300">
+                      $1 = R$
+                    </span>
+                    <input
+                      aria-label="USD to BRL Exchange Rate"
+                      type="number"
+                      min={1}
+                      max={20}
+                      step={0.1}
+                      value={exchangeRateUsdToBrl}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val) && val > 0)
+                          setExchangeRateUsdToBrl(val);
+                      }}
+                      className="w-14 rounded bg-slate-900 px-1 py-0.5 text-center font-mono font-bold text-amber-300 focus:outline-none border border-slate-700"
+                      title="Exchange rate used to convert US benchmark MSRP to BRL"
+                    />
+                  </div>
+                )}
+
+                {/* Import Deals Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsDealImporterOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/20 px-3 py-1.5 font-bold text-indigo-300 hover:bg-indigo-500/30 hover:border-indigo-400 transition shadow-sm"
+                  title="Paste listings from Pichau, Terabyte, KaBuM, PCYes, Amazon, etc."
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />+ Import Deals
+                </button>
+              </>
             )}
-
-            {/* Import Deals Button */}
-            <button
-              type="button"
-              onClick={() => setIsDealImporterOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/20 px-3 py-1.5 font-bold text-indigo-300 hover:bg-indigo-500/30 hover:border-indigo-400 transition shadow-sm"
-              title="Paste listings from Pichau, Terabyte, KaBuM, PCYes, Amazon, etc."
-            >
-              <PlusCircle className="h-3.5 w-3.5" />+ Import Deals
-            </button>
 
             {/* 3 Proportional Experience Level Buttons */}
             <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
@@ -327,6 +330,8 @@ export function App() {
         ) : uiMode === 'simple' ? (
           <SimpleParetoGuide
             gpus={rankedGpus}
+            rawCatalog={rawCatalog}
+            currency={activeCurrency}
             constraints={constraints}
             onChangeConstraints={setConstraints}
             xMetric={xMetric}
@@ -348,6 +353,7 @@ export function App() {
               setUiMode('explorer');
               setChartView('hyper');
             }}
+            onSwitchToBuilds={() => setUiMode('builds')}
             maxBudgetBound={maxBudgetBound}
           />
         ) : (

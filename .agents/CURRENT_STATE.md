@@ -3,14 +3,22 @@
 > Snapshot of active work. Update **only** when 🔴 In Flight or 🔶 Decisions change (Rule 15).
 
 ## 🔴 In Flight
+ 
+- `[BLD-01]`, `[BLD-02]` Complete 8-component PC build data model (Storage NVMe, Case, CPU Cooler) and physical clearance compatibility engine.
+ 
+ ## 🔶 Decisions Made Without Validation
+ 
+ - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`) and the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs) so normal users immediately get an approachable experience, while **Pro Math Mode** and the **Phase 1 Synthetic Sandbox (10 GPUs)** are one click away in the top header.
+ 
+ ## 🟡 Recently Completed
+ 
+ - **Answer-First Beginner Flow & Unified Whole-PC Journey (`[UX-01]`, `[UX-02]`, `[UX-11]`, 2026-10-19):**
+   - Transformed Simple Guide into an answer-first flow with `BeginnerIntakeCard.tsx` (Goal, Resolution, Budget), displaying #1 GPU hero card with plain-language shopping reasons (`SimpleGuidePickHero.tsx`) and 2 trade-off alternative cards (`Step-Down Bargain` and `Step-Up Upgrade`).
+   - For users choosing "A Whole PC Build", directly embeds the top Pareto complete build under budget (`FullBuildPickHero.tsx`) with 5-component bill of materials, bottleneck telemetry, total hardware cost, and 2 alternative builds.
+   - Hid expert controls (dataset switcher, USD/BRL currency conversion input, Import Deals) in Simple Guide mode header.
+   - Extracted SVG scatter plot to `SimpleGuideScatterPlot.tsx` to maintain strict compliance with file size limits.
+   - Backed by 95 Vitest tests and verified with `npm run check`.
 
-- None.
-
-## 🔶 Decisions Made Without Validation
-
-- Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`) and the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs) so normal users immediately get an approachable experience, while **Pro Math Mode** and the **Phase 1 Synthetic Sandbox (10 GPUs)** are one click away in the top header.
-
-## 🟡 Recently Completed
 
 - **Phase 1: Fix "Smart Buy" Labels, Eliminate Trap Endorsements & Sensible Default Budget (`[UX-12]`, `[UX-13]`, 2026-10-19):**
   - Resolved trust defects in Simple Guide: cards marked `[TRAP]` (e.g. RTX 4060 Ti 16GB, RTX 4060 Ti 8GB, RTX 3060 12GB) and dominated cards are never labeled "Smart Buy" or recommended as top choices, and clearly show "Bad Value Trap".
