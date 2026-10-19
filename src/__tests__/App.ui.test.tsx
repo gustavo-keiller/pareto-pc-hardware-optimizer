@@ -147,4 +147,30 @@ describe('App modes', () => {
     // Prices should be rendered in BRL (R$)
     expect(screen.getAllByText(/R\$/i).length).toBeGreaterThan(0);
   });
+
+  it('UX-12: no [TRAP] card in the leaderboard table is ever labeled "Smart Buy"', () => {
+    render(<App />);
+    const trapRows = screen
+      .getAllByRole('row')
+      .filter((row) => row.textContent?.includes('[TRAP]'));
+    expect(trapRows.length).toBeGreaterThan(0);
+    for (const row of trapRows) {
+      expect(row.textContent).not.toContain('Smart Buy');
+      expect(row.textContent).toContain('Bad Value Trap');
+    }
+  });
+
+  it('UX-13: sensible default initial budget ($550) recommends an accessible mid-range GPU, not the most expensive halo card', () => {
+    render(<App />);
+    const topPick = topPickName();
+    const gpu = REAL_WORLD_GPUS.find((g) => g.name === topPick);
+    expect(gpu).toBeDefined();
+    // Default initial top pick must be within the $550 sensible budget
+    expect(gpu?.price ?? Infinity).toBeLessThanOrEqual(550);
+    // Specifically must NOT be an $800+ ultra enthusiast card like RX 7900 XTX
+    expect(gpu?.price ?? 0).toBeLessThan(800);
+    // Button for <= $550 should be active
+    const btn550 = screen.getByRole('button', { name: '≤ $550' });
+    expect(btn550.className).toContain('bg-emerald-500/20');
+  });
 });

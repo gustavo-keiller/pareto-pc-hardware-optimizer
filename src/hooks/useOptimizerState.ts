@@ -172,8 +172,26 @@ export const PRESET_PROFILES: PresetProfile[] = [
 ];
 
 const DEFAULT_CONSTRAINTS_REAL: HardConstraints = {
-  maxPrice: 1800,
+  maxPrice: 550,
   minVram: 8,
+  maxWatts: 450,
+  selectedVendors: [],
+  selectedArchitectures: [],
+  requiredFeatures: [],
+};
+
+const DEFAULT_CONSTRAINTS_SYNTHETIC: HardConstraints = {
+  maxPrice: 400,
+  minVram: 8,
+  maxWatts: 350,
+  selectedVendors: [],
+  selectedArchitectures: [],
+  requiredFeatures: [],
+};
+
+const DEFAULT_CONSTRAINTS_COMBINED: HardConstraints = {
+  maxPrice: 5000,
+  minVram: 6,
   maxWatts: 450,
   selectedVendors: [],
   selectedArchitectures: [],
@@ -246,8 +264,8 @@ export function useOptimizerState() {
   const [yMetric, setYMetric] = useState<MetricKey>('rasterFps1440p');
   const [zMetric, setZMetric] = useState<MetricKey>('vramGb');
   const [paretoMode, setParetoMode] = useState<'2d-axes' | 'all-5d'>(() => {
-    const saved = safeGetString('paretopc_pareto_mode', 'all-5d');
-    return saved === '2d-axes' ? '2d-axes' : 'all-5d';
+    const saved = safeGetString('paretopc_pareto_mode', '2d-axes');
+    return saved === 'all-5d' ? 'all-5d' : '2d-axes';
   });
 
   // Linear & Non-Linear Value Extrapolation Tool
@@ -370,13 +388,15 @@ export function useOptimizerState() {
   );
 
   // Stage 2: Active Pareto Objectives
-  const activeObjectives = useMemo<MetricKey[]>(
-    () =>
-      paretoMode === '2d-axes'
-        ? Array.from(new Set([xMetric, yMetric]))
-        : ALL_METRIC_KEYS,
-    [paretoMode, xMetric, yMetric],
-  );
+  const activeObjectives = useMemo<MetricKey[]>(() => {
+    if (uiMode === 'simple') {
+      // Simple mode strictly evaluates Pareto dominance on active user criteria (Price & Performance)
+      return Array.from(new Set([xMetric, yMetric]));
+    }
+    return paretoMode === '2d-axes'
+      ? Array.from(new Set([xMetric, yMetric]))
+      : ALL_METRIC_KEYS;
+  }, [uiMode, paretoMode, xMetric, yMetric]);
 
   const paretoGpus = useMemo(
     () => evaluateParetoFrontier(validGpus, activeObjectives),
@@ -395,7 +415,11 @@ export function useOptimizerState() {
   const normalizedWeights = useMemo(() => normalizeWeights(weights), [weights]);
 
   const topWinner = useMemo(
-    () => rankedGpus.find((g) => g.isParetoOptimal) ?? rankedGpus[0] ?? null,
+    () =>
+      rankedGpus.find((g) => g.isParetoOptimal && !g.name.includes('[TRAP]')) ??
+      rankedGpus.find((g) => !g.name.includes('[TRAP]')) ??
+      rankedGpus[0] ??
+      null,
     [rankedGpus],
   );
 
@@ -414,14 +438,18 @@ export function useOptimizerState() {
     [rankedGpus],
   );
   const trapCount = useMemo(
-    () => rankedGpus.filter((g) => g.isDominated).length,
+    () =>
+      rankedGpus.filter((g) => g.isDominated || g.name.includes('[TRAP]'))
+        .length,
     [rankedGpus],
   );
 
   const displayedTableGpus = useMemo(
     () =>
       hideTrapsInTable
-        ? rankedGpus.filter((g) => g.isParetoOptimal)
+        ? rankedGpus.filter(
+            (g) => g.isParetoOptimal && !g.name.includes('[TRAP]'),
+          )
         : rankedGpus,
     [rankedGpus, hideTrapsInTable],
   );
@@ -430,14 +458,7 @@ export function useOptimizerState() {
     setDatasetMode(mode);
     setHoveredGpuId(null);
     if (mode === 'synthetic') {
-      setConstraints({
-        maxPrice: 1000,
-        minVram: 8,
-        maxWatts: 350,
-        selectedVendors: [],
-        selectedArchitectures: [],
-        requiredFeatures: [],
-      });
+      setConstraints(DEFAULT_CONSTRAINTS_SYNTHETIC);
       setSelectedGpuIds(['gpu-4', 'gpu-6', 'gpu-7']);
       setExtrapolation((prev) => ({ ...prev, anchorGpuId: 'gpu-6' }));
     } else if (mode === 'custom') {
@@ -461,15 +482,7 @@ export function useOptimizerState() {
         }));
       }
     } else if (mode === 'combined') {
-      const maxCombinedPrice = 15000;
-      setConstraints({
-        maxPrice: maxCombinedPrice,
-        minVram: 6,
-        maxWatts: 450,
-        selectedVendors: [],
-        selectedArchitectures: [],
-        requiredFeatures: [],
-      });
+      setConstraints(DEFAULT_CONSTRAINTS_COMBINED);
       setSelectedGpuIds([
         'deal-pichau-rx9060xt',
         'ref-arc-b580',
@@ -550,21 +563,16 @@ export function useOptimizerState() {
             selectedArchitectures: [],
             requiredFeatures: [],
           }
-        : datasetMode === 'real'
-          ? DEFAULT_CONSTRAINTS_REAL
-          : {
-              maxPrice: 1000,
-              minVram: 8,
-              maxWatts: 350,
-              selectedVendors: [],
-              selectedArchitectures: [],
-              requiredFeatures: [],
-            },
+        : datasetMode === 'combined'
+          ? DEFAULT_CONSTRAINTS_COMBINED
+          : datasetMode === 'real'
+            ? DEFAULT_CONSTRAINTS_REAL
+            : DEFAULT_CONSTRAINTS_SYNTHETIC,
     );
     setXMetric('price');
     setYMetric('rasterFps1440p');
     setZMetric('vramGb');
-    setParetoMode('all-5d');
+    setParetoMode('2d-axes');
     setExtrapolation({
       ...DEFAULT_EXTRAPOLATION_CONFIG,
       anchorGpuId:

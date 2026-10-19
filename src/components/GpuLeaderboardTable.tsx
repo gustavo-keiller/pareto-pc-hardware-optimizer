@@ -168,19 +168,37 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3">
-                    {gpu.isParetoOptimal ? (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">
-                        <CheckCircle2 className="h-3 w-3" />
-                        {uiMode === 'simple' ? 'Smart Buy' : 'Frontier Optimal'}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-400">
-                        <ShieldAlert className="h-3 w-3" />
-                        {uiMode === 'simple'
-                          ? 'Bad Value Trap'
-                          : `Dominated (${gpu.dominatedBy.length})`}
-                      </span>
-                    )}
+                    {(() => {
+                      const isTrap =
+                        gpu.name.includes('[TRAP]') ||
+                        Boolean(
+                          gpu.notes && gpu.notes.toLowerCase().includes('trap'),
+                        );
+                      const isSmartBuy =
+                        gpu.isParetoOptimal && !gpu.isDominated && !isTrap;
+
+                      if (isSmartBuy) {
+                        return (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">
+                            <CheckCircle2 className="h-3 w-3" />
+                            {uiMode === 'simple'
+                              ? 'Smart Buy'
+                              : 'Frontier Optimal'}
+                          </span>
+                        );
+                      }
+
+                      return (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-400">
+                          <ShieldAlert className="h-3 w-3" />
+                          {uiMode === 'simple'
+                            ? 'Bad Value Trap'
+                            : isTrap && !gpu.isDominated
+                              ? '5D Niche (Trap Risk)'
+                              : `Dominated (${gpu.dominatedBy.length})`}
+                        </span>
+                      );
+                    })()}
                   </td>
 
                   <td className="py-3 px-3 w-40">

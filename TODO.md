@@ -19,18 +19,6 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (Reprioritized from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[UX-12]` Fix "Smart Buy" labels and eliminate trap card endorsements:**
-  Ensure a GPU is only marked as a "Smart Buy" if nothing cheaper is at least as good on the user's active criteria, and NEVER show "Smart Buy" on any card the dataset flags as a trap (e.g. RTX 4060 Ti 16GB [TRAP]).
-  - **Files likely touched:** `src/components/SimpleParetoGuide.tsx`, `src/lib/math/pareto.ts`, `src/components/GpuLeaderboardTable.tsx`, `CODEMAP.md`
-  - **Done when:** cards flagged with `[TRAP]` or strictly dominated on active user metrics are never labeled "Smart Buy", and the top recommendation card warns users away from trap cards.
-  - **Test to add:** unit/property test in `src/lib/math/__tests__/math.test.ts` and UI test in `src/__tests__/App.ui.test.tsx` asserting `[TRAP]` cards are never given the "Smart Buy" badge.
-
-- **`[UX-13]` Sensible default budget in Simple Guide:**
-  Replace the default "All ($1800)" budget with a sensible mid-range budget ($400 / R$ 2.500) so first-time users aren't immediately recommended an $890 top-tier GPU as their top pick.
-  - **Files likely touched:** `src/hooks/useOptimizerState.ts`, `src/components/SimpleParetoGuide.tsx`, `CODEMAP.md`
-  - **Done when:** a fresh visitor landing on Simple mode sees a realistic mid-range default budget and an accessible mid-range top recommendation rather than the most expensive halo card in the catalog.
-  - **Test to add:** test in `src/__tests__/App.ui.test.tsx` verifying default initial top recommendation under fresh state.
-
 - **`[UX-01]` Answer-first beginner flow (3 questions → 1 top pick + 2 alternatives):**
   Redesign Simple Guide into an answer-first flow: (1) What will you do? (Gaming, Streaming, Video Editing, AI), (2) Resolution? (1080p, 1440p, 4K), (3) Budget. Display 1 top recommended GPU + 2 alternatives with shopping reasons, turning the 5-step tutorial into an optional "Why this pick?" drawer.
   - **Files likely touched:** `src/components/SimpleParetoGuide.tsx`, `src/hooks/useOptimizerState.ts`, `CODEMAP.md`

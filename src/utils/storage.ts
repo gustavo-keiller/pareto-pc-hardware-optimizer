@@ -3,7 +3,7 @@
  * Ensures user slider weights, hard constraints, and saved builds never white-screen the app.
  */
 
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
 
 /**
  * Safely parses JSON from localStorage with fallback on error or malformed data.
@@ -127,8 +127,16 @@ export function safeGetString(key: string, defaultValue: string): string {
 export function runStorageMigrations(): void {
   const currentVersion = safeGetInt('paretopc_schema_version', 0);
 
-  if (currentVersion < 1) {
+  if (currentVersion < 2) {
     try {
+      const savedConstraints = safeGetJSON<Record<string, unknown> | null>(
+        'paretopc_constraints',
+        null,
+      );
+      if (savedConstraints && savedConstraints.maxPrice === 1800) {
+        savedConstraints.maxPrice = 550;
+        safeSetJSON('paretopc_constraints', savedConstraints);
+      }
       localStorage.setItem(
         'paretopc_schema_version',
         String(CURRENT_SCHEMA_VERSION),

@@ -575,3 +575,33 @@ describe('Type guards for untrusted strings', () => {
     expect(isExtrapolationScalingModel('cubic')).toBe(false);
   });
 });
+
+describe('UX-12: Smart Buy vs Trap Guarantees', () => {
+  it('ensures every [TRAP] card in REAL_WORLD_GPUS is dominated under active 2D criteria (price & rasterFps)', () => {
+    const eval2D = evaluateParetoFrontier(REAL_WORLD_GPUS, [
+      'price',
+      'rasterFps1440p',
+    ]);
+    const trapCards = eval2D.filter((g) => g.name.includes('[TRAP]'));
+    expect(trapCards.length).toBeGreaterThanOrEqual(3);
+    for (const trap of trapCards) {
+      expect(trap.isDominated).toBe(true);
+      expect(trap.isParetoOptimal).toBe(false);
+      expect(trap.dominatedBy.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('ensures every [TRAP] card in PHASE1_SEED_GPUS is dominated across active objectives', () => {
+    const eval2D = evaluateParetoFrontier(PHASE1_SEED_GPUS, [
+      'price',
+      'rasterFps1440p',
+    ]);
+    const trapCards = eval2D.filter((g) => g.name.includes('[TRAP]'));
+    expect(trapCards.length).toBeGreaterThanOrEqual(3);
+    for (const trap of trapCards) {
+      expect(trap.isDominated).toBe(true);
+      expect(trap.isParetoOptimal).toBe(false);
+      expect(trap.dominatedBy.length).toBeGreaterThan(0);
+    }
+  });
+});

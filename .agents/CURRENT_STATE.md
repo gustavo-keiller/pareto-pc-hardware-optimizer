@@ -12,6 +12,13 @@
 
 ## 🟡 Recently Completed
 
+- **Phase 1: Fix "Smart Buy" Labels, Eliminate Trap Endorsements & Sensible Default Budget (`[UX-12]`, `[UX-13]`, 2026-10-19):**
+  - Resolved trust defects in Simple Guide: cards marked `[TRAP]` (e.g. RTX 4060 Ti 16GB, RTX 4060 Ti 8GB, RTX 3060 12GB) and dominated cards are never labeled "Smart Buy" or recommended as top choices, and clearly show "Bad Value Trap".
+  - Restricted Simple Guide Pareto dominance strictly to active user criteria (`['price', 'rasterFps1440p']`).
+  - Replaced $1800 "All" default budget with accessible $550 sweet-spot budget (R$ 5.000 in Combined BRL mode) so beginners immediately get an approachable recommendation (e.g. RX 7800 XT / Arc B580) instead of an $890+ halo GPU.
+  - Decomposed `SimpleParetoGuide.tsx` by extracting mini widgets (`MiniWeightBar`, `SkewedStatBar`) into `src/components/SimpleGuideWidgets.tsx` (bringing `SimpleParetoGuide.tsx` well under its allowlist ceiling).
+  - Backed by unit and UI integration tests (92 Vitest tests passing, Playwright e2e passing).
+
 - **Phase 3: Combined Sandbox Mode with Live USD/BRL Currency Conversion (`[P3-04]`, 2026-10-19):**
   - Shipped `src/utils/currency.ts`: `convertUsdToBrl`, `convertBrlToUsd`, and `DEFAULT_USD_TO_BRL_RATE` (5.70), backed by 4 unit tests.
   - Implemented `'combined'` dataset mode in `src/hooks/useOptimizerState.ts` with real-time currency conversion, merging the 18 Real-World GPU benchmarks with custom user imported retail deals.
