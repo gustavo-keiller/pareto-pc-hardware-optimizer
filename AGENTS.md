@@ -44,7 +44,7 @@ Every turn re-reads the whole conversation, so anything that enters context is p
 - **Pre-Prune Before Combinatorics (Rule 4).** In Phase 3 (Full-System Builder), always filter by hard constraints and eliminate Pareto-dominated components **within each category** (`CPU`, `GPU`, `RAM`, `Motherboard`, `PSU`) *before* generating Cartesian combinations. Never brute-force unpruned catalogs on the UI thread.
 - **Strict TypeScript — Zero `any` & Zero Unchecked `as` (Rule 5).** Use discriminated unions and `_exhaustive: never` in `switch` statements over `MetricKey` or hardware categories. External JSON or `localStorage` data starts as `unknown`.
 - **Safe Storage (Rule 6).** Use `safeGetJSON` / `safeSetJSON` / `safeGetInt` / `safeGetBool` from `src/utils/storage.ts`. A raw `JSON.parse(localStorage.getItem(...))` white-screens the app on corrupted or migrated data.
-- **Deep Modules & File Size Cap (Rule 7).** Favor deep modules (small interface, rich implementation). Split any file approaching ~600–800 lines into focused modules or custom hooks (`src/App.tsx` is actively queued for decomposition).
+- **Deep Modules & File Size Cap (Rule 7).** Favor deep modules (small interface, rich implementation). Split any file approaching ~600–800 lines into focused modules or custom hooks (`src/App.tsx` is actively queued for decomposition). `check:docs` fails above 800 lines; the legacy files in `OVERSIZED_FILE_ALLOWLIST` may only shrink, so never raise their ceilings: move code out instead.
 - **Durable Property Tests Only (Rule 8).** Tests in `__tests__/` must assert mathematical invariants (transitivity, scale invariance, monotonicity, bounds $C_i \in [0, 1]$, zero-weight fallback) — never ephemeral one-off debug repros.
 
 ## Verify before declaring done

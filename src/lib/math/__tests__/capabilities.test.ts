@@ -6,6 +6,8 @@ import {
   inferGpuVendor,
   KNOWN_GPU_TECHNOLOGIES,
 } from '../capabilities';
+import { filterByHardConstraints } from '../pareto';
+import { GpuCandidate } from '../types';
 import { REAL_WORLD_GPUS } from '../../../data/realGpus';
 import { PHASE1_SEED_GPUS } from '../../../data/seedGpus';
 
@@ -172,6 +174,53 @@ describe('Hardware Capabilities & Ecosystem Technology Engine', () => {
     it('works on synthetic seed data as well', () => {
       const facets = computeGpuFacets(PHASE1_SEED_GPUS, { maxPrice: 1000 });
       expect(facets[0].options.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('facet counts agree with filtering', () => {
+    // A card with an explicitly empty feature list is still inferred everywhere.
+    const catalog: GpuCandidate[] = [
+      ...REAL_WORLD_GPUS,
+      { ...REAL_WORLD_GPUS[0], id: 'empty-features', features: [] },
+    ];
+    const limits = { maxPrice: 1200, minVram: 8, maxWatts: 450 };
+
+    it('filtering by any facet option returns exactly its count', () => {
+      const [vendorFacet, techFacet] = computeGpuFacets(catalog, limits);
+      for (const option of techFacet.options) {
+        const kept = filterByHardConstraints(catalog, {
+          ...limits,
+          requiredFeatures: [option.id],
+        });
+        expect(kept.length).toBe(option.count);
+      }
+      for (const option of vendorFacet.options) {
+        const vendor = option.id;
+        if (vendor !== 'NVIDIA' && vendor !== 'AMD' && vendor !== 'Intel')
+          continue;
+        const kept = filterByHardConstraints(catalog, {
+          ...limits,
+          selectedVendors: [vendor],
+        });
+        expect(kept.length).toBe(option.count);
+      }
+    });
+
+    it('RTX 20 cards have hardware ray tracing, GTX 16 cards do not', () => {
+      expect(
+        inferGpuFeatures({
+          name: 'GeForce RTX 2060 6GB',
+          chip: 'RTX 2060',
+          rtFps1440p: 0,
+        }),
+      ).toContain('Hardware Ray Tracing');
+      expect(
+        inferGpuFeatures({
+          name: 'GeForce GTX 1660 Super 6GB',
+          chip: 'GTX 1660 Super',
+          rtFps1440p: 0,
+        }),
+      ).not.toContain('Hardware Ray Tracing');
     });
   });
 });

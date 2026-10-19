@@ -24,12 +24,13 @@ const WARN_FILE_LINES = 600;
 const MAX_FILE_LINES = 800;
 
 // Legacy files already over MAX_FILE_LINES (line count when the cap was added).
-// They may shrink but not grow. When PERF-03 splits one below 800, delete its entry.
+// They may shrink but not grow: never raise a ceiling to make a change fit; split the file
+// instead (PERF-03). Lower a ceiling when a file shrinks; delete the entry once it is under 800.
 const OVERSIZED_FILE_ALLOWLIST = {
-  'src/App.tsx': 1125,
+  'src/App.tsx': 1122,
   'src/components/Pareto3DCloud.tsx': 1168,
   'src/components/HyperDimensionalExplorer.tsx': 1489,
-  'src/components/SimpleParetoGuide.tsx': 2105,
+  'src/components/SimpleParetoGuide.tsx': 2096,
 };
 const warnings = [];
 

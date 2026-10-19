@@ -37,7 +37,7 @@ export function filterByHardConstraints(
 
     // 2. Brand / Vendor filter (if active and non-empty)
     if (selectedVendors && selectedVendors.length > 0) {
-      const vendor = gpu.vendor ?? inferGpuVendor(gpu);
+      const vendor = inferGpuVendor(gpu);
       if (!selectedVendors.includes(vendor)) {
         return false;
       }
@@ -45,7 +45,7 @@ export function filterByHardConstraints(
 
     // 3. Architecture filter (if active and non-empty)
     if (selectedArchitectures && selectedArchitectures.length > 0) {
-      const arch = gpu.architecture ?? inferGpuArchitecture(gpu);
+      const arch = inferGpuArchitecture(gpu);
       if (!selectedArchitectures.includes(arch)) {
         return false;
       }
@@ -53,7 +53,8 @@ export function filterByHardConstraints(
 
     // 4. Ecosystem & Technology requirements (if active and non-empty)
     if (requiredFeatures && requiredFeatures.length > 0) {
-      const feats = gpu.features ?? inferGpuFeatures(gpu);
+      // Same inference as computeGpuFacets, so a facet's count matches what it filters.
+      const feats = inferGpuFeatures(gpu);
       const hasAll = requiredFeatures.every((req) => feats.includes(req));
       if (!hasAll) {
         return false;

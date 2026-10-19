@@ -35,6 +35,9 @@
 | `vramGb` | Video memory (more lasts longer) | Memória de vídeo (VRAM) | VRAM (GB) |
 | `tdpWatts` | Power use (affects power supply and heat) | Consumo de energia | TBP / TDP (W) |
 | `price`, `priceCash` | Price / cash (PIX) price | Preço / preço à vista (PIX) | Street price |
+| `selectedVendors`, `inferGpuVendor()` | Brand (NVIDIA, AMD, Intel) | Marca (NVIDIA, AMD, Intel) | Vendor filter |
+| `requiredFeatures`, `KNOWN_GPU_TECHNOLOGIES` | Must-have features (frame generation, AV1 streaming, CUDA for AI/3D) | Recursos obrigatórios (geração de quadros, streaming AV1, CUDA para IA/3D) | Ecosystem technology filter |
+| `inferGpuArchitecture()` | Generation (e.g. RTX 40, RX 7000) | Geração (ex.: RTX 40, RX 7000) | Architecture |
 
 ## Full-build terms (Phase 2 builder, planned)
 
