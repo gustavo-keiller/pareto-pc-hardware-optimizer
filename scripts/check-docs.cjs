@@ -133,6 +133,7 @@ function checkMarkdownLinks() {
     path.join(ROOT, 'CODEMAP.md'),
     path.join(ROOT, 'CONTEXT.md'),
     path.join(ROOT, 'TODO.md'),
+    path.join(ROOT, 'ROADMAP.md'),
     path.join(ROOT, 'DONE.md'),
     path.join(ROOT, '.agents', 'AGENTS.md'),
     path.join(ROOT, '.agents', 'CURRENT_STATE.md'),
