@@ -31,6 +31,7 @@ Pure TypeScript modules with zero React/DOM/ECharts dependencies:
 | `src/data/seedGpus.ts` | **Phase 1 Seed Dataset** — 10 synthetic GPUs (`PHASE1_SEED_GPUS`) with known Pareto anchors and dominated `[TRAP]` cards for deterministic verification |
 | `src/utils/storage.ts` | **Safe LocalStorage Layer** — `safeGetJSON`, `safeSetJSON`, `safeGetInt`, `safeGetBool`, `safeGetString`, and versioned schema migrations (`runStorageMigrations`) |
 | `src/utils/currency.ts` | **Currency Formatter & Converter** — formats BRL (`R$ 3.899,99`) and USD (`$250`), plus bidirectional USD/BRL conversion (`convertUsdToBrl`, `convertBrlToUsd`) |
+| `src/utils/i18n.ts` | **Lightweight Localization Dictionary (`[UX-06]`)** — type-safe translation helper supporting Brazil-first (`pt-BR`) and English (`en-US`) with plain-language, unslop copywriting |
 
 ---
 
@@ -49,7 +50,11 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | `src/components/BuildLeaderboardTable.tsx` | **Pareto Build Leaderboard Table** — complete table of Pareto-optimal and candidate full PC builds with component specs, bottleneck telemetry, and select/inspect actions |
 | `src/components/GpuDealImporterModal.tsx` | **Interactive GPU Deal Importer & Validator Modal** — 3-tab modal featuring Smart Paste (with one-click templates for Pichau, Terabyte, KaBuM, PCYes), Inspect & Validate card previews (cash/PIX vs. installment selector, benchmark links, editable specs), and My Deals database manager |
 | `src/components/HardwareFilterPanel.tsx` | **Brand & Ecosystem Technology Filters** — multi-select brand chips (`NVIDIA`, `AMD`, `Intel`) and proprietary technology toggles (`DLSS 3+ Frame Gen`, `FSR 3 Frame Gen`, `AV1 Video Encode`, `Hardware Ray Tracing`, `CUDA / OptiX AI & 3D`) with live candidate counts |
+| `src/components/DealbreakerFilterPanel.tsx` | **Stage 1 Dealbreaker Filters** — budget limit slider, min VRAM selectors, max TDP watt limit slider, and nested ecosystem technology toggles |
 | `src/components/SimpleParetoGuide.tsx` | **Interactive Smart Buyer Guide** — answer-first beginner flow with 3-question intake (`Goal`, `Use Case`, `Budget`), above-the-fold #1 value recommendation hero + 2 alternatives, expandable 5-step Pareto math accordion with interactive 2D value curve and priority sliders |
+| `src/components/SimpleGuideMathWalkthrough.tsx` | **Collapsible 5-Step Math Walkthrough Container** — modularized container holding 5-step storytelling progression, priority weight sliders, and interactive SVG value curve |
+| `src/components/SimpleGuideStepStories.tsx` | **Steps 1–4 Storytelling Cards** — single-spec trap, 2D trade-offs, strictly dominated bad deal / value trap spotlight, and value frontier shortlist cards with inline budget/brand filters |
+| `src/components/SimpleGuideStep5Priority.tsx` | **Step 5 Priority & Variable Controls** — 2-variable balance slider, 3D split presets, metric pickers, and live best-match spotlight |
 | `src/components/BeginnerIntakeCard.tsx` | **3-Question Beginner Intake Card (`[UX-01]`, `[UX-11]`)** — accessible intake stepper selecting building goal (`GPU` vs. `Whole PC`), gaming style & resolution (`1080p Esports`, `1440p Sweet Spot`, `4K RT`, `Creator/AI`), and active currency budget pills |
 | `src/components/SimpleGuidePickHero.tsx` | **#1 Top Pick GPU Hero & Alternatives (`[UX-01]`)** — prominent above-the-fold value recommendation hero card with plain-language shopping reasons, price-performance metrics, and 2 trade-off alternatives (`Step-Down Bargain` and `Step-Up Upgrade`) |
 | `src/components/FullBuildPickHero.tsx` | **#1 Top Complete PC Build Hero & Alternatives (`[UX-11]`)** — unified beginner recommendation for complete systems, displaying total hardware cost, 8-component bill of materials, CPU/GPU bottleneck telemetry, and 1-click transition to Full Build Explorer |

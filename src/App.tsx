@@ -12,19 +12,16 @@ import { GpuLeaderboardTable } from './components/GpuLeaderboardTable';
 import { SimpleParetoGuide } from './components/SimpleParetoGuide';
 import { HyperDimensionalExplorer } from './components/HyperDimensionalExplorer';
 import { GpuDealImporterModal } from './components/GpuDealImporterModal';
-import { HardwareFilterPanel } from './components/HardwareFilterPanel';
+import { DealbreakerFilterPanel } from './components/DealbreakerFilterPanel';
 import { TopWinnerBanner } from './components/TopWinnerBanner';
 import { FullBuildExplorer } from './components/FullBuildExplorer';
-import { formatCurrency } from './utils/currency';
+import { t } from './utils/i18n';
 import {
   Sliders,
   ShieldAlert,
   CheckCircle2,
-  Filter,
   RotateCcw,
   Cpu,
-  Zap,
-  DollarSign,
   Sparkles,
   BarChart3,
   Info,
@@ -96,6 +93,8 @@ export function App() {
     activeCurrency,
     exchangeRateUsdToBrl,
     setExchangeRateUsdToBrl,
+    locale,
+    handleToggleLocale,
   } = useOptimizerState();
 
   const [isChartExpanded, setIsChartExpanded] = useState<boolean>(false);
@@ -250,7 +249,35 @@ export function App() {
               </>
             )}
 
-            {/* 3 Proportional Experience Level Buttons */}
+            {/* Language / Currency Toggle (UX-06) */}
+            <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
+              <button
+                type="button"
+                onClick={() => handleToggleLocale('pt-BR')}
+                className={`flex items-center gap-1 rounded-md px-2 py-1 font-bold transition ${
+                  locale === 'pt-BR'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Mudar para Português (Preços em Reais R$)"
+              >
+                🇧🇷 PT
+              </button>
+              <button
+                type="button"
+                onClick={() => handleToggleLocale('en-US')}
+                className={`flex items-center gap-1 rounded-md px-2 py-1 font-bold transition ${
+                  locale === 'en-US'
+                    ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Switch to English (Prices in USD $)"
+              >
+                🇺🇸 EN
+              </button>
+            </div>
+
+            {/* 4 Proportional Experience Level Buttons */}
             <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
               <button
                 type="button"
@@ -260,10 +287,9 @@ export function App() {
                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
-                title="Level 1: Clean, simple guide for normal PC buyers"
               >
                 <Eye className="h-3.5 w-3.5" />
-                1. Simple Guide
+                {t('modeSimple', locale)}
               </button>
               <button
                 type="button"
@@ -273,10 +299,9 @@ export function App() {
                     ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
-                title="Level 2: Unlock custom axis selectors, 4D-7D Hyper-Graph, 4-panel matrix, and guided value rules"
               >
                 <Compass className="h-3.5 w-3.5" />
-                2. Explorer
+                {t('modeExplorer', locale)}
               </button>
               <button
                 type="button"
@@ -286,10 +311,9 @@ export function App() {
                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
-                title="Level 3: Full MCDM math controls, non-linear curve laws, and Hedonic OLS regression"
               >
                 <Wrench className="h-3.5 w-3.5" />
-                3. Pro Lab
+                {t('modePro', locale)}
               </button>
               <button
                 type="button"
@@ -299,10 +323,9 @@ export function App() {
                     ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
-                title="Level 4: Mario Kart Mode — Combinatorial Full PC Build Explorer"
               >
                 <Layers className="h-3.5 w-3.5" />
-                4. Full Builds
+                {t('modeBuilds', locale)}
               </button>
             </div>
 
@@ -332,6 +355,7 @@ export function App() {
             gpus={rankedGpus}
             rawCatalog={rawCatalog}
             currency={activeCurrency}
+            locale={locale}
             constraints={constraints}
             onChangeConstraints={setConstraints}
             xMetric={xMetric}
@@ -374,147 +398,16 @@ export function App() {
                 }`}
               >
                 {/* Step 1: Budget & Hardware Limits */}
-                <section className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <div className="flex items-center gap-2">
-                      <Filter className="h-4 w-4 text-emerald-400" />
-                      <h2 className="text-sm font-bold uppercase tracking-wider text-white">
-                        Stage 1: Hard Dealbreakers
-                      </h2>
-                    </div>
-                    <span className="text-[11px] font-medium text-emerald-400">
-                      {validGpus.length}/{rawCatalog.length} GPUs Fit
-                    </span>
-                  </div>
-
-                  <div className="mt-4 space-y-4">
-                    {/* Max Budget Slider */}
-                    <div>
-                      <div className="flex justify-between text-xs mb-1.5">
-                        <label
-                          htmlFor="max-budget-slider"
-                          className="font-medium text-slate-300 flex items-center gap-1"
-                        >
-                          <DollarSign className="h-3.5 w-3.5 text-emerald-400" />
-                          Maximum Budget
-                        </label>
-                        <span className="font-mono font-bold text-emerald-400">
-                          {formatCurrency(constraints.maxPrice, activeCurrency)}
-                        </span>
-                      </div>
-                      <input
-                        id="max-budget-slider"
-                        type="range"
-                        min={datasetMode === 'custom' ? 500 : 200}
-                        max={maxBudgetBound}
-                        step={datasetMode === 'custom' ? 50 : 10}
-                        value={Math.min(constraints.maxPrice, maxBudgetBound)}
-                        onChange={(e) =>
-                          setConstraints((prev) => ({
-                            ...prev,
-                            maxPrice: Number(e.target.value),
-                          }))
-                        }
-                        className="w-full accent-emerald-500 cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
-                        <span>
-                          {formatCurrency(
-                            datasetMode === 'custom' ? 500 : 200,
-                            activeCurrency,
-                          )}
-                        </span>
-                        <span>
-                          {formatCurrency(
-                            Math.round(maxBudgetBound / 2),
-                            activeCurrency,
-                          )}
-                        </span>
-                        <span>
-                          {formatCurrency(maxBudgetBound, activeCurrency)} (All)
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Min VRAM Floor Selector */}
-                    <div>
-                      <div className="flex justify-between text-xs mb-1.5">
-                        <span className="font-medium text-slate-300">
-                          Minimum VRAM Required
-                        </span>
-                        <span className="font-mono font-bold text-sky-400">
-                          {constraints.minVram} GB+
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-4 gap-1.5">
-                        {[8, 12, 16, 20].map((vram) => (
-                          <button
-                            key={vram}
-                            type="button"
-                            onClick={() =>
-                              setConstraints((prev) => ({
-                                ...prev,
-                                minVram: vram,
-                              }))
-                            }
-                            className={`rounded-lg py-1.5 text-xs font-semibold transition border ${
-                              constraints.minVram === vram
-                                ? 'border-sky-500 bg-sky-500/20 text-sky-300'
-                                : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 hover:text-slate-200'
-                            }`}
-                          >
-                            {vram} GB+
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Max Power TDP Slider */}
-                    <div>
-                      <div className="flex justify-between text-xs mb-1.5">
-                        <label
-                          htmlFor="max-watts-slider"
-                          className="font-medium text-slate-300 flex items-center gap-1"
-                        >
-                          <Zap className="h-3.5 w-3.5 text-amber-400" />
-                          Max GPU Power Draw (PSU Limit)
-                        </label>
-                        <span className="font-mono font-bold text-amber-400">
-                          {constraints.maxWatts} W
-                        </span>
-                      </div>
-                      <input
-                        id="max-watts-slider"
-                        type="range"
-                        min={120}
-                        max={maxWattsBound}
-                        step={5}
-                        value={Math.min(constraints.maxWatts, maxWattsBound)}
-                        onChange={(e) =>
-                          setConstraints((prev) => ({
-                            ...prev,
-                            maxWatts: Number(e.target.value),
-                          }))
-                        }
-                        className="w-full accent-amber-500 cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
-                        <span>120W (Low Power)</span>
-                        <span>260W</span>
-                        <span>{maxWattsBound}W (No Limit)</span>
-                      </div>
-                    </div>
-
-                    {/* Brand & Ecosystem Filters */}
-                    <div className="pt-2 border-t border-slate-800/80">
-                      <HardwareFilterPanel
-                        candidates={rawCatalog}
-                        constraints={constraints}
-                        onChangeConstraints={setConstraints}
-                      />
-                    </div>
-                  </div>
-                </section>
+                <DealbreakerFilterPanel
+                  constraints={constraints}
+                  onChangeConstraints={setConstraints}
+                  rawCatalog={rawCatalog}
+                  validGpus={validGpus}
+                  activeCurrency={activeCurrency}
+                  maxBudgetBound={maxBudgetBound}
+                  maxWattsBound={maxWattsBound}
+                  datasetMode={datasetMode}
+                />
 
                 {/* Step 2: Gaming Priorities / Stage 3 TOPSIS Sliders */}
                 <section className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl">

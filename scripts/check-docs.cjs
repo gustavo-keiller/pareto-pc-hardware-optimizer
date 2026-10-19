@@ -30,7 +30,6 @@ const OVERSIZED_FILE_ALLOWLIST = {
   'src/App.tsx': 1122,
   'src/components/Pareto3DCloud.tsx': 1168,
   'src/components/HyperDimensionalExplorer.tsx': 1489,
-  'src/components/SimpleParetoGuide.tsx': 2096,
 };
 const warnings = [];
 

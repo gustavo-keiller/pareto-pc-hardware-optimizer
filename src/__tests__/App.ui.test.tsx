@@ -24,6 +24,7 @@ function topPickName(): string {
 
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('paretopc_locale', 'en-US');
 });
 
 afterEach(() => {
@@ -79,7 +80,10 @@ describe('App modes', () => {
   it('picking a lower budget changes the top pick to a card within budget', async () => {
     const user = userEvent.setup();
     render(<App />);
+    // Default budget is <= $550. First switch to All Limits
+    await user.click(screen.getByRole('button', { name: /All Limits/i }));
     const before = topPickName();
+    // Then switch down to <= $350
     await user.click(screen.getByRole('button', { name: '≤ $350' }));
     const after = topPickName();
     expect(after).not.toBe(before);
@@ -247,6 +251,31 @@ describe('App modes', () => {
     // Verifies transition to Full Builds mode
     expect(
       screen.getByText(/Level 4: Mario Kart Full-Build Explorer/i),
+    ).toBeDefined();
+  });
+
+  it('UX-06: defaults to pt-BR and BRL when fresh, and toggles cleanly between Portuguese and English', async () => {
+    localStorage.clear();
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Defaults to pt-BR
+    expect(
+      screen.getByRole('button', { name: /1\. Guia Simples/i }),
+    ).toBeDefined();
+    expect(screen.getAllByText(/R\$/i).length).toBeGreaterThan(0);
+
+    // Switch to EN
+    await user.click(screen.getByRole('button', { name: /🇺🇸 EN/i }));
+    expect(
+      screen.getByRole('button', { name: /1\. Simple Guide/i }),
+    ).toBeDefined();
+    expect(screen.getByRole('button', { name: '≤ $550' })).toBeDefined();
+
+    // Switch back to PT
+    await user.click(screen.getByRole('button', { name: /🇧🇷 PT/i }));
+    expect(
+      screen.getByRole('button', { name: /1\. Guia Simples/i }),
     ).toBeDefined();
   });
 });

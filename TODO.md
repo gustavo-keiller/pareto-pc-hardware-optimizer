@@ -19,12 +19,6 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (Reprioritized from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[UX-06]` Country-agnostic money & language layer (Brazil-first testing):**
-  Add region/locale state (default `'pt-BR'` / `'BRL'`, with `'en-US'` / `'USD'` toggle) using `Intl.NumberFormat` for currency, currency-aware budget steps, and a lightweight typed dictionary for Brazilian Portuguese and English.
-  - **Files likely touched:** `src/utils/currency.ts`, `src/hooks/useOptimizerState.ts`, `src/components/BeginnerIntakeCard.tsx`, `src/App.tsx`, `CODEMAP.md`
-  - **Done when:** UI defaults to pt-BR / R$ (BRL) with an instant English toggle in header, formatting prices and budget presets appropriately without code duplication.
-  - **Test to add:** Vitest unit tests in `src/utils/__tests__/currency.test.ts` and UI test in `src/__tests__/App.ui.test.tsx`.
-
 - **`[UX-03]` Plain-language copy pass on Simple Guide:**
   Audit all copy in Simple Guide, intake card, pick hero, and full-build cards against `.agents/GLOSSARY.md` to ensure zero math jargon ("Pareto", "frontier", "dominated", "TOPSIS", "tradeoff hyperplane") appears in Simple mode, replacing with plain shopping terms ("Melhor custo-benefício", "Alternativa econômica", "Opção superior").
   - **Files likely touched:** `src/components/SimpleParetoGuide.tsx`, `src/components/SimpleGuidePickHero.tsx`, `src/components/FullBuildPickHero.tsx`, `src/components/BeginnerIntakeCard.tsx`

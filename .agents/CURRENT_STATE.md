@@ -4,13 +4,23 @@
 
 ## 🔴 In Flight
 
-- `[UX-06]` Country-agnostic money & language layer (Brazil-first testing, R$/pt-BR default with USD/en-US toggle).
+- `[UX-03]` Plain-language copy pass on Simple Guide (audit copy against GLOSSARY.md for zero math jargon in beginner mode).
+- `[UX-05]` Mobile layout & responsive polish (ensure 360px-420px viewport layouts fit without clipping).
 
 ## 🔶 Decisions Made Without Validation
 
-- Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`) and the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs) so normal users immediately get an approachable experience, while **Pro Math Mode** and the **Phase 1 Synthetic Sandbox (10 GPUs)** are one click away in the top header.
+- Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Country-Agnostic Money & Language Layer (Brazil-First Default) & Simple Guide Decomposition (`[UX-06]`, 2026-10-19):**
+  - Shipped `src/utils/i18n.ts`: `AppLocale` (`'pt-BR' | 'en-US'`), `DEFAULT_LOCALE = 'pt-BR'`, typed zero-jargon dictionary, and `t(key, locale)` helper.
+  - Shipped `src/utils/currency.ts`: locale-aware `formatCurrency` with non-breaking space normalization and currency formatting.
+  - Added header locale toggle `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` in `src/App.tsx` and state hook in `src/hooks/useOptimizerState.ts`.
+  - Decomposed `SimpleParetoGuide.tsx` from 1,898 lines down to 318 lines into `SimpleGuideStepStories.tsx`, `SimpleGuideMathWalkthrough.tsx`, and `SimpleGuideStep5Priority.tsx`.
+  - Permanently removed `SimpleParetoGuide.tsx` from `OVERSIZED_FILE_ALLOWLIST` in `scripts/check-docs.cjs`.
+  - Extracted `DealbreakerFilterPanel.tsx` from `src/App.tsx`, reducing `App.tsx` to 1007 lines.
+  - Backed by 5 unit tests in `src/utils/__tests__/i18n.test.ts` and UI test in `src/__tests__/App.ui.test.tsx` (112 tests passing across 9 suites).
 
 - **Complete 8-Component PC Build Data Model & Physical Clearance Compatibility Engine (`[BLD-01]`, `[BLD-02]`, 2026-10-19):**
   - Expanded full PC build tuple to 8 components (`StorageCandidate`, `CaseCandidate`, `CoolerCandidate`).

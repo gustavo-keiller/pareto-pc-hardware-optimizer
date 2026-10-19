@@ -1,24 +1,28 @@
+import { AppLocale } from './i18n';
+
 /**
- * Format currency amount based on detected or selected currency ('USD' or 'BRL').
+ * Format currency amount using Intl.NumberFormat based on currency and locale.
  */
 export function formatCurrency(
   val: number,
   currency: 'USD' | 'BRL' = 'USD',
   showCents = false,
+  locale?: AppLocale,
 ): string {
-  if (isNaN(val)) return currency === 'BRL' ? 'R$ 0' : '$0';
-
-  if (currency === 'BRL') {
-    return `R$ ${val.toLocaleString('pt-BR', {
-      minimumFractionDigits: showCents || val % 1 !== 0 ? 2 : 0,
-      maximumFractionDigits: 2,
-    })}`;
+  const targetLocale = locale ?? (currency === 'BRL' ? 'pt-BR' : 'en-US');
+  if (isNaN(val)) {
+    return currency === 'BRL' ? 'R$ 0' : '$0';
   }
 
-  return `$${val.toLocaleString('en-US', {
-    minimumFractionDigits: showCents && val % 1 !== 0 ? 2 : 0,
-    maximumFractionDigits: 2,
-  })}`;
+  const fractionDigits = showCents || val % 1 !== 0 ? 2 : 0;
+  return new Intl.NumberFormat(targetLocale, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  })
+    .format(val)
+    .replace(/\u00A0/g, ' ');
 }
 
 /**

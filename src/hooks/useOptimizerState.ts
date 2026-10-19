@@ -29,6 +29,7 @@ import {
   safeSetJSON,
 } from '../utils/storage';
 import { DEFAULT_USD_TO_BRL_RATE, convertUsdToBrl } from '../utils/currency';
+import { AppLocale, DEFAULT_LOCALE } from '../utils/i18n';
 
 export type DatasetMode = 'real' | 'custom' | 'synthetic' | 'combined';
 export type UiMode = 'simple' | 'explorer' | 'pro' | 'builds';
@@ -171,8 +172,17 @@ export const PRESET_PROFILES: PresetProfile[] = [
   },
 ];
 
-const DEFAULT_CONSTRAINTS_REAL: HardConstraints = {
+const DEFAULT_CONSTRAINTS_REAL_USD: HardConstraints = {
   maxPrice: 550,
+  minVram: 8,
+  maxWatts: 450,
+  selectedVendors: [],
+  selectedArchitectures: [],
+  requiredFeatures: [],
+};
+
+const DEFAULT_CONSTRAINTS_REAL_BRL: HardConstraints = {
+  maxPrice: 5000,
   minVram: 8,
   maxWatts: 450,
   selectedVendors: [],
@@ -217,6 +227,12 @@ export function useOptimizerState() {
     runStorageMigrations();
   }, []);
 
+  // Active UI Locale: 'pt-BR' (default, Brazil-first per D-1) or 'en-US'
+  const [locale, setLocale] = useState<AppLocale>(() => {
+    const saved = safeGetString('paretopc_locale', DEFAULT_LOCALE);
+    return saved === 'en-US' ? 'en-US' : 'pt-BR';
+  });
+
   // Dataset switcher: defaults to 'real' (18 real-world GPUs), 'custom' (My Deals), 'synthetic' (Phase 1 seed), or 'combined' (Unified Sandbox)
   const [datasetMode, setDatasetMode] = useState<DatasetMode>(() => {
     const saved = safeGetString('paretopc_dataset', 'real');
@@ -254,10 +270,16 @@ export function useOptimizerState() {
   const [chartView, setChartView] = useState<ChartViewMode>('2d');
 
   // Stage 1: Hard Constraints
-  const [constraints, setConstraints] = useState<HardConstraints>(() => ({
-    ...DEFAULT_CONSTRAINTS_REAL,
-    ...safeGetJSON('paretopc_constraints', DEFAULT_CONSTRAINTS_REAL),
-  }));
+  const [constraints, setConstraints] = useState<HardConstraints>(() => {
+    const baseDefault =
+      locale === 'pt-BR'
+        ? DEFAULT_CONSTRAINTS_REAL_BRL
+        : DEFAULT_CONSTRAINTS_REAL_USD;
+    return {
+      ...baseDefault,
+      ...safeGetJSON('paretopc_constraints', baseDefault),
+    };
+  });
 
   // Stage 2: Axes & Pareto Mode
   const [xMetric, setXMetric] = useState<MetricKey>('price');
@@ -295,7 +317,10 @@ export function useOptimizerState() {
     safeGetBool('paretopc_hide_traps', false),
   );
 
-  // Persist changes to localStorage
+  useEffect(() => {
+    safeSetJSON('paretopc_locale', locale);
+  }, [locale]);
+
   useEffect(() => {
     safeSetJSON('paretopc_dataset', datasetMode);
   }, [datasetMode]);
@@ -358,8 +383,16 @@ export function useOptimizerState() {
       );
       return [...deals, ...convertedBaselineGpus];
     }
+    if (locale === 'pt-BR' && datasetMode === 'real') {
+      return REAL_WORLD_GPUS.map((g) => ({
+        ...g,
+        originalUsdPrice: g.price,
+        price: convertUsdToBrl(g.price, exchangeRateUsdToBrl),
+        currency: 'BRL' as const,
+      }));
+    }
     return datasetMode === 'real' ? REAL_WORLD_GPUS : PHASE1_SEED_GPUS;
-  }, [datasetMode, customGpus, exchangeRateUsdToBrl]);
+  }, [datasetMode, customGpus, exchangeRateUsdToBrl, locale]);
 
   // Detected active currency ('BRL' or 'USD')
   const activeCurrency = useMemo<'USD' | 'BRL'>(() => {
@@ -372,8 +405,26 @@ export function useOptimizerState() {
     ) {
       return 'BRL';
     }
+    if (locale === 'pt-BR') {
+      return 'BRL';
+    }
     return 'USD';
-  }, [datasetMode, rawCatalog]);
+  }, [datasetMode, rawCatalog, locale]);
+
+  const handleToggleLocale = (newLocale: AppLocale) => {
+    setLocale(newLocale);
+    if (newLocale === 'pt-BR' && constraints.maxPrice < 1500) {
+      setConstraints((prev) => ({
+        ...prev,
+        maxPrice: convertUsdToBrl(prev.maxPrice, exchangeRateUsdToBrl),
+      }));
+    } else if (newLocale === 'en-US' && constraints.maxPrice >= 1500) {
+      setConstraints((prev) => ({
+        ...prev,
+        maxPrice: Math.round(prev.maxPrice / exchangeRateUsdToBrl),
+      }));
+    }
+  };
 
   // Compute Hedonic OLS Regression across the full catalog so fair-value baselines remain anchored
   const olsModel = useMemo(
@@ -493,7 +544,11 @@ export function useOptimizerState() {
         anchorGpuId: 'ref-arc-b580',
       }));
     } else {
-      setConstraints(DEFAULT_CONSTRAINTS_REAL);
+      setConstraints(
+        locale === 'pt-BR'
+          ? DEFAULT_CONSTRAINTS_REAL_BRL
+          : DEFAULT_CONSTRAINTS_REAL_USD,
+      );
       setSelectedGpuIds(['arc-b580', 'rx-7800-xt', 'rtx-4070-super']);
       setExtrapolation((prev) => ({ ...prev, anchorGpuId: 'arc-b580' }));
     }
@@ -566,7 +621,9 @@ export function useOptimizerState() {
         : datasetMode === 'combined'
           ? DEFAULT_CONSTRAINTS_COMBINED
           : datasetMode === 'real'
-            ? DEFAULT_CONSTRAINTS_REAL
+            ? locale === 'pt-BR'
+              ? DEFAULT_CONSTRAINTS_REAL_BRL
+              : DEFAULT_CONSTRAINTS_REAL_USD
             : DEFAULT_CONSTRAINTS_SYNTHETIC,
     );
     setXMetric('price');
@@ -639,5 +696,8 @@ export function useOptimizerState() {
     activeCurrency,
     exchangeRateUsdToBrl,
     setExchangeRateUsdToBrl,
+    locale,
+    setLocale,
+    handleToggleLocale,
   };
 }
