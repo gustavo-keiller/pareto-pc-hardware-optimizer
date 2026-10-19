@@ -87,4 +87,43 @@ describe('App modes', () => {
     expect(gpu).toBeDefined();
     expect(gpu?.price ?? Infinity).toBeLessThanOrEqual(350);
   });
+
+  it('Trap Rule controls are visible and toggleable in Explorer mode', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Switch to Explorer mode
+    await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
+
+    // Trap Rule should be visible in Explorer mode
+    expect(screen.getByText(/Trap Rule:/i)).toBeDefined();
+    const btn5D = screen.getByRole('button', { name: /All 5 Specs \(5D\)/i });
+    const btn2D = screen.getByRole('button', { name: /Strict 2D Axes/i });
+    expect(btn5D).toBeDefined();
+    expect(btn2D).toBeDefined();
+
+    // Toggle to Strict 2D Axes
+    await user.click(btn2D);
+    expect(btn2D.className).toContain('bg-emerald-500/20');
+  });
+
+  it('switching from Pro with residuals view to Explorer gracefully falls back to 2D view', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Go to Pro Lab
+    await user.click(screen.getByRole('button', { name: /3\. Pro Lab/ }));
+    await user.click(
+      screen.getByRole('button', { name: /Fair Value \(OLS\)/i }),
+    );
+
+    // Switch to Explorer mode
+    await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
+
+    // Should fall back to 2D Frontier instead of crashing or showing invalid tab
+    expect(screen.getByRole('button', { name: /2D Frontier/i })).toBeDefined();
+    expect(
+      screen.queryByRole('button', { name: /Fair Value \(OLS\)/i }),
+    ).toBeNull();
+  });
 });

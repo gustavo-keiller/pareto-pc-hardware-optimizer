@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { METRIC_DEFINITIONS, isMetricKey } from './lib/math/types';
 import { ALL_METRIC_KEYS } from './lib/math/topsis';
 import { PRESET_PROFILES, useOptimizerState } from './hooks/useOptimizerState';
@@ -100,6 +100,13 @@ export function App() {
   const [showDominatedZoneMesh, setShowDominatedZoneMesh] =
     useState<boolean>(true);
   const [hideDominatedNodes, setHideDominatedNodes] = useState<boolean>(false);
+
+  // When switching away from Pro mode, gracefully fall back to 2D view if residuals was selected
+  useEffect(() => {
+    if (uiMode !== 'pro' && chartView === 'residuals') {
+      setChartView('2d');
+    }
+  }, [uiMode, chartView, setChartView]);
 
   const maxBudgetBound =
     datasetMode === 'custom'
@@ -204,16 +211,7 @@ export function App() {
             <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
               <button
                 type="button"
-                onClick={() => {
-                  setUiMode('simple');
-                  if (
-                    chartView === 'residuals' ||
-                    chartView === 'axes' ||
-                    chartView === 'hyper'
-                  ) {
-                    setChartView('2d');
-                  }
-                }}
+                onClick={() => setUiMode('simple')}
                 className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
                   uiMode === 'simple'
                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
@@ -226,12 +224,7 @@ export function App() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setUiMode('explorer');
-                  if (chartView === 'residuals') {
-                    setChartView('2d');
-                  }
-                }}
+                onClick={() => setUiMode('explorer')}
                 className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
                   uiMode === 'explorer'
                     ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
@@ -738,8 +731,8 @@ export function App() {
                   {chartView === '2d' && (
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-800/80 bg-slate-950/60 px-3 py-2 text-xs">
                       <div className="flex flex-wrap items-center gap-2">
-                        {/* Trap Rule 5D vs 2D only shown in Pro mode */}
-                        {uiMode === 'pro' && (
+                        {/* Trap Rule 5D vs 2D shown in both Explorer and Pro modes */}
+                        {(uiMode === 'pro' || uiMode === 'explorer') && (
                           <>
                             <span className="text-slate-400 font-medium">
                               Trap Rule:
@@ -1036,27 +1029,31 @@ export function App() {
           </>
         )}
 
-        {/* Multi-Metric Comparison Drawer (Radar & Parallel Coordinates) */}
-        <ComparisonDrawer
-          selectedGpus={selectedGpus}
-          allGpus={rankedGpus}
-          onRemoveGpu={handleToggleSelectGpu}
-          onClearAll={() => setSelectedGpuIds([])}
-        />
+        {/* Multi-Metric Comparison Drawer & GPU Leaderboard Table (Hidden in Full Builds mode where Build Leaderboard is shown) */}
+        {uiMode !== 'builds' && (
+          <>
+            <ComparisonDrawer
+              selectedGpus={selectedGpus}
+              allGpus={rankedGpus}
+              onRemoveGpu={handleToggleSelectGpu}
+              onClearAll={() => setSelectedGpuIds([])}
+            />
 
-        {/* Live-Sorted TOPSIS Leaderboard & OLS Fair-Value Table */}
-        <GpuLeaderboardTable
-          gpus={displayedTableGpus}
-          topWinnerId={topWinner?.id ?? null}
-          hoveredGpuId={hoveredGpuId}
-          selectedGpuIds={selectedGpuIds}
-          hideTrapsInTable={hideTrapsInTable}
-          trapCount={trapCount}
-          uiMode={uiMode}
-          onHoverGpu={setHoveredGpuId}
-          onToggleSelectGpu={handleToggleSelectGpu}
-          onToggleHideTraps={setHideTrapsInTable}
-        />
+            {/* Live-Sorted TOPSIS Leaderboard & OLS Fair-Value Table */}
+            <GpuLeaderboardTable
+              gpus={displayedTableGpus}
+              topWinnerId={topWinner?.id ?? null}
+              hoveredGpuId={hoveredGpuId}
+              selectedGpuIds={selectedGpuIds}
+              hideTrapsInTable={hideTrapsInTable}
+              trapCount={trapCount}
+              uiMode={uiMode}
+              onHoverGpu={setHoveredGpuId}
+              onToggleSelectGpu={handleToggleSelectGpu}
+              onToggleHideTraps={setHideTrapsInTable}
+            />
+          </>
+        )}
 
         {/* GPU Deal Importer & Custom Database Modal */}
         <GpuDealImporterModal
