@@ -43,18 +43,18 @@ describe('App modes', () => {
     render(<App />);
     await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
     expect(screen.queryAllByTestId('top-choice')).toHaveLength(0);
-    expect(screen.getAllByTestId('echarts-placeholder').length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (await screen.findAllByTestId('echarts-placeholder')).length,
+    ).toBeGreaterThan(0);
     await user.click(screen.getByRole('button', { name: /3\. Pro Lab/ }));
     expect(screen.queryAllByTestId('top-choice')).toHaveLength(0);
-    expect(screen.getAllByTestId('echarts-placeholder').length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (await screen.findAllByTestId('echarts-placeholder')).length,
+    ).toBeGreaterThan(0);
     await user.click(screen.getByRole('button', { name: /4\. Full Builds/ }));
     expect(screen.queryAllByTestId('top-choice')).toHaveLength(0);
-    expect(screen.getByTestId('top-build-card')).toBeDefined();
-    expect(screen.getByText(/Total Hardware Cost/i)).toBeDefined();
+    expect(await screen.findByTestId('top-build-card')).toBeDefined();
+    expect(await screen.findByText(/Total Hardware Cost/i)).toBeDefined();
 
     await user.click(screen.getByRole('button', { name: /1\. Simple Guide/ }));
     expect(screen.getAllByTestId('top-choice')).toHaveLength(3);
@@ -64,7 +64,7 @@ describe('App modes', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: /4\. Full Builds/ }));
-    const topBuildCard = screen.getByTestId('top-build-card');
+    const topBuildCard = await screen.findByTestId('top-build-card');
     const initialText = topBuildCard.textContent ?? '';
 
     // Switch to $2,200 Enthusiast preset
@@ -295,7 +295,7 @@ describe('App modes', () => {
     ).toBeDefined();
 
     // Verify top build card is rendered with BRL total cost
-    expect(screen.getByTestId('top-build-card')).toBeDefined();
+    expect(await screen.findByTestId('top-build-card')).toBeDefined();
     expect(screen.getAllByText(/R\$/i).length).toBeGreaterThan(0);
 
     // Switch to USD
@@ -303,7 +303,7 @@ describe('App modes', () => {
     expect(
       screen.getByRole('button', { name: /\$1,000 Sweet Spot/i }),
     ).toBeDefined();
-    expect(screen.getByTestId('top-build-card')).toBeDefined();
+    expect(await screen.findByTestId('top-build-card')).toBeDefined();
   });
 
   it('UX-07: "See Math in 2D Explorer" button smoothly transitions user from Simple Guide pick to Explorer mode with GPU highlighted', async () => {

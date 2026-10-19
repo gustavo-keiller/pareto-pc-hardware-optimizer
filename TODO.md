@@ -19,12 +19,6 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (Reprioritized from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[PERF-01]` Code-split by mode & Lazy Loading:**
-  Lazy-load heavy Explorer, Pro Lab, and deal importer components (`ParetoScatterPlot`, `Pareto3DCloud`, `HyperDimensionalExplorer`, `ValueResidualsChart`, `ComparisonDrawer`, `GpuDealImporterModal`, `FullBuildExplorer`) via `React.lazy` and `Suspense`, so first-time visitors landing on Simple Guide download a much smaller initial bundle without downloading 3D WebGL or 7D multi-objective visualization libraries until needed.
-  - **Files likely touched:** `src/App.tsx`, `src/components/`
-  - **Done when:** bundle analyzer / build shows separate async chunks for heavy visualizers and initial bundle size is substantially reduced.
-  - **Test to add:** UI tests in `src/__tests__/App.ui.test.tsx` verifying lazy-loaded components render cleanly with Suspense fallbacks.
-
 - **`[PERF-02]` Slim ECharts tree-shaking:**
   Import only the specific ECharts modules used (`echarts/core`, `ScatterChart`, `RadarChart`, `ParallelChart`, `BarChart`, `GridComponent`, `TooltipComponent`, `CanvasRenderer`) via `echarts-for-react/lib/core` instead of importing the monolithic 1MB+ `echarts` bundle.
   - **Files likely touched:** `src/components/ParetoScatterPlot.tsx`, `src/components/ComparisonDrawer.tsx`, `src/components/ValueResidualsChart.tsx`

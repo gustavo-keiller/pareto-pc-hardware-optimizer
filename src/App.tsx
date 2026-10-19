@@ -1,20 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { METRIC_DEFINITIONS, isMetricKey } from './lib/math/types';
 import { ALL_METRIC_KEYS } from './lib/math/topsis';
 import { PRESET_PROFILES, useOptimizerState } from './hooks/useOptimizerState';
-import { ParetoScatterPlot } from './components/ParetoScatterPlot';
-import { Pareto3DCloud } from './components/Pareto3DCloud';
-import { AxisViewsGrid } from './components/AxisViewsGrid';
 import { ExtrapolationToolbar } from './components/ExtrapolationToolbar';
-import { ValueResidualsChart } from './components/ValueResidualsChart';
-import { ComparisonDrawer } from './components/ComparisonDrawer';
 import { GpuLeaderboardTable } from './components/GpuLeaderboardTable';
 import { SimpleParetoGuide } from './components/SimpleParetoGuide';
-import { HyperDimensionalExplorer } from './components/HyperDimensionalExplorer';
-import { GpuDealImporterModal } from './components/GpuDealImporterModal';
 import { DealbreakerFilterPanel } from './components/DealbreakerFilterPanel';
 import { TopWinnerBanner } from './components/TopWinnerBanner';
-import { FullBuildExplorer } from './components/FullBuildExplorer';
 import { t } from './utils/i18n';
 import {
   Sliders,
@@ -39,6 +31,78 @@ import {
   Store,
   PlusCircle,
 } from 'lucide-react';
+
+// Lazy-loaded heavy visualizers & mode views (PERF-01)
+const FullBuildExplorer = lazy(() =>
+  import('./components/FullBuildExplorer').then((m) => ({
+    default: m.FullBuildExplorer,
+  })),
+);
+const ParetoScatterPlot = lazy(() =>
+  import('./components/ParetoScatterPlot').then((m) => ({
+    default: m.ParetoScatterPlot,
+  })),
+);
+const Pareto3DCloud = lazy(() =>
+  import('./components/Pareto3DCloud').then((m) => ({
+    default: m.Pareto3DCloud,
+  })),
+);
+const AxisViewsGrid = lazy(() =>
+  import('./components/AxisViewsGrid').then((m) => ({
+    default: m.AxisViewsGrid,
+  })),
+);
+const ValueResidualsChart = lazy(() =>
+  import('./components/ValueResidualsChart').then((m) => ({
+    default: m.ValueResidualsChart,
+  })),
+);
+const HyperDimensionalExplorer = lazy(() =>
+  import('./components/HyperDimensionalExplorer').then((m) => ({
+    default: m.HyperDimensionalExplorer,
+  })),
+);
+const ComparisonDrawer = lazy(() =>
+  import('./components/ComparisonDrawer').then((m) => ({
+    default: m.ComparisonDrawer,
+  })),
+);
+const GpuDealImporterModal = lazy(() =>
+  import('./components/GpuDealImporterModal').then((m) => ({
+    default: m.GpuDealImporterModal,
+  })),
+);
+
+function ChartLoadingFallback() {
+  return (
+    <div
+      data-testid="chart-loading-fallback"
+      className="flex h-96 w-full items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/60 p-8 shadow-xl"
+    >
+      <div className="flex flex-col items-center gap-3 text-slate-400">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+        <span className="text-xs font-medium">Carregando visualizador...</span>
+      </div>
+    </div>
+  );
+}
+
+function BuildExplorerLoadingFallback() {
+  return (
+    <div
+      data-testid="builds-loading-fallback"
+      className="flex h-96 w-full items-center justify-center rounded-3xl border border-slate-800 bg-slate-900/60 p-8 shadow-xl"
+    >
+      <div className="flex flex-col items-center gap-3 text-slate-400">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+        <span className="text-xs font-medium">
+          Carregando montador de PC...
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export function App() {
   const {
@@ -356,13 +420,15 @@ export function App() {
 
       <main className="mx-auto max-w-7xl px-4 pt-6 sm:px-6">
         {uiMode === 'builds' ? (
-          <FullBuildExplorer
-            gpus={rawCatalog}
-            currency={activeCurrency}
-            locale={locale}
-            onSwitchToSimple={() => setUiMode('simple')}
-            onSwitchToExplorer={() => setUiMode('explorer')}
-          />
+          <Suspense fallback={<BuildExplorerLoadingFallback />}>
+            <FullBuildExplorer
+              gpus={rawCatalog}
+              currency={activeCurrency}
+              locale={locale}
+              onSwitchToSimple={() => setUiMode('simple')}
+              onSwitchToExplorer={() => setUiMode('explorer')}
+            />
+          </Suspense>
         ) : uiMode === 'simple' ? (
           <SimpleParetoGuide
             gpus={rankedGpus}
@@ -825,80 +891,82 @@ export function App() {
 
                   {/* Active Visualization Canvas */}
                   {rankedGpus.length > 0 ? (
-                    chartView === '2d' ? (
-                      <ParetoScatterPlot
-                        gpus={rankedGpus}
-                        xMetric={xMetric}
-                        yMetric={yMetric}
-                        paretoMode={paretoMode}
-                        extrapolation={extrapolation}
-                        hoveredGpuId={hoveredGpuId}
-                        selectedGpuIds={selectedGpuIds}
-                        isExpanded={isChartExpanded}
-                        hideDominatedNodes={hideDominatedNodes}
-                        showDominatedZoneMesh={showDominatedZoneMesh}
-                        onHoverGpu={setHoveredGpuId}
-                        onToggleSelectGpu={handleToggleSelectGpu}
-                      />
-                    ) : chartView === '3d' ? (
-                      <Pareto3DCloud
-                        gpus={rankedGpus}
-                        xMetric={xMetric}
-                        yMetric={yMetric}
-                        zMetric={zMetric}
-                        extrapolation={extrapolation}
-                        hoveredGpuId={hoveredGpuId}
-                        selectedGpuIds={selectedGpuIds}
-                        isExpanded={isChartExpanded}
-                        hideDominatedNodes={hideDominatedNodes}
-                        showDominatedZoneMesh={showDominatedZoneMesh}
-                        onToggleHideDominatedNodes={() =>
-                          setHideDominatedNodes((prev) => !prev)
-                        }
-                        onToggleDominatedZoneMesh={() =>
-                          setShowDominatedZoneMesh((prev) => !prev)
-                        }
-                        onHoverGpu={setHoveredGpuId}
-                        onToggleSelectGpu={handleToggleSelectGpu}
-                        onChangeXMetric={setXMetric}
-                        onChangeYMetric={setYMetric}
-                        onChangeZMetric={setZMetric}
-                      />
-                    ) : chartView === 'hyper' ? (
-                      <HyperDimensionalExplorer
-                        gpus={rankedGpus}
-                        hoveredGpuId={hoveredGpuId}
-                        selectedGpuIds={selectedGpuIds}
-                        isExpanded={isChartExpanded}
-                        hideDominatedNodes={hideDominatedNodes}
-                        onHoverGpu={setHoveredGpuId}
-                        onToggleSelectGpu={handleToggleSelectGpu}
-                      />
-                    ) : chartView === 'axes' ? (
-                      <AxisViewsGrid
-                        gpus={rankedGpus}
-                        baseMetric={xMetric}
-                        onChangeBaseMetric={setXMetric}
-                        extrapolation={extrapolation}
-                        hoveredGpuId={hoveredGpuId}
-                        selectedGpuIds={selectedGpuIds}
-                        isExpanded={isChartExpanded}
-                        hideDominatedNodes={hideDominatedNodes}
-                        showDominatedZoneMesh={showDominatedZoneMesh}
-                        onHoverGpu={setHoveredGpuId}
-                        onToggleSelectGpu={handleToggleSelectGpu}
-                      />
-                    ) : (
-                      <ValueResidualsChart
-                        gpus={rankedGpus}
-                        rSquared={olsModel.rSquared}
-                        hoveredGpuId={hoveredGpuId}
-                        isExpanded={isChartExpanded}
-                        hideDominatedNodes={hideDominatedNodes}
-                        onHoverGpu={setHoveredGpuId}
-                        onToggleSelectGpu={handleToggleSelectGpu}
-                      />
-                    )
+                    <Suspense fallback={<ChartLoadingFallback />}>
+                      {chartView === '2d' ? (
+                        <ParetoScatterPlot
+                          gpus={rankedGpus}
+                          xMetric={xMetric}
+                          yMetric={yMetric}
+                          paretoMode={paretoMode}
+                          extrapolation={extrapolation}
+                          hoveredGpuId={hoveredGpuId}
+                          selectedGpuIds={selectedGpuIds}
+                          isExpanded={isChartExpanded}
+                          hideDominatedNodes={hideDominatedNodes}
+                          showDominatedZoneMesh={showDominatedZoneMesh}
+                          onHoverGpu={setHoveredGpuId}
+                          onToggleSelectGpu={handleToggleSelectGpu}
+                        />
+                      ) : chartView === '3d' ? (
+                        <Pareto3DCloud
+                          gpus={rankedGpus}
+                          xMetric={xMetric}
+                          yMetric={yMetric}
+                          zMetric={zMetric}
+                          extrapolation={extrapolation}
+                          hoveredGpuId={hoveredGpuId}
+                          selectedGpuIds={selectedGpuIds}
+                          isExpanded={isChartExpanded}
+                          hideDominatedNodes={hideDominatedNodes}
+                          showDominatedZoneMesh={showDominatedZoneMesh}
+                          onToggleHideDominatedNodes={() =>
+                            setHideDominatedNodes((prev) => !prev)
+                          }
+                          onToggleDominatedZoneMesh={() =>
+                            setShowDominatedZoneMesh((prev) => !prev)
+                          }
+                          onHoverGpu={setHoveredGpuId}
+                          onToggleSelectGpu={handleToggleSelectGpu}
+                          onChangeXMetric={setXMetric}
+                          onChangeYMetric={setYMetric}
+                          onChangeZMetric={setZMetric}
+                        />
+                      ) : chartView === 'hyper' ? (
+                        <HyperDimensionalExplorer
+                          gpus={rankedGpus}
+                          hoveredGpuId={hoveredGpuId}
+                          selectedGpuIds={selectedGpuIds}
+                          isExpanded={isChartExpanded}
+                          hideDominatedNodes={hideDominatedNodes}
+                          onHoverGpu={setHoveredGpuId}
+                          onToggleSelectGpu={handleToggleSelectGpu}
+                        />
+                      ) : chartView === 'axes' ? (
+                        <AxisViewsGrid
+                          gpus={rankedGpus}
+                          baseMetric={xMetric}
+                          onChangeBaseMetric={setXMetric}
+                          extrapolation={extrapolation}
+                          hoveredGpuId={hoveredGpuId}
+                          selectedGpuIds={selectedGpuIds}
+                          isExpanded={isChartExpanded}
+                          hideDominatedNodes={hideDominatedNodes}
+                          showDominatedZoneMesh={showDominatedZoneMesh}
+                          onHoverGpu={setHoveredGpuId}
+                          onToggleSelectGpu={handleToggleSelectGpu}
+                        />
+                      ) : (
+                        <ValueResidualsChart
+                          gpus={rankedGpus}
+                          rSquared={olsModel.rSquared}
+                          hoveredGpuId={hoveredGpuId}
+                          isExpanded={isChartExpanded}
+                          hideDominatedNodes={hideDominatedNodes}
+                          onHoverGpu={setHoveredGpuId}
+                          onToggleSelectGpu={handleToggleSelectGpu}
+                        />
+                      )}
+                    </Suspense>
                   ) : (
                     <div className="flex h-[420px] flex-col items-center justify-center text-center p-6">
                       <ShieldAlert className="h-10 w-10 text-rose-400 mb-2" />
@@ -985,12 +1053,16 @@ export function App() {
         {/* Multi-Metric Comparison Drawer & GPU Leaderboard Table (Hidden in Full Builds mode where Build Leaderboard is shown) */}
         {uiMode !== 'builds' && (
           <>
-            <ComparisonDrawer
-              selectedGpus={selectedGpus}
-              allGpus={rankedGpus}
-              onRemoveGpu={handleToggleSelectGpu}
-              onClearAll={() => setSelectedGpuIds([])}
-            />
+            {selectedGpus.length > 0 && (
+              <Suspense fallback={null}>
+                <ComparisonDrawer
+                  selectedGpus={selectedGpus}
+                  allGpus={rankedGpus}
+                  onRemoveGpu={handleToggleSelectGpu}
+                  onClearAll={() => setSelectedGpuIds([])}
+                />
+              </Suspense>
+            )}
 
             {/* Live-Sorted TOPSIS Leaderboard & OLS Fair-Value Table */}
             <GpuLeaderboardTable
@@ -1009,15 +1081,19 @@ export function App() {
         )}
 
         {/* GPU Deal Importer & Custom Database Modal */}
-        <GpuDealImporterModal
-          isOpen={isDealImporterOpen}
-          onClose={() => setIsDealImporterOpen(false)}
-          customGpus={customGpus}
-          onAddCustomGpus={addCustomGpus}
-          onRemoveCustomGpu={removeCustomGpu}
-          onClearCustomGpus={clearCustomGpus}
-          onSwitchToCustomDataset={() => handleSwitchDataset('custom')}
-        />
+        {isDealImporterOpen && (
+          <Suspense fallback={null}>
+            <GpuDealImporterModal
+              isOpen={isDealImporterOpen}
+              onClose={() => setIsDealImporterOpen(false)}
+              customGpus={customGpus}
+              onAddCustomGpus={addCustomGpus}
+              onRemoveCustomGpu={removeCustomGpu}
+              onClearCustomGpus={clearCustomGpus}
+              onSwitchToCustomDataset={() => handleSwitchDataset('custom')}
+            />
+          </Suspense>
+        )}
       </main>
     </div>
   );

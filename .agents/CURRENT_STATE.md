@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- `[PERF-01]` Code-split by mode & Lazy Loading (lazy-load Explorer/Pro views, 3D cloud, hyper explorer, deal importer, and full build explorer via `React.lazy` and `Suspense` to reduce initial bundle size for beginners).
+- `[PERF-02]` Slim ECharts tree-shaking (Import only specific ECharts modules used via `echarts-for-react/lib/core` instead of monolithic 1MB+ bundle).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Code-Split by Mode & Lazy Loading (`[PERF-01]`, 2026-10-19):**
+  - Lazy-loaded heavy visualizers, 3D WebGL charts, 7D hyper-dimensional views, full-build explorer, comparison drawer, and deal importer modals (`ParetoScatterPlot`, `Pareto3DCloud`, `AxisViewsGrid`, `ValueResidualsChart`, `HyperDimensionalExplorer`, `ComparisonDrawer`, `GpuDealImporterModal`, `FullBuildExplorer`) via `React.lazy` and `<Suspense>`.
+  - Added responsive fallback skeletons (`ChartLoadingFallback`, `BuildExplorerLoadingFallback`).
+  - Reduced monolithic initial JavaScript bundle from 1,548 kB (483 kB gzipped) down to 367 kB (101 kB gzipped), a ~79% download size reduction for beginners.
+  - Backed by UI integration tests in `src/__tests__/App.ui.test.tsx` (120 tests passing) and 4 Playwright e2e tests.
 
 - **Smooth Step-Up Between Levels ("See Math in 2D Explorer") (`[UX-07]`, 2026-10-19):**
   - Added a prominent "See Math in 2D Explorer →" / "Ver Cálculo no Explorador 2D →" transition button on the #1 recommended GPU hero card and quick-inspect compass buttons on both Step-Down Bargain and Step-Up Upgrade alternatives (`SimpleGuidePickHero.tsx`).
