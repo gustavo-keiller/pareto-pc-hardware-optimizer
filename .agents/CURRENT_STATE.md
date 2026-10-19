@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- `[P3-02]` Pre-Pruned Combinatorial Engine & Bottleneck Model (`src/lib/math/combinatorial.ts`).
+- `[P3-03]` Full-Build Pareto Explorer UI.
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`) and the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs) so normal users immediately get an approachable experience, while **Pro Math Mode** and the **Phase 1 Synthetic Sandbox (10 GPUs)** are one click away in the top header.
 
 ## 🟡 Recently Completed
+
+- **Phase 3: Pre-Pruned Combinatorial Engine & Bottleneck Model (`[P3-02]`, 2026-10-19):**
+  - Shipped `src/lib/math/combinatorial.ts`: intra-category Pareto pruning (`pruneDominatedCpus`, `pruneDominatedRam`, `pruneDominatedMotherboards`, `pruneDominatedPsus`).
+  - Constraint-propagating backtracking generator (`generateCompatibleBuilds`) guaranteeing 100% physically valid builds.
+  - System-level 2D Pareto dominance engine (`evaluateBuildParetoFrontier`) across Total Price vs. Effective FPS, plus user criteria filtering (`optimizeFullSystemBuilds`).
+  - Added 12 Vitest property tests in `src/lib/math/__tests__/combinatorial.test.ts`.
 
 - **Phase 3: Multi-Component Datasets & Schemas (`[P3-01]`, 2026-10-18):**
   - Shipped `src/lib/math/buildTypes.ts`: typed schemas for `CpuCandidate`, `MotherboardCandidate`, `RamCandidate`, `PsuCandidate`, and `PcBuild`.
