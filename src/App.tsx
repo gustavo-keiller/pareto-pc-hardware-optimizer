@@ -13,9 +13,10 @@ import { SimpleParetoGuide } from './components/SimpleParetoGuide';
 import { HyperDimensionalExplorer } from './components/HyperDimensionalExplorer';
 import { GpuDealImporterModal } from './components/GpuDealImporterModal';
 import { HardwareFilterPanel } from './components/HardwareFilterPanel';
+import { TopWinnerBanner } from './components/TopWinnerBanner';
+import { FullBuildExplorer } from './components/FullBuildExplorer';
 import { formatCurrency } from './utils/currency';
 import {
-  Award,
   Sliders,
   ShieldAlert,
   CheckCircle2,
@@ -130,7 +131,9 @@ export function App() {
                     ? 'Level 1: Easy Buyer Guide'
                     : uiMode === 'explorer'
                       ? 'Level 2: Visual Axis Explorer'
-                      : 'Level 3: Pro MCDM Lab'}
+                      : uiMode === 'builds'
+                        ? 'Level 4: Mario Kart Full-Build Explorer'
+                        : 'Level 3: Pro MCDM Lab'}
                 </span>
               </div>
               <p className="text-xs text-slate-400">
@@ -138,7 +141,9 @@ export function App() {
                   ? 'Pick your budget and gaming style — overpriced value traps are filtered out automatically'
                   : uiMode === 'explorer'
                     ? 'Explore custom hardware axes, 3D views, 4D–7D Hyper-Graphs, and custom $/spec extrapolation rules'
-                    : 'Full 4D–7D Hyper-Space Frontier, TOPSIS Closeness, Non-Linear Extrapolation & Hedonic OLS Lab'}
+                    : uiMode === 'builds'
+                      ? 'Assemble CPU, GPU, RAM, Motherboard, and PSU into Pareto-optimal complete PC systems'
+                      : 'Full 4D–7D Hyper-Space Frontier, TOPSIS Closeness, Non-Linear Extrapolation & Hedonic OLS Lab'}
               </p>
             </div>
           </div>
@@ -250,6 +255,19 @@ export function App() {
                 <Wrench className="h-3.5 w-3.5" />
                 3. Pro Lab
               </button>
+              <button
+                type="button"
+                onClick={() => setUiMode('builds')}
+                className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
+                  uiMode === 'builds'
+                    ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Level 4: Mario Kart Mode — Combinatorial Full PC Build Explorer"
+              >
+                <Layers className="h-3.5 w-3.5" />
+                4. Full Builds
+              </button>
             </div>
 
             <button
@@ -266,7 +284,14 @@ export function App() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 pt-6 sm:px-6">
-        {uiMode === 'simple' ? (
+        {uiMode === 'builds' ? (
+          <FullBuildExplorer
+            gpus={rawCatalog}
+            currency={activeCurrency}
+            onSwitchToSimple={() => setUiMode('simple')}
+            onSwitchToExplorer={() => setUiMode('explorer')}
+          />
+        ) : uiMode === 'simple' ? (
           <SimpleParetoGuide
             gpus={rankedGpus}
             constraints={constraints}
@@ -296,78 +321,7 @@ export function App() {
           <>
             {/* Top #1 Winner Hero Banner */}
             {topWinner && (
-              <div className="mb-6 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-slate-900 to-emerald-500/10 p-4 sm:p-5 shadow-xl">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex items-start sm:items-center gap-3.5">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400">
-                      <Award className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                          Stage 3 Optimal Recommendation (#1 TOPSIS Match)
-                        </span>
-                        <span className="rounded bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-300 border border-amber-500/30">
-                          Closeness Cᵢ = {topWinner.topsisScore.toFixed(3)} (
-                          {topWinner.topsisScorePct.toFixed(1)}%)
-                        </span>
-                        {topWinner.valuation && (
-                          <span
-                            className={`rounded px-2 py-0.5 text-xs font-semibold border ${
-                              topWinner.valuation.residualUsd <= 0
-                                ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                                : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
-                            }`}
-                          >
-                            {topWinner.valuation.residualUsd <= 0
-                              ? `${formatCurrency(Math.abs(topWinner.valuation.residualUsd), topWinner.currency)} Below Fair Market Price (${formatCurrency(topWinner.valuation.fairPrice, topWinner.currency)})`
-                              : `${formatCurrency(topWinner.valuation.residualUsd, topWinner.currency)} Above Fair Market Price (${formatCurrency(topWinner.valuation.fairPrice, topWinner.currency)})`}
-                          </span>
-                        )}
-                      </div>
-                      <h2 className="text-xl font-extrabold text-white mt-0.5">
-                        {topWinner.name}{' '}
-                        <span className="text-emerald-400 font-bold">
-                          —{' '}
-                          {formatCurrency(topWinner.price, topWinner.currency)}
-                        </span>
-                      </h2>
-                      <p className="text-xs text-slate-300 mt-0.5">
-                        {topWinner.notes}
-                        {uiMode === 'pro' &&
-                          ` • Ideal Distance d⁺ = ${topWinner.distanceToBest.toFixed(4)}, Anti-Ideal d⁻ = ${topWinner.distanceToWorst.toFixed(4)}`}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-3 text-xs">
-                    <div className="rounded-xl border border-slate-800 bg-slate-950/80 px-3.5 py-2">
-                      <div className="text-slate-400">1440p Gaming</div>
-                      <div className="text-sm font-bold text-white">
-                        {topWinner.rasterFps1440p} FPS
-                      </div>
-                    </div>
-                    <div className="rounded-xl border border-slate-800 bg-slate-950/80 px-3.5 py-2">
-                      <div className="text-slate-400">Ray Tracing</div>
-                      <div className="text-sm font-bold text-white">
-                        {topWinner.rtFps1440p} FPS
-                      </div>
-                    </div>
-                    <div className="rounded-xl border border-slate-800 bg-slate-950/80 px-3.5 py-2">
-                      <div className="text-slate-400">VRAM</div>
-                      <div className="text-sm font-bold text-sky-400">
-                        {topWinner.vramGb} GB
-                      </div>
-                    </div>
-                    <div className="rounded-xl border border-slate-800 bg-slate-950/80 px-3.5 py-2">
-                      <div className="text-slate-400">Power Draw</div>
-                      <div className="text-sm font-bold text-slate-200">
-                        {topWinner.tdpWatts} W
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <TopWinnerBanner topWinner={topWinner} uiMode={uiMode} />
             )}
 
             {/* Main 12-Column Interactive Grid */}

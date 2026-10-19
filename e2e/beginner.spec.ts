@@ -16,3 +16,20 @@ test('a beginner gets a recommendation', async ({ page }) => {
   );
   await expect(topPick).toContainText('$');
 });
+
+test('a user explores complete PC builds in Mario Kart mode', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  await page.getByRole('button', { name: /4\. Full Builds/ }).click();
+  const topBuild = page.getByTestId('top-build-card');
+  await expect(topBuild).toBeVisible();
+  await expect(topBuild).toContainText('Total Hardware Cost');
+
+  const initialText = await topBuild.textContent();
+
+  await page.getByRole('button', { name: '$2,200 Enthusiast' }).click();
+  await expect(topBuild).not.toHaveText(initialText ?? '');
+  await expect(topBuild).toContainText('Total Hardware Cost');
+});

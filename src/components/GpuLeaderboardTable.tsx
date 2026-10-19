@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
 
+import { UiMode } from '../hooks/useOptimizerState';
+
 interface GpuLeaderboardTableProps {
   gpus: RankedGpu[];
   topWinnerId: string | null;
@@ -19,7 +21,7 @@ interface GpuLeaderboardTableProps {
   selectedGpuIds: string[];
   hideTrapsInTable: boolean;
   trapCount: number;
-  uiMode: 'simple' | 'explorer' | 'pro';
+  uiMode: UiMode;
   onHoverGpu: (id: string | null) => void;
   onToggleSelectGpu: (id: string) => void;
   onToggleHideTraps: (hide: boolean) => void;

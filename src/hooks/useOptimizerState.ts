@@ -29,7 +29,7 @@ import {
 } from '../utils/storage';
 
 export type DatasetMode = 'real' | 'custom' | 'synthetic';
-export type UiMode = 'simple' | 'explorer' | 'pro';
+export type UiMode = 'simple' | 'explorer' | 'pro' | 'builds';
 export type ChartViewMode = '2d' | '3d' | 'hyper' | 'axes' | 'residuals';
 
 export const DEFAULT_CUSTOM_GPUS: GpuCandidate[] = [
@@ -210,10 +210,11 @@ export function useOptimizerState() {
   );
   const [isDealImporterOpen, setIsDealImporterOpen] = useState<boolean>(false);
 
-  // 3 Proportional UI Complexity Modes: 'simple' (Level 1) | 'explorer' (Level 2) | 'pro' (Level 3)
+  // 4 Proportional UI Complexity Modes: 'simple' (Level 1) | 'explorer' (Level 2) | 'pro' (Level 3) | 'builds' (Level 4 Mario Kart)
   const [uiMode, setUiMode] = useState<UiMode>(() => {
     const saved = safeGetString('paretopc_ui_mode', 'simple');
-    if (saved === 'pro' || saved === 'explorer') return saved;
+    if (saved === 'pro' || saved === 'explorer' || saved === 'builds')
+      return saved;
     return 'simple';
   });
 

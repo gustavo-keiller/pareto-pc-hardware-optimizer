@@ -37,7 +37,7 @@ describe('App modes', () => {
     expect(topPickName()).not.toBe('');
   });
 
-  it('Explorer and Pro modes render without crashing', async () => {
+  it('Explorer, Pro, and Full Builds modes render without crashing', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
@@ -50,8 +50,30 @@ describe('App modes', () => {
     expect(screen.getAllByTestId('echarts-placeholder').length).toBeGreaterThan(
       0,
     );
+    await user.click(screen.getByRole('button', { name: /4\. Full Builds/ }));
+    expect(screen.queryAllByTestId('top-choice')).toHaveLength(0);
+    expect(screen.getByTestId('top-build-card')).toBeDefined();
+    expect(screen.getByText(/Total Hardware Cost/i)).toBeDefined();
+
     await user.click(screen.getByRole('button', { name: /1\. Simple Guide/ }));
     expect(screen.getAllByTestId('top-choice')).toHaveLength(3);
+  });
+
+  it('picking a different budget in Full Builds updates the top build', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: /4\. Full Builds/ }));
+    const topBuildCard = screen.getByTestId('top-build-card');
+    const initialText = topBuildCard.textContent ?? '';
+
+    // Switch to $2,200 Enthusiast preset
+    await user.click(
+      screen.getByRole('button', { name: /\$2,200 Enthusiast/i }),
+    );
+    const updatedText = topBuildCard.textContent ?? '';
+
+    expect(updatedText).not.toBe(initialText);
+    expect(updatedText).toContain('Total Hardware Cost');
   });
 
   it('picking a lower budget changes the top pick to a card within budget', async () => {

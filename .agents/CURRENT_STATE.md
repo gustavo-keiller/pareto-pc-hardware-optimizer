@@ -3,14 +3,23 @@
 > Snapshot of active work. Update **only** when 🔴 In Flight or 🔶 Decisions change (Rule 15).
 
 ## 🔴 In Flight
-
-- `[P3-03]` Full-Build Pareto Explorer UI.
-
-## 🔶 Decisions Made Without Validation
-
-- Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`) and the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs) so normal users immediately get an approachable experience, while **Pro Math Mode** and the **Phase 1 Synthetic Sandbox (10 GPUs)** are one click away in the top header.
-
-## 🟡 Recently Completed
+ 
+- None. (Phase 1, Phase 2, and Phase 3 roadmap milestones are 100% complete).
+ 
+ ## 🔶 Decisions Made Without Validation
+ 
+ - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`) and the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs) so normal users immediately get an approachable experience, while **Pro Math Mode** and the **Phase 1 Synthetic Sandbox (10 GPUs)** are one click away in the top header.
+ 
+ ## 🟡 Recently Completed
+ 
+ - **Phase 3: Full-Build Pareto Explorer UI ("Mario Kart Mode") (`[P3-03]`, 2026-10-19):**
+   - Shipped `src/components/FullBuildExplorer.tsx`, `src/components/BuildHeroCard.tsx`, `src/components/BuildLeaderboardTable.tsx`, and `src/components/TopWinnerBanner.tsx`.
+   - Wired 4th experience mode (`4. Full Builds`) into `src/App.tsx` and `src/hooks/useOptimizerState.ts`.
+   - Interactive budget presets ($800, $1200, $1600, $2200, $3000) and custom slider, platform/socket filters (AM4, AM5, LGA1700, LGA1851), RAM generation filters (DDR4, DDR5), and GPU vendor filters (NVIDIA, AMD, Intel).
+   - Component breakdown, power load, PSU headroom gauge, bottleneck warning telemetry, and budget distribution bar.
+   - Decomposed `src/App.tsx` down to 1077 lines (safely below the 1125 ceiling in `OVERSIZED_FILE_ALLOWLIST`).
+   - Added UI tests in `src/__tests__/App.ui.test.tsx` (81 passing tests) and e2e test in `e2e/beginner.spec.ts`.
+ 
 
 - **Phase 3: Pre-Pruned Combinatorial Engine & Bottleneck Model (`[P3-02]`, 2026-10-19):**
   - Shipped `src/lib/math/combinatorial.ts`: intra-category Pareto pruning (`pruneDominatedCpus`, `pruneDominatedRam`, `pruneDominatedMotherboards`, `pruneDominatedPsus`).

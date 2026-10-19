@@ -13,7 +13,7 @@ import { createServer } from 'vite';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = path.join(ROOT, 'snapshots');
-const ALL_MODES = ['simple', 'explorer', 'pro'];
+const ALL_MODES = ['simple', 'explorer', 'pro', 'builds'];
 const VIEWPORTS = {
   desktop: { viewport: { width: 1400, height: 900 } },
   phone: devices['Pixel 7'],

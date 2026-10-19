@@ -1,0 +1,342 @@
+import React from 'react';
+import {
+  Award,
+  ShieldCheck,
+  AlertTriangle,
+  Cpu,
+  TrendingUp,
+  Layers,
+  Zap,
+  CheckCircle2,
+} from 'lucide-react';
+import { PcBuild } from '../lib/math/buildTypes';
+import { formatCurrency } from '../utils/currency';
+
+interface BuildHeroCardProps {
+  build: PcBuild;
+  currency?: 'USD' | 'BRL';
+}
+
+export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
+  build,
+  currency = 'USD',
+}) => {
+  return (
+    <section
+      data-testid="top-build-card"
+      className="rounded-3xl border-2 border-emerald-500/40 bg-gradient-to-b from-slate-900 to-slate-950 p-6 sm:p-8 shadow-2xl relative overflow-hidden"
+    >
+      {/* Top Banner & Badges */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-lg shadow-emerald-500/10">
+            <Award className="h-6 w-6" />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
+                #1 Recommended PC Build (Pareto Frontier)
+              </span>
+              <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
+                Max FPS Under Budget
+              </span>
+              {build.bottleneckPct === 0 ? (
+                <span className="rounded bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-xs font-semibold text-emerald-300 flex items-center gap-1">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  100% GPU Throughput (0% Bottleneck)
+                </span>
+              ) : (
+                <span className="rounded bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-xs font-semibold text-amber-300 flex items-center gap-1">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  {build.bottleneckPct}% CPU Bottleneck
+                </span>
+              )}
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-black text-white mt-1">
+              {formatCurrency(build.totalPrice, currency)}{' '}
+              <span className="text-lg font-normal text-slate-400">
+                Total Hardware Cost
+              </span>
+            </h3>
+          </div>
+        </div>
+
+        {/* Performance & Power Quick Telemetry */}
+        <div className="flex flex-wrap items-center gap-3 text-xs">
+          <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
+            <div className="text-slate-400 font-medium">Effective Gaming</div>
+            <div className="text-xl font-black text-emerald-400">
+              {build.effectiveFps1440p} FPS
+            </div>
+            <div className="text-[10px] text-slate-400">
+              1440p Ultra Geomean
+            </div>
+          </div>
+          <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
+            <div className="text-slate-400 font-medium">Raw GPU Capacity</div>
+            <div className="text-xl font-black text-slate-200">
+              {build.rawGpuFps1440p} FPS
+            </div>
+            <div className="text-[10px] text-slate-400">
+              {Math.round(build.bottleneckFactor * 100)}% Fed by CPU
+            </div>
+          </div>
+          <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
+            <div className="text-slate-400 font-medium">
+              Estimated Power Draw
+            </div>
+            <div className="text-xl font-black text-teal-400">
+              {build.estimatedPowerDrawWatts} W
+            </div>
+            <div className="text-[10px] text-slate-400">
+              +{build.powerHeadroomWatts}W PSU Headroom
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 5-Component Bill of Materials Cards */}
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+        {/* CPU Card */}
+        <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <Cpu className="h-3.5 w-3.5" /> CPU
+            </span>
+            <span className="font-black text-white">
+              {formatCurrency(build.cpu.price, currency)}
+            </span>
+          </div>
+          <div className="text-sm font-bold text-white leading-tight">
+            {build.cpu.name}
+          </div>
+          <div className="text-[11px] text-slate-400 space-y-0.5">
+            <div>
+              Platform:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.cpu.socket}
+              </span>
+            </div>
+            <div>
+              Cores:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.cpu.cores}C / {build.cpu.threads}T
+              </span>
+            </div>
+            <div>
+              TDP:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.cpu.tdpWatts}W
+              </span>{' '}
+              · Score:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.cpu.gamingScore}/100
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* GPU Card */}
+        <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+              <TrendingUp className="h-3.5 w-3.5" /> GPU
+            </span>
+            <span className="font-black text-white">
+              {formatCurrency(build.gpu.price, currency)}
+            </span>
+          </div>
+          <div className="text-sm font-bold text-white leading-tight">
+            {build.gpu.name}
+          </div>
+          <div className="text-[11px] text-slate-400 space-y-0.5">
+            <div>
+              VRAM:{' '}
+              <span className="text-sky-400 font-medium">
+                {build.gpu.vramGb} GB
+              </span>
+            </div>
+            <div>
+              Raster:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.gpu.rasterFps1440p} FPS
+              </span>
+            </div>
+            <div>
+              TBP:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.gpu.tdpWatts}W
+              </span>{' '}
+              · Vendor:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.gpu.vendor}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Motherboard Card */}
+        <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <Layers className="h-3.5 w-3.5" /> Motherboard
+            </span>
+            <span className="font-black text-white">
+              {formatCurrency(build.motherboard.price, currency)}
+            </span>
+          </div>
+          <div className="text-sm font-bold text-white leading-tight">
+            {build.motherboard.name}
+          </div>
+          <div className="text-[11px] text-slate-400 space-y-0.5">
+            <div>
+              Chipset:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.motherboard.chipset ?? 'Standard'}
+              </span>
+            </div>
+            <div>
+              RAM Slots:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.motherboard.ramSlots} ({build.motherboard.ramGeneration})
+              </span>
+            </div>
+            <div>
+              Form Factor:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.motherboard.formFactor}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* RAM Card */}
+        <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+              <Zap className="h-3.5 w-3.5" /> Memory
+            </span>
+            <span className="font-black text-white">
+              {formatCurrency(build.ram.price, currency)}
+            </span>
+          </div>
+          <div className="text-sm font-bold text-white leading-tight">
+            {build.ram.name}
+          </div>
+          <div className="text-[11px] text-slate-400 space-y-0.5">
+            <div>
+              Capacity:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.ram.capacityGb} GB ({build.ram.modulesCount} sticks)
+              </span>
+            </div>
+            <div>
+              Speed:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.ram.speedMhz} MHz
+              </span>
+            </div>
+            <div>
+              Generation:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.ram.generation}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* PSU Card */}
+        <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+              <CheckCircle2 className="h-3.5 w-3.5" /> Power Supply
+            </span>
+            <span className="font-black text-white">
+              {formatCurrency(build.psu.price, currency)}
+            </span>
+          </div>
+          <div className="text-sm font-bold text-white leading-tight">
+            {build.psu.name}
+          </div>
+          <div className="text-[11px] text-slate-400 space-y-0.5">
+            <div>
+              Capacity:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.psu.wattage} W
+              </span>
+            </div>
+            <div>
+              Rating:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.psu.efficiencyRating}
+              </span>
+            </div>
+            <div>
+              Cables:{' '}
+              <span className="text-slate-200 font-medium">
+                {build.psu.modular} Modular
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Budget Allocation Breakdown Bar */}
+      <div className="mt-6 border-t border-slate-800/80 pt-5">
+        <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+          <span className="font-semibold text-slate-300">
+            Component Budget Distribution
+          </span>
+          <span>
+            GPU: {Math.round((build.gpu.price / build.totalPrice) * 100)}% ·
+            CPU: {Math.round((build.cpu.price / build.totalPrice) * 100)}% ·
+            Platform:{' '}
+            {Math.round(
+              ((build.motherboard.price + build.ram.price + build.psu.price) /
+                build.totalPrice) *
+                100,
+            )}
+            %
+          </span>
+        </div>
+        <div className="flex h-3 w-full rounded-full overflow-hidden bg-slate-800">
+          <div
+            style={{
+              width: `${(build.gpu.price / build.totalPrice) * 100}%`,
+            }}
+            className="bg-indigo-500"
+            title={`GPU: $${build.gpu.price}`}
+          />
+          <div
+            style={{
+              width: `${(build.cpu.price / build.totalPrice) * 100}%`,
+            }}
+            className="bg-emerald-500"
+            title={`CPU: $${build.cpu.price}`}
+          />
+          <div
+            style={{
+              width: `${(build.motherboard.price / build.totalPrice) * 100}%`,
+            }}
+            className="bg-amber-500"
+            title={`Motherboard: $${build.motherboard.price}`}
+          />
+          <div
+            style={{
+              width: `${(build.ram.price / build.totalPrice) * 100}%`,
+            }}
+            className="bg-sky-500"
+            title={`RAM: $${build.ram.price}`}
+          />
+          <div
+            style={{
+              width: `${(build.psu.price / build.totalPrice) * 100}%`,
+            }}
+            className="bg-teal-500"
+            title={`PSU: $${build.psu.price}`}
+          />
+        </div>
+      </div>
+    </section>
+  );
+};

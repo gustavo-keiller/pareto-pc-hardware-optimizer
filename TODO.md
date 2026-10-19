@@ -17,10 +17,6 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ---
 
-## 🧩 Phase 3: Combinatorial Full-System Builder ("Mario Kart Mode")
+## 🧩 Active Tasks
 
-- **`[P3-03]` Full-Build Pareto Explorer UI:**
-  Build the interactive "Mario Kart Mode" view allowing users to explore Pareto-optimal complete PC builds across total budget vs. effective system FPS.
-  - **Files likely touched:** `src/components/` (new view), `src/hooks/useOptimizerState.ts`, `src/App.tsx`, `CODEMAP.md`
-  - **Done when:** a user can pick a budget and see the best full builds with total price, and `npm run snap` shows the view on desktop and phone without overlapping labels.
-  - **Test to add:** UI smoke test in `src/__tests__/` (view renders, budget change updates the top build) and an e2e step in `e2e/`.
+_All Phase 1, Phase 2, and Phase 3 roadmap milestones are complete! See [`DONE.md`](DONE.md) for shipped milestones. Copy future backlog items here when ready to start._
