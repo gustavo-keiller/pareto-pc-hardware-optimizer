@@ -173,6 +173,9 @@ const DEFAULT_CONSTRAINTS_REAL: HardConstraints = {
   maxPrice: 1800,
   minVram: 8,
   maxWatts: 450,
+  selectedVendors: [],
+  selectedArchitectures: [],
+  requiredFeatures: [],
 };
 
 export const DEFAULT_EXTRAPOLATION_CONFIG: ExtrapolationConfig = {
@@ -218,9 +221,10 @@ export function useOptimizerState() {
   const [chartView, setChartView] = useState<ChartViewMode>('2d');
 
   // Stage 1: Hard Constraints
-  const [constraints, setConstraints] = useState<HardConstraints>(() =>
-    safeGetJSON('paretopc_constraints', DEFAULT_CONSTRAINTS_REAL),
-  );
+  const [constraints, setConstraints] = useState<HardConstraints>(() => ({
+    ...DEFAULT_CONSTRAINTS_REAL,
+    ...safeGetJSON('paretopc_constraints', DEFAULT_CONSTRAINTS_REAL),
+  }));
 
   // Stage 2: Axes & Pareto Mode
   const [xMetric, setXMetric] = useState<MetricKey>('price');
@@ -387,7 +391,14 @@ export function useOptimizerState() {
     setDatasetMode(mode);
     setHoveredGpuId(null);
     if (mode === 'synthetic') {
-      setConstraints({ maxPrice: 1000, minVram: 8, maxWatts: 350 });
+      setConstraints({
+        maxPrice: 1000,
+        minVram: 8,
+        maxWatts: 350,
+        selectedVendors: [],
+        selectedArchitectures: [],
+        requiredFeatures: [],
+      });
       setSelectedGpuIds(['gpu-4', 'gpu-6', 'gpu-7']);
       setExtrapolation((prev) => ({ ...prev, anchorGpuId: 'gpu-6' }));
     } else if (mode === 'custom') {
@@ -395,7 +406,14 @@ export function useOptimizerState() {
         6000,
         ...(customGpus.length ? customGpus.map((g) => g.price) : [6000]),
       );
-      setConstraints({ maxPrice: maxCustomPrice, minVram: 6, maxWatts: 450 });
+      setConstraints({
+        maxPrice: maxCustomPrice,
+        minVram: 6,
+        maxWatts: 450,
+        selectedVendors: [],
+        selectedArchitectures: [],
+        requiredFeatures: [],
+      });
       if (customGpus.length > 0) {
         setSelectedGpuIds(customGpus.slice(0, 3).map((g) => g.id));
         setExtrapolation((prev) => ({
@@ -470,10 +488,20 @@ export function useOptimizerState() {
             ),
             minVram: 6,
             maxWatts: 450,
+            selectedVendors: [],
+            selectedArchitectures: [],
+            requiredFeatures: [],
           }
         : datasetMode === 'real'
           ? DEFAULT_CONSTRAINTS_REAL
-          : { maxPrice: 1000, minVram: 8, maxWatts: 350 },
+          : {
+              maxPrice: 1000,
+              minVram: 8,
+              maxWatts: 350,
+              selectedVendors: [],
+              selectedArchitectures: [],
+              requiredFeatures: [],
+            },
     );
     setXMetric('price');
     setYMetric('rasterFps1440p');

@@ -1,7 +1,12 @@
+export type HardwareVendor = 'NVIDIA' | 'AMD' | 'Intel' | 'Synthetic' | 'Other';
+
 export interface GpuCandidate {
   id: string;
   name: string;
-  vendor?: 'NVIDIA' | 'AMD' | 'Intel' | 'Synthetic' | 'Other';
+  vendor?: HardwareVendor;
+  architecture?: string;
+  generation?: string;
+  features?: string[];
   price: number;
   rasterFps1440p: number;
   rtFps1440p: number;
@@ -96,6 +101,27 @@ export interface HardConstraints {
   maxPrice: number;
   minVram: number;
   maxWatts: number;
+
+  // Categorical & Ecosystem filters (empty or omitted = allow all)
+  selectedVendors?: HardwareVendor[];
+  selectedArchitectures?: string[];
+  requiredFeatures?: string[];
+}
+
+export type HardwareCategory = 'GPU' | 'CPU' | 'RAM' | 'Motherboard' | 'PSU';
+
+export interface FilterFacetOption {
+  id: string;
+  label: string;
+  badge?: string;
+  count?: number;
+}
+
+export interface FilterFacet {
+  id: string;
+  label: string;
+  description?: string;
+  options: FilterFacetOption[];
 }
 
 export type PreferenceWeights = Record<MetricKey, number>;

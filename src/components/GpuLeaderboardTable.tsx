@@ -118,7 +118,17 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                     <div className="font-bold text-white flex items-center gap-1.5 flex-wrap">
                       <span>{gpu.name}</span>
                       {gpu.vendor && gpu.vendor !== 'Synthetic' && (
-                        <span className="rounded bg-slate-800 px-1.5 py-0.2 text-[10px] font-medium text-slate-300">
+                        <span
+                          className={`rounded px-1.5 py-0.5 text-[10px] font-bold border ${
+                            gpu.vendor === 'NVIDIA'
+                              ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                              : gpu.vendor === 'AMD'
+                                ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                                : gpu.vendor === 'Intel'
+                                  ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
+                                  : 'bg-slate-800 text-slate-300 border-slate-700'
+                          }`}
+                        >
                           {gpu.vendor}
                         </span>
                       )}

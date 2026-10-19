@@ -19,11 +19,6 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Phase 3: Combinatorial Full-System Builder ("Mario Kart Mode")
 
-- **`[P3-01]` Multi-Component Datasets & Schemas:**
-  Define typed schemas and seed catalogs for `CPU`, `GPU`, `RAM`, `Motherboard`, and `PSU` including socket, RAM generation, TDP, and CPU gaming score.
-  - **Files likely touched:** `src/lib/math/buildTypes.ts` (new), `src/data/` (new seed catalogs), `CODEMAP.md`, `.agents/GLOSSARY.md`
-  - **Done when:** each category has a typed schema and a seed catalog with at least one compatible and one incompatible pair per rule in P3-02, and `npm run check` passes.
-  - **Test to add:** catalog integrity test (unique ids, no missing fields, positive numbers) in `src/lib/math/__tests__/`.
 - **`[P3-02]` Pre-Pruned Combinatorial Engine & Bottleneck Model:**
   Eliminate dominated parts per category first, enforce socket (`CPU.socket === Motherboard.socket`), RAM generation, and PSU headroom (`(CPU.tdp + GPU.tdp + 75) * 1.25 <= PSU.wattage`), and compute system `EffectiveFPS` using the CPU-GPU bottleneck formula.
   - **Files likely touched:** `src/lib/math/combinatorial.ts` (new), `CONTEXT.md` §4, `CODEMAP.md`

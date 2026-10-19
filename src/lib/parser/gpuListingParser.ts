@@ -22,12 +22,16 @@ const KNOWN_BRANDS = [
   'Zotac',
   'Sapphire',
   'XFX',
+  'Leadertech',
   'PNY',
   'Gainward',
   'Inno3D',
   'Colorful',
   'ASRock',
   'EVGA',
+  'Mancer',
+  'Duex',
+  'Biostar',
 ];
 
 const KNOWN_STORES = [
@@ -44,6 +48,37 @@ const KNOWN_STORES = [
   { name: 'Newegg', pattern: /newegg/i },
   { name: 'Micro Center', pattern: /micro\s*center|microcenter/i },
 ];
+
+/**
+ * Strips promotional badges (e.g. "22%OFF", "30 UNID", "Frete Grátis: Sul e Sudeste").
+ */
+function cleanPromotionalPrefixes(text: string): string {
+  let cleaned = text.replace(/^\[\s*/, '');
+  let prev = '';
+  while (cleaned !== prev) {
+    prev = cleaned;
+    cleaned = cleaned
+      .replace(
+        /^(?:\d+%\s*OFF|\d+\s*UNID(?:ADES)?|FRETE\s*GR[ÁA]TIS(?::\s*[^P\n]+)?|MAIS\s*VENDIDO[^\n]*?)\s*/i,
+        '',
+      )
+      .trim();
+  }
+  return cleaned;
+}
+
+/**
+ * Normalizes squished text copied from e-commerce product grids without spaces.
+ */
+function normalizeSquishedListing(text: string): string {
+  return text
+    .replace(/([a-zA-Z0-9])(de\s*R?\$)/gi, '$1 $2')
+    .replace(/\b(por)(R?\$)/gi, '$1 $2')
+    .replace(/(,\d{2})([A-Za-zÀ-ÿ])/g, '$1 $2')
+    .replace(/(PIX)(R?\$)/gi, '$1 $2')
+    .replace(/(,\d{2})(Em\s*até)/gi, '$1 $2')
+    .replace(/(\d+x)(de)/gi, '$1 $2');
+}
 
 /**
  * Parses numeric price string supporting BRL ("3.899,99", "1389,99") and US ("1,299.99", "299.99").
@@ -78,17 +113,49 @@ export function parsePriceString(rawStr: string): number {
 export function splitMultiListings(rawText: string): string[] {
   if (!rawText || !rawText.trim()) return [];
 
-  // Match boundaries where a new listing starts (e.g. "Placa de Video", "Placa de Vídeo", or 3+ newlines)
-  const productHeaderRegex =
-    /(?:^|\n\s*\n+)(?=(?:Placa\s+de\s+V[íi]deo|NVIDIA|AMD|Intel|PowerColor|Gamer\s+Ninja|Palit|PCYes|ASUS|Gigabyte|MSI|Galax|Zotac|Sapphire|XFX|GeForce|Radeon|Arc)\b)/i;
+  // 1. Markdown Links Detection: If text contains multiple markdown links [title](url)
+  const mdRegex = /\[([\s\S]*?)\]\((https?:\/\/[^\s)]+)\)/g;
+  const mdMatches = Array.from(rawText.matchAll(mdRegex));
+  if (mdMatches.length > 1) {
+    return mdMatches.map((m) => `${m[1].trim()}\n${m[2].trim()}`);
+  }
+
+  // If exactly one markdown link wrapping the whole input, unpack it
+  if (
+    mdMatches.length === 1 &&
+    rawText.trim().startsWith('[') &&
+    rawText.trim().endsWith(')')
+  ) {
+    return [`${mdMatches[0][1].trim()}\n${mdMatches[0][2].trim()}`];
+  }
+
+  // 2. Multi-Listing blocks separated by blank lines (2+ newlines) with a product title
+  const boundaryRegex =
+    /(?:^|\n\s*\n+)(?=(?:\[)?(?:(?:\d+%\s*OFF|\d+\s*UNID|Frete\s*Gr[áa]tis[^\n]*?)\s*)*(?:Placa\s+de\s+V[íi]deo|NVIDIA|AMD|Intel|PowerColor|Gamer\s+Ninja|Palit|PCYes|ASUS|Gigabyte|MSI|Galax|Zotac|Sapphire|XFX|Leadertech|Mancer|GeForce|Radeon|Arc)\b)/i;
 
   const chunks = rawText
-    .split(productHeaderRegex)
+    .split(boundaryRegex)
     .map((c) => c.trim())
     .filter(Boolean);
 
   if (chunks.length > 1) {
     return chunks;
+  }
+
+  // 3. Single-line-per-product paste: where each line has a price AND a GPU keyword
+  const lines = rawText
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (
+    lines.length > 1 &&
+    lines.every(
+      (l) =>
+        /(?:R\$|\$)\s*[\d.]+/i.test(l) &&
+        /(?:RTX|GTX|RX|Arc|Radeon|GeForce|Placa)/i.test(l),
+    )
+  ) {
+    return lines;
   }
 
   // Fallback: split by 3 or more newlines
@@ -111,16 +178,21 @@ export function parseSingleGpuListing(
   index = 0,
 ): ParsedGpuDeal {
   const warnings: string[] = [];
-  const lines = rawListing
+  const cleanedListing = cleanPromotionalPrefixes(rawListing);
+  const normalizedListing = normalizeSquishedListing(cleanedListing);
+  const lines = normalizedListing
     .split(/\r?\n/)
     .map((l) => l.trim())
     .filter(Boolean);
 
   // 1. Raw Title & Clean Name
-  const rawTitle = lines[0] || 'Unknown GPU Listing';
+  let rawTitle = lines[0] || 'Unknown GPU Listing';
+  rawTitle = rawTitle
+    .replace(/\s*(?:de|de:)?\s*R?\$?\s*[\d.]+(?:,\d{2})?\s*por.*$/i, '')
+    .trim();
 
   // 2. Chip & Benchmark Match
-  const benchmarkMatch = matchKnownGpuChip(rawListing);
+  const benchmarkMatch = matchKnownGpuChip(normalizedListing);
   const chip = benchmarkMatch ? benchmarkMatch.chip : 'Unknown Chip';
   const vendor = benchmarkMatch ? benchmarkMatch.vendor : 'Other';
 
@@ -133,7 +205,7 @@ export function parseSingleGpuListing(
   // 3. VRAM extraction
   let vramGb = benchmarkMatch ? benchmarkMatch.vramGb : 8;
   const vramRegex = /\b(\d{1,2})\s*(?:GB|G)\b/i;
-  const vramMatch = rawListing.match(vramRegex);
+  const vramMatch = normalizedListing.match(vramRegex);
   if (vramMatch && vramMatch[1]) {
     const parsedVram = parseInt(vramMatch[1], 10);
     if (!isNaN(parsedVram) && parsedVram >= 2 && parsedVram <= 48) {
@@ -145,7 +217,7 @@ export function parseSingleGpuListing(
   let brand: string | undefined;
   for (const b of KNOWN_BRANDS) {
     const brandRegex = new RegExp(`\\b${b.replace(/\s+/g, '\\s+')}\\b`, 'i');
-    if (brandRegex.test(rawListing)) {
+    if (brandRegex.test(normalizedListing)) {
       brand = b;
       break;
     }
@@ -154,21 +226,6 @@ export function parseSingleGpuListing(
   // 5. Store & URL extraction
   let store = 'Online Store';
   let url: string | undefined;
-
-  // Check explicit seller label "Vendido por: TerabyteShop"
-  const soldByMatch = rawListing.match(
-    /Vendido\s*(?:e\s*entregue)?\s*por:\s*([^\n\r,]+)/i,
-  );
-  if (soldByMatch && soldByMatch[1]) {
-    store = soldByMatch[1].trim();
-  } else {
-    for (const s of KNOWN_STORES) {
-      if (s.pattern.test(rawListing)) {
-        store = s.name;
-        break;
-      }
-    }
-  }
 
   // Markdown link or direct URL
   const mdUrlMatch = rawListing.match(/\[.*?\]\((https?:\/\/[^\s)]+)\)/i);
@@ -179,8 +236,23 @@ export function parseSingleGpuListing(
     url = rawUrlMatch[0];
   }
 
+  // Check explicit seller label "Vendido por: TerabyteShop"
+  const soldByMatch = normalizedListing.match(
+    /Vendido\s*(?:e\s*entregue)?\s*por:\s*([^\n\r,]+)/i,
+  );
+  if (soldByMatch && soldByMatch[1]) {
+    store = soldByMatch[1].trim();
+  } else {
+    for (const s of KNOWN_STORES) {
+      if (s.pattern.test(normalizedListing) || (url && s.pattern.test(url))) {
+        store = s.name;
+        break;
+      }
+    }
+  }
+
   // 6. Currency Detection
-  const hasBrl = /R\$|PIX|reais|sem\s*juros/i.test(rawListing);
+  const hasBrl = /R\$|PIX|reais|sem\s*juros/i.test(normalizedListing);
   const currency: 'BRL' | 'USD' = hasBrl ? 'BRL' : 'USD';
 
   // 7. Price Extraction (Cash/PIX vs. Card/Installment vs. Original)
@@ -189,15 +261,14 @@ export function parseSingleGpuListing(
   let priceInstallment: number | undefined;
 
   // Original price: e.g. "de R$ 5.176,46 por:" or "De: R$ 1.449,99 por:"
-  const origMatch = rawListing.match(
-    /(?:de|de:)\s*R?\$?\s*([\d.]+(?:,\d{2})?)\s*por/i,
+  const origMatch = normalizedListing.match(
+    /(?:de|de:)\s*R?\$?\s*([\d.]+(?:,\d{2})?)\s*(?:por|\/)/i,
   );
   if (origMatch && origMatch[1]) {
     originalPrice = parsePriceString(origMatch[1]);
   }
 
   // Extract all valid currency tokens with explicit currency sign or decimal cents
-  // Example tokens: "R$ 3.899,99", "R$ 4.588,22", "3099,00", "2.944,05"
   interface FoundPrice {
     value: number;
     lineIndex: number;
@@ -209,36 +280,49 @@ export function parseSingleGpuListing(
     /(?:R\$\s*|(?<!\w))(\d{1,3}(?:\.\d{3})+,\d{2}|\d{3,6},\d{2}|\d{3,6}\.\d{2})\b/g;
 
   lines.forEach((line, lineIdx) => {
-    // Skip product title and bus width / pc points lines
-    if (lineIdx === 0 && !line.includes('R$')) return;
+    if (
+      lineIdx === 0 &&
+      !line.includes('R$') &&
+      !/\b\d{3,6},\d{2}\b/.test(line)
+    )
+      return;
     const matches = Array.from(line.matchAll(pricePattern));
     for (const m of matches) {
+      const matchIndex = m.index ?? 0;
+      // Preceding text up to match - check if it's an installment monthly installment
+      const preText = line.slice(Math.max(0, matchIndex - 30), matchIndex);
+      if (/\b\d{1,2}\s*x\s*(?:de\s*)?$/i.test(preText.trim())) {
+        continue;
+      }
+
       const val = parsePriceString(m[1]);
       if (val >= 100) {
-        // Exclude originalPrice from being tagged as cash or installment
         if (originalPrice && Math.abs(val - originalPrice) < 0.01) continue;
-        foundPrices.push({ value: val, lineIndex: lineIdx, rawText: line });
+
+        // Context window around this specific price occurrence (±50 characters)
+        const windowStart = Math.max(0, matchIndex - 50);
+        const windowEnd = Math.min(line.length, matchIndex + m[0].length + 50);
+        const localContext = line.slice(windowStart, windowEnd);
+
+        foundPrices.push({
+          value: val,
+          lineIndex: lineIdx,
+          rawText: localContext,
+        });
       }
     }
   });
 
-  // Classify each found price
+  // Classify each found price using its surrounding context
   for (const fp of foundPrices) {
-    const surrounding = [
-      lines[fp.lineIndex - 1] || '',
-      lines[fp.lineIndex] || '',
-      lines[fp.lineIndex + 1] || '',
-    ].join(' ');
-
     const isInstallmentContext =
-      /em\s*até|\d+x|cartão|sem\s*juros|ou\s*R\$/i.test(surrounding);
-    const isCashContext = /à\s*vista|a\s*vista|pix|no\s*pix|desconto/i.test(
-      surrounding,
-    );
+      /em\s*até|\d+\s*x|cartão|sem\s*juros|ou\s*R\$/i.test(fp.rawText);
+    const isCashContext =
+      /à\s*vista|a\s*vista|pix|no\s*pix|desconto|por\s*R\$/i.test(fp.rawText);
 
-    if (isCashContext && !priceCash) {
+    if (isCashContext && !isInstallmentContext && !priceCash) {
       priceCash = fp.value;
-    } else if (isInstallmentContext && !priceInstallment) {
+    } else if (isInstallmentContext && !isCashContext && !priceInstallment) {
       priceInstallment = fp.value;
     }
   }
@@ -246,7 +330,6 @@ export function parseSingleGpuListing(
   // If we found prices but couldn't strictly differentiate:
   if (foundPrices.length > 0) {
     if (!priceCash && !priceInstallment) {
-      // If two prices found, the smaller is cash/PIX and the larger is installment
       if (foundPrices.length >= 2) {
         const sorted = [...foundPrices].sort((a, b) => a.value - b.value);
         priceCash = sorted[0].value;
@@ -255,10 +338,15 @@ export function parseSingleGpuListing(
         priceCash = foundPrices[0].value;
       }
     } else if (!priceCash && priceInstallment) {
-      // Look for a smaller price in foundPrices
       const remaining = foundPrices.filter((p) => p.value !== priceInstallment);
       if (remaining.length > 0) {
-        priceCash = remaining[0].value;
+        priceCash = Math.min(...remaining.map((p) => p.value));
+      }
+    } else if (priceCash !== undefined && !priceInstallment) {
+      const cash = priceCash;
+      const remaining = foundPrices.filter((p) => p.value > cash);
+      if (remaining.length > 0) {
+        priceInstallment = Math.max(...remaining.map((p) => p.value));
       }
     }
   }
