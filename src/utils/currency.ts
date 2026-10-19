@@ -1,4 +1,4 @@
-import { AppLocale } from './i18n';
+import { AppLocale, isAppLocale } from './i18n';
 
 /**
  * Format currency amount using Intl.NumberFormat based on currency and locale.
@@ -6,15 +6,25 @@ import { AppLocale } from './i18n';
 export function formatCurrency(
   val: number,
   currency: 'USD' | 'BRL' = 'USD',
-  showCents = false,
+  showCents: boolean | AppLocale = false,
   locale?: AppLocale,
 ): string {
-  const targetLocale = locale ?? (currency === 'BRL' ? 'pt-BR' : 'en-US');
+  let actualShowCents = false;
+  let actualLocale = locale;
+
+  if (isAppLocale(showCents)) {
+    actualLocale = showCents;
+    actualShowCents = false;
+  } else {
+    actualShowCents = Boolean(showCents);
+  }
+
+  const targetLocale = actualLocale ?? (currency === 'BRL' ? 'pt-BR' : 'en-US');
   if (isNaN(val)) {
     return currency === 'BRL' ? 'R$ 0' : '$0';
   }
 
-  const fractionDigits = showCents || val % 1 !== 0 ? 2 : 0;
+  const fractionDigits = actualShowCents || val % 1 !== 0 ? 2 : 0;
   return new Intl.NumberFormat(targetLocale, {
     style: 'currency',
     currency,

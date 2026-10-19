@@ -1,6 +1,7 @@
 import React from 'react';
 import { Monitor, Sparkles, Zap, Flame, Bot, Layers } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
+import { AppLocale, t } from '../utils/i18n';
 
 export type BeginnerGoal = 'gpu' | 'pc';
 
@@ -12,6 +13,7 @@ export interface BeginnerIntakeCardProps {
   useCase: BeginnerUseCase;
   budget: number;
   currency: 'USD' | 'BRL';
+  locale?: AppLocale;
   maxBudgetBound: number;
   onSelectGoal: (goal: BeginnerGoal) => void;
   onSelectUseCase: (useCase: BeginnerUseCase) => void;
@@ -25,36 +27,34 @@ interface UseCaseOption {
   icon: React.ElementType;
 }
 
-const USE_CASES: UseCaseOption[] = [
-  {
-    id: 'esports-1080p',
-    title: '1080p Esports / Budget',
-    subtitle:
-      'Max FPS per dollar for Valorant, CS2, Fortnite, and low-latency gaming.',
-    icon: Zap,
-  },
-  {
-    id: 'sweetspot-1440p',
-    title: '1440p High Refresh (Sweet Spot)',
-    subtitle:
-      'Optimal value: 12GB+ VRAM, high FPS in modern AAA titles at 1440p.',
-    icon: Sparkles,
-  },
-  {
-    id: 'enthusiast-4k',
-    title: '4K & Ray Tracing Enthusiast',
-    subtitle:
-      'High visual fidelity, modern Ray Tracing, and 16GB+ VRAM capacity.',
-    icon: Flame,
-  },
-  {
-    id: 'creator-ai',
-    title: 'Creator & AI Workloads',
-    subtitle:
-      'High VRAM, CUDA/Tensor cores for video editing, 3D render, and local LLMs.',
-    icon: Bot,
-  },
-];
+function getUseCases(locale: AppLocale): UseCaseOption[] {
+  return [
+    {
+      id: 'esports-1080p',
+      title: t('intakeUc1080pTitle', locale),
+      subtitle: t('intakeUc1080pDesc', locale),
+      icon: Zap,
+    },
+    {
+      id: 'sweetspot-1440p',
+      title: t('intakeUc1440pTitle', locale),
+      subtitle: t('intakeUc1440pDesc', locale),
+      icon: Sparkles,
+    },
+    {
+      id: 'enthusiast-4k',
+      title: t('intakeUc4kTitle', locale),
+      subtitle: t('intakeUc4kDesc', locale),
+      icon: Flame,
+    },
+    {
+      id: 'creator-ai',
+      title: t('intakeUcAiTitle', locale),
+      subtitle: t('intakeUcAiDesc', locale),
+      icon: Bot,
+    },
+  ];
+}
 
 const GPU_BUDGET_PRESETS_USD = [250, 350, 550, 800, 1200];
 const GPU_BUDGET_PRESETS_BRL = [1800, 2500, 3500, 5000, 8000];
@@ -67,6 +67,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
   useCase,
   budget,
   currency,
+  locale = 'pt-BR',
   maxBudgetBound,
   onSelectGoal,
   onSelectUseCase,
@@ -91,6 +92,8 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
     }
   };
 
+  const useCases = getUseCases(locale);
+
   return (
     <section
       data-testid="beginner-intake"
@@ -100,10 +103,12 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
       <div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
-            Step 1 • What Are You Building?
+            {t('intakeStep1Title', locale)}
           </span>
           <span className="text-xs text-slate-400">
-            {goal === 'gpu' ? 'Graphics Card Only' : 'Complete PC Build'}
+            {goal === 'gpu'
+              ? t('intakeGoalGpu', locale)
+              : t('intakeGoalPc', locale)}
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -126,9 +131,11 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
               <Monitor className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-sm font-bold">Just a Graphics Card</div>
+              <div className="text-sm font-bold">
+                {t('intakeGoalGpu', locale)}
+              </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Upgrading your current PC or replacing an older card.
+                {t('intakeGoalGpuDesc', locale)}
               </p>
             </div>
           </button>
@@ -152,9 +159,11 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
               <Layers className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-sm font-bold">A Whole PC Build</div>
+              <div className="text-sm font-bold">
+                {t('intakeGoalPc', locale)}
+              </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Full balanced system: CPU, GPU, RAM, Motherboard, and PSU.
+                {t('intakeGoalPcDesc', locale)}
               </p>
             </div>
           </button>
@@ -165,14 +174,16 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
       <div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-black uppercase tracking-wider text-sky-400">
-            Step 2 • Gaming Style &amp; Workload
+            {t('intakeStep2Title', locale)}
           </span>
           <span className="text-xs text-slate-400">
-            Tailors priorities to your games
+            {locale === 'pt-BR'
+              ? 'Ajusta prioridades para seus jogos'
+              : 'Tailors priorities to your games'}
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-          {USE_CASES.map((uc) => {
+          {useCases.map((uc) => {
             const Icon = uc.icon;
             const isSelected = useCase === uc.id;
             return (
@@ -211,10 +222,11 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
       <div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-black uppercase tracking-wider text-amber-400">
-            Step 3 • Maximum Budget Limit
+            {t('intakeStep3Title', locale)}
           </span>
           <span className="font-mono text-sm font-bold text-emerald-400">
-            Up to {formatCurrency(budget, currency)}
+            {locale === 'pt-BR' ? 'Até ' : 'Up to '}
+            {formatCurrency(budget, currency, false, locale)}
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -231,7 +243,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
                     : 'border-slate-800 bg-slate-950/90 text-slate-400 hover:border-slate-700 hover:text-slate-200'
                 }`}
               >
-                ≤ {formatCurrency(amount, currency)}
+                ≤ {formatCurrency(amount, currency, false, locale)}
               </button>
             );
           })}
@@ -244,7 +256,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
                 : 'border-slate-800 bg-slate-950/90 text-slate-400 hover:border-slate-700 hover:text-slate-200'
             }`}
           >
-            All Limits
+            {locale === 'pt-BR' ? 'Sem Limite' : 'All Limits'}
           </button>
         </div>
       </div>

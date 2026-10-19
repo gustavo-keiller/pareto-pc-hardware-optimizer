@@ -531,7 +531,7 @@ export const SimpleGuideStepStories: React.FC<SimpleGuideStepStoriesProps> = ({
             </div>
           ) : (
             <p className="text-xs text-slate-400">
-              No dominated bad deals found for this pair of variables!
+              No bad deals found for this pair of specs!
             </p>
           )}
 
@@ -555,7 +555,7 @@ export const SimpleGuideStepStories: React.FC<SimpleGuideStepStoriesProps> = ({
                 }}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/50 bg-amber-400 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition hover:bg-amber-300 shadow-md shadow-amber-500/20"
               >
-                Next: The Value Frontier <ArrowRight className="h-3.5 w-3.5" />
+                Next: Cards Worth Buying <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
           )}
@@ -574,7 +574,7 @@ export const SimpleGuideStepStories: React.FC<SimpleGuideStepStoriesProps> = ({
         >
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-400">
-              Step 4 • The Value Frontier (Smart Shortlist)
+              Step 4 • Best Deals (Smart Shortlist)
             </span>
             <button
               type="button"
@@ -605,11 +605,11 @@ export const SimpleGuideStepStories: React.FC<SimpleGuideStepStoriesProps> = ({
             There are {gpus.length} graphics cards in your budget. Instead of
             analyzing dozens of mediocre options, the{' '}
             <span className="rounded bg-amber-400 px-1.5 py-0.5 font-black text-slate-950">
-              Value Frontier
+              Best-Deal Line
             </span>{' '}
             narrows the field to the{' '}
             <strong className="text-emerald-400">
-              {frontier2DGpus.length} most efficient options
+              {frontier2DGpus.length} cards worth considering
             </strong>
             . Every card on this line delivers the maximum performance at its
             price bracket.

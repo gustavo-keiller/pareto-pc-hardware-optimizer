@@ -115,9 +115,9 @@ export const SimpleGuideScatterPlot: React.FC<SimpleGuideScatterPlotProps> = ({
               : activeStep === 2
                 ? `Step 2: Trade-Off Between ${xDef.shortLabel} & ${yDef.shortLabel}`
                 : activeStep === 3
-                  ? `Step 3: Why ${spotlightTrap?.name ?? 'a Bad Deal'} Is Strictly Dominated`
+                  ? `Step 3: Why ${spotlightTrap?.name ?? 'This Card'} Is an Overpriced Trap`
                   : activeStep === 4
-                    ? `Step 4: The Value Frontier (${frontier2DGpus.length} Efficient Options)`
+                    ? `Step 4: The Best Deals (${frontier2DGpus.length} Cards Worth Considering)`
                     : `Step 5: Value Trade-Off Curve & Top Recommendations`}
           </h3>
           <p className="text-[11px] text-slate-400 mt-0.5">
@@ -125,7 +125,7 @@ export const SimpleGuideScatterPlot: React.FC<SimpleGuideScatterPlotProps> = ({
               ? 'When you only look at 1 metric, every GPU sits on a single line.'
               : activeStep === 5
                 ? 'Drag the priority slider on the left to balance what matters most to your setup.'
-                : 'Green points sit on the Value Frontier. Red points are bad deals beaten on both axes.'}
+                : 'Green points are cards worth considering. Red points are bad deals beaten on both specs.'}
           </p>
         </div>
 

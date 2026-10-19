@@ -19,12 +19,6 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (Reprioritized from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[UX-03]` Plain-language copy pass on Simple Guide:**
-  Audit all copy in Simple Guide, intake card, pick hero, and full-build cards against `.agents/GLOSSARY.md` to ensure zero math jargon ("Pareto", "frontier", "dominated", "TOPSIS", "tradeoff hyperplane") appears in Simple mode, replacing with plain shopping terms ("Melhor custo-benefício", "Alternativa econômica", "Opção superior").
-  - **Files likely touched:** `src/components/SimpleParetoGuide.tsx`, `src/components/SimpleGuidePickHero.tsx`, `src/components/FullBuildPickHero.tsx`, `src/components/BeginnerIntakeCard.tsx`
-  - **Done when:** zero mathematical MCDM terms appear in Simple Guide UI text, and all recommendations speak directly to hardware buyers.
-  - **Test to add:** Vitest string assertion test verifying no forbidden jargon in Simple Guide components.
-
 - **`[UX-05]` Mobile layout & responsive polish:**
   Improve mobile phone layout: compact single-row header navigation, ensure SVG plot labels and recommendation cards render cleanly without overflow or clipping on 360px–420px viewport widths.
   - **Files likely touched:** `src/App.tsx`, `src/components/SimpleGuideScatterPlot.tsx`, `src/components/SimpleGuidePickHero.tsx`, `src/components/FullBuildPickHero.tsx`

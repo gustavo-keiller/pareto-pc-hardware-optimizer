@@ -9,12 +9,14 @@ import {
 } from 'lucide-react';
 import { RankedGpu } from '../lib/math/types';
 import { formatCurrency } from '../utils/currency';
+import { AppLocale, t } from '../utils/i18n';
 
 export interface SimpleGuidePickHeroProps {
   topPick: RankedGpu | null;
   stepDownAlt: RankedGpu | null;
   stepUpAlt: RankedGpu | null;
   currency: 'USD' | 'BRL';
+  locale?: AppLocale;
   selectedGpuIds: string[];
   onToggleSelectGpu: (id: string) => void;
   onOpenAccordion: () => void;
@@ -25,6 +27,7 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
   stepDownAlt,
   stepUpAlt,
   currency,
+  locale = 'pt-BR',
   selectedGpuIds,
   onToggleSelectGpu,
   onOpenAccordion,
@@ -58,14 +61,15 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-md bg-amber-400 px-2 py-0.5 text-xs font-black uppercase text-slate-950">
-                  #1 Top Recommended GPU
+                  {t('heroTopPickBadge', locale)}
                 </span>
                 <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
-                  {topPick.topsisScorePct.toFixed(0)}% Value Score
+                  {topPick.topsisScorePct.toFixed(0)}%{' '}
+                  {t('heroMatchScore', locale)}
                 </span>
                 <span className="rounded bg-sky-500/20 px-2 py-0.5 text-xs font-bold text-sky-300 border border-sky-500/30 flex items-center gap-1">
                   <ShieldCheck className="h-3.5 w-3.5" />
-                  Pareto Optimal
+                  {t('heroGoodDealBadge', locale)}
                 </span>
               </div>
               <h4 className="text-2xl sm:text-3xl font-black text-white mt-1">
@@ -132,7 +136,7 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
             className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 hover:text-amber-200 transition"
           >
             <ChevronDown className="h-4 w-4" />
-            Why this pick? Inspect the 2D value curve and trade-off math
+            {t('heroWhyThisPickInspect', locale)}
           </button>
 
           <button
@@ -147,10 +151,10 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
             {isSelected ? (
               <>
                 <Check className="h-4 w-4 text-amber-300" />
-                Selected for Spec Comparison
+                {t('heroSelectedComparison', locale)}
               </>
             ) : (
-              '+ Compare Specs'
+              t('heroCompareSpecs', locale)
             )}
           </button>
         </div>
@@ -168,7 +172,7 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1 font-bold text-sky-400">
                   <ArrowDownRight className="h-4 w-4" />
-                  Step-Down Bargain
+                  {t('heroStepDownTitle', locale)}
                 </span>
                 <span className="font-mono text-xs font-bold text-emerald-400">
                   Save{' '}
@@ -196,8 +200,8 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
                 className="w-full rounded-lg border border-slate-800 bg-slate-950 py-1.5 text-xs font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition"
               >
                 {selectedGpuIds.includes(stepDownAlt.id)
-                  ? 'In Comparison'
-                  : '+ Compare'}
+                  ? t('heroInComparison', locale)
+                  : t('heroCompareSpecs', locale)}
               </button>
             </div>
           )}
@@ -211,7 +215,7 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1 font-bold text-amber-400">
                   <ArrowUpRight className="h-4 w-4" />
-                  Step-Up Upgrade
+                  {t('heroStepUpTitle', locale)}
                 </span>
                 <span className="font-mono text-xs font-bold text-amber-400">
                   +
@@ -244,8 +248,8 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
                 className="w-full rounded-lg border border-slate-800 bg-slate-950 py-1.5 text-xs font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition"
               >
                 {selectedGpuIds.includes(stepUpAlt.id)
-                  ? 'In Comparison'
-                  : '+ Compare'}
+                  ? t('heroInComparison', locale)
+                  : t('heroCompareSpecs', locale)}
               </button>
             </div>
           )}

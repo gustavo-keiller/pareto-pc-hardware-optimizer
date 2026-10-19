@@ -6,6 +6,10 @@
 
 export type AppLocale = 'pt-BR' | 'en-US';
 
+export function isAppLocale(val: unknown): val is AppLocale {
+  return val === 'pt-BR' || val === 'en-US';
+}
+
 export const DEFAULT_LOCALE: AppLocale = 'pt-BR';
 
 export interface Translations {
@@ -47,7 +51,13 @@ export interface Translations {
   heroStepUpTitle: string;
   heroStepUpTag: string;
   heroWhyThisPick: string;
+  heroWhyThisPickInspect: string;
   heroExploreBuild: string;
+  heroGoodDealBadge: string;
+  heroMatchScore: string;
+  heroCompareSpecs: string;
+  heroInComparison: string;
+  heroSelectedComparison: string;
   heroTotalBuildCost: string;
   heroEstimatedFps: string;
   heroPsuHeadroom: string;
@@ -92,7 +102,7 @@ export const TRANSLATIONS: Record<AppLocale, Translations> = {
     intakeGoalPc: 'Um PC Completo',
     intakeGoalPcDesc:
       'Todos os 8 componentes balanceados prontos para ligar e jogar.',
-    intakeStep2Title: 'Passo 2 • Qual a sua resolução ou objetivo?',
+    intakeStep2Title: 'Passo 2 • Estilo de Jogo & Resolução',
     intakeUc1080pTitle: '1080p Competitivo / Econômico',
     intakeUc1080pDesc:
       'Máximo FPS por real para Valorant, CS2, Fortnite e jogos rápidos.',
@@ -105,7 +115,7 @@ export const TRANSLATIONS: Record<AppLocale, Translations> = {
     intakeUcAiTitle: 'Criação & Inteligência Artificial',
     intakeUcAiDesc:
       'Muito VRAM e núcleos CUDA para edição 4K, 3D e rodar IA localmente.',
-    intakeStep3Title: 'Passo 3 • Qual o seu limite de orçamento?',
+    intakeStep3Title: 'Passo 3 • Limite Máximo de Orçamento',
     intakeBudgetMax: 'Limite de Orçamento',
 
     heroTopPickBadge: '#1 Recomendação • Melhor Custo-Benefício',
@@ -115,7 +125,14 @@ export const TRANSLATIONS: Record<AppLocale, Translations> = {
     heroStepUpTitle: 'Opção Superior',
     heroStepUpTag: 'Mais desempenho',
     heroWhyThisPick: 'Por que recomendamos:',
-    heroExploreBuild: 'Ver detalhes no Montador',
+    heroWhyThisPickInspect:
+      'Por que esta escolha? Ver a curva de valor e opções',
+    heroExploreBuild: 'Inspecionar & Trocar Peças no Montador →',
+    heroGoodDealBadge: 'Bom Negócio',
+    heroMatchScore: 'Combina',
+    heroCompareSpecs: '+ Comparar',
+    heroInComparison: 'Na Comparação',
+    heroSelectedComparison: 'Selecionado para Comparação',
     heroTotalBuildCost: 'Custo Total do Hardware',
     heroEstimatedFps: 'Desempenho Estimado',
     heroPsuHeadroom: 'Folga da Fonte',
@@ -158,7 +175,7 @@ export const TRANSLATIONS: Record<AppLocale, Translations> = {
       'For buyers with an existing PC looking for a GPU upgrade.',
     intakeGoalPc: 'A Whole PC Build',
     intakeGoalPcDesc: 'All 8 balanced components ready to power on and game.',
-    intakeStep2Title: 'Step 2 • What is your resolution or workload?',
+    intakeStep2Title: 'Step 2 • Gaming Style & Workload',
     intakeUc1080pTitle: '1080p Esports / Budget',
     intakeUc1080pDesc:
       'Max FPS per dollar for Valorant, CS2, Fortnite, and low-latency gaming.',
@@ -171,17 +188,24 @@ export const TRANSLATIONS: Record<AppLocale, Translations> = {
     intakeUcAiTitle: 'Creator & AI Workloads',
     intakeUcAiDesc:
       'High VRAM and CUDA cores for video editing, 3D render, and local LLMs.',
-    intakeStep3Title: 'Step 3 • What is your budget limit?',
+    intakeStep3Title: 'Step 3 • Maximum Budget Limit',
     intakeBudgetMax: 'Maximum Budget Limit',
 
-    heroTopPickBadge: '#1 Recommendation • Best Value Pick',
-    heroTopBuildBadge: '#1 Recommendation • Ideal Complete PC',
+    heroTopPickBadge: '#1 Top Recommended GPU • Best Value Pick',
+    heroTopBuildBadge: '#1 Recommended PC Build',
     heroStepDownTitle: 'Step-Down Bargain',
     heroStepDownTag: 'Save money',
     heroStepUpTitle: 'Step-Up Upgrade',
     heroStepUpTag: 'More performance',
     heroWhyThisPick: 'Why we recommend this:',
-    heroExploreBuild: 'View details in Builder',
+    heroWhyThisPickInspect:
+      'Why this pick? Inspect the value curve and trade-offs',
+    heroExploreBuild: 'Inspect & Swap Parts in Full Build Explorer →',
+    heroGoodDealBadge: 'Good Deal',
+    heroMatchScore: 'Match',
+    heroCompareSpecs: '+ Compare',
+    heroInComparison: 'In Comparison',
+    heroSelectedComparison: 'Selected for Spec Comparison',
     heroTotalBuildCost: 'Total Hardware Cost',
     heroEstimatedFps: 'Estimated Performance',
     heroPsuHeadroom: 'PSU Headroom',

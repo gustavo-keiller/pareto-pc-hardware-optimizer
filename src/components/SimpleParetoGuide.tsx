@@ -235,6 +235,7 @@ export function SimpleParetoGuide({
         useCase={beginnerUseCase}
         budget={constraints.maxPrice}
         currency={currency}
+        locale={locale}
         maxBudgetBound={maxBudgetBound}
         onSelectGoal={setBeginnerGoal}
         onSelectUseCase={handleSelectUseCase}
@@ -248,6 +249,7 @@ export function SimpleParetoGuide({
           stepDownAlt={stepDownAlt}
           stepUpAlt={stepUpAlt}
           currency={currency}
+          locale={locale}
           selectedGpuIds={selectedGpuIds}
           onToggleSelectGpu={onToggleSelectGpu}
           onOpenAccordion={() => setShowDeepMath(true)}
@@ -258,6 +260,7 @@ export function SimpleParetoGuide({
           stepDownBuild={stepDownBuild}
           stepUpBuild={stepUpBuild}
           currency={currency}
+          locale={locale}
           onSwitchToBuilds={onSwitchToBuilds ?? (() => {})}
         />
       )}

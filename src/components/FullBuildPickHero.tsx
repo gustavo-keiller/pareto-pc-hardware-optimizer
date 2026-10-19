@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
 import { formatCurrency } from '../utils/currency';
+import { AppLocale, t } from '../utils/i18n';
 import { BuildHeroCard } from './BuildHeroCard';
 
 export interface FullBuildPickHeroProps {
@@ -14,6 +15,7 @@ export interface FullBuildPickHeroProps {
   stepDownBuild: PcBuild | null;
   stepUpBuild: PcBuild | null;
   currency: 'USD' | 'BRL';
+  locale?: AppLocale;
   onSwitchToBuilds: () => void;
 }
 
@@ -22,6 +24,7 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
   stepDownBuild,
   stepUpBuild,
   currency,
+  locale = 'pt-BR',
   onSwitchToBuilds,
 }) => {
   if (!topBuild) {
@@ -55,7 +58,7 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
           className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/50 bg-emerald-500/20 px-4 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/30 transition shadow-sm"
         >
           <Compass className="h-4 w-4" />
-          Inspect &amp; Swap Parts in Full Build Explorer →
+          {t('heroExploreBuild', locale)}
         </button>
       </div>
 

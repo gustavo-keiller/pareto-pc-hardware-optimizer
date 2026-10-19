@@ -366,7 +366,7 @@ export const SimpleGuideMathWalkthrough: React.FC<
                 { step: 1, label: '1. One Spec' },
                 { step: 2, label: '2. Trade-Offs' },
                 { step: 3, label: '3. Avoid Bad Deals' },
-                { step: 4, label: '4. Value Frontier' },
+                { step: 4, label: '4. Best-Deal Line' },
                 { step: 5, label: '5. Priorities & Top Picks' },
               ] as const
             ).map((item) => (
@@ -485,7 +485,7 @@ export const SimpleGuideMathWalkthrough: React.FC<
                   </h3>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Ranked along the Value Frontier using {xDef.shortLabel} and{' '}
+                  Ranked along the best-deal line using {xDef.shortLabel} and{' '}
                   {yDef.shortLabel}.
                 </p>
               </div>

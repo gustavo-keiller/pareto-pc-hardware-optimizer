@@ -4,14 +4,19 @@
 
 ## 🔴 In Flight
 
-- `[UX-03]` Plain-language copy pass on Simple Guide (audit copy against GLOSSARY.md for zero math jargon in beginner mode).
-- `[UX-05]` Mobile layout & responsive polish (ensure 360px-420px viewport layouts fit without clipping).
+- `[UX-05]` Mobile layout & responsive polish (compact single-row header navigation, ensure 360px-420px viewport layouts fit without clipping).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Plain-Language Buyer Copy Pass on Simple Guide (`[UX-03]`, 2026-10-19):**
+  - Audited and purged all mathematical MCDM jargon ("Pareto", "TOPSIS", "Strictly Dominated", "tradeoff hyperplane") from the Simple Guide experience in both Portuguese (`pt-BR`) and English (`en-US`), replacing with plain shopping vocabulary ("Bom Negócio" / "Good Deal", "Combina" / "Match", "Peças Desvantajosas" / "Overpriced Bad Deals", "Curva de Melhores Negócios" / "Best-Deal Line").
+  - Fixed `BuildHeroCard` header badge to render `#1 Recommended PC Build (Best Value)`, eliminating residual "(Pareto Frontier)" jargon.
+  - Enhanced `formatCurrency` with safe `isAppLocale` type guard and normalized fraction digits.
+  - Backed by 4 durable plain-language regression property tests in `src/utils/__tests__/plainLanguage.test.tsx` (116 total Vitest tests passing across 10 suites).
 
 - **Country-Agnostic Money & Language Layer (Brazil-First Default) & Simple Guide Decomposition (`[UX-06]`, 2026-10-19):**
   - Shipped `src/utils/i18n.ts`: `AppLocale` (`'pt-BR' | 'en-US'`), `DEFAULT_LOCALE = 'pt-BR'`, typed zero-jargon dictionary, and `t(key, locale)` helper.

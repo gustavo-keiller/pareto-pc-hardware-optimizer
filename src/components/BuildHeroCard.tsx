@@ -38,7 +38,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
-                #1 Recommended PC Build (Pareto Frontier)
+                #1 Recommended PC Build (Best Value)
               </span>
               <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
                 Max FPS Under Budget
