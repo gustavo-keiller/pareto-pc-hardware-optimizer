@@ -375,4 +375,21 @@ export const enUS: Translations = {
   chartTableColPredicted: 'Fair Market Price',
   chartTableColDiff: 'Difference',
   chartTableColStatus: 'Valuation Tier',
+
+  // Interactive Part Swapper (BLD-05)
+  swapPart: 'Swap',
+  swapPartModalTitle: 'Swap Component',
+  swapPartModalSubtitle:
+    'Compare alternative components and see the real-time impact on total price and gaming performance.',
+  swapCurrentPart: 'Current Component in Build',
+  swapSelectPart: 'Choose This Part',
+  swapActiveBadge: 'Active',
+  swapPriceDeltaCheaper: 'cheaper',
+  swapPriceDeltaMoreExpensive: 'more',
+  swapFpsDeltaFaster: 'faster',
+  swapFpsDeltaSlower: 'slower',
+  swapCompatible: 'Compatible',
+  swapIncompatible: 'Incompatible',
+  swapCustomizedBuildBadge: 'Customized Build',
+  swapResetToRecommended: 'Reset to Recommended',
 };

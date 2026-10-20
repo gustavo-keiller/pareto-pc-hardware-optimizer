@@ -376,4 +376,21 @@ export const ptBR: Translations = {
   chartTableColPredicted: 'Preço Justo Estimado',
   chartTableColDiff: 'Diferença',
   chartTableColStatus: 'Classificação de Valor',
+
+  // Interactive Part Swapper (BLD-05)
+  swapPart: 'Trocar',
+  swapPartModalTitle: 'Trocar Componente',
+  swapPartModalSubtitle:
+    'Compare peças alternativas e veja o impacto imediato no preço total e no desempenho do computador.',
+  swapCurrentPart: 'Peça Atual na Configuração',
+  swapSelectPart: 'Escolher Esta Peça',
+  swapActiveBadge: 'Atual',
+  swapPriceDeltaCheaper: 'a menos',
+  swapPriceDeltaMoreExpensive: 'a mais',
+  swapFpsDeltaFaster: 'mais rápido',
+  swapFpsDeltaSlower: 'mais lento',
+  swapCompatible: 'Compatível',
+  swapIncompatible: 'Incompatível',
+  swapCustomizedBuildBadge: 'Configuração Personalizada',
+  swapResetToRecommended: 'Restaurar Recomendação Automática',
 };

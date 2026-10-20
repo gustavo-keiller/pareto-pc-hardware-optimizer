@@ -4,13 +4,20 @@
 
 ## 🔴 In Flight
 
-- `feat/bld-04-worker-engine`: Finalizing Web Worker engine commit (`[BLD-04]`) and moving to interactive part swapper (`[BLD-05]`).
+- None currently active. Phase 2 (`[BLD-01]` through `[BLD-08]`) is 100% complete and verified. Ready to begin Phase 3 (`[DATA-01]` Move catalogs from `.ts` files into versioned JSON with schema validation).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Interactive Part Swapper on Full Build Hero Card (`[BLD-05]`, 2026-10-20):**
+  - Built interactive modal (`PartSwapperModal.tsx`) allowing users to swap any of the 8 components (CPU, GPU, RAM, Motherboard, PSU, Storage, Cooler, Case) on recommended builds.
+  - Computes real-time price deltas, CPU/GPU FPS deltas, and validates physical clearance and platform compatibility via `checkBuildCompatibility` before applying changes.
+  - Added "Trocar" / "Swap" buttons to all 8 component cards in `BuildHeroCard.tsx` with dedicated accessible `aria-label` tags.
+  - Added a customized build banner in `BuildHeroCard.tsx` with an instant 1-click revert button to return to the original recommended Pareto configuration.
+  - Backed by UI integration tests in `src/__tests__/PartSwapper.ui.test.tsx`.
 
 - **Web Worker Combinatorial Engine & Strict Time Budget (`[BLD-04]`, 2026-10-20):**
   - Spun up dedicated Web Worker (`builderWorker.ts`) to execute `optimizeFullSystemBuilds` without dropping UI frames.

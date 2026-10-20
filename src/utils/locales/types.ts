@@ -363,4 +363,20 @@ export interface Translations {
   chartTableColPredicted: string;
   chartTableColDiff: string;
   chartTableColStatus: string;
+
+  // Interactive Part Swapper (BLD-05)
+  swapPart: string;
+  swapPartModalTitle: string;
+  swapPartModalSubtitle: string;
+  swapCurrentPart: string;
+  swapSelectPart: string;
+  swapActiveBadge: string;
+  swapPriceDeltaCheaper: string;
+  swapPriceDeltaMoreExpensive: string;
+  swapFpsDeltaFaster: string;
+  swapFpsDeltaSlower: string;
+  swapCompatible: string;
+  swapIncompatible: string;
+  swapCustomizedBuildBadge: string;
+  swapResetToRecommended: string;
 }
