@@ -19,8 +19,6 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (top to bottom; reprioritized 2026-10-20 from [`ROADMAP.md`](ROADMAP.md))
 
-> Branch `fix/perf-engine-and-ci` (engine speed, lint, Simple-mode table toggle, price notice, pt-BR pass, share link) is not merged yet. Open its PR first and merge it when CI is green; the items below assume it is merged.
-
 - **`[UX-10]` Test with 3–5 people who know nothing about PCs:**
   Success = they pick a graphics card or a whole PC in under 2 minutes without help and can say why. Findings become `TODO.md` items.
   - **Files likely touched:** `TODO.md`, `ROADMAP.md`

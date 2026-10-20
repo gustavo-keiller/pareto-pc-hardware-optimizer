@@ -1,0 +1,41 @@
+[
+  {
+    "id": "storage-kingston-nv2-1tb",
+    "name": "Kingston NV2 1TB M.2 NVMe",
+    "vendor": "Kingston",
+    "price": 60,
+    "type": "NVMe M.2",
+    "formFactor": "M.2-2280",
+    "capacityGb": 1000,
+    "readSpeedMbps": 3500,
+    "notes": "Value king PCIe 4.0 NVMe SSD for fast boot and game loading.",
+    "source": "Kingston Official Specs / CrystalDiskMark Baseline",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "storage-wd-sn770-1tb",
+    "name": "WD Black SN770 1TB M.2 NVMe",
+    "vendor": "Western Digital",
+    "price": 75,
+    "type": "NVMe M.2",
+    "formFactor": "M.2-2280",
+    "capacityGb": 1000,
+    "readSpeedMbps": 5150,
+    "notes": "High-speed PCIe 4.0 DRAM-less champion with sustained reads.",
+    "source": "Tom's Hardware SSD Review / Western Digital Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "storage-wd-sn850x-2tb",
+    "name": "WD Black SN850X 2TB M.2 NVMe",
+    "vendor": "Western Digital",
+    "price": 155,
+    "type": "NVMe M.2",
+    "formFactor": "M.2-2280",
+    "capacityGb": 2000,
+    "readSpeedMbps": 7300,
+    "notes": "Flagship enthusiast PCIe 4.0 with dedicated DRAM cache.",
+    "source": "Tom's Hardware SSD Review / Western Digital Specs",
+    "checkedAt": "2026-10-20"
+  }
+]

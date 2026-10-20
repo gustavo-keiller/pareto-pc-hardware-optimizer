@@ -32,7 +32,8 @@ Pure TypeScript modules with zero React/DOM/ECharts dependencies:
 | `src/lib/parser/__tests__/gpuListingParser.test.ts` | **Vitest Parser Suite** — comprehensive unit tests verifying tokenization and extraction across single and batch listings |
 | `src/data/knownGpuBenchmarks.ts` | **40+ Desktop GPU Benchmark Reference Database** — 1440p Ultra raster FPS, ray tracing FPS, TDP Watts, VRAM, and chip matching aliases (`matchKnownGpuChip`) |
 | `src/data/realGpus.ts` | **Phase 2 Real-World GPU Dataset** — 18 desktop GPUs (`REAL_WORLD_GPUS`) across NVIDIA, AMD, and Intel with 1440p Raster/RT geomean FPS, VRAM, TBP Watts, and retail street pricing |
-| `src/data/seedComponents.ts` | **Phase 3 Seed Component Catalogs** — typed real-world CPU, Motherboard, RAM, PSU, Storage (NVMe SSD), Case, and CPU Cooler candidates (`SEED_CPUS`, `SEED_MOTHERBOARDS`, `SEED_RAM_KITS`, `SEED_PSUS`, `SEED_STORAGES`, `SEED_CASES`, `SEED_COOLERS`) |
+| `src/data/catalogs/` | **Versioned JSON Hardware Catalogs (`[DATA-01]`)** — versioned JSON datasets (`cpus.json`, `gpus.json`, `motherboards.json`, `ram.json`, `storage.json`, `coolers.json`, `cases.json`, `psus.json`) with mandatory source citations and audit dates on every component |
+| `src/data/seedComponents.ts` | **Phase 3 Seed Component Catalogs** — typed real-world CPU, Motherboard, RAM, PSU, Storage (NVMe SSD), Case, and CPU Cooler candidates (`SEED_CPUS`, `SEED_MOTHERBOARDS`, `SEED_RAM_KITS`, `SEED_PSUS`, `SEED_STORAGES`, `SEED_CASES`, `SEED_COOLERS`) loaded from `src/data/catalogs/` |
 | `src/lib/math/upgradeOptimizer.ts` | **Upgrade Optimizer Engine (`[BLD-06]`)** — evaluates optimal upgrade paths when users own hardware components, setting owned parts to $0 new expenditure, enforcing socket/RAM/PSU/clearance constraints, and extracting the Pareto frontier of net upgrade cost vs. performance |
 | `src/data/budgetPresets.ts` | **Full Build & Upgrade Budget Presets** — typed presets for USD ($750 to $3,200) and BRL (R$ 4.500 to R$ 18.000) with target descriptions |
 | `src/utils/storage.ts` | **Safe LocalStorage Layer** — `safeGetJSON`, `safeSetJSON`, `safeGetInt`, `safeGetBool`, `safeGetString`, and versioned schema migrations (`runStorageMigrations`) |
@@ -102,10 +103,12 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | Path | Purpose |
 | :--- | :--- |
 | `scripts/check-docs.cjs` | Validates `AGENTS.md` character cap (<12,000 chars), internal markdown links, `.agents/skills/` frontmatter, `.claude/skills/` stub parity, and the 600/800-line file cap (with a shrink-only allowlist) |
+| `scripts/validate-catalogs.cjs` | Validates schema conformance, numeric bounds, ID uniqueness, source citations, audit dates, and cross-catalog compatibility for all JSON hardware catalogs (`[DATA-01]`) |
 | `.github/workflows/check.yml` | CI: `npm ci`, `npm run check`, `npm run build`, plus the Playwright e2e job, on every push to `main` and every PR |
 | `scripts/snap.mjs` | `npm run snap`: starts Vite and saves desktop + phone screenshots of each mode to `snapshots/` (gitignored) |
 | `src/__tests__/App.ui.test.tsx` | UI smoke tests (jsdom + Testing Library): each mode renders, budget changes the Simple top pick, share buttons copy links and feedback badges |
 | `src/__tests__/PartSwapper.ui.test.tsx` | UI integration test (jsdom + Testing Library): interactive part swapping in Full Builds mode and live build metric updates (`[BLD-05]`) |
+| `src/data/__tests__/catalogs.test.ts` | Vitest catalog suite (`[DATA-01]`): verifies all 8 JSON catalogs load, maintain unique IDs, include source/date metadata, and satisfy cross-platform compatibility |
 | `src/lib/math/__tests__/upgradeOptimizer.test.ts` | **Vitest Upgrade Optimizer Suite** — 9 property and boundary tests verifying 0-cost accounting, socket preservation, PSU wattage guards, compact case clearance, and Pareto monotonicity |
 | `src/utils/__tests__/shareBuild.test.ts` | Unit tests for build share URL encoding/decoding, parameter sanitization, and plain-text clipboard formatting |
 | `src/utils/__tests__/plainLanguage.test.tsx` | Plain-language buyer copy regression tests ([`UX-03`]): asserts zero forbidden math jargon in Simple mode in pt-BR and en-US |

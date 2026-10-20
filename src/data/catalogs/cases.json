@@ -1,0 +1,72 @@
+[
+  {
+    "id": "case-deepcool-cc560",
+    "name": "DeepCool CC560 V2 Mid-Tower",
+    "vendor": "DeepCool",
+    "price": 55,
+    "supportedFormFactors": ["ATX", "Micro-ATX", "Mini-ITX"],
+    "maxGpuLengthMm": 370,
+    "maxCpuCoolerHeightMm": 163,
+    "isSff": false,
+    "rgb": false,
+    "notes": "High-airflow value mid-tower with 4 pre-installed fans.",
+    "source": "DeepCool Official Specs Sheet",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "case-montech-air903",
+    "name": "Montech Air 903 Base Mid-Tower",
+    "vendor": "Montech",
+    "price": 65,
+    "supportedFormFactors": ["ATX", "Micro-ATX", "Mini-ITX"],
+    "maxGpuLengthMm": 400,
+    "maxCpuCoolerHeightMm": 180,
+    "isSff": false,
+    "rgb": false,
+    "notes": "Massive clearance mesh case fitting all GPU and cooler sizes.",
+    "source": "Montech Official Specs Sheet / Gamers Nexus Review",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "case-montech-air903-max",
+    "name": "Montech Air 903 MAX ARGB",
+    "vendor": "Montech",
+    "price": 75,
+    "supportedFormFactors": ["ATX", "Micro-ATX", "Mini-ITX"],
+    "maxGpuLengthMm": 400,
+    "maxCpuCoolerHeightMm": 180,
+    "isSff": false,
+    "rgb": true,
+    "notes": "High-airflow mesh mid-tower with 4 pre-installed 140mm ARGB PWM fans.",
+    "source": "Montech Official Specs Sheet",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "case-nzxt-h5-flow",
+    "name": "NZXT H5 Flow Compact ATX",
+    "vendor": "NZXT",
+    "price": 89,
+    "supportedFormFactors": ["ATX", "Micro-ATX", "Mini-ITX"],
+    "maxGpuLengthMm": 365,
+    "maxCpuCoolerHeightMm": 165,
+    "isSff": false,
+    "rgb": false,
+    "notes": "Clean modern aesthetic with dedicated bottom GPU intake fan.",
+    "source": "NZXT Official Product Manual",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "case-cm-nr200p",
+    "name": "Cooler Master MasterBox NR200P SFF",
+    "vendor": "Cooler Master",
+    "price": 95,
+    "supportedFormFactors": ["Mini-ITX"],
+    "maxGpuLengthMm": 330,
+    "maxCpuCoolerHeightMm": 155,
+    "isSff": true,
+    "rgb": false,
+    "notes": "Iconic 18L SFF chassis with high compatibility and tool-free panels.",
+    "source": "Cooler Master Specs / SFF Network Database",
+    "checkedAt": "2026-10-20"
+  }
+]

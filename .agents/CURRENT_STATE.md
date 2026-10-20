@@ -4,13 +4,20 @@
 
 ## 🔴 In Flight
 
-- None currently active. Phase 2 (`[BLD-01]` through `[BLD-08]`) is 100% complete and verified. Ready to begin Phase 3 (`[DATA-01]` Move catalogs from `.ts` files into versioned JSON with schema validation).
+- `feat/data-01-json-catalogs`: Finalizing `[DATA-01]` (versioned JSON catalogs with schema validation in `npm run check`).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Versioned JSON Catalogs with Schema Validation (`[DATA-01]`, 2026-10-20):**
+  - Moved all 8 hardware component catalogs into versioned JSON files in `src/data/catalogs/` (`cpus.json`, `gpus.json`, `motherboards.json`, `ram.json`, `storage.json`, `coolers.json`, `cases.json`, `psus.json`).
+  - Added mandatory provenance citation `source` and audit date `checkedAt` to all 72 hardware components.
+  - Implemented automated schema and integrity validator in `scripts/validate-catalogs.cjs` running in `npm run check`.
+  - Converted `seedComponents.ts` and `realGpus.ts` to zero-assertion type-safe JSON loaders, shrinking `seedComponents.ts` from 742 lines to 127 lines and eliminating check-docs warnings.
+  - Backed by dedicated Vitest schema and referential integrity suite in `src/data/__tests__/catalogs.test.ts`.
 
 - **Interactive Part Swapper on Full Build Hero Card (`[BLD-05]`, 2026-10-20):**
   - Built interactive modal (`PartSwapperModal.tsx`) allowing users to swap any of the 8 components (CPU, GPU, RAM, Motherboard, PSU, Storage, Cooler, Case) on recommended builds.

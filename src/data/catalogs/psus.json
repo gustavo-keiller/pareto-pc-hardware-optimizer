@@ -1,0 +1,86 @@
+[
+  {
+    "id": "psu-msi-a550bn",
+    "name": "MSI MAG A550BN 550W",
+    "vendor": "MSI",
+    "price": 55,
+    "wattage": 550,
+    "efficiencyRating": "80+ Bronze",
+    "modular": "Non",
+    "notes": "Reliable entry-level Bronze power supply for budget builds.",
+    "source": "MSI Official Specs / Cultists Network PSU Tier List Tier C",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "psu-corsair-cx650m",
+    "name": "Corsair CX650M 650W",
+    "vendor": "Corsair",
+    "price": 70,
+    "wattage": 650,
+    "efficiencyRating": "80+ Bronze",
+    "modular": "Semi",
+    "notes": "Semi-modular 650W unit for midrange single-GPU systems.",
+    "source": "Corsair Official Specs / Cybenetics Certification Database",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "psu-seasonic-focus-750",
+    "name": "Seasonic FOCUS GX-750 750W",
+    "vendor": "Seasonic",
+    "price": 100,
+    "wattage": 750,
+    "efficiencyRating": "80+ Gold",
+    "modular": "Full",
+    "notes": "Tier A gold standard fully modular PSU with 10-year warranty.",
+    "source": "Seasonic Official Specs / Cultists Tier List Tier A",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "psu-corsair-rm750e",
+    "name": "Corsair RM750e 750W",
+    "vendor": "Corsair",
+    "price": 100,
+    "wattage": 750,
+    "efficiencyRating": "80+ Gold",
+    "modular": "Full",
+    "notes": "ATX 3.0 / PCIe 5.0 compliant with native 12VHPWR cable.",
+    "source": "Corsair Official Specs / Cybenetics Gold Report",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "psu-bequiet-850",
+    "name": "be quiet! Pure Power 12 M 850W",
+    "vendor": "be quiet!",
+    "price": 120,
+    "wattage": 850,
+    "efficiencyRating": "80+ Gold",
+    "modular": "Full",
+    "notes": "ATX 3.0 ultra-quiet power supply with 850W headroom.",
+    "source": "be quiet! Specs / Cybenetics Gold Report",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "psu-corsair-rm850x",
+    "name": "Corsair RM850x 850W",
+    "vendor": "Corsair",
+    "price": 135,
+    "wattage": 850,
+    "efficiencyRating": "80+ Gold",
+    "modular": "Full",
+    "notes": "Top-tier Japanese capacitors and zero-RPM fan mode.",
+    "source": "Corsair Specs / Hardware Busters Testing",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "psu-seasonic-vertex-1000",
+    "name": "Seasonic Vertex GX-1000 1000W",
+    "vendor": "Seasonic",
+    "price": 190,
+    "wattage": 1000,
+    "efficiencyRating": "80+ Gold",
+    "modular": "Full",
+    "notes": "Flagship 1000W ATX 3.0 power supply for high-TDP hardware.",
+    "source": "Seasonic Specs / Cybenetics Platinum/Gold Database",
+    "checkedAt": "2026-10-20"
+  }
+]

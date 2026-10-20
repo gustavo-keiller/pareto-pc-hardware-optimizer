@@ -1,0 +1,72 @@
+[
+  {
+    "id": "cooler-wraith-stealth",
+    "name": "AMD Wraith Stealth (Stock)",
+    "vendor": "AMD",
+    "price": 15,
+    "supportedSockets": ["AM4", "AM5"],
+    "heightMm": 54,
+    "maxTdpWatts": 65,
+    "type": "Air",
+    "rgb": false,
+    "notes": "Compact stock cooler suitable for 65W TDP processors.",
+    "source": "AMD Official Cooler Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cooler-thermalright-assassin-x",
+    "name": "Thermalright Assassin X 120 SE",
+    "vendor": "Thermalright",
+    "price": 20,
+    "supportedSockets": ["AM4", "AM5", "LGA1700", "LGA1851"],
+    "heightMm": 148,
+    "maxTdpWatts": 180,
+    "type": "Air",
+    "rgb": false,
+    "notes": "Budget single-tower benchmark champ, cools up to 180W CPUs.",
+    "source": "Thermalright Official Specs / Gamers Nexus Review",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cooler-thermalright-peerless-assassin",
+    "name": "Thermalright Peerless Assassin 120 SE",
+    "vendor": "Thermalright",
+    "price": 35,
+    "supportedSockets": ["AM4", "AM5", "LGA1700", "LGA1851"],
+    "heightMm": 155,
+    "maxTdpWatts": 245,
+    "type": "Air",
+    "rgb": false,
+    "notes": "Dual-tower champion, handles 7800X3D and Core i7 effortlessly.",
+    "source": "Hardware Canucks / Gamers Nexus Air Cooler Benchmark",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cooler-thermalright-frozen-prism-240",
+    "name": "Thermalright Frozen Prism 240 ARGB",
+    "vendor": "Thermalright",
+    "price": 55,
+    "supportedSockets": ["AM4", "AM5", "LGA1700", "LGA1851"],
+    "heightMm": 52,
+    "maxTdpWatts": 260,
+    "type": "AIO",
+    "rgb": true,
+    "notes": "High-performance 240mm AIO liquid cooler with magnetic pump cover and ARGB.",
+    "source": "Thermalright Official Specs / Tom's Hardware AIO Roundup",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cooler-arctic-lf3-240-black",
+    "name": "Arctic Liquid Freezer III 240 Black",
+    "vendor": "Arctic",
+    "price": 80,
+    "supportedSockets": ["AM4", "AM5", "LGA1700", "LGA1851"],
+    "heightMm": 65,
+    "maxTdpWatts": 280,
+    "type": "AIO",
+    "rgb": false,
+    "notes": "Thick 38mm radiator with VRM cooling fan for silent high-thermal dissipation.",
+    "source": "Gamers Nexus Liquid Cooler of the Year / Arctic Specs",
+    "checkedAt": "2026-10-20"
+  }
+]

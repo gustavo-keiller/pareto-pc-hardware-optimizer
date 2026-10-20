@@ -29,6 +29,10 @@ export interface GpuCandidate {
   isBenchmarkEstimated?: boolean;
   isBenchmarkRef?: boolean;
   originalUsdPrice?: number;
+
+  // Provenance & Audit Metadata (DATA-01)
+  source?: string;
+  checkedAt?: string;
 }
 
 export type MetricKey =

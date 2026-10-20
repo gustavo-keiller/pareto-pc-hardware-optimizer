@@ -6,727 +6,130 @@ import {
   PsuCandidate,
   RamCandidate,
   StorageCandidate,
+  isCpuSocket,
+  isMotherboardFormFactor,
+  isPsuEfficiencyRating,
+  isRamGeneration,
 } from '../lib/math/buildTypes';
+import { HardwareVendor } from '../lib/math/types';
+import cpusJson from './catalogs/cpus.json';
+import motherboardsJson from './catalogs/motherboards.json';
+import ramJson from './catalogs/ram.json';
+import psusJson from './catalogs/psus.json';
+import storagesJson from './catalogs/storage.json';
+import casesJson from './catalogs/cases.json';
+import coolersJson from './catalogs/coolers.json';
+
+function parseCpu(item: (typeof cpusJson)[number]): CpuCandidate {
+  if (!isCpuSocket(item.socket)) {
+    throw new Error(`Invalid CPU socket: ${item.socket}`);
+  }
+  const vendor: HardwareVendor =
+    item.vendor === 'AMD' || item.vendor === 'Intel' ? item.vendor : 'Other';
+  const supportedRamGenerations =
+    item.supportedRamGenerations.filter(isRamGeneration);
+  return {
+    ...item,
+    socket: item.socket,
+    vendor,
+    supportedRamGenerations,
+  };
+}
+
+function parseMotherboard(
+  item: (typeof motherboardsJson)[number],
+): MotherboardCandidate {
+  if (!isCpuSocket(item.socket)) {
+    throw new Error(`Invalid Motherboard socket: ${item.socket}`);
+  }
+  if (!isRamGeneration(item.ramGeneration)) {
+    throw new Error(`Invalid RAM generation: ${item.ramGeneration}`);
+  }
+  if (!isMotherboardFormFactor(item.formFactor)) {
+    throw new Error(`Invalid form factor: ${item.formFactor}`);
+  }
+  return {
+    ...item,
+    socket: item.socket,
+    ramGeneration: item.ramGeneration,
+    formFactor: item.formFactor,
+  };
+}
+
+function parseRam(item: (typeof ramJson)[number]): RamCandidate {
+  if (!isRamGeneration(item.generation)) {
+    throw new Error(`Invalid RAM generation: ${item.generation}`);
+  }
+  return {
+    ...item,
+    generation: item.generation,
+  };
+}
+
+function parseStorage(item: (typeof storagesJson)[number]): StorageCandidate {
+  const type =
+    item.type === 'NVMe M.2' || item.type === 'SATA 2.5"'
+      ? item.type
+      : 'NVMe M.2';
+  const formFactor =
+    item.formFactor === 'M.2-2280' || item.formFactor === '2.5-inch'
+      ? item.formFactor
+      : 'M.2-2280';
+  return {
+    ...item,
+    type,
+    formFactor,
+  };
+}
+
+function parseCase(item: (typeof casesJson)[number]): CaseCandidate {
+  const supportedFormFactors = item.supportedFormFactors.filter(
+    isMotherboardFormFactor,
+  );
+  return {
+    ...item,
+    supportedFormFactors,
+  };
+}
+
+function parseCooler(item: (typeof coolersJson)[number]): CoolerCandidate {
+  const supportedSockets = item.supportedSockets.filter(isCpuSocket);
+  const type =
+    item.type === 'Air' || item.type === 'AIO' ? item.type : undefined;
+  return {
+    ...item,
+    supportedSockets,
+    type,
+  };
+}
+
+function parsePsu(item: (typeof psusJson)[number]): PsuCandidate {
+  if (!isPsuEfficiencyRating(item.efficiencyRating)) {
+    throw new Error(`Invalid efficiency rating: ${item.efficiencyRating}`);
+  }
+  const modular =
+    item.modular === 'Non' || item.modular === 'Semi' || item.modular === 'Full'
+      ? item.modular
+      : 'Non';
+  return {
+    ...item,
+    efficiencyRating: item.efficiencyRating,
+    modular,
+  };
+}
 
 /**
- * Phase 3 Seed CPU Catalog.
- * Gaming score is a normalized 0–100 benchmark index (Ryzen 7 7800X3D = 100).
+ * Phase 3 Seed Hardware Catalogs.
+ * Loaded from versioned JSON files in src/data/catalogs/ with schema validation.
  */
-export const SEED_CPUS: CpuCandidate[] = [
-  {
-    id: 'cpu-ryzen-5500',
-    name: 'AMD Ryzen 5 5500',
-    vendor: 'AMD',
-    price: 85,
-    socket: 'AM4',
-    cores: 6,
-    threads: 12,
-    tdpWatts: 65,
-    gamingScore: 56,
-    supportedRamGenerations: ['DDR4'],
-    notes: 'Entry-level 6-core budget AM4 CPU (PCIe 3.0 only).',
-  },
-  {
-    id: 'cpu-ryzen-5600',
-    name: 'AMD Ryzen 5 5600',
-    vendor: 'AMD',
-    price: 125,
-    socket: 'AM4',
-    cores: 6,
-    threads: 12,
-    tdpWatts: 65,
-    gamingScore: 65,
-    supportedRamGenerations: ['DDR4'],
-    notes: 'Value king for sub-$700 budget gaming builds.',
-  },
-  {
-    id: 'cpu-ryzen-5700x3d',
-    name: 'AMD Ryzen 7 5700X3D',
-    vendor: 'AMD',
-    price: 205,
-    socket: 'AM4',
-    cores: 8,
-    threads: 16,
-    tdpWatts: 105,
-    gamingScore: 82,
-    supportedRamGenerations: ['DDR4'],
-    notes: 'Maximum gaming performance on mature AM4 platform with 3D V-Cache.',
-  },
-  {
-    id: 'cpu-ryzen-7600',
-    name: 'AMD Ryzen 5 7600',
-    vendor: 'AMD',
-    price: 185,
-    socket: 'AM5',
-    cores: 6,
-    threads: 12,
-    tdpWatts: 65,
-    gamingScore: 82,
-    supportedRamGenerations: ['DDR5'],
-    notes: 'Modern AM5 gateway CPU; low 65W TDP and upgradable platform.',
-  },
-  {
-    id: 'cpu-ryzen-7600x',
-    name: 'AMD Ryzen 5 7600X',
-    vendor: 'AMD',
-    price: 205,
-    socket: 'AM5',
-    cores: 6,
-    threads: 12,
-    tdpWatts: 105,
-    gamingScore: 84,
-    supportedRamGenerations: ['DDR5'],
-    notes: 'Higher clock speed 6-core AM5 option.',
-  },
-  {
-    id: 'cpu-ryzen-7800x3d',
-    name: 'AMD Ryzen 7 7800X3D',
-    vendor: 'AMD',
-    price: 430,
-    socket: 'AM5',
-    cores: 8,
-    threads: 16,
-    tdpWatts: 120,
-    gamingScore: 100,
-    supportedRamGenerations: ['DDR5'],
-    notes: 'The undisputed desktop gaming performance benchmark anchor.',
-  },
-  {
-    id: 'cpu-ryzen-9700x',
-    name: 'AMD Ryzen 7 9700X',
-    vendor: 'AMD',
-    price: 330,
-    socket: 'AM5',
-    cores: 8,
-    threads: 16,
-    tdpWatts: 65,
-    gamingScore: 88,
-    supportedRamGenerations: ['DDR5'],
-    notes: 'Zen 5 8-core CPU with superior single-thread efficiency.',
-  },
-  {
-    id: 'cpu-i3-12100f',
-    name: 'Intel Core i3-12100F',
-    vendor: 'Intel',
-    price: 85,
-    socket: 'LGA1700',
-    cores: 4,
-    threads: 8,
-    tdpWatts: 58,
-    gamingScore: 54,
-    supportedRamGenerations: ['DDR4', 'DDR5'],
-    notes: 'Ultra-budget quad-core for entry esports setups.',
-  },
-  {
-    id: 'cpu-i5-12400f',
-    name: 'Intel Core i5-12400F',
-    vendor: 'Intel',
-    price: 110,
-    socket: 'LGA1700',
-    cores: 6,
-    threads: 12,
-    tdpWatts: 65,
-    gamingScore: 63,
-    supportedRamGenerations: ['DDR4', 'DDR5'],
-    notes: 'Strong budget alternative to Ryzen 5600 with LGA1700 options.',
-  },
-  {
-    id: 'cpu-i5-13600k',
-    name: 'Intel Core i5-13600K',
-    vendor: 'Intel',
-    price: 270,
-    socket: 'LGA1700',
-    cores: 14,
-    threads: 20,
-    tdpWatts: 125,
-    gamingScore: 86,
-    supportedRamGenerations: ['DDR4', 'DDR5'],
-    notes: 'Hybrid architecture powerhouse for gaming and multithreaded apps.',
-  },
-  {
-    id: 'cpu-i7-14700k',
-    name: 'Intel Core i7-14700K',
-    vendor: 'Intel',
-    price: 380,
-    socket: 'LGA1700',
-    cores: 20,
-    threads: 28,
-    tdpWatts: 125,
-    gamingScore: 92,
-    supportedRamGenerations: ['DDR4', 'DDR5'],
-    notes: 'Flagship gaming and content creation processor on LGA1700.',
-  },
-  {
-    id: 'cpu-ultra7-265k',
-    name: 'Intel Core Ultra 7 265K',
-    vendor: 'Intel',
-    price: 390,
-    socket: 'LGA1851',
-    cores: 20,
-    threads: 20,
-    tdpWatts: 125,
-    gamingScore: 87,
-    supportedRamGenerations: ['DDR5'],
-    notes: 'Arrow Lake LGA1851 processor with dedicated NPU.',
-  },
-];
-
-/**
- * Phase 3 Seed Motherboard Catalog.
- */
-export const SEED_MOTHERBOARDS: MotherboardCandidate[] = [
-  {
-    id: 'mobo-asrock-b550m-hdv',
-    name: 'ASRock B550M-HDV',
-    vendor: 'ASRock',
-    price: 75,
-    socket: 'AM4',
-    chipset: 'B550',
-    ramGeneration: 'DDR4',
-    ramSlots: 2,
-    m2Slots: 1,
-    formFactor: 'Micro-ATX',
-    pcieGeneration: 4,
-    notes: 'Ultra-budget AM4 board for 65W CPUs.',
-  },
-  {
-    id: 'mobo-msi-b550-a-pro',
-    name: 'MSI B550-A PRO',
-    vendor: 'MSI',
-    price: 110,
-    socket: 'AM4',
-    chipset: 'B550',
-    ramGeneration: 'DDR4',
-    ramSlots: 4,
-    m2Slots: 2,
-    formFactor: 'ATX',
-    pcieGeneration: 4,
-    notes: 'Reliable full-sized ATX AM4 board with solid VRMs.',
-  },
-  {
-    id: 'mobo-msi-b550-tomahawk',
-    name: 'MSI MAG B550 TOMAHAWK MAX WIFI',
-    vendor: 'MSI',
-    price: 150,
-    socket: 'AM4',
-    chipset: 'B550',
-    ramGeneration: 'DDR4',
-    ramSlots: 4,
-    m2Slots: 2,
-    formFactor: 'ATX',
-    pcieGeneration: 4,
-    notes: 'Premium AM4 board with WiFi 6E and robust heatsinks.',
-  },
-  {
-    id: 'mobo-asrock-b650m-hdv',
-    name: 'ASRock B650M-HDV/M.2',
-    vendor: 'ASRock',
-    price: 110,
-    socket: 'AM5',
-    chipset: 'B650',
-    ramGeneration: 'DDR5',
-    ramSlots: 2,
-    m2Slots: 2,
-    formFactor: 'Micro-ATX',
-    pcieGeneration: 5,
-    notes: 'Benchmark budget AM5 board capable of running 7800X3D cleanly.',
-  },
-  {
-    id: 'mobo-gigabyte-b650-gaming-x',
-    name: 'Gigabyte B650 GAMING X AX',
-    vendor: 'Gigabyte',
-    price: 160,
-    socket: 'AM5',
-    chipset: 'B650',
-    ramGeneration: 'DDR5',
-    ramSlots: 4,
-    m2Slots: 3,
-    formFactor: 'ATX',
-    pcieGeneration: 4,
-    notes: 'Mainstream 4-slot ATX AM5 board with integrated Wi-Fi.',
-  },
-  {
-    id: 'mobo-msi-mag-b650-tomahawk',
-    name: 'MSI MAG B650 TOMAHAWK WIFI',
-    vendor: 'MSI',
-    price: 200,
-    socket: 'AM5',
-    chipset: 'B650',
-    ramGeneration: 'DDR5',
-    ramSlots: 4,
-    m2Slots: 3,
-    formFactor: 'ATX',
-    pcieGeneration: 4,
-    notes: 'Premium AM5 board with high-tier VRM thermal performance.',
-  },
-  {
-    id: 'mobo-asrock-b760m-d4',
-    name: 'ASRock B760M-HDV/M.2 D4',
-    vendor: 'ASRock',
-    price: 90,
-    socket: 'LGA1700',
-    chipset: 'B760',
-    ramGeneration: 'DDR4',
-    ramSlots: 2,
-    m2Slots: 2,
-    formFactor: 'Micro-ATX',
-    pcieGeneration: 4,
-    notes: 'Budget LGA1700 board utilizing low-cost DDR4 memory.',
-  },
-  {
-    id: 'mobo-msi-pro-b760-p-d4',
-    name: 'MSI PRO B760-P WIFI DDR4',
-    vendor: 'MSI',
-    price: 140,
-    socket: 'LGA1700',
-    chipset: 'B760',
-    ramGeneration: 'DDR4',
-    ramSlots: 4,
-    m2Slots: 2,
-    formFactor: 'ATX',
-    pcieGeneration: 4,
-    notes: 'Full-featured ATX board for Intel 12th-14th Gen on DDR4.',
-  },
-  {
-    id: 'mobo-msi-b760-gaming-plus-d5',
-    name: 'MSI B760 GAMING PLUS WIFI',
-    vendor: 'MSI',
-    price: 155,
-    socket: 'LGA1700',
-    chipset: 'B760',
-    ramGeneration: 'DDR5',
-    ramSlots: 4,
-    m2Slots: 2,
-    formFactor: 'ATX',
-    pcieGeneration: 4,
-    notes: 'Modern DDR5 ATX motherboard for LGA1700 CPUs.',
-  },
-  {
-    id: 'mobo-asus-rog-b760-f',
-    name: 'ASUS ROG STRIX B760-F GAMING WIFI',
-    vendor: 'ASUS',
-    price: 220,
-    socket: 'LGA1700',
-    chipset: 'B760',
-    ramGeneration: 'DDR5',
-    ramSlots: 4,
-    m2Slots: 3,
-    formFactor: 'ATX',
-    pcieGeneration: 5,
-    notes: 'Enthusiast LGA1700 board with PCIe 5.0 and premium audio.',
-  },
-  {
-    id: 'mobo-asrock-b650i-lightning',
-    name: 'ASRock B650I Lightning WiFi',
-    vendor: 'ASRock',
-    price: 195,
-    socket: 'AM5',
-    chipset: 'B650',
-    ramGeneration: 'DDR5',
-    ramSlots: 2,
-    m2Slots: 2,
-    formFactor: 'Mini-ITX',
-    pcieGeneration: 4,
-    notes:
-      'Premium AM5 Mini-ITX board for compact Small Form Factor (SFF) builds.',
-  },
-  {
-    id: 'mobo-asrock-b760i-lightning',
-    name: 'ASRock B760I Lightning WiFi',
-    vendor: 'ASRock',
-    price: 185,
-    socket: 'LGA1700',
-    chipset: 'B760',
-    ramGeneration: 'DDR5',
-    ramSlots: 2,
-    m2Slots: 2,
-    formFactor: 'Mini-ITX',
-    pcieGeneration: 5,
-    notes: 'High-end Intel LGA1700 Mini-ITX motherboard with DDR5 support.',
-  },
-  {
-    id: 'mobo-asrock-z890-pro',
-    name: 'ASRock Z890 PRO RS',
-    vendor: 'ASRock',
-    price: 200,
-    socket: 'LGA1851',
-    chipset: 'Z890',
-    ramGeneration: 'DDR5',
-    ramSlots: 4,
-    m2Slots: 4,
-    formFactor: 'ATX',
-    pcieGeneration: 5,
-    notes: 'Arrow Lake LGA1851 board with Thunderbolt 4 / USB4 support.',
-  },
-];
-
-/**
- * Phase 3 Seed RAM Kits.
- */
-export const SEED_RAM_KITS: RamCandidate[] = [
-  {
-    id: 'ram-sp-16gb-d4-3200',
-    name: 'Silicon Power 16GB (2x8GB) DDR4-3200 CL16',
-    vendor: 'Silicon Power',
-    price: 32,
-    generation: 'DDR4',
-    capacityGb: 16,
-    speedMhz: 3200,
-    casLatency: 16,
-    modulesCount: 2,
-    notes: 'Cheapest viable dual-channel DDR4 memory kit.',
-  },
-  {
-    id: 'ram-team-32gb-d4-3200',
-    name: 'TeamGroup T-Force Vulcan Z 32GB (2x16GB) DDR4-3200 CL16',
-    vendor: 'TeamGroup',
-    price: 54,
-    generation: 'DDR4',
-    capacityGb: 32,
-    speedMhz: 3200,
-    casLatency: 16,
-    modulesCount: 2,
-    notes: 'Sub-$60 32GB sweet spot kit for AM4 and budget LGA1700.',
-  },
-  {
-    id: 'ram-corsair-32gb-d4-3600',
-    name: 'Corsair Vengeance LPX 32GB (2x16GB) DDR4-3600 CL18',
-    vendor: 'Corsair',
-    price: 65,
-    generation: 'DDR4',
-    capacityGb: 32,
-    speedMhz: 3600,
-    casLatency: 18,
-    modulesCount: 2,
-    notes: 'Low profile 3600MHz RAM with 1:1 Infinity Fabric clock on AM4.',
-  },
-  {
-    id: 'ram-corsair-64gb-d4-3600',
-    name: 'Corsair Vengeance LPX 64GB (2x32GB) DDR4-3600 CL18',
-    vendor: 'Corsair',
-    price: 130,
-    generation: 'DDR4',
-    capacityGb: 64,
-    speedMhz: 3600,
-    casLatency: 18,
-    modulesCount: 2,
-    notes: 'High capacity DDR4 workstation kit.',
-  },
-  {
-    id: 'ram-crucial-32gb-d5-5600',
-    name: 'Crucial Pro 32GB (2x16GB) DDR5-5600 CL46',
-    vendor: 'Crucial',
-    price: 75,
-    generation: 'DDR5',
-    capacityGb: 32,
-    speedMhz: 5600,
-    casLatency: 46,
-    modulesCount: 2,
-    notes: 'JEDEC standard budget DDR5 kit.',
-  },
-  {
-    id: 'ram-team-32gb-d5-6000-cl30',
-    name: 'TeamGroup T-Create Expert 32GB (2x16GB) DDR5-6000 CL30',
-    vendor: 'TeamGroup',
-    price: 92,
-    generation: 'DDR5',
-    capacityGb: 32,
-    speedMhz: 6000,
-    casLatency: 30,
-    modulesCount: 2,
-    notes: 'Optimal AMD AM5 memory timing sweet spot (EXPO profile).',
-  },
-  {
-    id: 'ram-gskill-flare-32gb-d5-6000',
-    name: 'G.Skill Flare X5 32GB (2x16GB) DDR5-6000 CL30',
-    vendor: 'G.Skill',
-    price: 105,
-    generation: 'DDR5',
-    capacityGb: 32,
-    speedMhz: 6000,
-    casLatency: 30,
-    modulesCount: 2,
-    notes:
-      'Low-profile AMD EXPO kit designed for large dual-tower air coolers.',
-  },
-  {
-    id: 'ram-corsair-32gb-d5-rgb',
-    name: 'Corsair Vengeance RGB 32GB (2x16GB) DDR5-6000 CL30',
-    vendor: 'Corsair',
-    price: 115,
-    generation: 'DDR5',
-    capacityGb: 32,
-    speedMhz: 6000,
-    casLatency: 30,
-    modulesCount: 2,
-    rgb: true,
-    notes:
-      'Dynamic ten-zone RGB lighting with AMD EXPO and Intel XMP profiles.',
-  },
-  {
-    id: 'ram-corsair-64gb-d5-6000',
-    name: 'Corsair Vengeance 64GB (2x32GB) DDR5-6000 CL30',
-    vendor: 'Corsair',
-    price: 210,
-    generation: 'DDR5',
-    capacityGb: 64,
-    speedMhz: 6000,
-    casLatency: 30,
-    modulesCount: 2,
-    notes: 'High-density DDR5 kit for modern heavy workloads and gaming.',
-  },
-];
-
-/**
- * Phase 3 Seed Power Supplies (PSUs).
- */
-export const SEED_PSUS: PsuCandidate[] = [
-  {
-    id: 'psu-msi-a550bn',
-    name: 'MSI MAG A550BN 550W',
-    vendor: 'MSI',
-    price: 55,
-    wattage: 550,
-    efficiencyRating: '80+ Bronze',
-    modular: 'Non',
-    notes: 'Reliable entry-level Bronze power supply for budget builds.',
-  },
-  {
-    id: 'psu-corsair-cx650m',
-    name: 'Corsair CX650M 650W',
-    vendor: 'Corsair',
-    price: 70,
-    wattage: 650,
-    efficiencyRating: '80+ Bronze',
-    modular: 'Semi',
-    notes: 'Semi-modular 650W unit for midrange single-GPU systems.',
-  },
-  {
-    id: 'psu-seasonic-focus-750',
-    name: 'Seasonic FOCUS GX-750 750W',
-    vendor: 'Seasonic',
-    price: 100,
-    wattage: 750,
-    efficiencyRating: '80+ Gold',
-    modular: 'Full',
-    notes: 'Tier A gold standard fully modular PSU with 10-year warranty.',
-  },
-  {
-    id: 'psu-corsair-rm750e',
-    name: 'Corsair RM750e 750W',
-    vendor: 'Corsair',
-    price: 100,
-    wattage: 750,
-    efficiencyRating: '80+ Gold',
-    modular: 'Full',
-    notes: 'ATX 3.0 / PCIe 5.0 compliant with native 12VHPWR cable.',
-  },
-  {
-    id: 'psu-bequiet-850',
-    name: 'be quiet! Pure Power 12 M 850W',
-    vendor: 'be quiet!',
-    price: 120,
-    wattage: 850,
-    efficiencyRating: '80+ Gold',
-    modular: 'Full',
-    notes: 'ATX 3.0 ultra-quiet power supply with 850W headroom.',
-  },
-  {
-    id: 'psu-corsair-rm850x',
-    name: 'Corsair RM850x 850W',
-    vendor: 'Corsair',
-    price: 135,
-    wattage: 850,
-    efficiencyRating: '80+ Gold',
-    modular: 'Full',
-    notes: 'Top-tier Japanese capacitors and zero-RPM fan mode.',
-  },
-  {
-    id: 'psu-seasonic-vertex-1000',
-    name: 'Seasonic Vertex GX-1000 1000W',
-    vendor: 'Seasonic',
-    price: 190,
-    wattage: 1000,
-    efficiencyRating: '80+ Gold',
-    modular: 'Full',
-    notes: 'Flagship 1000W ATX 3.0 power supply for high-TDP hardware.',
-  },
-];
-
-/**
- * Phase 3 Seed Storage Catalog.
- */
-export const SEED_STORAGES: StorageCandidate[] = [
-  {
-    id: 'storage-kingston-nv2-1tb',
-    name: 'Kingston NV2 1TB M.2 NVMe',
-    vendor: 'Kingston',
-    price: 60,
-    type: 'NVMe M.2',
-    formFactor: 'M.2-2280',
-    capacityGb: 1000,
-    readSpeedMbps: 3500,
-    notes: 'Value king PCIe 4.0 NVMe SSD for fast boot and game loading.',
-  },
-  {
-    id: 'storage-wd-sn770-1tb',
-    name: 'WD Black SN770 1TB M.2 NVMe',
-    vendor: 'Western Digital',
-    price: 75,
-    type: 'NVMe M.2',
-    formFactor: 'M.2-2280',
-    capacityGb: 1000,
-    readSpeedMbps: 5150,
-    notes: 'High-speed PCIe 4.0 DRAM-less champion with sustained reads.',
-  },
-  {
-    id: 'storage-wd-sn850x-2tb',
-    name: 'WD Black SN850X 2TB M.2 NVMe',
-    vendor: 'Western Digital',
-    price: 155,
-    type: 'NVMe M.2',
-    formFactor: 'M.2-2280',
-    capacityGb: 2000,
-    readSpeedMbps: 7300,
-    notes: 'Flagship enthusiast PCIe 4.0 with dedicated DRAM cache.',
-  },
-];
-
-/**
- * Phase 3 Seed PC Case Catalog.
- */
-export const SEED_CASES: CaseCandidate[] = [
-  {
-    id: 'case-deepcool-cc560',
-    name: 'DeepCool CC560 V2 Mid-Tower',
-    vendor: 'DeepCool',
-    price: 55,
-    supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
-    maxGpuLengthMm: 370,
-    maxCpuCoolerHeightMm: 163,
-    isSff: false,
-    rgb: false,
-    notes: 'High-airflow value mid-tower with 4 pre-installed fans.',
-  },
-  {
-    id: 'case-montech-air903',
-    name: 'Montech Air 903 Base Mid-Tower',
-    vendor: 'Montech',
-    price: 65,
-    supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
-    maxGpuLengthMm: 400,
-    maxCpuCoolerHeightMm: 180,
-    isSff: false,
-    rgb: false,
-    notes: 'Massive clearance mesh case fitting all GPU and cooler sizes.',
-  },
-  {
-    id: 'case-montech-air903-max',
-    name: 'Montech Air 903 MAX ARGB',
-    vendor: 'Montech',
-    price: 75,
-    supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
-    maxGpuLengthMm: 400,
-    maxCpuCoolerHeightMm: 180,
-    isSff: false,
-    rgb: true,
-    notes:
-      'High-airflow mesh mid-tower with 4 pre-installed 140mm ARGB PWM fans.',
-  },
-  {
-    id: 'case-nzxt-h5-flow',
-    name: 'NZXT H5 Flow Compact ATX',
-    vendor: 'NZXT',
-    price: 89,
-    supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
-    maxGpuLengthMm: 365,
-    maxCpuCoolerHeightMm: 165,
-    isSff: false,
-    rgb: false,
-    notes: 'Clean modern aesthetic with dedicated bottom GPU intake fan.',
-  },
-  {
-    id: 'case-cm-nr200p',
-    name: 'Cooler Master MasterBox NR200P SFF',
-    vendor: 'Cooler Master',
-    price: 95,
-    supportedFormFactors: ['Mini-ITX'],
-    maxGpuLengthMm: 330,
-    maxCpuCoolerHeightMm: 155,
-    isSff: true,
-    rgb: false,
-    notes:
-      'Iconic 18L SFF chassis with high compatibility and tool-free panels.',
-  },
-];
-
-/**
- * Phase 3 Seed CPU Cooler Catalog.
- */
-export const SEED_COOLERS: CoolerCandidate[] = [
-  {
-    id: 'cooler-wraith-stealth',
-    name: 'AMD Wraith Stealth (Stock)',
-    vendor: 'AMD',
-    price: 15,
-    supportedSockets: ['AM4', 'AM5'],
-    heightMm: 54,
-    maxTdpWatts: 65,
-    type: 'Air',
-    rgb: false,
-    notes: 'Compact stock cooler suitable for 65W TDP processors.',
-  },
-  {
-    id: 'cooler-thermalright-assassin-x',
-    name: 'Thermalright Assassin X 120 SE',
-    vendor: 'Thermalright',
-    price: 20,
-    supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
-    heightMm: 148,
-    maxTdpWatts: 180,
-    type: 'Air',
-    rgb: false,
-    notes: 'Budget single-tower benchmark champ, cools up to 180W CPUs.',
-  },
-  {
-    id: 'cooler-thermalright-peerless-assassin',
-    name: 'Thermalright Peerless Assassin 120 SE',
-    vendor: 'Thermalright',
-    price: 35,
-    supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
-    heightMm: 155,
-    maxTdpWatts: 245,
-    type: 'Air',
-    rgb: false,
-    notes: 'Dual-tower champion, handles 7800X3D and Core i7 effortlessly.',
-  },
-  {
-    id: 'cooler-thermalright-frozen-prism-240',
-    name: 'Thermalright Frozen Prism 240 ARGB',
-    vendor: 'Thermalright',
-    price: 55,
-    supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
-    heightMm: 52,
-    maxTdpWatts: 260,
-    type: 'AIO',
-    rgb: true,
-    notes:
-      'High-performance 240mm AIO liquid cooler with magnetic pump cover and ARGB.',
-  },
-  {
-    id: 'cooler-arctic-lf3-240-black',
-    name: 'Arctic Liquid Freezer III 240 Black',
-    vendor: 'Arctic',
-    price: 80,
-    supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
-    heightMm: 65,
-    maxTdpWatts: 280,
-    type: 'AIO',
-    rgb: false,
-    notes:
-      'Thick 38mm radiator with VRM cooling fan for silent high-thermal dissipation.',
-  },
-];
+export const SEED_CPUS: CpuCandidate[] = cpusJson.map(parseCpu);
+export const SEED_MOTHERBOARDS: MotherboardCandidate[] =
+  motherboardsJson.map(parseMotherboard);
+export const SEED_RAM_KITS: RamCandidate[] = ramJson.map(parseRam);
+export const SEED_STORAGES: StorageCandidate[] = storagesJson.map(parseStorage);
+export const SEED_CASES: CaseCandidate[] = casesJson.map(parseCase);
+export const SEED_COOLERS: CoolerCandidate[] = coolersJson.map(parseCooler);
+export const SEED_PSUS: PsuCandidate[] = psusJson.map(parsePsu);
 
 /**
  * All seed components bundled by hardware category.

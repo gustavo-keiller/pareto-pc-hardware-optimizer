@@ -10,7 +10,7 @@
 
 **Shipped since the first roadmap:** Phase 0 (CI, lint, UI tests, `npm run snap`, glossary); the answer-first beginner flow ending in a graphics card or a whole PC (UX-01/02/11); trust fixes (UX-12/13); plain words, phone layout, pt-BR + reais (UX-03/05/06); shopping reasons (UX-04); step-up to Explorer (UX-07); accessibility and pro extras (UX-08/09); full 8-part PC builder with clearance fit checks (BLD-01/02), use-case scores (BLD-03), background Web Worker engine (BLD-04), interactive part swapper (BLD-05), upgrade mode (BLD-06), share links (BLD-07), and enthusiast constraints (BLD-08); code splitting and slim ECharts (PERF-01/02, first download ~108 KB gzipped).
 
-**Phase status:** Phase 0, Phase 1, and Phase 2 are 100% complete. Next up is Phase 3: Real, fresh data (`[DATA-01]` through `[DATA-05]`).
+**Phase status:** Phase 0, Phase 1, and Phase 2 are 100% complete. In Phase 3, `[DATA-01]` (versioned JSON catalogs & validation) is shipped; next up is `[DATA-02]` (benchmark sourcing from public creators).
 
 **Known problems (see `TODO.md`):**
 - BRL prices are US prices × 5.7 (labelled as estimates); real Brazilian prices are Phase 3 (DATA-04).
@@ -73,7 +73,7 @@
 
 ## Phase 3 — Real, fresh data
 
-- [ ] **`[DATA-01]` Move catalogs from `.ts` files into versioned JSON** with a validation step in `npm run check` (schema check, no missing fields, source + date on every row).
+- [x] **`[DATA-01]` Move catalogs from `.ts` files into versioned JSON** with a validation step in `npm run check` (schema check, no missing fields, source + date on every row). _Done 2026-10-20._
 - [ ] **`[DATA-02]` Benchmark sourcing from public creators (D-3).** Prefer creators who publish written charts/tables (LTT Labs, Hardware Unboxed, Gamers Nexus, TechPowerUp). Store numbers with source citation, normalize to relative performance vs reference card.
 - [ ] **`[DATA-03]` Coverage:** from 18 real GPUs to all current and previous generation parts in every BLD-01 category.
 - [ ] **`[DATA-04]` Prices as JSON in the repo, per store and region** (`data/prices/br.json` first), each with a "checked on" date. No live scraping (D-2).

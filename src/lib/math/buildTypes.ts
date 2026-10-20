@@ -160,6 +160,8 @@ export interface CpuCandidate {
    */
   supportedRamGenerations?: RamGeneration[];
   notes?: string;
+  source?: string;
+  checkedAt?: string;
 }
 
 /**
@@ -179,6 +181,8 @@ export interface MotherboardCandidate {
   m2Slots?: number;
   rgb?: boolean;
   notes?: string;
+  source?: string;
+  checkedAt?: string;
 }
 
 /**
@@ -196,6 +200,8 @@ export interface RamCandidate {
   modulesCount: number;
   rgb?: boolean;
   notes?: string;
+  source?: string;
+  checkedAt?: string;
 }
 
 /**
@@ -214,6 +220,8 @@ export interface StorageCandidate {
   capacityGb: number;
   readSpeedMbps?: number;
   notes?: string;
+  source?: string;
+  checkedAt?: string;
 }
 
 /**
@@ -230,6 +238,8 @@ export interface CaseCandidate {
   isSff?: boolean;
   rgb?: boolean;
   notes?: string;
+  source?: string;
+  checkedAt?: string;
 }
 
 /**
@@ -248,6 +258,8 @@ export interface CoolerCandidate {
   type?: CoolerType;
   rgb?: boolean;
   notes?: string;
+  source?: string;
+  checkedAt?: string;
 }
 
 /**
@@ -262,6 +274,8 @@ export interface PsuCandidate {
   efficiencyRating: PsuEfficiencyRating;
   modular: PsuModularity;
   notes?: string;
+  source?: string;
+  checkedAt?: string;
 }
 
 /**
