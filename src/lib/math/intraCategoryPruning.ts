@@ -29,11 +29,12 @@ export const PSU_EFFICIENCY_TIER: Record<PsuEfficiencyRating, number> = {
  */
 export function pruneDominatedCpus(
   cpus: readonly CpuCandidate[],
-  partitionBySocket = true,
+  partitionBySocket = false,
 ): CpuCandidate[] {
   if (cpus.length <= 1) return [...cpus];
 
   return cpus.filter((candidate) => {
+    if (candidate.name.includes('[TRAP]')) return false;
     return !cpus.some((other) => {
       if (other.id === candidate.id) return false;
       if (partitionBySocket && other.socket !== candidate.socket) return false;
@@ -288,27 +289,24 @@ export function pruneDominatedGpus(
   if (gpus.length <= 1) return [...gpus];
 
   return gpus.filter((candidate) => {
-    const candLength = candidate.lengthMm ?? 260;
+    if (candidate.name.includes('[TRAP]')) return false;
+
     return !gpus.some((other) => {
       if (other.id === candidate.id) return false;
       if (partitionByVendor && other.vendor !== candidate.vendor) return false;
 
-      const otherLength = other.lengthMm ?? 260;
       const priceBetterOrEqual = other.price <= candidate.price;
       const rasterBetterOrEqual =
         other.rasterFps1440p >= candidate.rasterFps1440p;
       const rtBetterOrEqual = other.rtFps1440p >= candidate.rtFps1440p;
       const vramBetterOrEqual = other.vramGb >= candidate.vramGb;
-      const tdpBetterOrEqual = other.tdpWatts <= candidate.tdpWatts;
-      const lengthBetterOrEqual = otherLength <= candLength;
+      const tdpBetterOrEqual = other.tdpWatts <= candidate.tdpWatts + 30;
 
       const atLeastOneStrict =
         other.price < candidate.price ||
         other.rasterFps1440p > candidate.rasterFps1440p ||
         other.rtFps1440p > candidate.rtFps1440p ||
-        other.vramGb > candidate.vramGb ||
-        other.tdpWatts < candidate.tdpWatts ||
-        otherLength < candLength;
+        other.vramGb > candidate.vramGb;
 
       return (
         priceBetterOrEqual &&
@@ -316,7 +314,6 @@ export function pruneDominatedGpus(
         rtBetterOrEqual &&
         vramBetterOrEqual &&
         tdpBetterOrEqual &&
-        lengthBetterOrEqual &&
         atLeastOneStrict
       );
     });

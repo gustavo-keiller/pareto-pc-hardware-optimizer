@@ -272,7 +272,9 @@ describe('App modes', () => {
 
     // Verifies transition to Full Builds mode
     expect(
-      screen.getByText(/Level 4: Mario Kart Full-Build Explorer/i),
+      screen.getByText(
+        /Nível 4: Montador de PCs|Level 4: Mario Kart Full-Build Explorer/i,
+      ),
     ).toBeDefined();
   });
 
@@ -393,7 +395,11 @@ describe('App modes', () => {
     await user.click(seeMathBtn);
 
     // Verify mode switched to Explorer (Level 2: Visual Axis Explorer)
-    expect(screen.getByText(/Level 2: Visual Axis Explorer/i)).toBeDefined();
+    expect(
+      screen.getByText(
+        /Nível 2: Explorador Visual|Level 2: Visual Axis Explorer/i,
+      ),
+    ).toBeDefined();
     // Leaderboard table and comparison drawer are rendered
     expect(screen.getAllByRole('table').length).toBeGreaterThanOrEqual(1);
   });

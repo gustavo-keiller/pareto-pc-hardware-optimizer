@@ -397,3 +397,59 @@ export function t(
   const dict = TRANSLATIONS[locale] ?? TRANSLATIONS[DEFAULT_LOCALE];
   return dict[key] ?? TRANSLATIONS['en-US'][key] ?? key;
 }
+
+export function getHeaderBadge(
+  uiMode: string,
+  locale: AppLocale = DEFAULT_LOCALE,
+): string {
+  if (locale === 'pt-BR') {
+    switch (uiMode) {
+      case 'simple':
+        return 'Nível 1: Guia do Comprador';
+      case 'explorer':
+        return 'Nível 2: Explorador Visual';
+      case 'builds':
+        return 'Nível 4: Montador de PCs';
+      default:
+        return 'Nível 3: Laboratório Pro';
+    }
+  }
+  switch (uiMode) {
+    case 'simple':
+      return 'Level 1: Easy Buyer Guide';
+    case 'explorer':
+      return 'Level 2: Visual Axis Explorer';
+    case 'builds':
+      return 'Level 4: Mario Kart Full-Build Explorer';
+    default:
+      return 'Level 3: Pro MCDM Lab';
+  }
+}
+
+export function getHeaderSubtitle(
+  uiMode: string,
+  locale: AppLocale = DEFAULT_LOCALE,
+): string {
+  if (locale === 'pt-BR') {
+    switch (uiMode) {
+      case 'simple':
+        return 'Escolha seu orçamento e estilo de jogo — placas superfaturadas e desvantajosas são filtradas automaticamente';
+      case 'explorer':
+        return 'Explore eixos customizados, visualizações 3D, Hiper-Gráficos 4D–7D e regras de extrapolação';
+      case 'builds':
+        return 'Monte Processador, Placa de Vídeo, RAM, Placa-Mãe e Fonte em configurações completas balanceadas';
+      default:
+        return 'Fronteira Hiper-Espacial 4D–7D, Proximidade TOPSIS, Extrapolação e Regressão Hedônica OLS';
+    }
+  }
+  switch (uiMode) {
+    case 'simple':
+      return 'Pick your budget and gaming style — overpriced value traps are filtered out automatically';
+    case 'explorer':
+      return 'Explore custom hardware axes, 3D views, 4D–7D Hyper-Graphs, and custom $/spec extrapolation rules';
+    case 'builds':
+      return 'Assemble CPU, GPU, RAM, Motherboard, and PSU into Pareto-optimal complete PC systems';
+    default:
+      return 'Full 4D–7D Hyper-Space Frontier, TOPSIS Closeness, Non-Linear Extrapolation & Hedonic OLS Lab';
+  }
+}

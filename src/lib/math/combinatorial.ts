@@ -22,6 +22,7 @@ import {
   StorageCandidate,
 } from './buildTypes';
 import { GpuCandidate, HardwareVendor } from './types';
+import { searchOptimalBuildTuples } from './buildSearch';
 
 import {
   PSU_EFFICIENCY_TIER,
@@ -456,8 +457,14 @@ export function optimizeFullSystemBuilds(
   criteria?: BuildFilterCriteria,
 ): OptimizationResult {
   // Step 1: Pre-prune intra-category candidates
-  const prunedCpus = pruneDominatedCpus(catalogs.cpus);
-  const prunedRam = pruneDominatedRam(catalogs.ramKits);
+  const prunedCpus = pruneDominatedCpus(
+    catalogs.cpus,
+    Boolean(criteria?.preferredSocket),
+  );
+  const prunedRam = pruneDominatedRam(
+    catalogs.ramKits,
+    Boolean(criteria?.preferredRamGeneration),
+  );
   const prunedMobos = pruneDominatedMotherboards(catalogs.motherboards);
   const prunedPsus = pruneDominatedPsus(catalogs.psus);
   const prunedGpus = pruneDominatedGpus(
@@ -474,93 +481,136 @@ export function optimizeFullSystemBuilds(
     ? pruneDominatedCoolers(catalogs.coolers)
     : [DEFAULT_COOLER];
 
-  const prunedCatalogs: ComponentCatalogs = {
-    cpus: prunedCpus,
-    gpus: prunedGpus,
-    motherboards: prunedMobos,
-    ramKits: prunedRam,
-    psus: prunedPsus,
-    storages: prunedStorages,
-    cases: prunedCases,
-    coolers: prunedCoolers,
-  };
-
   const profile = criteria?.workloadProfile ?? 'sweetspot-1440p';
+  const elasticity = 0.5;
+  const maxBudget = criteria?.maxBudget;
+  const minBudget = criteria?.minBudget;
+  const minEffectiveFps = criteria?.minEffectiveFps;
 
-  // Step 2: Generate compatible builds with active workload profile and early criteria propagation
-  const allCompatible = generateCompatibleBuilds(prunedCatalogs, {
-    profile,
-    maxBudget: criteria?.maxBudget,
-    preferredSocket: criteria?.preferredSocket,
-    preferredRamGeneration: criteria?.preferredRamGeneration,
-    preferredGpuVendor: criteria?.preferredGpuVendor,
-  });
+  // Filter catalogs by user preferences upfront to avoid examining non-matching subtrees
+  let cpus = prunedCpus;
+  let motherboards = prunedMobos;
+  let ramKits = prunedRam;
+  let gpus = prunedGpus;
+  const psus = prunedPsus;
+  const storages = prunedStorages;
+  const cases = prunedCases;
+  const coolers = prunedCoolers;
 
-  // Step 3: Filter builds according to user criteria
-  let filteredBuilds = allCompatible;
-  if (criteria) {
-    filteredBuilds = allCompatible.filter((build) => {
-      if (
-        typeof criteria.minBudget === 'number' &&
-        build.totalPrice < criteria.minBudget
-      ) {
-        return false;
-      }
-      if (
-        typeof criteria.maxBudget === 'number' &&
-        build.totalPrice > criteria.maxBudget
-      ) {
-        return false;
-      }
-      const score = build.workloadScore ?? build.effectiveFps1440p;
-      if (
-        typeof criteria.minEffectiveFps === 'number' &&
-        score < criteria.minEffectiveFps
-      ) {
-        return false;
-      }
-      if (
-        criteria.preferredSocket &&
-        build.cpu.socket !== criteria.preferredSocket
-      ) {
-        return false;
-      }
-      if (
-        criteria.preferredRamGeneration &&
-        build.ram.generation !== criteria.preferredRamGeneration
-      ) {
-        return false;
-      }
-      if (
-        criteria.preferredGpuVendor &&
-        build.gpu.vendor !== criteria.preferredGpuVendor
-      ) {
-        return false;
-      }
-      return true;
-    });
+  if (criteria?.preferredSocket) {
+    cpus = cpus.filter((c) => c.socket === criteria.preferredSocket);
+    motherboards = motherboards.filter(
+      (m) => m.socket === criteria.preferredSocket,
+    );
+  }
+  if (criteria?.preferredRamGeneration) {
+    ramKits = ramKits.filter(
+      (r) => r.generation === criteria.preferredRamGeneration,
+    );
+    motherboards = motherboards.filter(
+      (m) => m.ramGeneration === criteria.preferredRamGeneration,
+    );
+  }
+  if (criteria?.preferredGpuVendor) {
+    gpus = gpus.filter((g) => g.vendor === criteria.preferredGpuVendor);
   }
 
-  // Step 4: Pareto frontier extraction
-  const { optimalBuilds, dominatedBuilds } = evaluateBuildParetoFrontier(
-    filteredBuilds,
-    profile,
+  const prunedPartCounts = {
+    cpus: prunedCpus.length,
+    gpus: prunedGpus.length,
+    motherboards: prunedMobos.length,
+    ramKits: prunedRam.length,
+    psus: prunedPsus.length,
+    storages: prunedStorages.length,
+    cases: prunedCases.length,
+    coolers: prunedCoolers.length,
+  };
+
+  if (
+    cpus.length === 0 ||
+    gpus.length === 0 ||
+    motherboards.length === 0 ||
+    ramKits.length === 0 ||
+    psus.length === 0 ||
+    storages.length === 0 ||
+    cases.length === 0 ||
+    coolers.length === 0
+  ) {
+    return {
+      optimalBuilds: [],
+      allCompatibleBuilds: [],
+      dominatedBuilds: [],
+      totalCompatibleBuilds: 0,
+      prunedPartCounts,
+    };
+  }
+
+  const { optimalTuples, sampleTuples, totalCompatibleBuilds } =
+    searchOptimalBuildTuples(
+      {
+        cpus,
+        motherboards,
+        ramKits,
+        storages,
+        gpus,
+        coolers,
+        cases,
+        psus,
+      },
+      {
+        maxBudget,
+        minBudget,
+        minEffectiveFps,
+        elasticity,
+        profile,
+      },
+    );
+
+  // Assemble full PcBuild objects strictly for optimal builds and samples
+  const optimalBuilds = optimalTuples.map((t) =>
+    assemblePcBuild(
+      t.cpu,
+      t.gpu,
+      t.ram,
+      t.mobo,
+      t.psu,
+      t.storage,
+      t.pcCase,
+      t.cooler,
+      elasticity,
+      profile,
+      true,
+      t.precomputed,
+    ),
   );
+
+  const allCompatibleBuilds =
+    totalCompatibleBuilds <= 100
+      ? sampleTuples.map((t) =>
+          assemblePcBuild(
+            t.cpu,
+            t.gpu,
+            t.ram,
+            t.mobo,
+            t.psu,
+            t.storage,
+            t.pcCase,
+            t.cooler,
+            elasticity,
+            profile,
+            true,
+            t.precomputed,
+          ),
+        )
+      : optimalBuilds.slice();
+
+  const dominatedBuilds: PcBuild[] = [];
 
   return {
     optimalBuilds,
-    allCompatibleBuilds: filteredBuilds,
+    allCompatibleBuilds,
     dominatedBuilds,
-    totalCompatibleBuilds: filteredBuilds.length,
-    prunedPartCounts: {
-      cpus: prunedCpus.length,
-      gpus: prunedGpus.length,
-      motherboards: prunedMobos.length,
-      ramKits: prunedRam.length,
-      psus: prunedPsus.length,
-      storages: prunedStorages.length,
-      cases: prunedCases.length,
-      coolers: prunedCoolers.length,
-    },
+    totalCompatibleBuilds,
+    prunedPartCounts,
   };
 }

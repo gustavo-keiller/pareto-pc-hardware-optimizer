@@ -8,7 +8,7 @@ import { SimpleParetoGuide } from './components/SimpleParetoGuide';
 import { DealbreakerFilterPanel } from './components/DealbreakerFilterPanel';
 import { TopWinnerBanner } from './components/TopWinnerBanner';
 import { TopsisWeightsPanel } from './components/TopsisWeightsPanel';
-import { t } from './utils/i18n';
+import { getHeaderBadge, getHeaderSubtitle, t } from './utils/i18n';
 import {
   ShieldAlert,
   CheckCircle2,
@@ -181,23 +181,11 @@ export function App() {
                     ParetoPC
                   </h1>
                   <span className="hidden sm:inline-flex rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400 truncate">
-                    {uiMode === 'simple'
-                      ? 'Level 1: Easy Buyer Guide'
-                      : uiMode === 'explorer'
-                        ? 'Level 2: Visual Axis Explorer'
-                        : uiMode === 'builds'
-                          ? 'Level 4: Mario Kart Full-Build Explorer'
-                          : 'Level 3: Pro MCDM Lab'}
+                    {getHeaderBadge(uiMode, locale)}
                   </span>
                 </div>
                 <p className="hidden md:block text-xs text-slate-400 truncate max-w-xl">
-                  {uiMode === 'simple'
-                    ? 'Pick your budget and gaming style — overpriced value traps are filtered out automatically'
-                    : uiMode === 'explorer'
-                      ? 'Explore custom hardware axes, 3D views, 4D–7D Hyper-Graphs, and custom $/spec extrapolation rules'
-                      : uiMode === 'builds'
-                        ? 'Assemble CPU, GPU, RAM, Motherboard, and PSU into Pareto-optimal complete PC systems'
-                        : 'Full 4D–7D Hyper-Space Frontier, TOPSIS Closeness, Non-Linear Extrapolation & Hedonic OLS Lab'}
+                  {getHeaderSubtitle(uiMode, locale)}
                 </p>
               </div>
             </div>
@@ -236,10 +224,16 @@ export function App() {
                 type="button"
                 onClick={handleResetAll}
                 className="inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 px-2 sm:px-2.5 py-1 sm:py-1.5 font-medium text-slate-300 hover:border-slate-700 hover:text-white transition"
-                title="Reset filters and weights to defaults"
+                title={
+                  locale === 'pt-BR'
+                    ? 'Restaurar filtros e pesos para os padrões'
+                    : 'Reset filters and weights to defaults'
+                }
               >
                 <RotateCcw className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Reset</span>
+                <span className="hidden sm:inline">
+                  {locale === 'pt-BR' ? 'Redefinir' : 'Reset'}
+                </span>
               </button>
             </div>
           </div>
