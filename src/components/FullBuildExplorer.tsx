@@ -1,18 +1,27 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Layers, AlertTriangle, Wrench } from 'lucide-react';
 import {
+  AestheticPreference,
   assemblePcBuild,
   BuildWorkloadProfile,
+  CaseCandidate,
+  CoolerCandidate,
+  CoolerTypePreference,
+  CpuCandidate,
   CpuSocket,
+  CpuVendorPreference,
+  FormFactorPreference,
+  MotherboardCandidate,
   PcBuild,
+  PsuCandidate,
+  RamCandidate,
   RamGeneration,
+  StorageCandidate,
 } from '../lib/math/buildTypes';
 import { GpuCandidate, HardwareVendor } from '../lib/math/types';
 import { BudgetPreset } from '../data/budgetPresets';
-import {
-  BuildFilterCriteria,
-  optimizeFullSystemBuilds,
-} from '../lib/math/combinatorial';
+import { BuildFilterCriteria } from '../lib/math/combinatorial';
+import { useFullSystemOptimizer } from '../hooks/useFullSystemOptimizer';
 import { formatCurrency, getCurrencyAdjustedCatalogs } from '../utils/currency';
 import { AppLocale, t } from '../utils/i18n';
 import { decodeBuildShareUrl } from '../utils/shareBuild';
@@ -21,6 +30,22 @@ import { BuildAlternatives } from './BuildAlternatives';
 import { BuildFilterControls } from './BuildFilterControls';
 import { BuildLeaderboardTable } from './BuildLeaderboardTable';
 import { UpgradePlannerModal } from './UpgradePlannerModal';
+import {
+  PartSwapperModal,
+  SwappableCategory,
+  SwappableSelection,
+} from './PartSwapperModal';
+
+export interface CustomOverrideParts {
+  cpu?: CpuCandidate;
+  gpu?: GpuCandidate;
+  motherboard?: MotherboardCandidate;
+  ram?: RamCandidate;
+  storage?: StorageCandidate;
+  cooler?: CoolerCandidate;
+  case?: CaseCandidate;
+  psu?: PsuCandidate;
+}
 
 interface FullBuildExplorerProps {
   gpus: GpuCandidate[];
@@ -61,6 +86,14 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   const [selectedGpuVendor, setSelectedGpuVendor] = useState<
     HardwareVendor | 'ALL'
   >('ALL');
+  const [selectedCpuVendor, setSelectedCpuVendor] =
+    useState<CpuVendorPreference>(() => initialShare?.cpuVendor ?? 'ALL');
+  const [selectedFormFactor, setSelectedFormFactor] =
+    useState<FormFactorPreference>(() => initialShare?.formFactor ?? 'ALL');
+  const [selectedCoolerType, setSelectedCoolerType] =
+    useState<CoolerTypePreference>(() => initialShare?.coolerType ?? 'ALL');
+  const [selectedAesthetic, setSelectedAesthetic] =
+    useState<AestheticPreference>(() => initialShare?.aesthetic ?? 'ALL');
   const [minEffectiveFps, setMinEffectiveFps] = useState<number>(0);
   const [selectedWorkload, setSelectedWorkload] =
     useState<BuildWorkloadProfile>(
@@ -75,6 +108,10 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   );
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [dismissSharedNotice, setDismissSharedNotice] = useState(false);
+  const [swappingCategory, setSwappingCategory] =
+    useState<SwappableCategory | null>(null);
+  const [customOverrides, setCustomOverrides] =
+    useState<CustomOverrideParts | null>(null);
 
   useEffect(() => {
     if (initialShare?.budget) return;
@@ -106,6 +143,14 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
         selectedRamGen === 'ALL' ? undefined : selectedRamGen,
       preferredGpuVendor:
         selectedGpuVendor === 'ALL' ? undefined : selectedGpuVendor,
+      preferredCpuVendor:
+        selectedCpuVendor === 'ALL' ? undefined : selectedCpuVendor,
+      preferredFormFactor:
+        selectedFormFactor === 'ALL' ? undefined : selectedFormFactor,
+      preferredCoolerType:
+        selectedCoolerType === 'ALL' ? undefined : selectedCoolerType,
+      preferredAesthetic:
+        selectedAesthetic === 'ALL' ? undefined : selectedAesthetic,
       minEffectiveFps: minEffectiveFps > 0 ? minEffectiveFps : undefined,
       workloadProfile: selectedWorkload,
     };
@@ -114,35 +159,41 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     selectedSocket,
     selectedRamGen,
     selectedGpuVendor,
+    selectedCpuVendor,
+    selectedFormFactor,
+    selectedCoolerType,
+    selectedAesthetic,
     minEffectiveFps,
     selectedWorkload,
   ]);
 
-  const optimizationResult = useMemo(() => {
-    return optimizeFullSystemBuilds(
-      {
-        cpus: activeCpus,
-        gpus,
-        motherboards: activeMotherboards,
-        ramKits: activeRam,
-        psus: activePsus,
-        storages: activeStorages,
-        cases: activeCases,
-        coolers: activeCoolers,
-      },
-      filterCriteria,
-    );
-  }, [
-    activeCpus,
-    gpus,
-    activeMotherboards,
-    activeRam,
-    activePsus,
-    activeStorages,
-    activeCases,
-    activeCoolers,
+  const fullCatalogs = useMemo(
+    () => ({
+      cpus: activeCpus,
+      gpus,
+      motherboards: activeMotherboards,
+      ramKits: activeRam,
+      psus: activePsus,
+      storages: activeStorages,
+      cases: activeCases,
+      coolers: activeCoolers,
+    }),
+    [
+      activeCpus,
+      gpus,
+      activeMotherboards,
+      activeRam,
+      activePsus,
+      activeStorages,
+      activeCases,
+      activeCoolers,
+    ],
+  );
+
+  const { optimizationResult, isCalculating } = useFullSystemOptimizer({
+    catalogs: fullCatalogs,
     filterCriteria,
-  ]);
+  });
 
   const { optimalBuilds, allCompatibleBuilds, totalCompatibleBuilds } =
     optimizationResult;
@@ -222,7 +273,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   }, [optimalBuilds, maxBudget]);
 
   // If user clicked a specific build, inspect that; otherwise inspect top build
-  const activeBuild = useMemo(() => {
+  const baseBuild = useMemo(() => {
     if (selectedBuildId) {
       const match =
         optimalBuilds.find((b) => b.id === selectedBuildId) ??
@@ -300,6 +351,44 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     selectedWorkload,
   ]);
 
+  // Apply user component swaps on top of the base recommended build [BLD-05]
+  const activeBuild = useMemo(() => {
+    if (!baseBuild) return null;
+    if (!customOverrides || Object.keys(customOverrides).length === 0) {
+      return baseBuild;
+    }
+
+    const cpu = customOverrides.cpu ?? baseBuild.cpu;
+    const gpu = customOverrides.gpu ?? baseBuild.gpu;
+    const mobo = customOverrides.motherboard ?? baseBuild.motherboard;
+    const ram = customOverrides.ram ?? baseBuild.ram;
+    const psu = customOverrides.psu ?? baseBuild.psu;
+    const storage = customOverrides.storage ?? baseBuild.storage;
+    const pcCase = customOverrides.case ?? baseBuild.case;
+    const cooler = customOverrides.cooler ?? baseBuild.cooler;
+
+    try {
+      return assemblePcBuild(
+        cpu,
+        gpu,
+        ram,
+        mobo,
+        psu,
+        storage,
+        pcCase,
+        cooler,
+        0.5,
+        selectedWorkload,
+      );
+    } catch {
+      return baseBuild;
+    }
+  }, [baseBuild, customOverrides, selectedWorkload]);
+
+  const isCustomized = Boolean(
+    customOverrides && Object.keys(customOverrides).length > 0,
+  );
+
   // Step-Down and Step-Up alternatives along the frontier
   const { stepDownBuild, stepUpBuild } = useMemo(() => {
     if (!activeBuild || optimalBuilds.length <= 1) {
@@ -320,6 +409,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     setActivePresetId(preset.id);
     setMaxBudget(preset.budget);
     setSelectedBuildId(null);
+    setCustomOverrides(null);
   };
 
   const handleResetFilters = () => {
@@ -327,10 +417,15 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     setSelectedSocket('ALL');
     setSelectedRamGen('ALL');
     setSelectedGpuVendor('ALL');
+    setSelectedCpuVendor('ALL');
+    setSelectedFormFactor('ALL');
+    setSelectedCoolerType('ALL');
+    setSelectedAesthetic('ALL');
     setSelectedWorkload('sweetspot-1440p');
     setMinEffectiveFps(0);
     setActivePresetId(isBrl ? 'sweet-6000' : 'sweet-1000');
     setSelectedBuildId(null);
+    setCustomOverrides(null);
   };
 
   return (
@@ -416,9 +511,41 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
             setSelectedGpuVendor(vendor);
             setSelectedBuildId(null);
           }}
+          selectedCpuVendor={selectedCpuVendor}
+          onCpuVendorChange={(vendor) => {
+            setSelectedCpuVendor(vendor);
+            setSelectedBuildId(null);
+          }}
+          selectedFormFactor={selectedFormFactor}
+          onFormFactorChange={(formFactor) => {
+            setSelectedFormFactor(formFactor);
+            setSelectedBuildId(null);
+          }}
+          selectedCoolerType={selectedCoolerType}
+          onCoolerTypeChange={(coolerType) => {
+            setSelectedCoolerType(coolerType);
+            setSelectedBuildId(null);
+          }}
+          selectedAesthetic={selectedAesthetic}
+          onAestheticChange={(aesthetic) => {
+            setSelectedAesthetic(aesthetic);
+            setSelectedBuildId(null);
+          }}
           onResetFilters={handleResetFilters}
         />
       </div>
+
+      {/* Web Worker Background Optimizer Activity Badge [BLD-04] */}
+      {isCalculating && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 animate-pulse"
+        >
+          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+          <span>{t('calculatingOptimizer', locale)}</span>
+        </div>
+      )}
 
       {/* Shared Build Fallback Notice */}
       {sharedBuildMissingParts && !dismissSharedNotice && (
@@ -457,6 +584,9 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
           build={activeBuild}
           currency={currency}
           locale={locale}
+          onSwapPart={(cat) => setSwappingCategory(cat)}
+          isCustomized={isCustomized}
+          onResetCustomization={() => setCustomOverrides(null)}
         />
       ) : (
         <div className="rounded-3xl border border-dashed border-slate-800 bg-slate-900/40 p-12 text-center text-slate-400">
@@ -485,7 +615,10 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
           stepUpBuild={stepUpBuild}
           currency={currency}
           locale={locale}
-          onSelectBuild={(buildId) => setSelectedBuildId(buildId)}
+          onSelectBuild={(buildId) => {
+            setSelectedBuildId(buildId);
+            setCustomOverrides(null);
+          }}
         />
       )}
 
@@ -496,7 +629,10 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
         maxBudget={maxBudget}
         currency={currency}
         locale={locale}
-        onSelectBuild={(buildId) => setSelectedBuildId(buildId)}
+        onSelectBuild={(buildId) => {
+          setSelectedBuildId(buildId);
+          setCustomOverrides(null);
+        }}
       />
 
       {isUpgradeModalOpen && (
@@ -517,7 +653,48 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
           onClose={() => setIsUpgradeModalOpen(false)}
           onSelectBuild={(build) => {
             setSelectedBuildId(build.id);
+            setCustomOverrides(null);
             setIsUpgradeModalOpen(false);
+          }}
+        />
+      )}
+
+      {/* Interactive Part Swapper Modal [BLD-05] */}
+      {swappingCategory && activeBuild && (
+        <PartSwapperModal
+          isOpen={Boolean(swappingCategory)}
+          onClose={() => setSwappingCategory(null)}
+          category={swappingCategory}
+          activeBuild={activeBuild}
+          catalogs={fullCatalogs}
+          currency={currency}
+          locale={locale}
+          onSelectComponent={(sel: SwappableSelection) => {
+            setCustomOverrides((prev) => {
+              const base = prev ?? {};
+              switch (sel.category) {
+                case 'cpu':
+                  return { ...base, cpu: sel.component };
+                case 'gpu':
+                  return { ...base, gpu: sel.component };
+                case 'motherboard':
+                  return { ...base, motherboard: sel.component };
+                case 'ram':
+                  return { ...base, ram: sel.component };
+                case 'storage':
+                  return { ...base, storage: sel.component };
+                case 'cooler':
+                  return { ...base, cooler: sel.component };
+                case 'case':
+                  return { ...base, case: sel.component };
+                case 'psu':
+                  return { ...base, psu: sel.component };
+                default: {
+                  const _exhaustive: never = sel;
+                  return _exhaustive;
+                }
+              }
+            });
           }}
         />
       )}

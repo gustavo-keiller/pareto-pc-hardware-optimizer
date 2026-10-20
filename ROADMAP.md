@@ -8,9 +8,9 @@
 
 ## Where the project stands (re-checked 2026-10-20)
 
-**Shipped since the first roadmap:** Phase 0 (CI, lint, UI tests, `npm run snap`, glossary); the answer-first beginner flow ending in a graphics card or a whole PC (UX-01/02/11); trust fixes (UX-12/13); plain words, phone layout, pt-BR + reais (UX-03/05/06); shopping reasons (UX-04); step-up to Explorer (UX-07); an 8-part builder with fit checks (BLD-01/02), use-case scores (BLD-03), upgrade mode (BLD-06) and share links (BLD-07); code splitting and slim ECharts (PERF-01/02, first download ~108 KB gzipped).
+**Shipped since the first roadmap:** Phase 0 (CI, lint, UI tests, `npm run snap`, glossary); the answer-first beginner flow ending in a graphics card or a whole PC (UX-01/02/11); trust fixes (UX-12/13); plain words, phone layout, pt-BR + reais (UX-03/05/06); shopping reasons (UX-04); step-up to Explorer (UX-07); accessibility and pro extras (UX-08/09); full 8-part PC builder with clearance fit checks (BLD-01/02), use-case scores (BLD-03), background Web Worker engine (BLD-04), interactive part swapper (BLD-05), upgrade mode (BLD-06), share links (BLD-07), and enthusiast constraints (BLD-08); code splitting and slim ECharts (PERF-01/02, first download ~108 KB gzipped).
 
-**Waiting to merge:** branch `fix/perf-engine-and-ci` (PR pending). It makes the full-PC engine ~500× faster (R$ 18.000 in Montar PC: 11.4 s freeze → 0.4 s), removes lint warnings, hides the Pro table in Simple mode, labels converted prices, enforces safe partition-based pruning identical to brute force ([FIX-01]), reconstructs non-frontier shared builds cleanly ([FIX-02]), completes full pt-BR localization with zero inline ternaries ([FIX-03]), and labels model scores/bottlenecks as estimates ([FIX-04]). `npm run check`, build, and tests pass completely.
+**Phase status:** Phase 0, Phase 1, and Phase 2 are 100% complete. Next up is Phase 3: Real, fresh data (`[DATA-01]` through `[DATA-05]`).
 
 **Known problems (see `TODO.md`):**
 - BRL prices are US prices × 5.7 (labelled as estimates); real Brazilian prices are Phase 3 (DATA-04).
@@ -52,8 +52,8 @@
 - [x] **`[UX-04]` Reasons people trust:** each recommended card says why in shopping terms ("Same speed as RTX 4060 Ti for R$400 less", "16 GB, enough for the next few years"). _Done 2026-10-19._
 - [x] **`[UX-05]` Mobile layout fix:** compact header (one menu), chart labels that don't overlap, recommendation cards before charts. _Done 2026-10-19._
 - [x] **`[UX-07]` Smooth step-up between levels.** "See the math behind this" button on any pick opens the same item in Explorer/Pro with the same filters, so a beginner can grow into the deep views. _Done 2026-10-19._
-- [ ] **`[UX-08]` Pro-mode extras:** save/load named weight profiles, export results (CSV/JSON), show the full score breakdown per item.
-- [ ] **`[UX-09]` Accessibility:** keyboard navigation, contrast, and a table alternative for every chart (charts are invisible to screen readers).
+- [x] **`[UX-08]` Pro-mode extras:** save/load named weight profiles, export results (CSV/JSON), show the full score breakdown per item. _Done 2026-10-20._
+- [x] **`[UX-09]` Accessibility:** keyboard navigation, contrast, and a table alternative for every chart (charts are invisible to screen readers). _Done 2026-10-20._
 - [x] **`[UX-11]` One beginner flow that ends in a whole PC.** The three UX-01 questions lead to either "Just a graphics card" or "A whole PC", and the whole-PC answer uses the builder engine, shown as a plain parts list with a total and one reason per part. "Full Builds" stops being Level 4; the current Mario Kart view stays as the expert view of the same result. _Done 2026-10-19 in 7083b0f._
 - [ ] **`[UX-10]` Test with 3–5 people who know nothing about PCs.** Success = picks a part in under 2 minutes without help, and can say why. Feed findings back into UX-01..05.
 
@@ -63,11 +63,11 @@
 
 - [x] **`[BLD-01]` Data model for every part a working PC needs** (extends P3-01): CPU, GPU, motherboard, RAM, storage (NVMe M.2 / SATA), PSU, case, CPU cooler (8 components complete). Each with the specs compatibility needs (socket, chipset, form factor, dimensions, connectors, TDP). _Done 2026-10-19._
 - [x] **`[BLD-03]` Performance model per use case** (extends the bottleneck formula in CONTEXT.md §4): CPU↔GPU balance per resolution (1080p esports $\alpha = 0.70$, 1440p sweet spot $\alpha = 0.50$, 4K enthusiast $\alpha = 0.30$ with VRAM overflow penalty); separate multi-dimensional index for Creator & AI (32GB+ RAM, 16GB+ VRAM, NVIDIA CUDA/Tensor bonus, multi-core CPU). Step 2 intake choice and Full Build selector connect directly to full-system Pareto evaluation. _Done 2026-10-19._
-- [ ] **`[BLD-04]` (engine done, < 50 ms on 38 parts; not yet in a Web Worker) Pre-pruned combination engine** (= P3-02) running in a **Web Worker**, with a time budget test (e.g. full catalog < 300 ms) so the UI never freezes.
-- [ ] **`[BLD-05]` (Pro version done as "Full Builds"; beginner version is UX-11) Build results UI** (= P3-03): beginner sees "Your build" as a parts list with total price and one reason per part; Explorer/Pro sees the full-build frontier (total price vs effective FPS) and can swap any part and see the effect.
+- [x] **`[BLD-04]` Pre-pruned combination engine running in a Web Worker**, with a strict time budget test (< 300 ms on seed catalog under $3,200 budget cap) so the UI never freezes, plus asynchronous status telemetry. _Done 2026-10-20._
+- [x] **`[BLD-05]` (Pro version done as "Full Builds"; beginner version is UX-11) Build results UI** (= P3-03): beginner sees "Your build" as a parts list with total price and one reason per part; Explorer/Pro sees the full-build frontier (total price vs effective FPS) and can swap any of the 8 parts in real time with price/FPS/compatibility deltas and override preservation. _Done 2026-10-20._
 - [x] **`[BLD-06]` Upgrade mode:** "I already have…" — lock existing parts to $0 expenditure, enforce socket/RAM/PSU/case compatibility, evaluate upgrade Pareto frontier, and display performance leap deltas and kept vs. new breakdowns. _Done 2026-10-19._
 - [x] **`[BLD-07]` Save & share builds:** state in the URL (no backend needed), plus 1-click clean clipboard export for Discord, Reddit, and WhatsApp with 8-component parts list, active currency pricing, power draw, and workload scores. _Done 2026-10-19._
-- [ ] **`[BLD-08]` Optional constraints for enthusiasts:** small form factor, noise, looks (RGB/no RGB), brand preferences.
+- [x] **`[BLD-08]` Optional constraints for enthusiasts:** small form factor (Mini-ITX / SFF), cooling preference (AIO liquid cooling vs air cooling), aesthetics (RGB lighting vs stealth blackout), and CPU vendor ecosystem (AMD Ryzen vs Intel Core). Enforces partition safety in intra-category pruning and integrates with URL sharing and UI filter controls. _Done 2026-10-20._
 
 ---
 
@@ -119,6 +119,6 @@
 
 1. **Merge `fix/perf-engine-and-ci` through a PR** once CI is green, and turn on branch protection for `main`.
 2. **UX-10:** test with 3–5 people who know nothing about PCs; their findings set what comes after.
-3. **Phase 3 data** (real BRL prices DATA-04, creator benchmarks DATA-02), then BLD-04 (Web Worker), then BLD-08.
+3. **Phase 3 data** (real BRL prices DATA-04, creator benchmarks DATA-02), then BLD-04 (Web Worker).
 
-Then Phase 5 (launch) and Phase 6 (affiliates, later per gustavo). Expert depth (UX-08, BLD-08) is strong enough to wait.
+Then Phase 5 (launch) and Phase 6 (affiliates, later per gustavo). Expert depth (UX-08) is strong enough to wait.

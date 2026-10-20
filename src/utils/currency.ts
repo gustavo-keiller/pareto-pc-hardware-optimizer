@@ -1,5 +1,7 @@
 import { AppLocale, isAppLocale } from './i18n';
 
+export type Currency = 'USD' | 'BRL';
+
 /**
  * Format currency amount using Intl.NumberFormat based on currency and locale.
  */

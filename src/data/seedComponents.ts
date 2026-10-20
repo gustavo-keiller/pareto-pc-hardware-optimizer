@@ -316,6 +316,35 @@ export const SEED_MOTHERBOARDS: MotherboardCandidate[] = [
     notes: 'Enthusiast LGA1700 board with PCIe 5.0 and premium audio.',
   },
   {
+    id: 'mobo-asrock-b650i-lightning',
+    name: 'ASRock B650I Lightning WiFi',
+    vendor: 'ASRock',
+    price: 195,
+    socket: 'AM5',
+    chipset: 'B650',
+    ramGeneration: 'DDR5',
+    ramSlots: 2,
+    m2Slots: 2,
+    formFactor: 'Mini-ITX',
+    pcieGeneration: 4,
+    notes:
+      'Premium AM5 Mini-ITX board for compact Small Form Factor (SFF) builds.',
+  },
+  {
+    id: 'mobo-asrock-b760i-lightning',
+    name: 'ASRock B760I Lightning WiFi',
+    vendor: 'ASRock',
+    price: 185,
+    socket: 'LGA1700',
+    chipset: 'B760',
+    ramGeneration: 'DDR5',
+    ramSlots: 2,
+    m2Slots: 2,
+    formFactor: 'Mini-ITX',
+    pcieGeneration: 5,
+    notes: 'High-end Intel LGA1700 Mini-ITX motherboard with DDR5 support.',
+  },
+  {
     id: 'mobo-asrock-z890-pro',
     name: 'ASRock Z890 PRO RS',
     vendor: 'ASRock',
@@ -419,6 +448,20 @@ export const SEED_RAM_KITS: RamCandidate[] = [
     modulesCount: 2,
     notes:
       'Low-profile AMD EXPO kit designed for large dual-tower air coolers.',
+  },
+  {
+    id: 'ram-corsair-32gb-d5-rgb',
+    name: 'Corsair Vengeance RGB 32GB (2x16GB) DDR5-6000 CL30',
+    vendor: 'Corsair',
+    price: 115,
+    generation: 'DDR5',
+    capacityGb: 32,
+    speedMhz: 6000,
+    casLatency: 30,
+    modulesCount: 2,
+    rgb: true,
+    notes:
+      'Dynamic ten-zone RGB lighting with AMD EXPO and Intel XMP profiles.',
   },
   {
     id: 'ram-corsair-64gb-d5-6000',
@@ -561,6 +604,8 @@ export const SEED_CASES: CaseCandidate[] = [
     supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
     maxGpuLengthMm: 370,
     maxCpuCoolerHeightMm: 163,
+    isSff: false,
+    rgb: false,
     notes: 'High-airflow value mid-tower with 4 pre-installed fans.',
   },
   {
@@ -571,7 +616,22 @@ export const SEED_CASES: CaseCandidate[] = [
     supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
     maxGpuLengthMm: 400,
     maxCpuCoolerHeightMm: 180,
+    isSff: false,
+    rgb: false,
     notes: 'Massive clearance mesh case fitting all GPU and cooler sizes.',
+  },
+  {
+    id: 'case-montech-air903-max',
+    name: 'Montech Air 903 MAX ARGB',
+    vendor: 'Montech',
+    price: 75,
+    supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
+    maxGpuLengthMm: 400,
+    maxCpuCoolerHeightMm: 180,
+    isSff: false,
+    rgb: true,
+    notes:
+      'High-airflow mesh mid-tower with 4 pre-installed 140mm ARGB PWM fans.',
   },
   {
     id: 'case-nzxt-h5-flow',
@@ -581,7 +641,22 @@ export const SEED_CASES: CaseCandidate[] = [
     supportedFormFactors: ['ATX', 'Micro-ATX', 'Mini-ITX'],
     maxGpuLengthMm: 365,
     maxCpuCoolerHeightMm: 165,
+    isSff: false,
+    rgb: false,
     notes: 'Clean modern aesthetic with dedicated bottom GPU intake fan.',
+  },
+  {
+    id: 'case-cm-nr200p',
+    name: 'Cooler Master MasterBox NR200P SFF',
+    vendor: 'Cooler Master',
+    price: 95,
+    supportedFormFactors: ['Mini-ITX'],
+    maxGpuLengthMm: 330,
+    maxCpuCoolerHeightMm: 155,
+    isSff: true,
+    rgb: false,
+    notes:
+      'Iconic 18L SFF chassis with high compatibility and tool-free panels.',
   },
 ];
 
@@ -598,6 +673,7 @@ export const SEED_COOLERS: CoolerCandidate[] = [
     heightMm: 54,
     maxTdpWatts: 65,
     type: 'Air',
+    rgb: false,
     notes: 'Compact stock cooler suitable for 65W TDP processors.',
   },
   {
@@ -609,6 +685,7 @@ export const SEED_COOLERS: CoolerCandidate[] = [
     heightMm: 148,
     maxTdpWatts: 180,
     type: 'Air',
+    rgb: false,
     notes: 'Budget single-tower benchmark champ, cools up to 180W CPUs.',
   },
   {
@@ -620,7 +697,34 @@ export const SEED_COOLERS: CoolerCandidate[] = [
     heightMm: 155,
     maxTdpWatts: 245,
     type: 'Air',
+    rgb: false,
     notes: 'Dual-tower champion, handles 7800X3D and Core i7 effortlessly.',
+  },
+  {
+    id: 'cooler-thermalright-frozen-prism-240',
+    name: 'Thermalright Frozen Prism 240 ARGB',
+    vendor: 'Thermalright',
+    price: 55,
+    supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
+    heightMm: 52,
+    maxTdpWatts: 260,
+    type: 'AIO',
+    rgb: true,
+    notes:
+      'High-performance 240mm AIO liquid cooler with magnetic pump cover and ARGB.',
+  },
+  {
+    id: 'cooler-arctic-lf3-240-black',
+    name: 'Arctic Liquid Freezer III 240 Black',
+    vendor: 'Arctic',
+    price: 80,
+    supportedSockets: ['AM4', 'AM5', 'LGA1700', 'LGA1851'],
+    heightMm: 65,
+    maxTdpWatts: 280,
+    type: 'AIO',
+    rgb: false,
+    notes:
+      'Thick 38mm radiator with VRM cooling fan for silent high-thermal dissipation.',
   },
 ];
 

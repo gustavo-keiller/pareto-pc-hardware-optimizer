@@ -4,13 +4,48 @@
 
 ## 🔴 In Flight
 
-- `fix/perf-engine-and-ci` PR: Open and land PR against `main` covering engine optimization, partitioned pruning (`[FIX-01]`), shared build reconstruction (`[FIX-02]`), full pt-BR localization without inline ternaries (`[FIX-03]`), and model estimate labels (`[FIX-04]`).
+- None currently active. Phase 2 (`[BLD-01]` through `[BLD-08]`) is 100% complete and verified. Ready to begin Phase 3 (`[DATA-01]` Move catalogs from `.ts` files into versioned JSON with schema validation).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Interactive Part Swapper on Full Build Hero Card (`[BLD-05]`, 2026-10-20):**
+  - Built interactive modal (`PartSwapperModal.tsx`) allowing users to swap any of the 8 components (CPU, GPU, RAM, Motherboard, PSU, Storage, Cooler, Case) on recommended builds.
+  - Computes real-time price deltas, CPU/GPU FPS deltas, and validates physical clearance and platform compatibility via `checkBuildCompatibility` before applying changes.
+  - Added "Trocar" / "Swap" buttons to all 8 component cards in `BuildHeroCard.tsx` with dedicated accessible `aria-label` tags.
+  - Added a customized build banner in `BuildHeroCard.tsx` with an instant 1-click revert button to return to the original recommended Pareto configuration.
+  - Backed by UI integration tests in `src/__tests__/PartSwapper.ui.test.tsx`.
+
+- **Web Worker Combinatorial Engine & Strict Time Budget (`[BLD-04]`, 2026-10-20):**
+  - Spun up dedicated Web Worker (`builderWorker.ts`) to execute `optimizeFullSystemBuilds` without dropping UI frames.
+  - Built custom React hook (`useFullSystemOptimizer`) with request ID serialization, race-condition mitigation, and synchronous fallback for Node/JSDOM.
+  - Added background activity indicator (`isCalculating`) in Full Build Explorer with localized status banner.
+  - Enforced a strict `< 300ms` time budget test on full seed catalog under the highest budget preset ($3,200).
+  - Backed by dedicated hook unit tests in `src/hooks/__tests__/useFullSystemOptimizer.test.ts`.
+
+- **Accessibility & Screen-Reader Alternatives (`[UX-09]`, 2026-10-20):**
+  - Added skip-link navigation (`#main-content`) with keyboard focus rings for screen-reader and keyboard users.
+  - Added semantic landmark structures (`<main id="main-content">`) and accessible labels across chart regions.
+  - Created screen-reader table alternatives (`<table className="sr-only">`) alongside SVG/ECharts graphs (`SimpleGuideScatterPlot`, `ValueResidualsChart`, `ParetoScatterPlot`).
+  - Extracted `AppHeader.tsx` deep module, reducing `src/App.tsx` from 1029 lines to 817 lines and respecting Rule 7 file size limits.
+  - Backed by UI integration tests in `src/__tests__/App.ui.test.tsx`.
+
+- **Pro-Mode Extras: Saved Weight Profiles, Data Export & TOPSIS Breakdown (`[UX-08]`, 2026-10-20):**
+  - Added named weight profiles management in Pro Lab with safe `localStorage` persistence (`CustomWeightProfilesManager`), enabling users to save, load, and delete custom weight calibrations.
+  - Added RFC 4180 compliant CSV export and structured JSON export (`exportData.ts`) with browser download triggers on the leaderboard table.
+  - Implemented mathematical multi-criteria TOPSIS score breakdown (`computeTopsisBreakdown`) calculating per-metric Euclidean distance components $(v_{ij} - A_j^+)^2$ and $(v_{ij} - A_j^-)^2$ with proximity-to-best bars in `ComparisonDrawer.tsx`.
+  - Backed by unit property tests in `src/lib/math/__tests__/topsisBreakdown.test.ts`, export tests in `src/utils/__tests__/exportData.test.ts`, and UI integration tests in `src/__tests__/App.ui.test.tsx`.
+
+- **Enthusiast Constraints: SFF, AIO vs. Air, RGB & CPU Vendor (`[BLD-08]`, 2026-10-20):**
+  - Added enthusiast filtering criteria across form factor (Mini-ITX / SFF, Micro-ATX, ATX), cooler type (AIO Liquid vs. Air), aesthetics (RGB vs. Stealth), and CPU vendor (AMD vs. Intel).
+  - Enforced partition safety in intra-category pruning: compact Mini-ITX motherboards and SFF cases cannot be dominated by ATX parts; AIO coolers are preserved; aesthetic preferences are partitioned cleanly.
+  - Expanded seed hardware catalog with Mini-ITX motherboards (B650I/B760I Lightning), SFF chassis (NR200P), 240mm AIO liquid coolers (Frozen Prism, Liquid Freezer III), and RGB RAM.
+  - Supported URL sharing serialization and deserialization for all 4 enthusiast criteria.
+  - Added accessible UI filter controls with full localization in `pt-BR` and `en-US`.
+  - Backed by unit property tests in `src/lib/math/__tests__/enthusiastConstraints.test.ts` and UI integration tests in `src/__tests__/App.ui.test.tsx`.
 
 - **Full Localization Integrity & Zero Inline Locale Ternaries (`[FIX-03]`, 2026-10-20):**
   - Modularized localization into typed dictionaries `src/utils/locales/ptBR.ts`, `enUS.ts`, and `types.ts` keeping each file well under the 800-line limit.

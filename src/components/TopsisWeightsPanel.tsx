@@ -11,12 +11,15 @@ import {
   PresetProfile,
   UiMode,
 } from '../hooks/useOptimizerState';
+import { AppLocale } from '../utils/i18n';
+import { CustomWeightProfilesManager } from './CustomWeightProfilesManager';
 
 export interface TopsisWeightsPanelProps {
   weights: PreferenceWeights;
   normalizedWeights: Record<MetricKey, number>;
   activePresetId: string;
   uiMode: UiMode;
+  locale?: AppLocale;
   onChangeWeights: (
     updater: (prev: PreferenceWeights) => PreferenceWeights,
   ) => void;
@@ -29,6 +32,7 @@ export const TopsisWeightsPanel: React.FC<TopsisWeightsPanelProps> = ({
   normalizedWeights,
   activePresetId,
   uiMode,
+  locale = 'pt-BR',
   onChangeWeights,
   onApplyPreset,
   onSelectCustomPreset,
@@ -143,6 +147,18 @@ export const TopsisWeightsPanel: React.FC<TopsisWeightsPanelProps> = ({
           })}
         </div>
       </div>
+
+      {uiMode === 'pro' && (
+        <CustomWeightProfilesManager
+          currentWeights={weights}
+          activeProfileId={activePresetId}
+          onApplyProfile={(profile) => {
+            onSelectCustomPreset();
+            onChangeWeights(() => profile.weights);
+          }}
+          locale={locale}
+        />
+      )}
     </section>
   );
 };

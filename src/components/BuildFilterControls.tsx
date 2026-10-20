@@ -1,9 +1,17 @@
 import React from 'react';
-import { DollarSign, RotateCcw } from 'lucide-react';
+import { DollarSign, RotateCcw, SlidersHorizontal } from 'lucide-react';
 import {
+  AestheticPreference,
   BuildWorkloadProfile,
+  CoolerTypePreference,
   CpuSocket,
+  CpuVendorPreference,
+  FormFactorPreference,
+  isAestheticPreference,
+  isCoolerTypePreference,
   isCpuSocket,
+  isCpuVendorPreference,
+  isFormFactorPreference,
   isRamGeneration,
   RamGeneration,
 } from '../lib/math/buildTypes';
@@ -37,6 +45,22 @@ function parseVendorFilter(value: string): HardwareVendor | 'ALL' {
   return 'ALL';
 }
 
+function parseCpuVendorFilter(value: string): CpuVendorPreference {
+  return isCpuVendorPreference(value) ? value : 'ALL';
+}
+
+function parseFormFactorFilter(value: string): FormFactorPreference {
+  return isFormFactorPreference(value) ? value : 'ALL';
+}
+
+function parseCoolerTypeFilter(value: string): CoolerTypePreference {
+  return isCoolerTypePreference(value) ? value : 'ALL';
+}
+
+function parseAestheticFilter(value: string): AestheticPreference {
+  return isAestheticPreference(value) ? value : 'ALL';
+}
+
 export interface BuildFilterControlsProps {
   currency: 'USD' | 'BRL';
   locale?: AppLocale;
@@ -53,6 +77,14 @@ export interface BuildFilterControlsProps {
   onRamGenChange: (ramGen: RamGeneration | 'ALL') => void;
   selectedGpuVendor: HardwareVendor | 'ALL';
   onGpuVendorChange: (vendor: HardwareVendor | 'ALL') => void;
+  selectedCpuVendor?: CpuVendorPreference;
+  onCpuVendorChange?: (vendor: CpuVendorPreference) => void;
+  selectedFormFactor?: FormFactorPreference;
+  onFormFactorChange?: (formFactor: FormFactorPreference) => void;
+  selectedCoolerType?: CoolerTypePreference;
+  onCoolerTypeChange?: (coolerType: CoolerTypePreference) => void;
+  selectedAesthetic?: AestheticPreference;
+  onAestheticChange?: (aesthetic: AestheticPreference) => void;
   onResetFilters: () => void;
 }
 
@@ -72,6 +104,14 @@ export const BuildFilterControls: React.FC<BuildFilterControlsProps> = ({
   onRamGenChange,
   selectedGpuVendor,
   onGpuVendorChange,
+  selectedCpuVendor = 'ALL',
+  onCpuVendorChange,
+  selectedFormFactor = 'ALL',
+  onFormFactorChange,
+  selectedCoolerType = 'ALL',
+  onCoolerTypeChange,
+  selectedAesthetic = 'ALL',
+  onAestheticChange,
   onResetFilters,
 }) => {
   const isBrl = currency === 'BRL';
@@ -289,6 +329,120 @@ export const BuildFilterControls: React.FC<BuildFilterControlsProps> = ({
             <RotateCcw className="h-3.5 w-3.5" />
             {t('filterResetButton', locale)}
           </button>
+        </div>
+
+        {/* Enthusiast Hardware Filters Row [BLD-08] */}
+        <div className="md:col-span-12 border-t border-slate-800/80 pt-3 mt-1">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <SlidersHorizontal className="h-3.5 w-3.5 text-emerald-400" />
+              {t('buildFiltersEnthusiastHeading', locale)}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {/* CPU Vendor */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
+                {t('buildFiltersCpuVendor', locale)}
+              </label>
+              <select
+                aria-label={t('buildFiltersCpuVendor', locale)}
+                value={selectedCpuVendor}
+                onChange={(e) =>
+                  onCpuVendorChange?.(parseCpuVendorFilter(e.target.value))
+                }
+                className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-200 focus:border-emerald-500 focus:outline-none"
+              >
+                <option value="ALL">
+                  {t('buildFiltersCpuVendorAll', locale)}
+                </option>
+                <option value="AMD">
+                  {t('buildFiltersCpuVendorAmd', locale)}
+                </option>
+                <option value="Intel">
+                  {t('buildFiltersCpuVendorIntel', locale)}
+                </option>
+              </select>
+            </div>
+
+            {/* Form Factor / Case Size */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
+                {t('buildFiltersFormFactor', locale)}
+              </label>
+              <select
+                aria-label={t('buildFiltersFormFactor', locale)}
+                value={selectedFormFactor}
+                onChange={(e) =>
+                  onFormFactorChange?.(parseFormFactorFilter(e.target.value))
+                }
+                className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-200 focus:border-emerald-500 focus:outline-none"
+              >
+                <option value="ALL">
+                  {t('buildFiltersFormFactorAll', locale)}
+                </option>
+                <option value="SFF">
+                  {t('buildFiltersFormFactorSff', locale)}
+                </option>
+                <option value="Micro-ATX">
+                  {t('buildFiltersFormFactorMatx', locale)}
+                </option>
+                <option value="ATX">
+                  {t('buildFiltersFormFactorAtx', locale)}
+                </option>
+              </select>
+            </div>
+
+            {/* Cooler Type */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
+                {t('buildFiltersCoolerType', locale)}
+              </label>
+              <select
+                aria-label={t('buildFiltersCoolerType', locale)}
+                value={selectedCoolerType}
+                onChange={(e) =>
+                  onCoolerTypeChange?.(parseCoolerTypeFilter(e.target.value))
+                }
+                className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-200 focus:border-emerald-500 focus:outline-none"
+              >
+                <option value="ALL">
+                  {t('buildFiltersCoolerTypeAll', locale)}
+                </option>
+                <option value="Air">
+                  {t('buildFiltersCoolerTypeAir', locale)}
+                </option>
+                <option value="AIO">
+                  {t('buildFiltersCoolerTypeAio', locale)}
+                </option>
+              </select>
+            </div>
+
+            {/* Aesthetic / RGB */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
+                {t('buildFiltersAesthetic', locale)}
+              </label>
+              <select
+                aria-label={t('buildFiltersAesthetic', locale)}
+                value={selectedAesthetic}
+                onChange={(e) =>
+                  onAestheticChange?.(parseAestheticFilter(e.target.value))
+                }
+                className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-200 focus:border-emerald-500 focus:outline-none"
+              >
+                <option value="ALL">
+                  {t('buildFiltersAestheticAll', locale)}
+                </option>
+                <option value="RGB">
+                  {t('buildFiltersAestheticRgb', locale)}
+                </option>
+                <option value="Stealth">
+                  {t('buildFiltersAestheticStealth', locale)}
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
     </>

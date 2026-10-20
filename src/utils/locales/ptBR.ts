@@ -162,6 +162,8 @@ export const ptBR: Translations = {
   tableVram: 'VRAM',
   tablePower: 'Consumo',
   tableCompare: 'Comparar',
+  tableCompareAdd: 'Adicionar à comparação multivariada (até 4)',
+  tableCompareRemove: 'Remover da comparação multivariada',
   verdictSmartBuy: 'Compra Inteligente',
   verdictTrap: 'Armadilha de Custo',
   verdictNiche: 'Específica / Nicho',
@@ -242,6 +244,27 @@ export const ptBR: Translations = {
   filterResetTooltip: 'Restaurar filtros de montagem',
   filterResetButton: 'Redefinir',
 
+  // Enthusiast Filters (BLD-08)
+  buildFiltersEnthusiastHeading: 'Opções Avançadas para Entusiastas',
+  buildFiltersEnthusiastToggle: 'Filtros Avançados (Gabinete, Cooler, RGB)',
+  buildFiltersFormFactor: 'Tamanho / Formato do Gabinete',
+  buildFiltersFormFactorAll: 'Todos os Tamanhos',
+  buildFiltersFormFactorSff: 'SFF (Gabinete Compacto Mini-ITX)',
+  buildFiltersFormFactorMatx: 'Micro-ATX (Torre Média)',
+  buildFiltersFormFactorAtx: 'ATX Padrão',
+  buildFiltersCoolerType: 'Tipo de Refrigeração (Cooler)',
+  buildFiltersCoolerTypeAll: 'Qualquer Cooler',
+  buildFiltersCoolerTypeAir: 'Cooler a Ar (Air Cooler)',
+  buildFiltersCoolerTypeAio: 'Water Cooler (AIO)',
+  buildFiltersAesthetic: 'Estilo Visual & Iluminação',
+  buildFiltersAestheticAll: 'Sem Preferência',
+  buildFiltersAestheticRgb: 'Com Iluminação RGB',
+  buildFiltersAestheticStealth: 'Sem RGB / Blackout (Stealth)',
+  buildFiltersCpuVendor: 'Processador (Fabricante)',
+  buildFiltersCpuVendorAll: 'AMD & Intel',
+  buildFiltersCpuVendorAmd: 'AMD Ryzen',
+  buildFiltersCpuVendorIntel: 'Intel Core',
+
   // Full Build Leaderboard Table
   buildLeaderboardTitle: 'Tabela de Configurações Recomendadas',
   buildLeaderboardSubtitle:
@@ -305,6 +328,7 @@ export const ptBR: Translations = {
   noCompatibleBuildsFound: 'Nenhuma Configuração Compatível Encontrada',
   noCompatibleBuildsDesc:
     'Tente aumentar o limite de orçamento ou relaxar os filtros de soquete e geração de RAM para encontrar combinações válidas.',
+  calculatingOptimizer: 'Calculando combinações...',
   btnSimpleGuide: 'Guia Simples',
   btnGpuExplorer: 'Explorador de GPUs',
   btnUpgradeMode: 'Modo Upgrade',
@@ -314,4 +338,59 @@ export const ptBR: Translations = {
   estimateBadge: 'estimativa',
   estimateExplanation:
     'Desempenho e gargalo calculados por modelo estimado até calibração com dados reais de benchmark (DATA-02).',
+
+  // Pro-Mode Extras (UX-08)
+  weightsProfilesTitle: 'Perfis Salvos de Pesos',
+  weightsProfilesSaveBtn: 'Salvar Perfil',
+  weightsProfilesPlaceholder: 'Nome do perfil (ex: Foco em 1440p)',
+  weightsProfilesNoProfiles: 'Nenhum perfil salvo ainda.',
+  weightsProfilesLoad: 'Carregar',
+  weightsProfilesDelete: 'Excluir',
+  weightsProfilesActive: 'Ativo',
+  btnExportCsv: 'Exportar CSV',
+  btnExportJson: 'Exportar JSON',
+  exportTooltip: 'Baixar dados tabulares completos',
+  drawerTabRadar: 'Gráfico Radar',
+  drawerTabParallel: 'Coordenadas Paralelas',
+  drawerTabBreakdown: 'Detalhamento TOPSIS',
+  breakdownColMetric: 'Critério',
+  breakdownColWeight: 'Peso Relativo',
+  breakdownColRaw: 'Valor Real',
+  breakdownColNormalized: 'Normalizado (rᵢⱼ)',
+  breakdownColIdeal: 'Melhor Ideal (A⁺)',
+  breakdownColWorst: 'Pior Ideal (A⁻)',
+  breakdownColProximity: 'Proximidade ao Ideal',
+  drawerBreakdownSummary:
+    'Detalhamento matemático dos vetores de distância Euclidiana e contribuição de cada critério para a pontuação relativa TOPSIS (Cᵢ).',
+
+  // Accessibility & Chart Alternatives (UX-09)
+  skipToContent: 'Pular para o conteúdo principal',
+  chartAriaScatterPlot:
+    'Gráfico interativo de dispersão Preço versus Desempenho',
+  chartAriaValueResiduals: 'Gráfico de resíduos de valor justo OLS',
+  chartTableCaptionSimple:
+    'Tabela acessível de placas de vídeo: Preço versus Desempenho e avaliação de negócio',
+  chartTableCaptionResiduals:
+    'Tabela acessível de resíduos OLS: Preço real versus Preço justo estimado',
+  chartTableColActual: 'Preço Real',
+  chartTableColPredicted: 'Preço Justo Estimado',
+  chartTableColDiff: 'Diferença',
+  chartTableColStatus: 'Classificação de Valor',
+
+  // Interactive Part Swapper (BLD-05)
+  swapPart: 'Trocar',
+  swapPartModalTitle: 'Trocar Componente',
+  swapPartModalSubtitle:
+    'Compare peças alternativas e veja o impacto imediato no preço total e no desempenho do computador.',
+  swapCurrentPart: 'Peça Atual na Configuração',
+  swapSelectPart: 'Escolher Esta Peça',
+  swapActiveBadge: 'Atual',
+  swapPriceDeltaCheaper: 'a menos',
+  swapPriceDeltaMoreExpensive: 'a mais',
+  swapFpsDeltaFaster: 'mais rápido',
+  swapFpsDeltaSlower: 'mais lento',
+  swapCompatible: 'Compatível',
+  swapIncompatible: 'Incompatível',
+  swapCustomizedBuildBadge: 'Configuração Personalizada',
+  swapResetToRecommended: 'Restaurar Recomendação Automática',
 };

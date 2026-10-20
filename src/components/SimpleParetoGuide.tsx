@@ -15,7 +15,7 @@ import {
 import { SimpleGuidePickHero } from './SimpleGuidePickHero';
 import { FullBuildPickHero } from './FullBuildPickHero';
 import { SimpleGuideMathWalkthrough } from './SimpleGuideMathWalkthrough';
-import { optimizeFullSystemBuilds } from '../lib/math/combinatorial';
+import { useFullSystemOptimizer } from '../hooks/useFullSystemOptimizer';
 import { AppLocale, t } from '../utils/i18n';
 import { getCurrencyAdjustedCatalogs } from '../utils/currency';
 
@@ -185,43 +185,51 @@ export function SimpleParetoGuide({
     coolers: effectiveCoolers,
   } = useMemo(() => getCurrencyAdjustedCatalogs(currency), [currency]);
 
-  const pcBuildsResult = useMemo(() => {
-    const catalog = rawCatalog ?? gpus;
-    const effectiveMaxBudget =
-      beginnerGoal === 'pc' &&
-      constraints.maxPrice < (currency === 'BRL' ? 4500 : 750)
-        ? currency === 'BRL'
-          ? 6000
-          : 1000
-        : constraints.maxPrice;
-    return optimizeFullSystemBuilds(
-      {
-        cpus: effectiveCpus,
-        gpus: catalog,
-        motherboards: effectiveMotherboards,
-        ramKits: effectiveRam,
-        psus: effectivePsus,
-        storages: effectiveStorages,
-        cases: effectiveCases,
-        coolers: effectiveCoolers,
-      },
-      { maxBudget: effectiveMaxBudget, workloadProfile: beginnerUseCase },
-    );
-  }, [
-    rawCatalog,
-    gpus,
-    beginnerGoal,
-    beginnerUseCase,
-    constraints.maxPrice,
-    currency,
-    effectiveCpus,
-    effectiveMotherboards,
-    effectiveRam,
-    effectivePsus,
-    effectiveStorages,
-    effectiveCases,
-    effectiveCoolers,
-  ]);
+  const fullSystemCatalogs = useMemo(
+    () => ({
+      cpus: effectiveCpus,
+      gpus: rawCatalog ?? gpus,
+      motherboards: effectiveMotherboards,
+      ramKits: effectiveRam,
+      psus: effectivePsus,
+      storages: effectiveStorages,
+      cases: effectiveCases,
+      coolers: effectiveCoolers,
+    }),
+    [
+      effectiveCpus,
+      rawCatalog,
+      gpus,
+      effectiveMotherboards,
+      effectiveRam,
+      effectivePsus,
+      effectiveStorages,
+      effectiveCases,
+      effectiveCoolers,
+    ],
+  );
+
+  const effectiveMaxBudget =
+    beginnerGoal === 'pc' &&
+    constraints.maxPrice < (currency === 'BRL' ? 4500 : 750)
+      ? currency === 'BRL'
+        ? 6000
+        : 1000
+      : constraints.maxPrice;
+
+  const pcBuildFilterCriteria = useMemo(
+    () => ({
+      maxBudget: effectiveMaxBudget,
+      workloadProfile: beginnerUseCase,
+    }),
+    [effectiveMaxBudget, beginnerUseCase],
+  );
+
+  const { optimizationResult: pcBuildsResult } = useFullSystemOptimizer({
+    catalogs: fullSystemCatalogs,
+    filterCriteria: pcBuildFilterCriteria,
+    enabled: beginnerGoal === 'pc',
+  });
 
   const { topBuild, stepDownBuild, stepUpBuild } = useMemo(() => {
     const { optimalBuilds } = pcBuildsResult;

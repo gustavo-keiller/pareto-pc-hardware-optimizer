@@ -95,6 +95,21 @@ describe('Save & Share Builds Engine (BLD-07)', () => {
       expect(decoded?.currency).toBeUndefined();
       expect(decoded?.workload).toBeUndefined();
     });
+
+    it('encodes and decodes enthusiast constraint options [BLD-08]', () => {
+      const url = encodeBuildShareUrl({
+        cpuVendor: 'AMD',
+        formFactor: 'SFF',
+        coolerType: 'AIO',
+        aesthetic: 'RGB',
+      });
+      const decoded = decodeBuildShareUrl(url);
+      expect(decoded).not.toBeNull();
+      expect(decoded?.cpuVendor).toBe('AMD');
+      expect(decoded?.formFactor).toBe('SFF');
+      expect(decoded?.coolerType).toBe('AIO');
+      expect(decoded?.aesthetic).toBe('RGB');
+    });
   });
 
   describe('formatBuildShareText', () => {

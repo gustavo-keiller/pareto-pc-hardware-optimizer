@@ -161,6 +161,8 @@ export const enUS: Translations = {
   tableVram: 'VRAM',
   tablePower: 'Power',
   tableCompare: 'Compare',
+  tableCompareAdd: 'Add to multi-metric comparison (up to 4)',
+  tableCompareRemove: 'Remove from multi-metric comparison',
   verdictSmartBuy: 'Smart Buy',
   verdictTrap: 'Bad Value Trap',
   verdictNiche: 'Niche / Specialized',
@@ -242,6 +244,27 @@ export const enUS: Translations = {
   filterResetTooltip: 'Reset full build filters',
   filterResetButton: 'Reset',
 
+  // Enthusiast Filters (BLD-08)
+  buildFiltersEnthusiastHeading: 'Enthusiast Hardware Options',
+  buildFiltersEnthusiastToggle: 'Advanced Filters (Case, Cooler, RGB)',
+  buildFiltersFormFactor: 'Enclosure Size / Form Factor',
+  buildFiltersFormFactorAll: 'All Sizes',
+  buildFiltersFormFactorSff: 'SFF (Compact Mini-ITX)',
+  buildFiltersFormFactorMatx: 'Micro-ATX (Mid-Size)',
+  buildFiltersFormFactorAtx: 'Standard ATX',
+  buildFiltersCoolerType: 'Cooling Solution',
+  buildFiltersCoolerTypeAll: 'Any Cooling',
+  buildFiltersCoolerTypeAir: 'Air Cooler',
+  buildFiltersCoolerTypeAio: 'AIO Liquid Cooler',
+  buildFiltersAesthetic: 'Visual Style & Lighting',
+  buildFiltersAestheticAll: 'No Preference',
+  buildFiltersAestheticRgb: 'RGB Lighting',
+  buildFiltersAestheticStealth: 'Stealth / No-RGB Blackout',
+  buildFiltersCpuVendor: 'CPU Manufacturer',
+  buildFiltersCpuVendorAll: 'AMD & Intel',
+  buildFiltersCpuVendorAmd: 'AMD Ryzen',
+  buildFiltersCpuVendorIntel: 'Intel Core',
+
   // Full Build Leaderboard Table
   buildLeaderboardTitle: 'Recommended Builds Leaderboard',
   buildLeaderboardSubtitle:
@@ -305,6 +328,7 @@ export const enUS: Translations = {
   noCompatibleBuildsFound: 'No Compatible Builds Found',
   noCompatibleBuildsDesc:
     'Try raising the maximum budget or relaxing socket and RAM generation filters to find valid hardware combinations.',
+  calculatingOptimizer: 'Calculating combinations...',
   btnSimpleGuide: 'Simple Guide',
   btnGpuExplorer: 'GPU Explorer',
   btnUpgradeMode: 'Upgrade Mode',
@@ -314,4 +338,58 @@ export const enUS: Translations = {
   estimateBadge: 'estimate',
   estimateExplanation:
     'Performance and bottleneck figures are model estimates until calibrated with empirical benchmark telemetry (DATA-02).',
+
+  // Pro-Mode Extras (UX-08)
+  weightsProfilesTitle: 'Saved Weight Profiles',
+  weightsProfilesSaveBtn: 'Save Profile',
+  weightsProfilesPlaceholder: 'Profile name (e.g. 1440p Focus)',
+  weightsProfilesNoProfiles: 'No saved profiles yet.',
+  weightsProfilesLoad: 'Load',
+  weightsProfilesDelete: 'Delete',
+  weightsProfilesActive: 'Active',
+  btnExportCsv: 'Export CSV',
+  btnExportJson: 'Export JSON',
+  exportTooltip: 'Download complete tabular dataset',
+  drawerTabRadar: 'Radar Chart',
+  drawerTabParallel: 'Parallel Coordinates',
+  drawerTabBreakdown: 'TOPSIS Breakdown',
+  breakdownColMetric: 'Metric',
+  breakdownColWeight: 'Relative Weight',
+  breakdownColRaw: 'Raw Value',
+  breakdownColNormalized: 'Normalized (r_ij)',
+  breakdownColIdeal: 'Ideal Best (A+)',
+  breakdownColWorst: 'Ideal Worst (A-)',
+  breakdownColProximity: 'Proximity to Best',
+  drawerBreakdownSummary:
+    'Mathematical breakdown of vector Euclidean distance components and objective contributions to relative TOPSIS closeness (C_i).',
+
+  // Accessibility & Chart Alternatives (UX-09)
+  skipToContent: 'Skip to main content',
+  chartAriaScatterPlot: 'Interactive Price versus Performance scatter plot',
+  chartAriaValueResiduals: 'OLS fair-value residuals bar chart',
+  chartTableCaptionSimple:
+    'Accessible graphics cards table: Price versus Performance and value deal verdict',
+  chartTableCaptionResiduals:
+    'Accessible OLS residuals table: Actual price versus estimated fair market price',
+  chartTableColActual: 'Actual Price',
+  chartTableColPredicted: 'Fair Market Price',
+  chartTableColDiff: 'Difference',
+  chartTableColStatus: 'Valuation Tier',
+
+  // Interactive Part Swapper (BLD-05)
+  swapPart: 'Swap',
+  swapPartModalTitle: 'Swap Component',
+  swapPartModalSubtitle:
+    'Compare alternative components and see the real-time impact on total price and gaming performance.',
+  swapCurrentPart: 'Current Component in Build',
+  swapSelectPart: 'Choose This Part',
+  swapActiveBadge: 'Active',
+  swapPriceDeltaCheaper: 'cheaper',
+  swapPriceDeltaMoreExpensive: 'more',
+  swapFpsDeltaFaster: 'faster',
+  swapFpsDeltaSlower: 'slower',
+  swapCompatible: 'Compatible',
+  swapIncompatible: 'Incompatible',
+  swapCustomizedBuildBadge: 'Customized Build',
+  swapResetToRecommended: 'Reset to Recommended',
 };

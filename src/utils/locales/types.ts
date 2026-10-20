@@ -163,6 +163,8 @@ export interface Translations {
   tableVram: string;
   tablePower: string;
   tableCompare: string;
+  tableCompareAdd: string;
+  tableCompareRemove: string;
   verdictSmartBuy: string;
   verdictTrap: string;
   verdictNiche: string;
@@ -239,6 +241,27 @@ export interface Translations {
   filterResetTooltip: string;
   filterResetButton: string;
 
+  // Enthusiast Filters (BLD-08)
+  buildFiltersEnthusiastHeading: string;
+  buildFiltersEnthusiastToggle: string;
+  buildFiltersFormFactor: string;
+  buildFiltersFormFactorAll: string;
+  buildFiltersFormFactorSff: string;
+  buildFiltersFormFactorMatx: string;
+  buildFiltersFormFactorAtx: string;
+  buildFiltersCoolerType: string;
+  buildFiltersCoolerTypeAll: string;
+  buildFiltersCoolerTypeAir: string;
+  buildFiltersCoolerTypeAio: string;
+  buildFiltersAesthetic: string;
+  buildFiltersAestheticAll: string;
+  buildFiltersAestheticRgb: string;
+  buildFiltersAestheticStealth: string;
+  buildFiltersCpuVendor: string;
+  buildFiltersCpuVendorAll: string;
+  buildFiltersCpuVendorAmd: string;
+  buildFiltersCpuVendorIntel: string;
+
   // Full Build Leaderboard Table
   buildLeaderboardTitle: string;
   buildLeaderboardSubtitle: string;
@@ -297,6 +320,7 @@ export interface Translations {
   sharedOverBudgetSuffix: string;
   noCompatibleBuildsFound: string;
   noCompatibleBuildsDesc: string;
+  calculatingOptimizer: string;
   btnSimpleGuide: string;
   btnGpuExplorer: string;
   btnUpgradeMode: string;
@@ -305,4 +329,54 @@ export interface Translations {
   // Estimate labels (FIX-04)
   estimateBadge: string;
   estimateExplanation: string;
+
+  // Pro-Mode Extras (UX-08)
+  weightsProfilesTitle: string;
+  weightsProfilesSaveBtn: string;
+  weightsProfilesPlaceholder: string;
+  weightsProfilesNoProfiles: string;
+  weightsProfilesLoad: string;
+  weightsProfilesDelete: string;
+  weightsProfilesActive: string;
+  btnExportCsv: string;
+  btnExportJson: string;
+  exportTooltip: string;
+  drawerTabRadar: string;
+  drawerTabParallel: string;
+  drawerTabBreakdown: string;
+  breakdownColMetric: string;
+  breakdownColWeight: string;
+  breakdownColRaw: string;
+  breakdownColNormalized: string;
+  breakdownColIdeal: string;
+  breakdownColWorst: string;
+  breakdownColProximity: string;
+  drawerBreakdownSummary: string;
+
+  // Accessibility & Chart Alternatives (UX-09)
+  skipToContent: string;
+  chartAriaScatterPlot: string;
+  chartAriaValueResiduals: string;
+  chartTableCaptionSimple: string;
+  chartTableCaptionResiduals: string;
+  chartTableColActual: string;
+  chartTableColPredicted: string;
+  chartTableColDiff: string;
+  chartTableColStatus: string;
+
+  // Interactive Part Swapper (BLD-05)
+  swapPart: string;
+  swapPartModalTitle: string;
+  swapPartModalSubtitle: string;
+  swapCurrentPart: string;
+  swapSelectPart: string;
+  swapActiveBadge: string;
+  swapPriceDeltaCheaper: string;
+  swapPriceDeltaMoreExpensive: string;
+  swapFpsDeltaFaster: string;
+  swapFpsDeltaSlower: string;
+  swapCompatible: string;
+  swapIncompatible: string;
+  swapCustomizedBuildBadge: string;
+  swapResetToRecommended: string;
 }
