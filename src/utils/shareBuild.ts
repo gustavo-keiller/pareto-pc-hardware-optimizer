@@ -1,4 +1,15 @@
-import { BuildWorkloadProfile, PcBuild } from '../lib/math/buildTypes';
+import {
+  AestheticPreference,
+  BuildWorkloadProfile,
+  CoolerTypePreference,
+  CpuVendorPreference,
+  FormFactorPreference,
+  isAestheticPreference,
+  isCoolerTypePreference,
+  isCpuVendorPreference,
+  isFormFactorPreference,
+  PcBuild,
+} from '../lib/math/buildTypes';
 import { formatCurrency } from './currency';
 import { AppLocale } from './i18n';
 
@@ -15,6 +26,10 @@ export interface BuildShareParams {
   workload?: BuildWorkloadProfile;
   currency?: 'USD' | 'BRL';
   buildId?: string;
+  cpuVendor?: CpuVendorPreference;
+  formFactor?: FormFactorPreference;
+  coolerType?: CoolerTypePreference;
+  aesthetic?: AestheticPreference;
 }
 
 export function isBuildWorkloadProfile(
@@ -57,6 +72,14 @@ export function encodeBuildShareUrl(
   if (params.workload) url.searchParams.set('workload', params.workload);
   if (params.currency) url.searchParams.set('curr', params.currency);
   if (params.buildId) url.searchParams.set('build', params.buildId);
+  if (params.cpuVendor && params.cpuVendor !== 'ALL')
+    url.searchParams.set('cpuvendor', params.cpuVendor);
+  if (params.formFactor && params.formFactor !== 'ALL')
+    url.searchParams.set('formfactor', params.formFactor);
+  if (params.coolerType && params.coolerType !== 'ALL')
+    url.searchParams.set('coolertype', params.coolerType);
+  if (params.aesthetic && params.aesthetic !== 'ALL')
+    url.searchParams.set('aesthetic', params.aesthetic);
 
   return url.toString();
 }
@@ -65,10 +88,15 @@ export function encodeBuildShareUrl(
  * Safely decodes search parameters from a shared URL.
  * Returns null if the query string contains no build-related parameters.
  */
-export function decodeBuildShareUrl(search: string): BuildShareParams | null {
-  if (!search || !search.includes('=')) return null;
+export function decodeBuildShareUrl(
+  searchOrUrl: string,
+): BuildShareParams | null {
+  if (!searchOrUrl || !searchOrUrl.includes('=')) return null;
 
   try {
+    const search = searchOrUrl.includes('?')
+      ? searchOrUrl.slice(searchOrUrl.indexOf('?'))
+      : searchOrUrl;
     const params = new URLSearchParams(search);
 
     const mode = params.get('mode');
@@ -110,6 +138,30 @@ export function decodeBuildShareUrl(search: string): BuildShareParams | null {
       return null;
     }
 
+    const rawCpuVendor = params.get('cpuvendor');
+    const cpuVendor =
+      rawCpuVendor && isCpuVendorPreference(rawCpuVendor)
+        ? rawCpuVendor
+        : undefined;
+
+    const rawFormFactor = params.get('formfactor');
+    const formFactor =
+      rawFormFactor && isFormFactorPreference(rawFormFactor)
+        ? rawFormFactor
+        : undefined;
+
+    const rawCoolerType = params.get('coolertype');
+    const coolerType =
+      rawCoolerType && isCoolerTypePreference(rawCoolerType)
+        ? rawCoolerType
+        : undefined;
+
+    const rawAesthetic = params.get('aesthetic');
+    const aesthetic =
+      rawAesthetic && isAestheticPreference(rawAesthetic)
+        ? rawAesthetic
+        : undefined;
+
     return {
       cpuId,
       gpuId,
@@ -123,6 +175,10 @@ export function decodeBuildShareUrl(search: string): BuildShareParams | null {
       workload,
       currency,
       buildId,
+      cpuVendor,
+      formFactor,
+      coolerType,
+      aesthetic,
     };
   } catch {
     return null;

@@ -632,4 +632,48 @@ describe('App modes', () => {
       ),
     ).toBeDefined();
   });
+
+  it('BLD-08: filters full system builds by enthusiast constraints (SFF form factor, AIO cooling, CPU vendor)', async () => {
+    localStorage.clear();
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Switch to English for deterministic option accessibility labels
+    const enToggle = screen.getByRole('button', { name: /🇺🇸 EN/i });
+    await user.click(enToggle);
+
+    // Switch to Full Builds mode
+    const buildsBtn = screen.getByRole('button', { name: /4\. Full Builds/i });
+    await user.click(buildsBtn);
+
+    // 1. Filter by Form Factor: SFF
+    const formFactorSelect = screen.getByRole('combobox', {
+      name: /Enclosure Size|Form Factor/i,
+    });
+    await user.selectOptions(formFactorSelect, 'SFF');
+
+    // Verify top build card updates with SFF case and Mini-ITX motherboard
+    const topBuildCard = await screen.findByTestId('top-build-card');
+    expect(topBuildCard.textContent).toContain('MasterBox NR200P');
+    expect(topBuildCard.textContent).toMatch(/B650I|B760I/);
+
+    // 2. Filter by Cooler Type: AIO
+    const coolerSelect = screen.getByRole('combobox', {
+      name: /Cooling Solution|Cooler/i,
+    });
+    await user.selectOptions(coolerSelect, 'AIO');
+
+    // Verify top build has an AIO cooler
+    const aioCard = await screen.findByTestId('top-build-card');
+    expect(aioCard.textContent).toMatch(/Liquid Freezer III|Frozen Prism/);
+
+    // 3. Filter by CPU Vendor: Intel
+    const cpuVendorSelect = screen.getByRole('combobox', {
+      name: /CPU Manufacturer|CPU Vendor/i,
+    });
+    await user.selectOptions(cpuVendorSelect, 'Intel');
+
+    const intelCard = await screen.findByTestId('top-build-card');
+    expect(intelCard.textContent).toMatch(/Core i[3579]/);
+  });
 });

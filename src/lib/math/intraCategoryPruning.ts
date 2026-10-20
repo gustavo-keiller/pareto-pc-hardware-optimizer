@@ -82,6 +82,10 @@ export function pruneDominatedRam(
       if (other.generation !== candidate.generation) {
         return false;
       }
+      // Aesthetic partition: never prune RGB against non-RGB
+      if (Boolean(candidate.rgb) !== Boolean(other.rgb)) {
+        return false;
+      }
 
       const priceBetterOrEqual = other.price <= candidate.price;
       const capacityBetterOrEqual = other.capacityGb >= candidate.capacityGb;
@@ -110,6 +114,7 @@ export function pruneDominatedRam(
  */
 export function pruneDominatedMotherboards(
   motherboards: readonly MotherboardCandidate[],
+  partitionByFormFactor = false,
 ): MotherboardCandidate[] {
   if (motherboards.length <= 1) return [...motherboards];
 
@@ -119,6 +124,17 @@ export function pruneDominatedMotherboards(
       if (
         other.socket !== candidate.socket ||
         other.ramGeneration !== candidate.ramGeneration
+      ) {
+        return false;
+      }
+      if (partitionByFormFactor && other.formFactor !== candidate.formFactor) {
+        return false;
+      }
+      // Mini-ITX boards can fit in SFF enclosures where ATX cannot fit.
+      // An ATX or Micro-ATX board cannot safely dominate a Mini-ITX board.
+      if (
+        candidate.formFactor === 'Mini-ITX' &&
+        other.formFactor !== 'Mini-ITX'
       ) {
         return false;
       }
@@ -233,6 +249,11 @@ export function pruneDominatedCases(
     return !cases.some((other) => {
       if (other.id === candidate.id) return false;
 
+      // SFF partition: an ATX case cannot dominate a dedicated Small Form Factor case
+      if (Boolean(candidate.isSff) !== Boolean(other.isSff)) return false;
+      // Aesthetic partition: never prune RGB against non-RGB
+      if (Boolean(candidate.rgb) !== Boolean(other.rgb)) return false;
+
       const formFactorsSuperset = candidate.supportedFormFactors.every((f) =>
         other.supportedFormFactors.includes(f),
       );
@@ -273,6 +294,13 @@ export function pruneDominatedCoolers(
   return coolers.filter((candidate) => {
     return !coolers.some((other) => {
       if (other.id === candidate.id) return false;
+
+      // Cooler type partition: Air coolers cannot dominate AIO liquid coolers and vice versa
+      if (candidate.type && other.type && candidate.type !== other.type) {
+        return false;
+      }
+      // Aesthetic partition: never prune RGB against non-RGB
+      if (Boolean(candidate.rgb) !== Boolean(other.rgb)) return false;
 
       const socketsSuperset = candidate.supportedSockets.every((s) =>
         other.supportedSockets.includes(s),

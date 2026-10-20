@@ -48,6 +48,68 @@ export function isMotherboardFormFactor(
 }
 
 /**
+ * Enthusiast form factor preference:
+ * - 'ALL': No restriction
+ * - 'SFF': Small Form Factor (Mini-ITX motherboard and SFF-compatible case)
+ * - 'Micro-ATX': Compact desktop (Micro-ATX motherboard)
+ * - 'ATX': Standard full-size tower (ATX motherboard)
+ */
+export type FormFactorPreference = 'ALL' | 'SFF' | 'Micro-ATX' | 'ATX';
+
+export function isFormFactorPreference(
+  value: string,
+): value is FormFactorPreference {
+  return (
+    value === 'ALL' ||
+    value === 'SFF' ||
+    value === 'Micro-ATX' ||
+    value === 'ATX'
+  );
+}
+
+/**
+ * Cooler type preference:
+ * - 'ALL': Any cooling solution
+ * - 'Air': Traditional air heatsink
+ * - 'AIO': All-In-One liquid cooler (radiator + pump)
+ */
+export type CoolerTypePreference = 'ALL' | 'Air' | 'AIO';
+
+export function isCoolerTypePreference(
+  value: string,
+): value is CoolerTypePreference {
+  return value === 'ALL' || value === 'Air' || value === 'AIO';
+}
+
+/**
+ * Aesthetic theme preference:
+ * - 'ALL': Any appearance
+ * - 'RGB': Addressable RGB lighting components
+ * - 'Stealth': Clean blackout / no-RGB aesthetic
+ */
+export type AestheticPreference = 'ALL' | 'RGB' | 'Stealth';
+
+export function isAestheticPreference(
+  value: string,
+): value is AestheticPreference {
+  return value === 'ALL' || value === 'RGB' || value === 'Stealth';
+}
+
+/**
+ * CPU vendor preference:
+ * - 'ALL': Any CPU manufacturer
+ * - 'AMD': AMD Ryzen processors
+ * - 'Intel': Intel Core processors
+ */
+export type CpuVendorPreference = 'ALL' | 'AMD' | 'Intel';
+
+export function isCpuVendorPreference(
+  value: string,
+): value is CpuVendorPreference {
+  return value === 'ALL' || value === 'AMD' || value === 'Intel';
+}
+
+/**
  * Power supply efficiency tier ratings.
  */
 export type PsuEfficiencyRating =
@@ -115,6 +177,7 @@ export interface MotherboardCandidate {
   formFactor: MotherboardFormFactor;
   pcieGeneration?: number;
   m2Slots?: number;
+  rgb?: boolean;
   notes?: string;
 }
 
@@ -131,6 +194,7 @@ export interface RamCandidate {
   speedMhz: number;
   casLatency?: number;
   modulesCount: number;
+  rgb?: boolean;
   notes?: string;
 }
 
@@ -163,6 +227,8 @@ export interface CaseCandidate {
   supportedFormFactors: MotherboardFormFactor[];
   maxGpuLengthMm: number;
   maxCpuCoolerHeightMm: number;
+  isSff?: boolean;
+  rgb?: boolean;
   notes?: string;
 }
 
@@ -180,6 +246,7 @@ export interface CoolerCandidate {
   heightMm: number;
   maxTdpWatts: number;
   type?: CoolerType;
+  rgb?: boolean;
   notes?: string;
 }
 

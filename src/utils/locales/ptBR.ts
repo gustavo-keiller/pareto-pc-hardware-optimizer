@@ -242,6 +242,27 @@ export const ptBR: Translations = {
   filterResetTooltip: 'Restaurar filtros de montagem',
   filterResetButton: 'Redefinir',
 
+  // Enthusiast Filters (BLD-08)
+  buildFiltersEnthusiastHeading: 'Opções Avançadas para Entusiastas',
+  buildFiltersEnthusiastToggle: 'Filtros Avançados (Gabinete, Cooler, RGB)',
+  buildFiltersFormFactor: 'Tamanho / Formato do Gabinete',
+  buildFiltersFormFactorAll: 'Todos os Tamanhos',
+  buildFiltersFormFactorSff: 'SFF (Gabinete Compacto Mini-ITX)',
+  buildFiltersFormFactorMatx: 'Micro-ATX (Torre Média)',
+  buildFiltersFormFactorAtx: 'ATX Padrão',
+  buildFiltersCoolerType: 'Tipo de Refrigeração (Cooler)',
+  buildFiltersCoolerTypeAll: 'Qualquer Cooler',
+  buildFiltersCoolerTypeAir: 'Cooler a Ar (Air Cooler)',
+  buildFiltersCoolerTypeAio: 'Water Cooler (AIO)',
+  buildFiltersAesthetic: 'Estilo Visual & Iluminação',
+  buildFiltersAestheticAll: 'Sem Preferência',
+  buildFiltersAestheticRgb: 'Com Iluminação RGB',
+  buildFiltersAestheticStealth: 'Sem RGB / Blackout (Stealth)',
+  buildFiltersCpuVendor: 'Processador (Fabricante)',
+  buildFiltersCpuVendorAll: 'AMD & Intel',
+  buildFiltersCpuVendorAmd: 'AMD Ryzen',
+  buildFiltersCpuVendorIntel: 'Intel Core',
+
   // Full Build Leaderboard Table
   buildLeaderboardTitle: 'Tabela de Configurações Recomendadas',
   buildLeaderboardSubtitle:

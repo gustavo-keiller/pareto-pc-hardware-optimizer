@@ -239,6 +239,27 @@ export interface Translations {
   filterResetTooltip: string;
   filterResetButton: string;
 
+  // Enthusiast Filters (BLD-08)
+  buildFiltersEnthusiastHeading: string;
+  buildFiltersEnthusiastToggle: string;
+  buildFiltersFormFactor: string;
+  buildFiltersFormFactorAll: string;
+  buildFiltersFormFactorSff: string;
+  buildFiltersFormFactorMatx: string;
+  buildFiltersFormFactorAtx: string;
+  buildFiltersCoolerType: string;
+  buildFiltersCoolerTypeAll: string;
+  buildFiltersCoolerTypeAir: string;
+  buildFiltersCoolerTypeAio: string;
+  buildFiltersAesthetic: string;
+  buildFiltersAestheticAll: string;
+  buildFiltersAestheticRgb: string;
+  buildFiltersAestheticStealth: string;
+  buildFiltersCpuVendor: string;
+  buildFiltersCpuVendorAll: string;
+  buildFiltersCpuVendorAmd: string;
+  buildFiltersCpuVendorIntel: string;
+
   // Full Build Leaderboard Table
   buildLeaderboardTitle: string;
   buildLeaderboardSubtitle: string;

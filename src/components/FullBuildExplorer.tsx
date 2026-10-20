@@ -1,9 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Layers, AlertTriangle, Wrench } from 'lucide-react';
 import {
+  AestheticPreference,
   assemblePcBuild,
   BuildWorkloadProfile,
+  CoolerTypePreference,
   CpuSocket,
+  CpuVendorPreference,
+  FormFactorPreference,
   PcBuild,
   RamGeneration,
 } from '../lib/math/buildTypes';
@@ -61,6 +65,14 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   const [selectedGpuVendor, setSelectedGpuVendor] = useState<
     HardwareVendor | 'ALL'
   >('ALL');
+  const [selectedCpuVendor, setSelectedCpuVendor] =
+    useState<CpuVendorPreference>(() => initialShare?.cpuVendor ?? 'ALL');
+  const [selectedFormFactor, setSelectedFormFactor] =
+    useState<FormFactorPreference>(() => initialShare?.formFactor ?? 'ALL');
+  const [selectedCoolerType, setSelectedCoolerType] =
+    useState<CoolerTypePreference>(() => initialShare?.coolerType ?? 'ALL');
+  const [selectedAesthetic, setSelectedAesthetic] =
+    useState<AestheticPreference>(() => initialShare?.aesthetic ?? 'ALL');
   const [minEffectiveFps, setMinEffectiveFps] = useState<number>(0);
   const [selectedWorkload, setSelectedWorkload] =
     useState<BuildWorkloadProfile>(
@@ -106,6 +118,14 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
         selectedRamGen === 'ALL' ? undefined : selectedRamGen,
       preferredGpuVendor:
         selectedGpuVendor === 'ALL' ? undefined : selectedGpuVendor,
+      preferredCpuVendor:
+        selectedCpuVendor === 'ALL' ? undefined : selectedCpuVendor,
+      preferredFormFactor:
+        selectedFormFactor === 'ALL' ? undefined : selectedFormFactor,
+      preferredCoolerType:
+        selectedCoolerType === 'ALL' ? undefined : selectedCoolerType,
+      preferredAesthetic:
+        selectedAesthetic === 'ALL' ? undefined : selectedAesthetic,
       minEffectiveFps: minEffectiveFps > 0 ? minEffectiveFps : undefined,
       workloadProfile: selectedWorkload,
     };
@@ -114,6 +134,10 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     selectedSocket,
     selectedRamGen,
     selectedGpuVendor,
+    selectedCpuVendor,
+    selectedFormFactor,
+    selectedCoolerType,
+    selectedAesthetic,
     minEffectiveFps,
     selectedWorkload,
   ]);
@@ -327,6 +351,10 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     setSelectedSocket('ALL');
     setSelectedRamGen('ALL');
     setSelectedGpuVendor('ALL');
+    setSelectedCpuVendor('ALL');
+    setSelectedFormFactor('ALL');
+    setSelectedCoolerType('ALL');
+    setSelectedAesthetic('ALL');
     setSelectedWorkload('sweetspot-1440p');
     setMinEffectiveFps(0);
     setActivePresetId(isBrl ? 'sweet-6000' : 'sweet-1000');
@@ -414,6 +442,26 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
           selectedGpuVendor={selectedGpuVendor}
           onGpuVendorChange={(vendor) => {
             setSelectedGpuVendor(vendor);
+            setSelectedBuildId(null);
+          }}
+          selectedCpuVendor={selectedCpuVendor}
+          onCpuVendorChange={(vendor) => {
+            setSelectedCpuVendor(vendor);
+            setSelectedBuildId(null);
+          }}
+          selectedFormFactor={selectedFormFactor}
+          onFormFactorChange={(formFactor) => {
+            setSelectedFormFactor(formFactor);
+            setSelectedBuildId(null);
+          }}
+          selectedCoolerType={selectedCoolerType}
+          onCoolerTypeChange={(coolerType) => {
+            setSelectedCoolerType(coolerType);
+            setSelectedBuildId(null);
+          }}
+          selectedAesthetic={selectedAesthetic}
+          onAestheticChange={(aesthetic) => {
+            setSelectedAesthetic(aesthetic);
             setSelectedBuildId(null);
           }}
           onResetFilters={handleResetFilters}

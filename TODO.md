@@ -26,9 +26,3 @@ Every item uses this shape, so an agent knows where to look and when it is finis
   - **Files likely touched:** `TODO.md`, `ROADMAP.md`
   - **Done when:** findings from at least 3 sessions are written up as tasks.
   - **Test to add:** none (user research).
-
-- **`[BLD-08]` Optional Constraints for Enthusiasts (SFF, Cooler Type, RGB & Brand Ecosystems):** _paused until FIX-01 lands; it adds filters to the same engine._
-  Add enthusiast-grade filtering criteria across form factor (Small Form Factor / Mini-ITX / Micro-ATX vs Standard ATX), cooling preference (Quiet Air Cooling vs AIO Liquid Cooler), aesthetics (Stealth Blackout / No-RGB vs RGB Lighting), and CPU vendor ecosystem (AMD Ryzen vs Intel Core), seamlessly filtering the multi-objective Pareto builds.
-  - **Files likely touched:** `src/lib/math/buildTypes.ts`, `src/lib/math/combinatorial.ts`, `src/components/FullBuildExplorer.tsx`, `src/lib/math/__tests__/combinatorial.test.ts`, `CODEMAP.md`
-  - **Done when:** selecting "Small Form Factor", "AIO Liquid Cooler", or "No RGB" filters down builds to strictly conforming hardware, and tests verify constraint propagation.
-  - **Test to add:** unit tests in `src/lib/math/__tests__/combinatorial.test.ts` verifying SFF filtering, AIO vs Air cooler constraints, and aesthetic tagging.

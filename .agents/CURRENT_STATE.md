@@ -4,13 +4,21 @@
 
 ## 🔴 In Flight
 
-- `fix/perf-engine-and-ci` PR: Open and land PR against `main` covering engine optimization, partitioned pruning (`[FIX-01]`), shared build reconstruction (`[FIX-02]`), full pt-BR localization without inline ternaries (`[FIX-03]`), and model estimate labels (`[FIX-04]`).
+- `feat/bld-08-enthusiast-constraints`: Land enthusiast filtering criteria (SFF/Mini-ITX, AIO vs. Air cooler, RGB vs. Stealth, CPU vendor ecosystem), partition-safe intra-category pruning, seed hardware additions, and URL sharing.
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Enthusiast Constraints: SFF, AIO vs. Air, RGB & CPU Vendor (`[BLD-08]`, 2026-10-20):**
+  - Added enthusiast filtering criteria across form factor (Mini-ITX / SFF, Micro-ATX, ATX), cooler type (AIO Liquid vs. Air), aesthetics (RGB vs. Stealth), and CPU vendor (AMD vs. Intel).
+  - Enforced partition safety in intra-category pruning: compact Mini-ITX motherboards and SFF cases cannot be dominated by ATX parts; AIO coolers are preserved; aesthetic preferences are partitioned cleanly.
+  - Expanded seed hardware catalog with Mini-ITX motherboards (B650I/B760I Lightning), SFF chassis (NR200P), 240mm AIO liquid coolers (Frozen Prism, Liquid Freezer III), and RGB RAM.
+  - Supported URL sharing serialization and deserialization for all 4 enthusiast criteria.
+  - Added accessible UI filter controls with full localization in `pt-BR` and `en-US`.
+  - Backed by unit property tests in `src/lib/math/__tests__/enthusiastConstraints.test.ts` and UI integration tests in `src/__tests__/App.ui.test.tsx`.
 
 - **Full Localization Integrity & Zero Inline Locale Ternaries (`[FIX-03]`, 2026-10-20):**
   - Modularized localization into typed dictionaries `src/utils/locales/ptBR.ts`, `enUS.ts`, and `types.ts` keeping each file well under the 800-line limit.

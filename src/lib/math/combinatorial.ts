@@ -1,18 +1,22 @@
 import {
+  AestheticPreference,
   assemblePcBuild,
   BuildWorkloadProfile,
   calculateEstimatedPowerDraw,
   calculateRecommendedPsuWattage,
   CaseCandidate,
   CoolerCandidate,
+  CoolerTypePreference,
   computeCpuGpuBottleneck,
   CpuCandidate,
   CpuSocket,
+  CpuVendorPreference,
   DEFAULT_CASE,
   DEFAULT_COOLER,
   DEFAULT_STORAGE,
   estimateGpuRequiredCpuScore,
   evaluateBuildForWorkload,
+  FormFactorPreference,
   MotherboardCandidate,
   PcBuild,
   PrecomputedBuildMetrics,
@@ -69,6 +73,10 @@ export interface GenerateCompatibleBuildsOptions {
   preferredSocket?: CpuSocket;
   preferredRamGeneration?: RamGeneration;
   preferredGpuVendor?: HardwareVendor;
+  preferredCpuVendor?: CpuVendorPreference;
+  preferredFormFactor?: FormFactorPreference;
+  preferredCoolerType?: CoolerTypePreference;
+  preferredAesthetic?: AestheticPreference;
 }
 
 /**
@@ -89,11 +97,11 @@ export function generateCompatibleBuilds(
     catalogs.storages && catalogs.storages.length > 0
       ? catalogs.storages
       : [DEFAULT_STORAGE];
-  const cases =
+  let cases =
     catalogs.cases && catalogs.cases.length > 0
       ? catalogs.cases
       : [DEFAULT_CASE];
-  const coolers =
+  let coolers =
     catalogs.coolers && catalogs.coolers.length > 0
       ? catalogs.coolers
       : [DEFAULT_COOLER];
@@ -114,6 +122,40 @@ export function generateCompatibleBuilds(
   }
   if (options?.preferredGpuVendor) {
     gpus = gpus.filter((g) => g.vendor === options.preferredGpuVendor);
+  }
+  if (options?.preferredCpuVendor && options.preferredCpuVendor !== 'ALL') {
+    cpus = cpus.filter((c) => c.vendor === options.preferredCpuVendor);
+  }
+  if (options?.preferredFormFactor && options.preferredFormFactor !== 'ALL') {
+    if (options.preferredFormFactor === 'SFF') {
+      motherboards = motherboards.filter((m) => m.formFactor === 'Mini-ITX');
+      cases = cases.filter(
+        (c) =>
+          c.isSff === true ||
+          (c.supportedFormFactors.includes('Mini-ITX') &&
+            !c.supportedFormFactors.includes('ATX')),
+      );
+    } else if (options.preferredFormFactor === 'Micro-ATX') {
+      motherboards = motherboards.filter((m) => m.formFactor === 'Micro-ATX');
+      cases = cases.filter(
+        (c) => c.supportedFormFactors.includes('Micro-ATX') && !c.isSff,
+      );
+    } else if (options.preferredFormFactor === 'ATX') {
+      motherboards = motherboards.filter((m) => m.formFactor === 'ATX');
+      cases = cases.filter((c) => c.supportedFormFactors.includes('ATX'));
+    }
+  }
+  if (options?.preferredCoolerType && options.preferredCoolerType !== 'ALL') {
+    coolers = coolers.filter((c) => c.type === options.preferredCoolerType);
+  }
+  if (options?.preferredAesthetic && options.preferredAesthetic !== 'ALL') {
+    if (options.preferredAesthetic === 'RGB') {
+      cases = cases.filter((c) => c.rgb === true);
+    } else if (options.preferredAesthetic === 'Stealth') {
+      cases = cases.filter((c) => c.rgb !== true);
+      coolers = coolers.filter((c) => c.rgb !== true);
+      ramKits = ramKits.filter((r) => r.rgb !== true);
+    }
   }
 
   if (
@@ -425,6 +467,10 @@ export interface BuildFilterCriteria {
   preferredSocket?: CpuSocket;
   preferredRamGeneration?: RamGeneration;
   preferredGpuVendor?: HardwareVendor;
+  preferredCpuVendor?: CpuVendorPreference;
+  preferredFormFactor?: FormFactorPreference;
+  preferredCoolerType?: CoolerTypePreference;
+  preferredAesthetic?: AestheticPreference;
   workloadProfile?: BuildWorkloadProfile;
 }
 
@@ -459,7 +505,10 @@ export function optimizeFullSystemBuilds(
   // Step 1: Pre-prune intra-category candidates
   const prunedCpus = pruneDominatedCpus(catalogs.cpus);
   const prunedRam = pruneDominatedRam(catalogs.ramKits);
-  const prunedMobos = pruneDominatedMotherboards(catalogs.motherboards);
+  const prunedMobos = pruneDominatedMotherboards(
+    catalogs.motherboards,
+    Boolean(criteria?.preferredFormFactor),
+  );
   const prunedPsus = pruneDominatedPsus(catalogs.psus);
   const prunedGpus = pruneDominatedGpus(
     catalogs.gpus,
@@ -488,8 +537,8 @@ export function optimizeFullSystemBuilds(
   let gpus = prunedGpus;
   const psus = prunedPsus;
   const storages = prunedStorages;
-  const cases = prunedCases;
-  const coolers = prunedCoolers;
+  let cases = prunedCases;
+  let coolers = prunedCoolers;
 
   if (criteria?.preferredSocket) {
     cpus = cpus.filter((c) => c.socket === criteria.preferredSocket);
@@ -507,6 +556,40 @@ export function optimizeFullSystemBuilds(
   }
   if (criteria?.preferredGpuVendor) {
     gpus = gpus.filter((g) => g.vendor === criteria.preferredGpuVendor);
+  }
+  if (criteria?.preferredCpuVendor && criteria.preferredCpuVendor !== 'ALL') {
+    cpus = cpus.filter((c) => c.vendor === criteria.preferredCpuVendor);
+  }
+  if (criteria?.preferredFormFactor && criteria.preferredFormFactor !== 'ALL') {
+    if (criteria.preferredFormFactor === 'SFF') {
+      motherboards = motherboards.filter((m) => m.formFactor === 'Mini-ITX');
+      cases = cases.filter(
+        (c) =>
+          c.isSff === true ||
+          (c.supportedFormFactors.includes('Mini-ITX') &&
+            !c.supportedFormFactors.includes('ATX')),
+      );
+    } else if (criteria.preferredFormFactor === 'Micro-ATX') {
+      motherboards = motherboards.filter((m) => m.formFactor === 'Micro-ATX');
+      cases = cases.filter(
+        (c) => c.supportedFormFactors.includes('Micro-ATX') && !c.isSff,
+      );
+    } else if (criteria.preferredFormFactor === 'ATX') {
+      motherboards = motherboards.filter((m) => m.formFactor === 'ATX');
+      cases = cases.filter((c) => c.supportedFormFactors.includes('ATX'));
+    }
+  }
+  if (criteria?.preferredCoolerType && criteria.preferredCoolerType !== 'ALL') {
+    coolers = coolers.filter((c) => c.type === criteria.preferredCoolerType);
+  }
+  if (criteria?.preferredAesthetic && criteria.preferredAesthetic !== 'ALL') {
+    if (criteria.preferredAesthetic === 'RGB') {
+      cases = cases.filter((c) => c.rgb === true);
+    } else if (criteria.preferredAesthetic === 'Stealth') {
+      cases = cases.filter((c) => c.rgb !== true);
+      coolers = coolers.filter((c) => c.rgb !== true);
+      ramKits = ramKits.filter((r) => r.rgb !== true);
+    }
   }
 
   const prunedPartCounts = {

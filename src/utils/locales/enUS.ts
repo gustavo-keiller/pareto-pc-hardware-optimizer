@@ -242,6 +242,27 @@ export const enUS: Translations = {
   filterResetTooltip: 'Reset full build filters',
   filterResetButton: 'Reset',
 
+  // Enthusiast Filters (BLD-08)
+  buildFiltersEnthusiastHeading: 'Enthusiast Hardware Options',
+  buildFiltersEnthusiastToggle: 'Advanced Filters (Case, Cooler, RGB)',
+  buildFiltersFormFactor: 'Enclosure Size / Form Factor',
+  buildFiltersFormFactorAll: 'All Sizes',
+  buildFiltersFormFactorSff: 'SFF (Compact Mini-ITX)',
+  buildFiltersFormFactorMatx: 'Micro-ATX (Mid-Size)',
+  buildFiltersFormFactorAtx: 'Standard ATX',
+  buildFiltersCoolerType: 'Cooling Solution',
+  buildFiltersCoolerTypeAll: 'Any Cooling',
+  buildFiltersCoolerTypeAir: 'Air Cooler',
+  buildFiltersCoolerTypeAio: 'AIO Liquid Cooler',
+  buildFiltersAesthetic: 'Visual Style & Lighting',
+  buildFiltersAestheticAll: 'No Preference',
+  buildFiltersAestheticRgb: 'RGB Lighting',
+  buildFiltersAestheticStealth: 'Stealth / No-RGB Blackout',
+  buildFiltersCpuVendor: 'CPU Manufacturer',
+  buildFiltersCpuVendorAll: 'AMD & Intel',
+  buildFiltersCpuVendorAmd: 'AMD Ryzen',
+  buildFiltersCpuVendorIntel: 'Intel Core',
+
   // Full Build Leaderboard Table
   buildLeaderboardTitle: 'Recommended Builds Leaderboard',
   buildLeaderboardSubtitle:

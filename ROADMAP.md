@@ -67,7 +67,7 @@
 - [ ] **`[BLD-05]` (Pro version done as "Full Builds"; beginner version is UX-11) Build results UI** (= P3-03): beginner sees "Your build" as a parts list with total price and one reason per part; Explorer/Pro sees the full-build frontier (total price vs effective FPS) and can swap any part and see the effect.
 - [x] **`[BLD-06]` Upgrade mode:** "I already have…" — lock existing parts to $0 expenditure, enforce socket/RAM/PSU/case compatibility, evaluate upgrade Pareto frontier, and display performance leap deltas and kept vs. new breakdowns. _Done 2026-10-19._
 - [x] **`[BLD-07]` Save & share builds:** state in the URL (no backend needed), plus 1-click clean clipboard export for Discord, Reddit, and WhatsApp with 8-component parts list, active currency pricing, power draw, and workload scores. _Done 2026-10-19._
-- [ ] **`[BLD-08]` Optional constraints for enthusiasts:** small form factor, noise, looks (RGB/no RGB), brand preferences.
+- [x] **`[BLD-08]` Optional constraints for enthusiasts:** small form factor (Mini-ITX / SFF), cooling preference (AIO liquid cooling vs air cooling), aesthetics (RGB lighting vs stealth blackout), and CPU vendor ecosystem (AMD Ryzen vs Intel Core). Enforces partition safety in intra-category pruning and integrates with URL sharing and UI filter controls. _Done 2026-10-20._
 
 ---
 
@@ -119,6 +119,6 @@
 
 1. **Merge `fix/perf-engine-and-ci` through a PR** once CI is green, and turn on branch protection for `main`.
 2. **UX-10:** test with 3–5 people who know nothing about PCs; their findings set what comes after.
-3. **Phase 3 data** (real BRL prices DATA-04, creator benchmarks DATA-02), then BLD-04 (Web Worker), then BLD-08.
+3. **Phase 3 data** (real BRL prices DATA-04, creator benchmarks DATA-02), then BLD-04 (Web Worker).
 
-Then Phase 5 (launch) and Phase 6 (affiliates, later per gustavo). Expert depth (UX-08, BLD-08) is strong enough to wait.
+Then Phase 5 (launch) and Phase 6 (affiliates, later per gustavo). Expert depth (UX-08) is strong enough to wait.
