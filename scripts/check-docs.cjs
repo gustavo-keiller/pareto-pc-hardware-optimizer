@@ -83,10 +83,22 @@ function checkSkillsAndStubs() {
         `.agents/skills/${entry.name}/SKILL.md frontmatter name must match folder '${entry.name}'`,
       );
     }
-    if (!fm[1].includes('description:')) {
+    const descMatch = fm[1].match(/^description:\s*(.+)$/m);
+    if (!descMatch) {
       errors.push(
         `.agents/skills/${entry.name}/SKILL.md frontmatter is missing 'description:'`,
       );
+    } else {
+      const descVal = descMatch[1].trim();
+      if (
+        !descVal.startsWith('"') &&
+        !descVal.startsWith("'") &&
+        descVal.includes(': ')
+      ) {
+        errors.push(
+          `.agents/skills/${entry.name}/SKILL.md frontmatter description contains ': ' and must be quoted to avoid YAML syntax errors`,
+        );
+      }
     }
     if (
       entry.name !== 'skill-library' &&

@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Two-axis review of changes: Standards (do changes follow AGENTS.md, maintainability rubrics, and domain skills?) and Spec (do changes match what the task asked for?). Run after completing any task before declaring done.
+description: "Two-axis review of changes: Standards (do changes follow AGENTS.md, maintainability rubrics, and domain skills?) and Spec (do changes match what the task asked for?). Run after completing any task before declaring done."
 ---
 
 # Code Review
