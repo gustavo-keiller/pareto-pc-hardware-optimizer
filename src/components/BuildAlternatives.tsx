@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
 import { formatCurrency } from '../utils/currency';
-import { AppLocale } from '../utils/i18n';
+import { AppLocale, t } from '../utils/i18n';
 
 export interface BuildAlternativesProps {
   activeBuild: PcBuild;
@@ -38,21 +38,19 @@ export const BuildAlternatives: React.FC<BuildAlternativesProps> = ({
             </div>
             <div>
               <div className="text-xs font-bold text-slate-400 uppercase tracking-wide">
-                {locale === 'pt-BR'
-                  ? 'Opção Mais Barata (Economize Dinheiro)'
-                  : 'Step Down (Save Money)'}
+                {t('altStepDownTitle', locale)}
               </div>
               <div className="text-sm font-bold text-white">
                 {formatCurrency(stepDownBuild.totalPrice, currency)} ·{' '}
                 {stepDownBuild.effectiveFps1440p} FPS
               </div>
               <div className="text-xs text-emerald-400 font-medium">
-                {locale === 'pt-BR' ? 'Economize ' : 'Save '}
+                {t('altSavePrefix', locale)}
                 {formatCurrency(
                   activeBuild.totalPrice - stepDownBuild.totalPrice,
                   currency,
                 )}{' '}
-                ({locale === 'pt-BR' ? 'perde ' : 'lose '}
+                ({t('altLosePrefix', locale)}
                 {(
                   activeBuild.effectiveFps1440p -
                   stepDownBuild.effectiveFps1440p
@@ -65,7 +63,7 @@ export const BuildAlternatives: React.FC<BuildAlternativesProps> = ({
             type="button"
             className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-200"
           >
-            {locale === 'pt-BR' ? 'Inspecionar' : 'Inspect'}
+            {t('altInspect', locale)}
           </button>
         </div>
       )}
@@ -81,9 +79,7 @@ export const BuildAlternatives: React.FC<BuildAlternativesProps> = ({
             </div>
             <div>
               <div className="text-xs font-bold text-slate-400 uppercase tracking-wide">
-                {locale === 'pt-BR'
-                  ? 'Opção Superior (Próximo Nível)'
-                  : 'Step Up (Next Performance Tier)'}
+                {t('altStepUpTitle', locale)}
               </div>
               <div className="text-sm font-bold text-white">
                 {formatCurrency(stepUpBuild.totalPrice, currency)} ·{' '}
@@ -95,7 +91,7 @@ export const BuildAlternatives: React.FC<BuildAlternativesProps> = ({
                   stepUpBuild.totalPrice - activeBuild.totalPrice,
                   currency,
                 )}{' '}
-                {locale === 'pt-BR' ? 'por +' : 'for +'}
+                {t('altForPrefix', locale)}{' '}
                 {(
                   stepUpBuild.effectiveFps1440p - activeBuild.effectiveFps1440p
                 ).toFixed(1)}{' '}
@@ -107,7 +103,7 @@ export const BuildAlternatives: React.FC<BuildAlternativesProps> = ({
             type="button"
             className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-200"
           >
-            {locale === 'pt-BR' ? 'Inspecionar' : 'Inspect'}
+            {t('altInspect', locale)}
           </button>
         </div>
       )}

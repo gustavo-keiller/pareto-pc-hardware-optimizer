@@ -328,6 +328,75 @@ describe('App modes', () => {
     expect(screen.getByText(/Lista Copiada!|Specs Copied!/i)).toBeDefined();
   });
 
+  it('FIX-02: reconstructing a shared build not on the frontier renders all 8 components', async () => {
+    localStorage.clear();
+    const shareQuery =
+      '?mode=builds&cpu=cpu-i3-12100f&gpu=rx-7600&mobo=mobo-asrock-b760m-d4&ram=ram-sp-16gb-d4-3200&psu=psu-msi-a550bn&storage=storage-kingston-nv2-1tb&case=case-nzxt-h5-flow&cooler=cooler-thermalright-peerless-assassin&budget=1200';
+    window.history.pushState({}, '', shareQuery);
+
+    try {
+      render(<App />);
+
+      // Wait for lazy-loaded FullBuildExplorer to mount
+      const cpuEls = await screen.findAllByText(/Intel Core i3-12100F/i);
+      expect(cpuEls.length).toBeGreaterThan(0);
+
+      // Verify all 8 components of the non-frontier shared build are rendered
+      expect(screen.getAllByText(/Radeon RX 7600 8GB/i).length).toBeGreaterThan(
+        0,
+      );
+      expect(
+        screen.getAllByText(/ASRock B760M-HDV\/M\.2 D4/i).length,
+      ).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Silicon Power 16GB/i).length).toBeGreaterThan(
+        0,
+      );
+      expect(screen.getAllByText(/MSI MAG A550BN/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Kingston NV2 1TB/i).length).toBeGreaterThan(
+        0,
+      );
+      expect(
+        screen.getAllByText(/NZXT H5 Flow Compact ATX/i).length,
+      ).toBeGreaterThan(0);
+      expect(
+        screen.getAllByText(/Thermalright Peerless Assassin 120 SE/i).length,
+      ).toBeGreaterThan(0);
+    } finally {
+      window.history.pushState({}, '', '/');
+    }
+  });
+
+  it('FIX-02: displays fallback notice when shared build part is missing or over budget', async () => {
+    localStorage.clear();
+    // Missing CPU ID
+    const missingPartQuery =
+      '?mode=builds&cpu=cpu-nonexistent&gpu=rx-7600&budget=1200';
+    window.history.pushState({}, '', missingPartQuery);
+
+    try {
+      const { unmount } = render(<App />);
+
+      const noticeEl = await screen.findByText(
+        /Uma ou mais peças do link compartilhado não foram encontradas no catálogo atual|One or more parts from the shared link were not found/i,
+      );
+      expect(noticeEl).toBeDefined();
+      unmount();
+
+      // Over budget shared build
+      const overBudgetQuery =
+        '?mode=builds&cpu=cpu-i3-12100f&gpu=rx-7600&mobo=mobo-asrock-b760m-d4&ram=ram-sp-16gb-d4-3200&psu=psu-msi-a550bn&storage=storage-kingston-nv2-1tb&case=case-nzxt-h5-flow&cooler=cooler-thermalright-peerless-assassin&budget=200';
+      window.history.pushState({}, '', overBudgetQuery);
+
+      render(<App />);
+      const overBudgetNotice = await screen.findByText(
+        /acima do orçamento selecionado|exceeding your selected budget/i,
+      );
+      expect(overBudgetNotice).toBeDefined();
+    } finally {
+      window.history.pushState({}, '', '/');
+    }
+  });
+
   it('UX-06: defaults to pt-BR and BRL when fresh, and toggles cleanly between Portuguese and English', async () => {
     localStorage.clear();
     const user = userEvent.setup();
@@ -478,5 +547,89 @@ describe('App modes', () => {
     expect(
       screen.queryByRole('button', { name: /\+ Import Deals/i }),
     ).toBeNull();
+  });
+
+  it('renders each mode in pt-BR without residual English UI terms [FIX-03]', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Switch to pt-BR
+    const ptToggle = screen.getByRole('button', { name: /🇧🇷 PT/i });
+    await user.click(ptToggle);
+
+    const forbiddenEnglishWords = [
+      'COMPLETE PARETO OPTIMAL BUILD FRONTIER',
+      'Simple Guide',
+      'GPU Explorer',
+      'Upgrade Mode',
+      'Platform Socket',
+      'All Platforms',
+      'RAM Gen',
+      'GPU Vendor',
+      'Reset All Filters',
+      'Popular AM4 Base',
+      'Upgrade Budget Ceiling',
+      'Select Components You Already Own',
+      'Top Upgrade Paths',
+    ];
+
+    // Check Simple Guide mode (mode 1)
+    for (const phrase of forbiddenEnglishWords) {
+      expect(screen.queryByText(new RegExp(`^${phrase}$`, 'i'))).toBeNull();
+    }
+
+    // Switch to Explorer mode (mode 2)
+    const explorerBtn = screen.getByRole('button', { name: /2\. Explorador/i });
+    await user.click(explorerBtn);
+    for (const phrase of forbiddenEnglishWords) {
+      expect(screen.queryByText(new RegExp(`^${phrase}$`, 'i'))).toBeNull();
+    }
+
+    // Switch to Pro mode (mode 3)
+    const proBtn = screen.getByRole('button', { name: /3\. Laborat/i });
+    await user.click(proBtn);
+    for (const phrase of forbiddenEnglishWords) {
+      expect(screen.queryByText(new RegExp(`^${phrase}$`, 'i'))).toBeNull();
+    }
+
+    // Switch to Full Builds mode (mode 4)
+    const buildsBtn = screen.getByRole('button', { name: /4\. Montar PC/i });
+    await user.click(buildsBtn);
+
+    for (const phrase of forbiddenEnglishWords) {
+      expect(screen.queryByText(new RegExp(`^${phrase}$`, 'i'))).toBeNull();
+    }
+
+    // Verify header subtitle mentions all 8 parts in pt-BR
+    expect(
+      screen.getByText(
+        /Processador, Placa de Vídeo, Placa-Mãe, RAM, Armazenamento, Fonte, Gabinete e Cooler/i,
+      ),
+    ).toBeDefined();
+  });
+
+  it('labels workload FPS and bottleneck figures as model estimates [FIX-04]', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Switch to pt-BR
+    const ptToggle = screen.getByRole('button', { name: /🇧🇷 PT/i });
+    await user.click(ptToggle);
+
+    // Switch to Full Builds mode (4. Montar PC)
+    const buildsBtn = screen.getByRole('button', { name: /4\. Montar PC/i });
+    await user.click(buildsBtn);
+
+    // 1. Verify estimate badge next to workload score
+    const estimateBadge = screen.getByTestId('workload-score-estimate-badge');
+    expect(estimateBadge).toBeDefined();
+    expect(estimateBadge.textContent?.toLowerCase()).toContain('estimativa');
+
+    // 2. Verify estimate explanation note is displayed
+    expect(
+      screen.getByText(
+        /Desempenho e gargalo calculados por modelo estimado até calibração com dados reais de benchmark \(DATA-02\)\./i,
+      ),
+    ).toBeDefined();
   });
 });

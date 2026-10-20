@@ -36,6 +36,9 @@ Pure TypeScript modules with zero React/DOM/ECharts dependencies:
 | `src/utils/storage.ts` | **Safe LocalStorage Layer** — `safeGetJSON`, `safeSetJSON`, `safeGetInt`, `safeGetBool`, `safeGetString`, and versioned schema migrations (`runStorageMigrations`) |
 | `src/utils/currency.ts` | **Currency Formatter & Converter** — formats BRL (`R$ 3.899,99`) and USD (`$250`), plus bidirectional USD/BRL conversion (`convertUsdToBrl`, `convertBrlToUsd`) |
 | `src/utils/i18n.ts` | **Lightweight Localization Dictionary (`[UX-06]`)** — type-safe translation helper supporting Brazil-first (`pt-BR`) and English (`en-US`) with plain-language, unslop copywriting |
+| `src/utils/locales/types.ts` | **Localization Types & Schema (`[FIX-03]`)** — interface and type definitions for strict localized translation keys |
+| `src/utils/locales/ptBR.ts` | **Brazilian Portuguese Dictionary (`[FIX-03]`)** — comprehensive pt-BR translations for all modes, components, and hardware labels |
+| `src/utils/locales/enUS.ts` | **US English Dictionary (`[FIX-03]`)** — comprehensive en-US translations for all modes, components, and hardware labels |
 | `src/utils/shoppingReasons.ts` | **Plain-Language Shopping Rationale Engine (`[UX-04]`)** — generates unslop shopping reasons with exact price savings, FPS percentages, VRAM longevity, and 8-component build breakdowns in `pt-BR` and `en-US` |
 | `src/utils/shareBuild.ts` | **Save & Share Build Engine (`[BLD-07]`)** — encodes/decodes full 8-component PC build IDs, budget, and workload profile into URL query parameters, plus generates unslop markdown/plain-text parts lists for Discord, Reddit, and WhatsApp with safe clipboard copying |
 

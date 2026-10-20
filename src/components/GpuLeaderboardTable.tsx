@@ -50,21 +50,13 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
         <div>
           <h2 className="text-base font-bold text-white">
             {uiMode === 'simple'
-              ? locale === 'pt-BR'
-                ? 'Todas as Placas de Vídeo Classificadas'
-                : 'Ranked GPU Recommendations & Value Traps to Avoid'
-              : locale === 'pt-BR'
-                ? 'Ranking Dinâmico TOPSIS, Fronteira de Pareto & Valor Justo OLS'
-                : 'Live-Sorted TOPSIS Leaderboard, Pareto Dominance & OLS Fair-Value Matrix'}
+              ? t('tableTitleSimple', locale)
+              : t('tableTitlePro', locale)}
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
             {uiMode === 'simple'
-              ? locale === 'pt-BR'
-                ? 'Ordenadas pelo melhor custo-benefício para seu orçamento. Clique em qualquer linha para comparar até 4 placas lado a lado.'
-                : 'Sorted automatically for your budget and gaming style. Click any row to compare up to 4 cards side-by-side.'
-              : locale === 'pt-BR'
-                ? 'Classificação por Proximidade Relativa Cᵢ = dᵢ⁻ / (dᵢ⁺ + dᵢ⁻) e Valor Justo Hedônico de Mercado.'
-                : 'Ranked dynamically by Relative Closeness Cᵢ = dᵢ⁻ / (dᵢ⁺ + dᵢ⁻) alongside Hedonic log-linear OLS Fair Market Value.'}
+              ? t('tableSubtitleSimple', locale)
+              : t('tableSubtitlePro', locale)}
           </p>
         </div>
 
@@ -206,9 +198,7 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                             <CheckCircle2 className="h-3 w-3" />
                             {uiMode === 'simple'
                               ? t('verdictSmartBuy', locale)
-                              : locale === 'pt-BR'
-                                ? 'Fronteira Ótima'
-                                : 'Frontier Optimal'}
+                              : t('verdictFrontierOptimal', locale)}
                           </span>
                         );
                       }
@@ -220,9 +210,7 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                             ? t('verdictTrap', locale)
                             : isTrap && !gpu.isDominated
                               ? t('verdictNiche', locale)
-                              : locale === 'pt-BR'
-                                ? `Desvantajosa (${gpu.dominatedBy.length})`
-                                : `Dominated (${gpu.dominatedBy.length})`}
+                              : `${t('verdictDominatedPrefix', locale)} (${gpu.dominatedBy.length})`}
                         </span>
                       );
                     })()}

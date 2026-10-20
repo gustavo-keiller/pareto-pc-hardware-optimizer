@@ -4,7 +4,7 @@ import { RankedGpu } from '../lib/math/types';
 import { Layers, Activity, X, Trash2 } from 'lucide-react';
 
 import { formatCurrency } from '../utils/currency';
-import { AppLocale } from '../utils/i18n';
+import { AppLocale, t } from '../utils/i18n';
 
 interface ComparisonDrawerProps {
   selectedGpus: RankedGpu[];
@@ -103,32 +103,27 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
         center: ['50%', '46%'],
         indicator: [
           {
-            name:
-              locale === 'pt-BR'
-                ? `Preço (${currency === 'BRL' ? 'R$' : '$'})`
-                : `Price (${currency === 'BRL' ? 'R$' : '$'})`,
+            name: `${t('drawerColPrice', locale)} (${currency === 'BRL' ? 'R$' : '$'})`,
             max: 100,
           },
           {
-            name: locale === 'pt-BR' ? 'Desempenho 1440p' : '1440p Raster FPS',
+            name: t('radarRaster', locale),
             max: 100,
           },
           {
-            name:
-              locale === 'pt-BR' ? 'Ray Tracing 1440p' : '1440p Ray Tracing',
+            name: t('radarRt', locale),
             max: 100,
           },
           {
-            name: locale === 'pt-BR' ? 'Capacidade VRAM' : 'VRAM Capacity',
+            name: t('radarVram', locale),
             max: 100,
           },
           {
-            name:
-              locale === 'pt-BR' ? 'Eficiência Energética' : 'Power Efficiency',
+            name: t('radarEfficiency', locale),
             max: 100,
           },
           {
-            name: locale === 'pt-BR' ? 'Nota TOPSIS' : 'TOPSIS Score',
+            name: t('radarTopsis', locale),
             max: 100,
           },
         ],
@@ -194,41 +189,31 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
       parallelAxis: [
         {
           dim: 0,
-          name:
-            locale === 'pt-BR'
-              ? `Preço (${currency === 'BRL' ? 'R$' : '$'})\n[Mínimo]`
-              : `Price (${currency === 'BRL' ? 'R$' : '$'})\n[Min]`,
+          name: `${t('drawerColPrice', locale)} (${currency === 'BRL' ? 'R$' : '$'})\n[Min]`,
           inverse: true,
           nameLocation: 'start',
         },
         {
           dim: 1,
-          name:
-            locale === 'pt-BR'
-              ? '1440p Bruto\n(FPS) [Máx]'
-              : '1440p Raster\n(FPS) [Max]',
+          name: t('parallelRaster', locale),
         },
         {
           dim: 2,
-          name:
-            locale === 'pt-BR'
-              ? '1440p RT\n(FPS) [Máx]'
-              : '1440p RT\n(FPS) [Max]',
+          name: t('parallelRt', locale),
         },
         {
           dim: 3,
-          name: locale === 'pt-BR' ? 'VRAM\n(GB) [Máx]' : 'VRAM\n(GB) [Max]',
+          name: t('parallelVram', locale),
         },
         {
           dim: 4,
-          name:
-            locale === 'pt-BR' ? 'Consumo\n(W) [Mín]' : 'Power TBP\n(W) [Min]',
+          name: t('parallelPower', locale),
           inverse: true,
           nameLocation: 'start',
         },
         {
           dim: 5,
-          name: locale === 'pt-BR' ? 'Nota TOPSIS\n(%)' : 'TOPSIS\nScore (%)',
+          name: t('parallelTopsis', locale),
         },
       ],
       parallel: {
@@ -264,15 +249,11 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
           <div className="flex items-center gap-2">
             <Layers className="h-5 w-5 text-sky-400" />
             <h2 className="text-lg font-bold text-white">
-              {locale === 'pt-BR'
-                ? `Comparação de Placas Finalistas (${selectedGpus.length}/4 Selecionadas)`
-                : `Multi-Dimensional Finalist Comparison (${selectedGpus.length}/4 Selected)`}
+              {t('drawerTitle', locale)} ({selectedGpus.length}/4)
             </h2>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            {locale === 'pt-BR'
-              ? 'Sobrepondo 6 dimensões de hardware simultaneamente. Vértices externos indicam custo-benefício e velocidade superiores.'
-              : 'Overlaying 6 hardware dimensions simultaneously. Outer vertices / upper parallel tracks indicate superior value & performance.'}
+            {t('drawerSubtitle', locale)}
           </p>
         </div>
 
@@ -288,7 +269,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
               }`}
             >
               <Layers className="h-3.5 w-3.5" />
-              {locale === 'pt-BR' ? 'Gráfico Radar' : 'Radar Overlay'}
+              {t('drawerRadarTab', locale)}
             </button>
             <button
               type="button"
@@ -300,9 +281,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
               }`}
             >
               <Activity className="h-3.5 w-3.5" />
-              {locale === 'pt-BR'
-                ? 'Coordenadas Paralelas'
-                : 'Parallel Coordinates'}
+              {t('drawerParallelTab', locale)}
             </button>
           </div>
 
@@ -312,7 +291,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
             className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950 px-3 py-1.5 text-xs font-medium text-slate-400 hover:border-rose-500/40 hover:text-rose-300 transition"
           >
             <Trash2 className="h-3.5 w-3.5" />
-            {locale === 'pt-BR' ? 'Limpar' : 'Clear'}
+            {t('drawerClear', locale)}
           </button>
         </div>
       </div>
@@ -332,10 +311,10 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
             <thead>
               <tr className="border-b border-slate-800 text-slate-400">
                 <th className="py-2 pr-3 font-medium">
-                  {locale === 'pt-BR' ? 'Placa de Vídeo' : 'GPU Candidate'}
+                  {t('drawerColGpu', locale)}
                 </th>
                 <th className="py-2 px-2 font-medium">
-                  {locale === 'pt-BR' ? 'Preço' : 'Price'}
+                  {t('drawerColPrice', locale)}
                 </th>
                 <th className="py-2 px-2 font-medium">1440p</th>
                 <th className="py-2 px-2 font-medium">RT</th>

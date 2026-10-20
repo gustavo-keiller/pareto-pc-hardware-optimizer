@@ -457,14 +457,8 @@ export function optimizeFullSystemBuilds(
   criteria?: BuildFilterCriteria,
 ): OptimizationResult {
   // Step 1: Pre-prune intra-category candidates
-  const prunedCpus = pruneDominatedCpus(
-    catalogs.cpus,
-    Boolean(criteria?.preferredSocket),
-  );
-  const prunedRam = pruneDominatedRam(
-    catalogs.ramKits,
-    Boolean(criteria?.preferredRamGeneration),
-  );
+  const prunedCpus = pruneDominatedCpus(catalogs.cpus);
+  const prunedRam = pruneDominatedRam(catalogs.ramKits);
   const prunedMobos = pruneDominatedMotherboards(catalogs.motherboards);
   const prunedPsus = pruneDominatedPsus(catalogs.psus);
   const prunedGpus = pruneDominatedGpus(

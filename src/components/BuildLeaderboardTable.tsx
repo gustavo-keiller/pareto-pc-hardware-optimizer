@@ -2,12 +2,14 @@ import React from 'react';
 import { Sparkles } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
 import { formatCurrency } from '../utils/currency';
+import { AppLocale, t } from '../utils/i18n';
 
 interface BuildLeaderboardTableProps {
   optimalBuilds: PcBuild[];
   activeBuildId: string | null;
   maxBudget: number;
   currency?: 'USD' | 'BRL';
+  locale?: AppLocale;
   onSelectBuild: (buildId: string) => void;
 }
 
@@ -16,6 +18,7 @@ export const BuildLeaderboardTable: React.FC<BuildLeaderboardTableProps> = ({
   activeBuildId,
   maxBudget,
   currency = 'USD',
+  locale = 'pt-BR',
   onSelectBuild,
 }) => {
   return (
@@ -24,13 +27,12 @@ export const BuildLeaderboardTable: React.FC<BuildLeaderboardTableProps> = ({
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-emerald-400" />
           <h3 className="text-sm font-bold uppercase tracking-wider text-white">
-            Complete Pareto Optimal Build Frontier ({optimalBuilds.length}{' '}
-            Builds)
+            {t('buildLeaderboardTitle', locale)} ({optimalBuilds.length}{' '}
+            {t('buildCountSuffix', locale)})
           </h3>
         </div>
         <span className="text-xs text-slate-400">
-          Every build below strictly dominates or ties all other combinations at
-          its price point
+          {t('buildLeaderboardSubtitle', locale)}
         </span>
       </div>
 
@@ -38,16 +40,19 @@ export const BuildLeaderboardTable: React.FC<BuildLeaderboardTableProps> = ({
         <table className="w-full text-left text-xs">
           <thead className="border-b border-slate-800 bg-slate-950/50 text-slate-400 uppercase tracking-wider">
             <tr>
-              <th className="py-2.5 px-3">Price</th>
+              <th className="py-2.5 px-3">{t('buildColPrice', locale)}</th>
               <th className="py-2.5 px-3">
-                {optimalBuilds[0]?.workloadMetricLabel ?? 'Effective FPS'}
+                {optimalBuilds[0]?.workloadMetricLabel ??
+                  t('buildColPerformance', locale)}
               </th>
-              <th className="py-2.5 px-3">CPU</th>
-              <th className="py-2.5 px-3">GPU</th>
-              <th className="py-2.5 px-3">Memory</th>
-              <th className="py-2.5 px-3">Motherboard</th>
-              <th className="py-2.5 px-3">Power</th>
-              <th className="py-2.5 px-3 text-right">Action</th>
+              <th className="py-2.5 px-3">{t('buildColCpu', locale)}</th>
+              <th className="py-2.5 px-3">{t('buildColGpu', locale)}</th>
+              <th className="py-2.5 px-3">{t('buildColRam', locale)}</th>
+              <th className="py-2.5 px-3">{t('buildColMobo', locale)}</th>
+              <th className="py-2.5 px-3">{t('buildColPower', locale)}</th>
+              <th className="py-2.5 px-3 text-right">
+                {t('buildColAction', locale)}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/60 font-medium text-slate-200">
@@ -71,7 +76,7 @@ export const BuildLeaderboardTable: React.FC<BuildLeaderboardTableProps> = ({
                     {formatCurrency(build.totalPrice, currency)}
                     {index === 0 && (
                       <span className="ml-1.5 rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300">
-                        Anchor
+                        {t('buildBadgeAnchor', locale)}
                       </span>
                     )}
                   </td>
@@ -119,7 +124,9 @@ export const BuildLeaderboardTable: React.FC<BuildLeaderboardTableProps> = ({
                           : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
                       }`}
                     >
-                      {isSelected ? 'Selected' : 'View'}
+                      {isSelected
+                        ? t('buildBtnSelected', locale)
+                        : t('buildBtnView', locale)}
                     </button>
                   </td>
                 </tr>

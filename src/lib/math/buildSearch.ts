@@ -88,7 +88,10 @@ export function searchOptimalBuildTuples(
   const minCase = hasBudgetCap ? Math.min(...cases.map((c) => c.price)) : 0;
   const minPsu = hasBudgetCap ? Math.min(...psus.map((p) => p.price)) : 0;
 
-  const bestByPrice = new Map<number, CandidateBuildTuple>();
+  const bestByPrice = new Map<
+    number,
+    { maxScore: number; tuples: CandidateBuildTuple[] }
+  >();
   const sampleTuples: CandidateBuildTuple[] = [];
   let totalCompatibleBuilds = 0;
 
@@ -260,38 +263,35 @@ export function searchOptimalBuildTuples(
 
                   totalCompatibleBuilds++;
 
+                  const tuple: CandidateBuildTuple = {
+                    cpu,
+                    gpu,
+                    ram,
+                    mobo,
+                    psu,
+                    storage,
+                    pcCase,
+                    cooler,
+                    totalPrice,
+                    score,
+                    precomputed,
+                  };
+
                   const existing = bestByPrice.get(totalPrice);
-                  if (!existing || score > existing.score) {
-                    const tuple: CandidateBuildTuple = {
-                      cpu,
-                      gpu,
-                      ram,
-                      mobo,
-                      psu,
-                      storage,
-                      pcCase,
-                      cooler,
-                      totalPrice,
-                      score,
-                      precomputed,
-                    };
-                    bestByPrice.set(totalPrice, tuple);
+                  if (!existing) {
+                    bestByPrice.set(totalPrice, {
+                      maxScore: score,
+                      tuples: [tuple],
+                    });
+                  } else if (score > existing.maxScore) {
+                    existing.maxScore = score;
+                    existing.tuples = [tuple];
+                  } else if (score === existing.maxScore) {
+                    existing.tuples.push(tuple);
                   }
 
                   if (sampleTuples.length < 100) {
-                    sampleTuples.push({
-                      cpu,
-                      gpu,
-                      ram,
-                      mobo,
-                      psu,
-                      storage,
-                      pcCase,
-                      cooler,
-                      totalPrice,
-                      score,
-                      precomputed,
-                    });
+                    sampleTuples.push(tuple);
                   }
                 }
               }
@@ -303,9 +303,19 @@ export function searchOptimalBuildTuples(
   }
 
   // Extract cross-price 2D Pareto frontier from bestByPrice
-  const candidateTuples = Array.from(bestByPrice.values()).sort((a, b) => {
+  const candidateTuples: CandidateBuildTuple[] = [];
+  for (const entry of bestByPrice.values()) {
+    for (const t of entry.tuples) {
+      candidateTuples.push(t);
+    }
+  }
+
+  candidateTuples.sort((a, b) => {
     if (a.totalPrice !== b.totalPrice) return a.totalPrice - b.totalPrice;
-    return b.score - a.score;
+    if (a.score !== b.score) return b.score - a.score;
+    const aKey = `${a.cpu.id}_${a.gpu.id}_${a.ram.id}_${a.mobo.id}_${a.psu.id}_${a.storage.id}_${a.pcCase.id}_${a.cooler.id}`;
+    const bKey = `${b.cpu.id}_${b.gpu.id}_${b.ram.id}_${b.mobo.id}_${b.psu.id}_${b.storage.id}_${b.pcCase.id}_${b.cooler.id}`;
+    return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
   });
 
   const optimalTuples: CandidateBuildTuple[] = [];
@@ -315,6 +325,12 @@ export function searchOptimalBuildTuples(
     if (t.score > maxScoreSeen) {
       optimalTuples.push(t);
       maxScoreSeen = t.score;
+    } else if (
+      optimalTuples.length > 0 &&
+      t.score === maxScoreSeen &&
+      t.totalPrice === optimalTuples[optimalTuples.length - 1].totalPrice
+    ) {
+      optimalTuples.push(t);
     }
   }
 

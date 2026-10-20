@@ -13,6 +13,7 @@ import {
   pruneDominatedStorage,
 } from '../combinatorial';
 import {
+  BuildWorkloadProfile,
   CaseCandidate,
   CoolerCandidate,
   CpuCandidate,
@@ -664,9 +665,9 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
 
       const durationMs = performance.now() - startTime;
 
-      // Assert pre-pruning removed dominated CPUs and GPUs
-      expect(result.prunedPartCounts.cpus).toBeLessThan(SEED_CPUS.length);
-      expect(result.prunedPartCounts.gpus).toBeLessThan(REAL_WORLD_GPUS.length);
+      // Assert pre-pruning preserves valid platform partitions without dropping parts by name
+      expect(result.prunedPartCounts.cpus).toBe(SEED_CPUS.length);
+      expect(result.prunedPartCounts.gpus).toBe(REAL_WORLD_GPUS.length);
 
       // Assert memory safety: total count calculated without leaking >100 build objects
       expect(result.totalCompatibleBuilds).toBeGreaterThan(0);
@@ -680,6 +681,49 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
 
       // Sanity bound to catch severe regressions while avoiding CPU contention flakes on CI
       expect(durationMs).toBeLessThan(1000);
+    });
+
+    it('proves optimizeFullSystemBuilds equals unpruned brute-force frontier across workloads and budgets [FIX-01]', () => {
+      const catalog = {
+        cpus: SEED_CPUS,
+        gpus: REAL_WORLD_GPUS,
+        motherboards: SEED_MOTHERBOARDS,
+        ramKits: SEED_RAM_KITS,
+        psus: SEED_PSUS,
+        storages: SEED_STORAGES,
+        cases: SEED_CASES,
+        coolers: SEED_COOLERS,
+      };
+
+      const workloads: BuildWorkloadProfile[] = [
+        'sweetspot-1440p',
+        'esports-1080p',
+        'enthusiast-4k',
+        'creator-ai',
+      ];
+      const budgets = [800, 1200, 2000, 3200];
+
+      for (const profile of workloads) {
+        for (const maxBudget of budgets) {
+          const brute = evaluateBuildParetoFrontier(
+            generateCompatibleBuilds(catalog, { profile, maxBudget }),
+          ).optimalBuilds;
+
+          const opt = optimizeFullSystemBuilds(catalog, {
+            workloadProfile: profile,
+            maxBudget,
+          }).optimalBuilds;
+
+          expect(opt.length).toBe(brute.length);
+          for (let i = 0; i < opt.length; i++) {
+            expect(opt[i].totalPrice).toBe(brute[i].totalPrice);
+            const optScore = opt[i].workloadScore ?? opt[i].effectiveFps1440p;
+            const bruteScore =
+              brute[i].workloadScore ?? brute[i].effectiveFps1440p;
+            expect(optScore).toBeCloseTo(bruteScore, 1);
+          }
+        }
+      }
     });
   });
 });

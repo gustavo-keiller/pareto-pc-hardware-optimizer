@@ -85,69 +85,42 @@ export const BuildFilterControls: React.FC<BuildFilterControlsProps> = ({
       {/* Performance Target & Workload Presets */}
       <div className="mt-6 border-t border-slate-800/80 pt-5">
         <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
-          <span>
-            {locale === 'pt-BR'
-              ? 'Objetivo de Desempenho'
-              : 'Performance Target'}
-          </span>
+          <span>{t('filterPerformanceTarget', locale)}</span>
           <span className="text-[11px] text-slate-400 font-normal">
             {selectedWorkload === 'esports-1080p' &&
-              (locale === 'pt-BR'
-                ? 'Foco em CPU e taxa de quadros competitiva'
-                : 'CPU-bound high-refresh esports')}
+              t('filterEsportsSub', locale)}
             {selectedWorkload === 'sweetspot-1440p' &&
-              (locale === 'pt-BR'
-                ? 'Equilíbrio ideal entre GPU e CPU em 1440p'
-                : 'Optimal 1440p raster and 12GB+ VRAM')}
+              t('filterSweetspotSub', locale)}
             {selectedWorkload === 'enthusiast-4k' &&
-              (locale === 'pt-BR'
-                ? 'Carga pesada de GPU, Ray Tracing e 16GB+ VRAM'
-                : 'Heavy GPU/RT throughput and 16GB+ VRAM')}
-            {selectedWorkload === 'creator-ai' &&
-              (locale === 'pt-BR'
-                ? 'Aceleração CUDA/Tensor e 32GB de RAM para IA e criação'
-                : 'CUDA/Tensor acceleration & 32GB RAM for creator/AI')}
+              t('filterEnthusiastSub', locale)}
+            {selectedWorkload === 'creator-ai' && t('filterCreatorSub', locale)}
           </span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           {[
             {
               id: 'sweetspot-1440p' as const,
-              label:
-                locale === 'pt-BR' ? '1440p Ponto Ideal' : '1440p Sweet Spot',
+              label: t('wlSweetspotLabel', locale),
               icon: '🎯',
-              desc:
-                locale === 'pt-BR'
-                  ? 'Equilibrado (Custo-Benefício)'
-                  : 'Balanced Value',
+              desc: t('wlSweetspotDesc', locale),
             },
             {
               id: 'esports-1080p' as const,
-              label: locale === 'pt-BR' ? '1080p Competitivo' : '1080p Esports',
+              label: t('wlEsportsLabel', locale),
               icon: '⚡',
-              desc:
-                locale === 'pt-BR'
-                  ? 'Alto FPS / Foco em CPU'
-                  : 'High Refresh / CPU Bound',
+              desc: t('wlEsportsDesc', locale),
             },
             {
               id: 'enthusiast-4k' as const,
-              label:
-                locale === 'pt-BR' ? '4K RT Entusiasta' : '4K RT Enthusiast',
+              label: t('wlEnthusiastLabel', locale),
               icon: '💎',
-              desc:
-                locale === 'pt-BR'
-                  ? 'Ray Tracing & 16GB+ VRAM'
-                  : 'Ray Tracing & 16GB+ VRAM',
+              desc: t('wlEnthusiastDesc', locale),
             },
             {
               id: 'creator-ai' as const,
-              label: locale === 'pt-BR' ? 'Criação & IA' : 'Creator & AI',
+              label: t('wlCreatorLabel', locale),
               icon: '🧠',
-              desc:
-                locale === 'pt-BR'
-                  ? 'CUDA / Tensor + 32GB RAM'
-                  : 'CUDA / Tensor + 32GB RAM',
+              desc: t('wlCreatorDesc', locale),
             },
           ].map((wl) => (
             <button
@@ -175,13 +148,9 @@ export const BuildFilterControls: React.FC<BuildFilterControlsProps> = ({
       {/* Quick Budget Presets */}
       <div className="mt-6 border-t border-slate-800/80 pt-5">
         <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
-          <span>
-            {locale === 'pt-BR' ? 'Orçamentos Prontos' : 'Quick Budget Presets'}
-          </span>
+          <span>{t('filterQuickPresets', locale)}</span>
           <span className="text-[11px] text-slate-400 font-normal">
-            {locale === 'pt-BR'
-              ? `${totalCompatibleBuilds} configurações compatíveis avaliadas`
-              : `${totalCompatibleBuilds} compatible builds evaluated`}
+            {totalCompatibleBuilds} {t('filterEvaluatedSuffix', locale)}
           </span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
@@ -253,7 +222,7 @@ export const BuildFilterControls: React.FC<BuildFilterControlsProps> = ({
           {/* Socket Filter */}
           <div className="space-y-1">
             <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
-              {locale === 'pt-BR' ? 'Plataforma / Soquete' : 'Platform Socket'}
+              {t('filterPlatformSocket', locale)}
             </label>
             <select
               value={selectedSocket}
@@ -262,30 +231,14 @@ export const BuildFilterControls: React.FC<BuildFilterControlsProps> = ({
               }
               className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-200 focus:border-emerald-500 focus:outline-none"
             >
-              <option value="ALL">
-                {locale === 'pt-BR'
-                  ? 'Todas as Plataformas (AM4, AM5, Intel)'
-                  : 'All Platforms (AM4, AM5, Intel)'}
-              </option>
-              <option value="AM4">
-                {locale === 'pt-BR'
-                  ? 'AMD AM4 (Econômico DDR4)'
-                  : 'AMD AM4 (Budget DDR4)'}
-              </option>
-              <option value="AM5">
-                {locale === 'pt-BR'
-                  ? 'AMD AM5 (DDR5 & Upgrades Futuros)'
-                  : 'AMD AM5 (DDR5 & Upgradeable)'}
-              </option>
+              <option value="ALL">{t('filterAllSockets', locale)}</option>
+              <option value="AM4">{t('filterSocketAm4', locale)}</option>
+              <option value="AM5">{t('filterSocketAm5', locale)}</option>
               <option value="LGA1700">
-                {locale === 'pt-BR'
-                  ? 'Intel LGA1700 (12ª–14ª Geração)'
-                  : 'Intel LGA1700 (12th–14th Gen)'}
+                {t('filterSocketLga1700', locale)}
               </option>
               <option value="LGA1851">
-                {locale === 'pt-BR'
-                  ? 'Intel LGA1851 (Arrow Lake)'
-                  : 'Intel LGA1851 (Arrow Lake)'}
+                {t('filterSocketLga1851', locale)}
               </option>
             </select>
           </div>
@@ -293,7 +246,7 @@ export const BuildFilterControls: React.FC<BuildFilterControlsProps> = ({
           {/* RAM Generation Filter */}
           <div className="space-y-1">
             <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
-              {locale === 'pt-BR' ? 'Geração de RAM' : 'RAM Gen'}
+              {t('filterRamGen', locale)}
             </label>
             <select
               value={selectedRamGen}
@@ -302,24 +255,16 @@ export const BuildFilterControls: React.FC<BuildFilterControlsProps> = ({
               }
               className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-200 focus:border-emerald-500 focus:outline-none"
             >
-              <option value="ALL">
-                {locale === 'pt-BR'
-                  ? 'Todas as Memórias (DDR4 & DDR5)'
-                  : 'All RAM (DDR4 & DDR5)'}
-              </option>
-              <option value="DDR4">
-                {locale === 'pt-BR' ? 'Apenas DDR4' : 'DDR4 Only'}
-              </option>
-              <option value="DDR5">
-                {locale === 'pt-BR' ? 'Apenas DDR5' : 'DDR5 Only'}
-              </option>
+              <option value="ALL">{t('filterAllRam', locale)}</option>
+              <option value="DDR4">{t('filterRamDdr4', locale)}</option>
+              <option value="DDR5">{t('filterRamDdr5', locale)}</option>
             </select>
           </div>
 
           {/* GPU Vendor Filter */}
           <div className="space-y-1">
             <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
-              {locale === 'pt-BR' ? 'Fabricante da Placa' : 'GPU Vendor'}
+              {t('filterGpuVendor', locale)}
             </label>
             <select
               value={selectedGpuVendor}
@@ -328,9 +273,7 @@ export const BuildFilterControls: React.FC<BuildFilterControlsProps> = ({
               }
               className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-200 focus:border-emerald-500 focus:outline-none"
             >
-              <option value="ALL">
-                {locale === 'pt-BR' ? 'Todas as Placas' : 'All GPUs'}
-              </option>
+              <option value="ALL">{t('filterAllGpus', locale)}</option>
               <option value="NVIDIA">NVIDIA</option>
               <option value="AMD">AMD</option>
               <option value="Intel">Intel</option>
@@ -341,14 +284,10 @@ export const BuildFilterControls: React.FC<BuildFilterControlsProps> = ({
             type="button"
             onClick={onResetFilters}
             className="mt-4 inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1.5 text-xs text-slate-400 hover:text-white hover:border-slate-700 transition"
-            title={
-              locale === 'pt-BR'
-                ? 'Restaurar filtros de montagem'
-                : 'Reset full build filters'
-            }
+            title={t('filterResetTooltip', locale)}
           >
             <RotateCcw className="h-3.5 w-3.5" />
-            {locale === 'pt-BR' ? 'Redefinir' : 'Reset'}
+            {t('filterResetButton', locale)}
           </button>
         </div>
       </div>

@@ -7,7 +7,12 @@ import {
 } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
 import { formatCurrency } from '../utils/currency';
-import { AppLocale, t } from '../utils/i18n';
+import {
+  AppLocale,
+  formatAltSavingsText,
+  formatAltStepUpText,
+  t,
+} from '../utils/i18n';
 import { BuildHeroCard } from './BuildHeroCard';
 
 export interface FullBuildPickHeroProps {
@@ -35,8 +40,7 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
       >
         <ShieldAlert className="h-8 w-8 text-rose-400 mx-auto mb-2" />
         <p className="text-sm font-semibold">
-          No compatible complete PC builds found under your selected budget. Try
-          raising the budget limit.
+          {t('noCompatibleBuildsSimple', locale)}
         </p>
       </div>
     );
@@ -91,12 +95,10 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
                   <div className="flex items-center justify-between text-xs">
                     <span className="flex items-center gap-1 font-bold text-sky-400">
                       <ArrowDownRight className="h-4 w-4" />
-                      {locale === 'pt-BR'
-                        ? 'Opção Mais Econômica'
-                        : 'Budget-Saver System'}
+                      {t('altStepDownTitle', locale)}
                     </span>
                     <span className="font-mono text-xs font-bold text-emerald-400">
-                      {locale === 'pt-BR' ? 'Economize ' : 'Save '}
+                      {t('altSavePrefix', locale)}
                       {formatCurrency(savings, currency, false, locale)}
                     </span>
                   </div>
@@ -116,18 +118,21 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    {locale === 'pt-BR'
-                      ? `Economize ${formatCurrency(savings, currency, false, locale)} (${pctSavings}% a menos), mantendo ${stepDownScore} ${unit} (${pctSpeed}% do desempenho da primeira opção).`
-                      : `Save ${formatCurrency(savings, currency, false, locale)} (${pctSavings}% less) while keeping ${stepDownScore} ${unit} (${pctSpeed}% speed of the top build).`}
+                    {formatAltSavingsText(
+                      formatCurrency(savings, currency, false, locale),
+                      pctSavings,
+                      stepDownScore,
+                      unit,
+                      pctSpeed,
+                      locale,
+                    )}
                   </p>
                   <button
                     type="button"
                     onClick={onSwitchToBuilds}
                     className="w-full rounded-lg border border-slate-800 bg-slate-950 py-1.5 text-xs font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition"
                   >
-                    {locale === 'pt-BR'
-                      ? 'Inspecionar Build no Explorador →'
-                      : 'Inspect Build in Explorer →'}
+                    {t('altInspectExplorer', locale)}
                   </button>
                 </div>
               );
@@ -154,13 +159,11 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
                   <div className="flex items-center justify-between text-xs">
                     <span className="flex items-center gap-1 font-bold text-amber-400">
                       <ArrowUpRight className="h-4 w-4" />
-                      {locale === 'pt-BR'
-                        ? 'Opção com Mais Desempenho'
-                        : 'Enthusiast-Tier Upgrade'}
+                      {t('altStepUpTitle', locale)}
                     </span>
                     <span className="font-mono text-xs font-bold text-amber-400">
                       +{formatCurrency(extraPrice, currency, false, locale)}{' '}
-                      {locale === 'pt-BR' ? 'a mais' : 'More'}
+                      {t('altSaveMore', locale)}
                     </span>
                   </div>
                   <div className="flex items-baseline justify-between">
@@ -179,18 +182,21 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    {locale === 'pt-BR'
-                      ? `Entrega +${scoreDiff} ${unit} (+${pctScore}%) chegando a ${stepUpScore} ${unit} por +${formatCurrency(extraPrice, currency, false, locale)} adicionais.`
-                      : `Delivers +${scoreDiff} ${unit} (+${pctScore}%) reaching ${stepUpScore} ${unit} for +${formatCurrency(extraPrice, currency, false, locale)} more.`}
+                    {formatAltStepUpText(
+                      scoreDiff,
+                      unit,
+                      pctScore,
+                      stepUpScore,
+                      formatCurrency(extraPrice, currency, false, locale),
+                      locale,
+                    )}
                   </p>
                   <button
                     type="button"
                     onClick={onSwitchToBuilds}
                     className="w-full rounded-lg border border-slate-800 bg-slate-950 py-1.5 text-xs font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition"
                   >
-                    {locale === 'pt-BR'
-                      ? 'Inspecionar Build no Explorador →'
-                      : 'Inspect Build in Explorer →'}
+                    {t('altInspectExplorer', locale)}
                   </button>
                 </div>
               );

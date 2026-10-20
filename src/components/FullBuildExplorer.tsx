@@ -361,7 +361,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
                 onClick={onSwitchToSimple}
                 className="rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition"
               >
-                {locale === 'pt-BR' ? 'Guia Simples' : 'Simple Guide'}
+                {t('btnSimpleGuide', locale)}
               </button>
             )}
             {onSwitchToExplorer && (
@@ -370,7 +370,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
                 onClick={onSwitchToExplorer}
                 className="rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition"
               >
-                {locale === 'pt-BR' ? 'Explorador de GPUs' : 'GPU Explorer'}
+                {t('btnGpuExplorer', locale)}
               </button>
             )}
             <button
@@ -379,9 +379,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
               className="flex items-center gap-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-300 hover:bg-amber-500/20 hover:border-amber-500/60 transition shadow-sm"
             >
               <Wrench className="h-3.5 w-3.5" />
-              <span>
-                {locale === 'pt-BR' ? 'Modo Upgrade' : 'Upgrade Mode'}
-              </span>
+              <span>{t('btnUpgradeMode', locale)}</span>
             </button>
           </div>
         </div>
@@ -427,17 +425,13 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-xs text-amber-200">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
-            <span>
-              {locale === 'pt-BR'
-                ? 'Uma ou mais peças do link compartilhado não foram encontradas no catálogo atual. Exibindo a melhor configuração recomendada para o seu orçamento.'
-                : 'One or more parts from the shared link were not found in the current catalog. Showing the top recommended build for your budget instead.'}
-            </span>
+            <span>{t('sharedMissingPartsNotice', locale)}</span>
           </div>
           <button
             type="button"
             onClick={() => setDismissSharedNotice(true)}
             className="text-amber-400 hover:text-white p-1 font-bold"
-            title={locale === 'pt-BR' ? 'Fechar aviso' : 'Dismiss notice'}
+            title={t('sharedDismissNotice', locale)}
           >
             ✕
           </button>
@@ -449,9 +443,10 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
         <div className="flex items-center gap-2 rounded-2xl border border-sky-500/40 bg-sky-500/10 px-4 py-3 text-xs text-sky-200">
           <AlertTriangle className="h-4 w-4 shrink-0 text-sky-400" />
           <span>
-            {locale === 'pt-BR'
-              ? `Aviso: Esta configuração compartilhada custa ${formatCurrency(activeBuild.totalPrice, currency)}, acima do orçamento selecionado de ${formatCurrency(maxBudget, currency)}.`
-              : `Notice: This shared build costs ${formatCurrency(activeBuild.totalPrice, currency)}, exceeding your selected budget of ${formatCurrency(maxBudget, currency)}.`}
+            {t('sharedOverBudgetNotice', locale)}{' '}
+            {formatCurrency(activeBuild.totalPrice, currency)}{' '}
+            {t('sharedOverBudgetSuffix', locale)}{' '}
+            {formatCurrency(maxBudget, currency)}.
           </span>
         </div>
       )}
@@ -467,23 +462,17 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
         <div className="rounded-3xl border border-dashed border-slate-800 bg-slate-900/40 p-12 text-center text-slate-400">
           <AlertTriangle className="h-8 w-8 text-amber-400 mx-auto mb-2" />
           <h3 className="text-lg font-bold text-white">
-            {locale === 'pt-BR'
-              ? 'Nenhuma Configuração Compatível Encontrada'
-              : 'No Compatible Builds Found'}
+            {t('noCompatibleBuildsFound', locale)}
           </h3>
           <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-            {locale === 'pt-BR'
-              ? 'Tente aumentar o limite de orçamento ou relaxar os filtros de soquete e geração de RAM para encontrar combinações válidas.'
-              : 'Try raising the maximum budget or relaxing socket and RAM generation filters to find valid hardware combinations.'}
+            {t('noCompatibleBuildsDesc', locale)}
           </p>
           <button
             type="button"
             onClick={handleResetFilters}
             className="mt-4 rounded-lg bg-emerald-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition"
           >
-            {locale === 'pt-BR'
-              ? 'Redefinir Todos os Filtros'
-              : 'Reset All Filters'}
+            {t('resetAllFilters', locale)}
           </button>
         </div>
       )}
@@ -506,6 +495,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
         activeBuildId={activeBuild?.id ?? null}
         maxBudget={maxBudget}
         currency={currency}
+        locale={locale}
         onSelectBuild={(buildId) => setSelectedBuildId(buildId)}
       />
 

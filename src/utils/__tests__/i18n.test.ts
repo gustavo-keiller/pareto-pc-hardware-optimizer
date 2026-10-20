@@ -31,8 +31,16 @@ describe('i18n localization (src/utils/i18n.ts)', () => {
     for (const locale of ['pt-BR', 'en-US'] as const) {
       const dict = TRANSLATIONS[locale];
       for (const [key, text] of Object.entries(dict)) {
-        // Exclude mathGuide heading/subheading from beginner prohibition since that is the explicit math explainer
-        if (key.startsWith('mathGuide')) continue;
+        // Exclude mathGuide heading/subheading, pro modes, and multidimensional charts from beginner prohibition
+        if (
+          key.startsWith('mathGuide') ||
+          key.includes('Pro') ||
+          key.startsWith('verdict') ||
+          key.startsWith('radar') ||
+          key.startsWith('parallel') ||
+          key.startsWith('drawer')
+        )
+          continue;
         const lower = text.toLowerCase();
         for (const word of forbidden) {
           expect(

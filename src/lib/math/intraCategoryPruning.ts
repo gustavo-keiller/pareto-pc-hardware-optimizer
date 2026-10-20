@@ -24,53 +24,69 @@ export const PSU_EFFICIENCY_TIER: Record<PsuEfficiencyRating, number> = {
 
 /**
  * Prunes strictly dominated CPUs within each platform socket.
- * A CPU is dominated if another CPU in the same socket is cheaper or equal in price
- * and faster or equal in gaming performance, with at least one strictly better.
+ * A CPU is dominated if another CPU in the SAME socket is cheaper or equal in price,
+ * faster or equal in gaming performance, and draws less or equal TDP,
+ * with at least one strictly better.
+ *
+ * NOTE: Pruning is ALWAYS partitioned by socket. A CPU on socket A cannot dominate
+ * a CPU on socket B because motherboard and RAM platform costs differ.
+ * Parts are NEVER pruned by name (e.g. [TRAP]).
  */
 export function pruneDominatedCpus(
   cpus: readonly CpuCandidate[],
-  partitionBySocket = false,
+  _partitionBySocket = true,
 ): CpuCandidate[] {
   if (cpus.length <= 1) return [...cpus];
 
   return cpus.filter((candidate) => {
-    if (candidate.name.includes('[TRAP]')) return false;
     return !cpus.some((other) => {
       if (other.id === candidate.id) return false;
-      if (partitionBySocket && other.socket !== candidate.socket) return false;
+      // Socket compatibility partition: never prune across sockets
+      if (other.socket !== candidate.socket) return false;
 
       const priceBetterOrEqual = other.price <= candidate.price;
       const scoreBetterOrEqual = other.gamingScore >= candidate.gamingScore;
+      const tdpBetterOrEqual = other.tdpWatts <= candidate.tdpWatts;
       const atLeastOneStrict =
         other.price < candidate.price ||
         other.gamingScore > candidate.gamingScore;
 
-      return priceBetterOrEqual && scoreBetterOrEqual && atLeastOneStrict;
+      return (
+        priceBetterOrEqual &&
+        scoreBetterOrEqual &&
+        tdpBetterOrEqual &&
+        atLeastOneStrict
+      );
     });
   });
 }
 
 /**
  * Prunes strictly dominated RAM kits within the same generation (DDR4 vs DDR5).
- * A kit is dominated if another kit is cheaper/equal, has greater/equal capacity,
- * and higher/equal speed, with at least one strictly better.
+ * A kit is dominated if another kit in the SAME generation is cheaper/equal,
+ * has greater/equal capacity, higher/equal speed, and requires fewer/equal modules,
+ * with at least one strictly better.
+ *
+ * NOTE: Pruning is ALWAYS partitioned by generation. DDR4 cannot fit DDR5 boards and vice versa.
  */
 export function pruneDominatedRam(
   ramKits: readonly RamCandidate[],
-  partitionByGeneration = true,
+  _partitionByGeneration = true,
 ): RamCandidate[] {
   if (ramKits.length <= 1) return [...ramKits];
 
   return ramKits.filter((candidate) => {
     return !ramKits.some((other) => {
       if (other.id === candidate.id) return false;
-      if (partitionByGeneration && other.generation !== candidate.generation) {
+      // RAM generation compatibility partition: never prune across DDR4 / DDR5
+      if (other.generation !== candidate.generation) {
         return false;
       }
 
       const priceBetterOrEqual = other.price <= candidate.price;
       const capacityBetterOrEqual = other.capacityGb >= candidate.capacityGb;
       const speedBetterOrEqual = other.speedMhz >= candidate.speedMhz;
+      const modulesBetterOrEqual = other.modulesCount <= candidate.modulesCount;
       const atLeastOneStrict =
         other.price < candidate.price ||
         other.capacityGb > candidate.capacityGb ||
@@ -80,6 +96,7 @@ export function pruneDominatedRam(
         priceBetterOrEqual &&
         capacityBetterOrEqual &&
         speedBetterOrEqual &&
+        modulesBetterOrEqual &&
         atLeastOneStrict
       );
     });
@@ -87,9 +104,9 @@ export function pruneDominatedRam(
 }
 
 /**
- * Prunes strictly dominated Motherboards within each (socket, ramGeneration) platform.
+ * Prunes strictly dominated Motherboards within each (socket, ramGeneration, formFactor) platform.
  * A board is dominated if another board has lower/equal price, greater/equal RAM slots,
- * and greater/equal PCIe gen, with at least one strictly better.
+ * greater/equal PCIe gen, and greater/equal M.2 slots, with at least one strictly better.
  */
 export function pruneDominatedMotherboards(
   motherboards: readonly MotherboardCandidate[],
@@ -108,19 +125,24 @@ export function pruneDominatedMotherboards(
 
       const otherPcie = other.pcieGeneration ?? 3;
       const candPcie = candidate.pcieGeneration ?? 3;
+      const otherM2 = other.m2Slots ?? 1;
+      const candM2 = candidate.m2Slots ?? 1;
 
       const priceBetterOrEqual = other.price <= candidate.price;
       const slotsBetterOrEqual = other.ramSlots >= candidate.ramSlots;
       const pcieBetterOrEqual = otherPcie >= candPcie;
+      const m2BetterOrEqual = otherM2 >= candM2;
       const atLeastOneStrict =
         other.price < candidate.price ||
         other.ramSlots > candidate.ramSlots ||
-        otherPcie > candPcie;
+        otherPcie > candPcie ||
+        otherM2 > candM2;
 
       return (
         priceBetterOrEqual &&
         slotsBetterOrEqual &&
         pcieBetterOrEqual &&
+        m2BetterOrEqual &&
         atLeastOneStrict
       );
     });
@@ -280,7 +302,13 @@ export function pruneDominatedCoolers(
  * Prunes strictly dominated GPUs within the combinatorial builder.
  * A GPU is dominated if another GPU is cheaper or equal in price,
  * faster or equal in both raster and ray tracing, has greater or equal VRAM,
- * draws less or equal power, and has lower or equal length, with at least one strictly better.
+ * draws less or equal power (strict TDP <= candidate TDP),
+ * and has lower or equal length (strict lengthMm <= candidate lengthMm),
+ * with at least one strictly better.
+ *
+ * NOTE: Parts are NEVER pruned by name (e.g. [TRAP]).
+ * Vendors are partitioned if partitionByVendor is requested, or if other is non-NVIDIA
+ * when candidate is NVIDIA (because creator-ai grants NVIDIA CUDA/Tensor bonus).
  */
 export function pruneDominatedGpus(
   gpus: readonly GpuCandidate[],
@@ -289,18 +317,26 @@ export function pruneDominatedGpus(
   if (gpus.length <= 1) return [...gpus];
 
   return gpus.filter((candidate) => {
-    if (candidate.name.includes('[TRAP]')) return false;
-
     return !gpus.some((other) => {
       if (other.id === candidate.id) return false;
       if (partitionByVendor && other.vendor !== candidate.vendor) return false;
+
+      // Creator-AI gives NVIDIA a vendor bonus (10 vs 4).
+      // A non-NVIDIA card cannot safely dominate an NVIDIA card across all workloads.
+      if (candidate.vendor === 'NVIDIA' && other.vendor !== 'NVIDIA') {
+        return false;
+      }
+
+      const otherLength = other.lengthMm ?? 260;
+      const candLength = candidate.lengthMm ?? 260;
 
       const priceBetterOrEqual = other.price <= candidate.price;
       const rasterBetterOrEqual =
         other.rasterFps1440p >= candidate.rasterFps1440p;
       const rtBetterOrEqual = other.rtFps1440p >= candidate.rtFps1440p;
       const vramBetterOrEqual = other.vramGb >= candidate.vramGb;
-      const tdpBetterOrEqual = other.tdpWatts <= candidate.tdpWatts + 30;
+      const tdpBetterOrEqual = other.tdpWatts <= candidate.tdpWatts;
+      const lengthBetterOrEqual = otherLength <= candLength;
 
       const atLeastOneStrict =
         other.price < candidate.price ||
@@ -314,6 +350,7 @@ export function pruneDominatedGpus(
         rtBetterOrEqual &&
         vramBetterOrEqual &&
         tdpBetterOrEqual &&
+        lengthBetterOrEqual &&
         atLeastOneStrict
       );
     });

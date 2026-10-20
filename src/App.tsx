@@ -224,15 +224,11 @@ export function App() {
                 type="button"
                 onClick={handleResetAll}
                 className="inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 px-2 sm:px-2.5 py-1 sm:py-1.5 font-medium text-slate-300 hover:border-slate-700 hover:text-white transition"
-                title={
-                  locale === 'pt-BR'
-                    ? 'Restaurar filtros e pesos para os padrões'
-                    : 'Reset filters and weights to defaults'
-                }
+                title={t('appResetTitle', locale)}
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">
-                  {locale === 'pt-BR' ? 'Redefinir' : 'Reset'}
+                  {t('appResetButton', locale)}
                 </span>
               </button>
             </div>
