@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { EChartsRenderer } from './EChartsRenderer';
-import { RankedGpu } from '../lib/math/types';
-import { Layers, Activity, X, Trash2 } from 'lucide-react';
-
+import { PreferenceWeights, RankedGpu } from '../lib/math/types';
+import { Layers, Activity, X, Trash2, Sliders } from 'lucide-react';
+import { TopsisScoreBreakdownView } from './TopsisScoreBreakdownView';
 import { formatCurrency } from '../utils/currency';
 import { AppLocale, t } from '../utils/i18n';
 
@@ -11,6 +11,7 @@ interface ComparisonDrawerProps {
   allGpus: RankedGpu[];
   currency?: 'USD' | 'BRL';
   locale?: AppLocale;
+  weights?: PreferenceWeights;
   onRemoveGpu: (id: string) => void;
   onClearAll: () => void;
 }
@@ -22,10 +23,13 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
   allGpus,
   currency = 'USD',
   locale = 'pt-BR',
+  weights,
   onRemoveGpu,
   onClearAll,
 }) => {
-  const [chartType, setChartType] = useState<'radar' | 'parallel'>('radar');
+  const [chartType, setChartType] = useState<
+    'radar' | 'parallel' | 'breakdown'
+  >('radar');
 
   // Compute min/max bounds across dataset so we can normalize all 5 metrics onto a 0-100 "higher is better" utility scale for Radar
   const bounds = useMemo(() => {
@@ -283,6 +287,18 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
               <Activity className="h-3.5 w-3.5" />
               {t('drawerParallelTab', locale)}
             </button>
+            <button
+              type="button"
+              onClick={() => setChartType('breakdown')}
+              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                chartType === 'breakdown'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Sliders className="h-3.5 w-3.5" />
+              {t('drawerTabBreakdown', locale)}
+            </button>
           </div>
 
           <button
@@ -296,84 +312,96 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
         </div>
       </div>
 
-      {/* Selected GPU Pills + Side-by-Side Spec Matrix */}
-      <div className="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-        <div className="lg:col-span-6 h-[340px]">
-          <EChartsRenderer
-            option={chartType === 'radar' ? radarOption : parallelOption}
-            style={{ height: '100%', width: '100%' }}
-            notMerge={true}
+      {chartType === 'breakdown' ? (
+        <div className="mt-4">
+          <TopsisScoreBreakdownView
+            selectedGpus={selectedGpus}
+            allGpus={allGpus}
+            weights={weights}
+            currency={currency}
+            locale={locale}
           />
         </div>
+      ) : (
+        /* Selected GPU Pills + Side-by-Side Spec Matrix */
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div className="lg:col-span-6 h-[340px]">
+            <EChartsRenderer
+              option={chartType === 'radar' ? radarOption : parallelOption}
+              style={{ height: '100%', width: '100%' }}
+              notMerge={true}
+            />
+          </div>
 
-        <div className="lg:col-span-6 overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="border-b border-slate-800 text-slate-400">
-                <th className="py-2 pr-3 font-medium">
-                  {t('drawerColGpu', locale)}
-                </th>
-                <th className="py-2 px-2 font-medium">
-                  {t('drawerColPrice', locale)}
-                </th>
-                <th className="py-2 px-2 font-medium">1440p</th>
-                <th className="py-2 px-2 font-medium">RT</th>
-                <th className="py-2 px-2 font-medium">VRAM</th>
-                <th className="py-2 px-2 font-medium">
-                  {currency === 'BRL' ? 'FPS/R$' : 'FPS/$'}
-                </th>
-                <th className="py-2 px-2 font-medium">TOPSIS</th>
-                <th className="py-2 pl-2"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60">
-              {selectedGpus.map((g, idx) => {
-                const color = COMPARE_COLORS[idx % COMPARE_COLORS.length];
-                const fpsPerDollar = (g.rasterFps1440p / g.price).toFixed(2);
-                return (
-                  <tr key={g.id} className="hover:bg-slate-800/30">
-                    <td className="py-2.5 pr-3 font-semibold text-white flex items-center gap-2">
-                      <span
-                        className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
-                        style={{ backgroundColor: color }}
-                      />
-                      <span>{g.name}</span>
-                    </td>
-                    <td className="py-2.5 px-2 text-slate-200">
-                      {formatCurrency(g.price, currency, false, locale)}
-                    </td>
-                    <td className="py-2.5 px-2 text-slate-200">
-                      {g.rasterFps1440p} FPS
-                    </td>
-                    <td className="py-2.5 px-2 text-slate-200">
-                      {g.rtFps1440p} FPS
-                    </td>
-                    <td className="py-2.5 px-2 text-sky-400 font-medium">
-                      {g.vramGb} GB
-                    </td>
-                    <td className="py-2.5 px-2 text-emerald-400 font-mono">
-                      {fpsPerDollar}
-                    </td>
-                    <td className="py-2.5 px-2 font-bold text-amber-400">
-                      {g.topsisScorePct.toFixed(1)}%
-                    </td>
-                    <td className="py-2.5 pl-2 text-right">
-                      <button
-                        type="button"
-                        onClick={() => onRemoveGpu(g.id)}
-                        className="text-slate-500 hover:text-rose-400 p-1"
-                        title="Remove from comparison"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="lg:col-span-6 overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-slate-800 text-slate-400">
+                  <th className="py-2 pr-3 font-medium">
+                    {t('drawerColGpu', locale)}
+                  </th>
+                  <th className="py-2 px-2 font-medium">
+                    {t('drawerColPrice', locale)}
+                  </th>
+                  <th className="py-2 px-2 font-medium">1440p</th>
+                  <th className="py-2 px-2 font-medium">RT</th>
+                  <th className="py-2 px-2 font-medium">VRAM</th>
+                  <th className="py-2 px-2 font-medium">
+                    {currency === 'BRL' ? 'FPS/R$' : 'FPS/$'}
+                  </th>
+                  <th className="py-2 px-2 font-medium">TOPSIS</th>
+                  <th className="py-2 pl-2"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {selectedGpus.map((g, idx) => {
+                  const color = COMPARE_COLORS[idx % COMPARE_COLORS.length];
+                  const fpsPerDollar = (g.rasterFps1440p / g.price).toFixed(2);
+                  return (
+                    <tr key={g.id} className="hover:bg-slate-800/30">
+                      <td className="py-2.5 pr-3 font-semibold text-white flex items-center gap-2">
+                        <span
+                          className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                          style={{ backgroundColor: color }}
+                        />
+                        <span>{g.name}</span>
+                      </td>
+                      <td className="py-2.5 px-2 text-slate-200">
+                        {formatCurrency(g.price, currency, false, locale)}
+                      </td>
+                      <td className="py-2.5 px-2 text-slate-200">
+                        {g.rasterFps1440p} FPS
+                      </td>
+                      <td className="py-2.5 px-2 text-slate-200">
+                        {g.rtFps1440p} FPS
+                      </td>
+                      <td className="py-2.5 px-2 text-sky-400 font-medium">
+                        {g.vramGb} GB
+                      </td>
+                      <td className="py-2.5 px-2 text-emerald-400 font-mono">
+                        {fpsPerDollar}
+                      </td>
+                      <td className="py-2.5 px-2 font-bold text-amber-400">
+                        {g.topsisScorePct.toFixed(1)}%
+                      </td>
+                      <td className="py-2.5 pl-2 text-right">
+                        <button
+                          type="button"
+                          onClick={() => onRemoveGpu(g.id)}
+                          className="text-slate-500 hover:text-rose-400 p-1"
+                          title="Remove from comparison"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 };

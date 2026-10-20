@@ -161,6 +161,8 @@ export const enUS: Translations = {
   tableVram: 'VRAM',
   tablePower: 'Power',
   tableCompare: 'Compare',
+  tableCompareAdd: 'Add to multi-metric comparison (up to 4)',
+  tableCompareRemove: 'Remove from multi-metric comparison',
   verdictSmartBuy: 'Smart Buy',
   verdictTrap: 'Bad Value Trap',
   verdictNiche: 'Niche / Specialized',
@@ -335,4 +337,28 @@ export const enUS: Translations = {
   estimateBadge: 'estimate',
   estimateExplanation:
     'Performance and bottleneck figures are model estimates until calibrated with empirical benchmark telemetry (DATA-02).',
+
+  // Pro-Mode Extras (UX-08)
+  weightsProfilesTitle: 'Saved Weight Profiles',
+  weightsProfilesSaveBtn: 'Save Profile',
+  weightsProfilesPlaceholder: 'Profile name (e.g. 1440p Focus)',
+  weightsProfilesNoProfiles: 'No saved profiles yet.',
+  weightsProfilesLoad: 'Load',
+  weightsProfilesDelete: 'Delete',
+  weightsProfilesActive: 'Active',
+  btnExportCsv: 'Export CSV',
+  btnExportJson: 'Export JSON',
+  exportTooltip: 'Download complete tabular dataset',
+  drawerTabRadar: 'Radar Chart',
+  drawerTabParallel: 'Parallel Coordinates',
+  drawerTabBreakdown: 'TOPSIS Breakdown',
+  breakdownColMetric: 'Metric',
+  breakdownColWeight: 'Relative Weight',
+  breakdownColRaw: 'Raw Value',
+  breakdownColNormalized: 'Normalized (r_ij)',
+  breakdownColIdeal: 'Ideal Best (A+)',
+  breakdownColWorst: 'Ideal Worst (A-)',
+  breakdownColProximity: 'Proximity to Best',
+  drawerBreakdownSummary:
+    'Mathematical breakdown of vector Euclidean distance components and objective contributions to relative TOPSIS closeness (C_i).',
 };

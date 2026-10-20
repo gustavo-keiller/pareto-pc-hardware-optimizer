@@ -676,4 +676,59 @@ describe('App modes', () => {
     const intelCard = await screen.findByTestId('top-build-card');
     expect(intelCard.textContent).toMatch(/Core i[3579]/);
   });
+
+  it('UX-08: saves/loads named weight profiles, exports data, and displays TOPSIS score breakdown in Pro mode', async () => {
+    localStorage.clear();
+    const user = userEvent.setup();
+    render(<App />);
+
+    // Switch to Pro mode
+    const proBtn = screen.getByRole('button', { name: /3\. Laborat|3\. Pro/i });
+    await user.click(proBtn);
+
+    // 1. Save a named custom profile
+    const profileInput = screen.getByPlaceholderText(
+      /Nome do perfil|Profile name/i,
+    );
+    await user.type(profileInput, 'Perfil Teste');
+    const saveProfileBtn = screen.getByRole('button', {
+      name: /Salvar Perfil|Save Profile/i,
+    });
+    await user.click(saveProfileBtn);
+
+    // Verify saved profile pill is displayed
+    expect(screen.getByText('Perfil Teste')).toBeDefined();
+
+    // 2. Verify Export CSV & JSON buttons are rendered
+    const exportCsvBtn = screen.getByRole('button', {
+      name: /Exportar CSV|Export CSV/i,
+    });
+    const exportJsonBtn = screen.getByRole('button', {
+      name: /Exportar JSON|Export JSON/i,
+    });
+    expect(exportCsvBtn).toBeDefined();
+    expect(exportJsonBtn).toBeDefined();
+
+    // 3. Select 2 GPUs to trigger comparison drawer and inspect breakdown
+    const compareButtons = screen.getAllByTitle(
+      /Adicionar à comparação|Add to multi-metric/i,
+    );
+    expect(compareButtons.length).toBeGreaterThanOrEqual(2);
+    await user.click(compareButtons[0]);
+    await user.click(compareButtons[1]);
+
+    // Switch to Breakdown tab
+    const breakdownTab = await screen.findByRole('button', {
+      name: /Detalhamento TOPSIS|TOPSIS Breakdown/i,
+    });
+    await user.click(breakdownTab);
+
+    // Verify breakdown content is displayed
+    expect(
+      screen.getByText(
+        /Detalhamento matemático dos vetores de distância Euclidiana|Mathematical breakdown of vector Euclidean distance/i,
+      ),
+    ).toBeDefined();
+    expect(screen.getAllByText(/Cᵢ =/i).length).toBeGreaterThan(0);
+  });
 });

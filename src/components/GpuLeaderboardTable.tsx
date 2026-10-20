@@ -1,5 +1,6 @@
 import React from 'react';
-import { RankedGpu } from '../lib/math/types';
+import { PreferenceWeights, RankedGpu } from '../lib/math/types';
+import { DEFAULT_PREFERENCE_WEIGHTS } from '../lib/math/topsis';
 import {
   CheckCircle2,
   ShieldAlert,
@@ -9,9 +10,14 @@ import {
   TrendingUp,
   Award,
   ExternalLink,
+  Download,
 } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
-
+import {
+  downloadDataFile,
+  exportRankedGpusToCsv,
+  exportRankedGpusToJson,
+} from '../utils/exportData';
 import { AppLocale, t } from '../utils/i18n';
 import { UiMode } from '../hooks/useOptimizerState';
 
@@ -25,6 +31,7 @@ interface GpuLeaderboardTableProps {
   uiMode: UiMode;
   currency?: 'USD' | 'BRL';
   locale?: AppLocale;
+  weights?: PreferenceWeights;
   onHoverGpu: (id: string | null) => void;
   onToggleSelectGpu: (id: string) => void;
   onToggleHideTraps: (hide: boolean) => void;
@@ -40,10 +47,33 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
   uiMode,
   currency = 'USD',
   locale = 'pt-BR',
+  weights,
   onHoverGpu,
   onToggleSelectGpu,
   onToggleHideTraps,
 }) => {
+  const handleExportCsv = () => {
+    const csvContent = exportRankedGpusToCsv(gpus, currency, locale);
+    downloadDataFile(
+      `paretopc-gpus-${new Date().toISOString().slice(0, 10)}.csv`,
+      csvContent,
+      'text/csv;charset=utf-8;',
+    );
+  };
+
+  const handleExportJson = () => {
+    const jsonContent = exportRankedGpusToJson(
+      gpus,
+      weights ?? DEFAULT_PREFERENCE_WEIGHTS,
+      currency,
+    );
+    downloadDataFile(
+      `paretopc-gpus-${new Date().toISOString().slice(0, 10)}.json`,
+      jsonContent,
+      'application/json;charset=utf-8;',
+    );
+  };
+
   return (
     <section className="dashboard-region mt-6 rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
@@ -60,15 +90,40 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
           </p>
         </div>
 
-        <label className="inline-flex items-center gap-2 text-xs font-medium text-slate-300 cursor-pointer select-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-1.5">
-          <input
-            type="checkbox"
-            checked={hideTrapsInTable}
-            onChange={(e) => onToggleHideTraps(e.target.checked)}
-            className="rounded accent-emerald-500"
-          />
-          {t('tableHideTraps', locale)} ({trapCount})
-        </label>
+        <div className="flex flex-wrap items-center gap-2">
+          {uiMode !== 'simple' && (
+            <div className="flex items-center gap-1.5 mr-2">
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-700 transition shadow-sm"
+                title={t('exportTooltip', locale)}
+              >
+                <Download className="h-3.5 w-3.5 text-sky-400" />
+                <span>{t('btnExportCsv', locale)}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleExportJson}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-700 transition shadow-sm"
+                title={t('exportTooltip', locale)}
+              >
+                <Download className="h-3.5 w-3.5 text-emerald-400" />
+                <span>{t('btnExportJson', locale)}</span>
+              </button>
+            </div>
+          )}
+
+          <label className="inline-flex items-center gap-2 text-xs font-medium text-slate-300 cursor-pointer select-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-1.5">
+            <input
+              type="checkbox"
+              checked={hideTrapsInTable}
+              onChange={(e) => onToggleHideTraps(e.target.checked)}
+              className="rounded accent-emerald-500"
+            />
+            {t('tableHideTraps', locale)} ({trapCount})
+          </label>
+        </div>
       </div>
 
       <div className="mt-4 overflow-x-auto">
@@ -315,8 +370,8 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                       }`}
                       title={
                         isSelected
-                          ? 'Remove from multi-metric comparison'
-                          : 'Add to multi-metric comparison (up to 4)'
+                          ? t('tableCompareRemove', locale)
+                          : t('tableCompareAdd', locale)
                       }
                     >
                       {isSelected ? (

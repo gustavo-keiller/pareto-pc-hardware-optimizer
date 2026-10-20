@@ -176,3 +176,27 @@ export interface RankedGpu extends ParetoEvaluatedGpu {
   frontierRank: number | null;
   valuation?: GpuValuation;
 }
+
+export interface MetricScoreBreakdown {
+  metric: MetricKey;
+  direction: 'min' | 'max';
+  rawVal: number;
+  normalizedVal: number;
+  weight: number;
+  weightedVal: number;
+  idealBest: number;
+  idealWorst: number;
+  diffBestSq: number;
+  diffWorstSq: number;
+  closenessPct: number;
+}
+
+export interface TopsisScoreBreakdown {
+  gpuId: string;
+  gpuName: string;
+  topsisScore: number;
+  topsisScorePct: number;
+  distanceToBest: number;
+  distanceToWorst: number;
+  metrics: MetricScoreBreakdown[];
+}

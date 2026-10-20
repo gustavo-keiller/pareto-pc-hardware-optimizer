@@ -1,9 +1,11 @@
 import {
   METRIC_DEFINITIONS,
   MetricKey,
+  MetricScoreBreakdown,
   ParetoEvaluatedGpu,
   PreferenceWeights,
   RankedGpu,
+  TopsisScoreBreakdown,
 } from './types';
 
 export const ALL_METRIC_KEYS: MetricKey[] = [
@@ -181,4 +183,97 @@ export function rankByTopsis(
     rank: idx + 1,
     frontierRank: item.isParetoOptimal ? currentFrontierRank++ : null,
   }));
+}
+
+/**
+ * Detailed multi-criteria score breakdown for a specific candidate.
+ * Shows normalized values r_ij, user weights w_j, weighted values v_ij,
+ * ideal best A_j^+ / worst A_j^-, squared Euclidean distances, and relative proximity.
+ */
+export function computeTopsisBreakdown(
+  candidate: RankedGpu,
+  allCandidates: RankedGpu[],
+  rawWeights: Partial<PreferenceWeights> = DEFAULT_PREFERENCE_WEIGHTS,
+): TopsisScoreBreakdown {
+  const weights = normalizeWeights(rawWeights);
+
+  // Determine Ideal Best (A^+) and Ideal Worst (A^-) across all candidates
+  const idealBest = zeroMetricRecord();
+  const idealWorst = zeroMetricRecord();
+
+  for (const metric of ALL_METRIC_KEYS) {
+    const values = allCandidates.map((c) => c.weightedMetrics[metric]);
+    const maxVal = values.length > 0 ? Math.max(...values) : 0;
+    const minVal = values.length > 0 ? Math.min(...values) : 0;
+    const direction = METRIC_DEFINITIONS[metric].direction;
+
+    if (direction === 'max') {
+      idealBest[metric] = maxVal;
+      idealWorst[metric] = minVal;
+    } else {
+      idealBest[metric] = minVal;
+      idealWorst[metric] = maxVal;
+    }
+  }
+
+  const metrics: MetricScoreBreakdown[] = ALL_METRIC_KEYS.map((metric) => {
+    const direction = METRIC_DEFINITIONS[metric].direction;
+    const rawVal = candidate[metric];
+    const normalizedVal = candidate.normalizedMetrics[metric];
+    const weight = weights[metric];
+    const weightedVal = candidate.weightedMetrics[metric];
+    const best = idealBest[metric];
+    const worst = idealWorst[metric];
+    const diffBest = weightedVal - best;
+    const diffWorst = weightedVal - worst;
+    const diffBestSq = diffBest * diffBest;
+    const diffWorstSq = diffWorst * diffWorst;
+
+    let closenessPct = 100;
+    const range = Math.abs(best - worst);
+    if (range > 1e-9) {
+      if (direction === 'max') {
+        closenessPct = Math.max(
+          0,
+          Math.min(100, ((weightedVal - worst) / range) * 100),
+        );
+      } else {
+        closenessPct = Math.max(
+          0,
+          Math.min(100, ((worst - weightedVal) / range) * 100),
+        );
+      }
+    }
+
+    return {
+      metric,
+      direction,
+      rawVal,
+      normalizedVal,
+      weight,
+      weightedVal,
+      idealBest: best,
+      idealWorst: worst,
+      diffBestSq,
+      diffWorstSq,
+      closenessPct: Math.round(closenessPct * 10) / 10,
+    };
+  });
+
+  const sumSqBest = metrics.reduce((acc, m) => acc + m.diffBestSq, 0);
+  const sumSqWorst = metrics.reduce((acc, m) => acc + m.diffWorstSq, 0);
+  const distanceToBest = Math.sqrt(sumSqBest);
+  const distanceToWorst = Math.sqrt(sumSqWorst);
+  const denom = distanceToBest + distanceToWorst;
+  const topsisScore = denom > 0 ? distanceToWorst / denom : 1.0;
+
+  return {
+    gpuId: candidate.id,
+    gpuName: candidate.name,
+    topsisScore,
+    topsisScorePct: Math.round(topsisScore * 1000) / 10,
+    distanceToBest,
+    distanceToWorst,
+    metrics,
+  };
 }

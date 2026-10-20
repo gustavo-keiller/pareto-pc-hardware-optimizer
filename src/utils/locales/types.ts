@@ -163,6 +163,8 @@ export interface Translations {
   tableVram: string;
   tablePower: string;
   tableCompare: string;
+  tableCompareAdd: string;
+  tableCompareRemove: string;
   verdictSmartBuy: string;
   verdictTrap: string;
   verdictNiche: string;
@@ -326,4 +328,27 @@ export interface Translations {
   // Estimate labels (FIX-04)
   estimateBadge: string;
   estimateExplanation: string;
+
+  // Pro-Mode Extras (UX-08)
+  weightsProfilesTitle: string;
+  weightsProfilesSaveBtn: string;
+  weightsProfilesPlaceholder: string;
+  weightsProfilesNoProfiles: string;
+  weightsProfilesLoad: string;
+  weightsProfilesDelete: string;
+  weightsProfilesActive: string;
+  btnExportCsv: string;
+  btnExportJson: string;
+  exportTooltip: string;
+  drawerTabRadar: string;
+  drawerTabParallel: string;
+  drawerTabBreakdown: string;
+  breakdownColMetric: string;
+  breakdownColWeight: string;
+  breakdownColRaw: string;
+  breakdownColNormalized: string;
+  breakdownColIdeal: string;
+  breakdownColWorst: string;
+  breakdownColProximity: string;
+  drawerBreakdownSummary: string;
 }

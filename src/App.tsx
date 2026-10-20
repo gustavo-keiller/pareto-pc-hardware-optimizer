@@ -462,6 +462,7 @@ export function App() {
                   normalizedWeights={normalizedWeights}
                   activePresetId={activePresetId}
                   uiMode={uiMode}
+                  locale={locale}
                   onChangeWeights={setWeights}
                   onApplyPreset={handleApplyPreset}
                   onSelectCustomPreset={() => setActivePresetId('custom')}
@@ -947,6 +948,7 @@ export function App() {
                   uiMode={uiMode}
                   currency={activeCurrency}
                   locale={locale}
+                  weights={weights}
                   onHoverGpu={setHoveredGpuId}
                   onToggleSelectGpu={handleToggleSelectGpu}
                   onToggleHideTraps={setHideTrapsInTable}
@@ -966,6 +968,7 @@ export function App() {
                   allGpus={rankedGpus}
                   currency={activeCurrency}
                   locale={locale}
+                  weights={weights}
                   onRemoveGpu={handleToggleSelectGpu}
                   onClearAll={() => setSelectedGpuIds([])}
                 />
@@ -983,6 +986,7 @@ export function App() {
               uiMode={uiMode}
               currency={activeCurrency}
               locale={locale}
+              weights={weights}
               onHoverGpu={setHoveredGpuId}
               onToggleSelectGpu={handleToggleSelectGpu}
               onToggleHideTraps={setHideTrapsInTable}

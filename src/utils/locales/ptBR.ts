@@ -162,6 +162,8 @@ export const ptBR: Translations = {
   tableVram: 'VRAM',
   tablePower: 'Consumo',
   tableCompare: 'Comparar',
+  tableCompareAdd: 'Adicionar à comparação multivariada (até 4)',
+  tableCompareRemove: 'Remover da comparação multivariada',
   verdictSmartBuy: 'Compra Inteligente',
   verdictTrap: 'Armadilha de Custo',
   verdictNiche: 'Específica / Nicho',
@@ -335,4 +337,28 @@ export const ptBR: Translations = {
   estimateBadge: 'estimativa',
   estimateExplanation:
     'Desempenho e gargalo calculados por modelo estimado até calibração com dados reais de benchmark (DATA-02).',
+
+  // Pro-Mode Extras (UX-08)
+  weightsProfilesTitle: 'Perfis Salvos de Pesos',
+  weightsProfilesSaveBtn: 'Salvar Perfil',
+  weightsProfilesPlaceholder: 'Nome do perfil (ex: Foco em 1440p)',
+  weightsProfilesNoProfiles: 'Nenhum perfil salvo ainda.',
+  weightsProfilesLoad: 'Carregar',
+  weightsProfilesDelete: 'Excluir',
+  weightsProfilesActive: 'Ativo',
+  btnExportCsv: 'Exportar CSV',
+  btnExportJson: 'Exportar JSON',
+  exportTooltip: 'Baixar dados tabulares completos',
+  drawerTabRadar: 'Gráfico Radar',
+  drawerTabParallel: 'Coordenadas Paralelas',
+  drawerTabBreakdown: 'Detalhamento TOPSIS',
+  breakdownColMetric: 'Critério',
+  breakdownColWeight: 'Peso Relativo',
+  breakdownColRaw: 'Valor Real',
+  breakdownColNormalized: 'Normalizado (rᵢⱼ)',
+  breakdownColIdeal: 'Melhor Ideal (A⁺)',
+  breakdownColWorst: 'Pior Ideal (A⁻)',
+  breakdownColProximity: 'Proximidade ao Ideal',
+  drawerBreakdownSummary:
+    'Detalhamento matemático dos vetores de distância Euclidiana e contribuição de cada critério para a pontuação relativa TOPSIS (Cᵢ).',
 };

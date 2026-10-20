@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- `feat/bld-08-enthusiast-constraints`: Land enthusiast filtering criteria (SFF/Mini-ITX, AIO vs. Air cooler, RGB vs. Stealth, CPU vendor ecosystem), partition-safe intra-category pruning, seed hardware additions, and URL sharing.
+- `feat/ux-08-pro-mode-extras`: Deliver Pro-mode extras (`[UX-08]`), including saved named weight profiles, CSV/JSON dataset export, and multi-criteria TOPSIS score breakdown.
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Pro-Mode Extras: Saved Weight Profiles, Data Export & TOPSIS Breakdown (`[UX-08]`, 2026-10-20):**
+  - Added named weight profiles management in Pro Lab with safe `localStorage` persistence (`CustomWeightProfilesManager`), enabling users to save, load, and delete custom weight calibrations.
+  - Added RFC 4180 compliant CSV export and structured JSON export (`exportData.ts`) with browser download triggers on the leaderboard table.
+  - Implemented mathematical multi-criteria TOPSIS score breakdown (`computeTopsisBreakdown`) calculating per-metric Euclidean distance components $(v_{ij} - A_j^+)^2$ and $(v_{ij} - A_j^-)^2$ with proximity-to-best bars in `ComparisonDrawer.tsx`.
+  - Backed by unit property tests in `src/lib/math/__tests__/topsisBreakdown.test.ts`, export tests in `src/utils/__tests__/exportData.test.ts`, and UI integration tests in `src/__tests__/App.ui.test.tsx`.
 
 - **Enthusiast Constraints: SFF, AIO vs. Air, RGB & CPU Vendor (`[BLD-08]`, 2026-10-20):**
   - Added enthusiast filtering criteria across form factor (Mini-ITX / SFF, Micro-ATX, ATX), cooler type (AIO Liquid vs. Air), aesthetics (RGB vs. Stealth), and CPU vendor (AMD vs. Intel).
