@@ -28,6 +28,22 @@ Cloud and remote sessions clone the GitHub repo (`gustavo-keiller/pareto-pc-hard
 
 Multiple agent sessions may work in this working tree at once. Only edit, stage, format, or revert files you changed. Never run `reset --hard`, `clean -f`, `branch -D`, `checkout .` / `restore .`, or a push that rewrites or deletes remote history (`--force`, `+refspec`, `--mirror`, `--delete`, force-push to main) — ask the user. (`.agents/scripts/block-dangerous-git.cjs` enforces this in Claude Code.)
 
+## How work lands on `main`
+
+- **Never push to `main`.** Every change goes on a branch and through a PR, one feature or fix per PR. CI (`.github/workflows/check.yml`) runs only on PRs and on `main`, so a branch without a PR has never been checked.
+- **Done = CI green on the PR.** Not a local run. A red `main` is the next task, before any new feature. Never raise a test timeout or loosen an assertion to get green; fix the cause.
+- **Don't write test counts or "all tests pass" into docs.** Link the PR or say nothing.
+- **`TODO.md` is the only task list.** Review findings, bug reports and notes from other agents become `TODO.md` items (task template) in the same PR that records them, not separate notes files. Work the list top to bottom.
+- **Keep `ROADMAP.md` true.** When a PR finishes a roadmap item, tick it and update "Where the project stands" and "Next up" in the same PR.
+
+## Product invariants (every user, beginner to expert)
+
+- **Every user-visible string goes through `src/utils/i18n.ts`**, in pt-BR and en-US. No inline `locale === 'pt-BR' ? … : …` text in components.
+- **Simple mode and "4. Montar PC" use plain words** from `.agents/GLOSSARY.md`: no Pareto, TOPSIS, OLS, frontier or dominated. Pro modes keep the real terms.
+- **Show uncertainty honestly.** Converted prices say they are estimates; scores from models (workload FPS, bottleneck %) are labelled as estimates, not facts.
+- **A faster engine must return the same answer.** Pruning only removes a part that is worse than another part it can always be swapped for (same socket, same RAM generation, fits the same builds). Never prune by name (`[TRAP]`). The full-build frontier must equal a brute-force frontier on the seed catalog (test in `combinatorial.test.ts`).
+- **Rankings never depend on money we earn** (affiliate links, partners): only on price and performance.
+
 ## Keep your context small
 
 Every turn re-reads the whole conversation, so anything that enters context is paid for again on every later turn.
