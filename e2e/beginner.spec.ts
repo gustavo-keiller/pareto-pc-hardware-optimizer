@@ -34,7 +34,9 @@ test('a user explores complete PC builds in Mario Kart mode', async ({
     .click();
   const topBuild = page.getByTestId('top-build-card');
   await expect(topBuild).toBeVisible();
-  await expect(topBuild).toContainText('Total Hardware Cost');
+  await expect(topBuild).toContainText(
+    /(Total Hardware Cost|Custo Total de Hardware)/i,
+  );
 
   const initialText = await topBuild.textContent();
 
@@ -44,5 +46,7 @@ test('a user explores complete PC builds in Mario Kart mode', async ({
     })
     .click();
   await expect(topBuild).not.toHaveText(initialText ?? '');
-  await expect(topBuild).toContainText('Total Hardware Cost');
+  await expect(topBuild).toContainText(
+    /(Total Hardware Cost|Custo Total de Hardware)/i,
+  );
 });

@@ -190,5 +190,39 @@ describe('shoppingReasons utility', () => {
     expect(buildReasonsEn.gpu).toContain('Arc B580');
     expect(buildReasonsEn.ram).toContain('Dual-channel');
     expect(buildReasonsEn.psu).toContain('headroom');
+
+    // Never output 'undefined' or doubled certification tokens like '80+ 80+'
+    for (const reasons of [buildReasonsPt, buildReasonsEn]) {
+      for (const [key, text] of Object.entries(reasons)) {
+        expect(
+          text,
+          `Field ${key} should not contain 'undefined'`,
+        ).not.toContain('undefined');
+        expect(
+          text,
+          `Field ${key} should not contain doubled '80+ 80+'`,
+        ).not.toContain('80+ 80+');
+        // No consecutive duplicated words (e.g. 'foo foo')
+        expect(
+          /\b(\w+)\s+\1\b/i.test(text),
+          `Field ${key} has duplicated word: "${text}"`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('safely handles motherboards without explicit m2Slots without printing undefined', () => {
+    const buildWithoutM2 = {
+      ...MOCK_BUILD,
+      motherboard: {
+        ...MOCK_BUILD.motherboard,
+        m2Slots: undefined,
+      },
+    };
+    const pt = generateBuildShoppingReasons(buildWithoutM2, 'BRL', 'pt-BR');
+    const en = generateBuildShoppingReasons(buildWithoutM2, 'USD', 'en-US');
+    expect(pt.motherboard).not.toContain('undefined');
+    expect(pt.motherboard).toContain('slot(s) M.2 NVMe');
+    expect(en.motherboard).not.toContain('undefined');
   });
 });

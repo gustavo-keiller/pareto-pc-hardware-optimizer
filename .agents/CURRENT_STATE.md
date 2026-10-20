@@ -4,13 +4,33 @@
 
 ## 🔴 In Flight
 
-- `[BLD-08]` Optional Constraints for Enthusiasts (SFF, Cooler Type, RGB & Brand Ecosystems) — add enthusiast-grade filtering criteria across form factor (Mini-ITX/Micro-ATX vs ATX), cooling preference (Quiet Air Cooling vs AIO Liquid Cooler), aesthetics (Stealth Blackout / No-RGB vs RGB Lighting), and CPU vendor ecosystem (AMD Ryzen vs Intel Core).
+- `fix/perf-engine-and-ci` PR: Open and land PR against `main` covering engine optimization, partitioned pruning (`[FIX-01]`), shared build reconstruction (`[FIX-02]`), full pt-BR localization without inline ternaries (`[FIX-03]`), and model estimate labels (`[FIX-04]`).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Full Localization Integrity & Zero Inline Locale Ternaries (`[FIX-03]`, 2026-10-20):**
+  - Modularized localization into typed dictionaries `src/utils/locales/ptBR.ts`, `enUS.ts`, and `types.ts` keeping each file well under the 800-line limit.
+  - Eliminated all inline `locale === 'pt-BR' ? ... : ...` text ternaries across all UI components, routing all strings through `t(key, locale)`.
+  - Replaced residual English terms in pt-BR mode (Montar PC table, header subtitle, badges, and modal controls).
+  - Backed by integration tests verifying zero residual English terms in all 4 UI modes in pt-BR.
+
+- **Workload Score and Bottleneck Model Estimate Labels (`[FIX-04]`, 2026-10-20):**
+  - Added explicit "estimativa" / "estimate" badge tags and explanatory footnote in `BuildHeroCard.tsx` for workload FPS and bottleneck percentages until DATA-02 physical benchmark calibration.
+  - Backed by UI integration tests in `src/__tests__/App.ui.test.tsx`.
+
+- **Direct Shared Build Reconstruction (`[FIX-02]`, 2026-10-20):**
+  - Ensured shared 8-component builds rebuild cleanly via `assemblePcBuild` even when off the receiver's local frontier sample.
+  - Added missing part and budget warning banners for receiver awareness.
+  - Backed by UI integration tests in `src/__tests__/App.ui.test.tsx`.
+
+- **Safe Partition-Based Pruning Matching Brute Force (`[FIX-01]`, 2026-10-20):**
+  - Replaced unpartitioned intra-category pruning with platform-safe partitions (CPUs partitioned by socket, RAM by generation, GPUs by TDP/length fit and vendor bonus).
+  - Purged name-based `[TRAP]` pruning, ensuring platform-advantaged CPUs (e.g. Ryzen 7 5700X3D) are never discarded against cross-platform alternatives.
+  - Backed by combinatorial property test proving `optimizeFullSystemBuilds` frontier equals unpruned brute-force across all 4 workloads and 4 budget levels.
 
 - **Upgrade Mode ("I Already Have...") (`[BLD-06]`, 2026-10-19):**
   - Shipped dedicated pure math engine in `src/lib/math/upgradeOptimizer.ts` enabling hardware owners to lock existing components with $0 new cost towards their upgrade budget.

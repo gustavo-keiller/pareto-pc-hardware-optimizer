@@ -34,7 +34,7 @@ import {
   UpgradeBuild,
 } from '../lib/math/upgradeOptimizer';
 import { formatCurrency } from '../utils/currency';
-import { AppLocale } from '../utils/i18n';
+import { AppLocale, t } from '../utils/i18n';
 
 export interface UpgradePlannerModalProps {
   catalogs: ComponentCatalogs;
@@ -81,7 +81,7 @@ const OwnedPartCard: React.FC<OwnedPartCardProps> = ({
       {owned && (
         <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-0.5">
           <CheckCircle2 className="h-3 w-3" />
-          {locale === 'pt-BR' ? 'Já Tenho' : 'Owned'}
+          {t('upgradeOwnedBadge', locale)}
         </span>
       )}
     </div>
@@ -90,9 +90,7 @@ const OwnedPartCard: React.FC<OwnedPartCardProps> = ({
       onChange={(e) => onChange(e.target.value)}
       className="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-white"
     >
-      <option value="">
-        {locale === 'pt-BR' ? 'Quero Comprar Nova' : 'None / Upgrade'}
-      </option>
+      <option value="">{t('upgradeBuyNewOption', locale)}</option>
       {options.map((opt) => (
         <option key={opt.id} value={opt.id}>
           {opt.label}
@@ -282,14 +280,10 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
               </span>
               <div>
                 <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  {locale === 'pt-BR'
-                    ? 'Planejador de Upgrade ("Já Tenho Peças")'
-                    : 'Upgrade Planner ("I Already Have...")'}
+                  {t('upgradeModalTitle', locale)}
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                  {locale === 'pt-BR'
-                    ? 'Trave as peças do seu PC atual com custo R$ 0 e encontre o maior ganho de performance pelo seu orçamento.'
-                    : 'Lock hardware you already own to $0 cost and discover the highest performance leap for your budget.'}
+                  {t('upgradeModalSubtitle', locale)}
                 </p>
               </div>
             </div>
@@ -298,7 +292,7 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
             type="button"
             onClick={onClose}
             className="rounded-xl border border-slate-800 bg-slate-800/60 p-2 text-slate-400 hover:text-white hover:border-slate-700 transition"
-            aria-label="Close modal"
+            aria-label={t('upgradeCloseModal', locale)}
           >
             <X className="h-5 w-5" />
           </button>
@@ -309,9 +303,7 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
           {/* Presets */}
           <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              {locale === 'pt-BR'
-                ? 'Base do Computador Atual'
-                : 'Current Setup Presets'}
+              {t('upgradeSetupPresetsLabel', locale)}
             </span>
             <div className="flex flex-wrap gap-2 mt-2.5">
               <button
@@ -319,16 +311,14 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
                 onClick={() => handleApplyPreset('am4')}
                 className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition"
               >
-                {locale === 'pt-BR'
-                  ? 'Base Popular AM4 (Ryzen + B550 + 550W)'
-                  : 'Popular AM4 Base (Ryzen + B550 + 550W)'}
+                {t('upgradePresetAm4', locale)}
               </button>
               <button
                 type="button"
                 onClick={() => handleApplyPreset('clear')}
                 className="rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-white transition"
               >
-                {locale === 'pt-BR' ? 'Limpar Tudo' : 'Clear All'}
+                {t('upgradeClearAll', locale)}
               </button>
             </div>
           </div>
@@ -337,9 +327,7 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
           <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                {locale === 'pt-BR'
-                  ? 'Orçamento Máximo do Upgrade'
-                  : 'Upgrade Budget Ceiling'}
+                {t('upgradeBudgetCeiling', locale)}
               </span>
               <span className="text-base font-black text-amber-400">
                 {formatCurrency(upgradeBudget, currency, locale)}
@@ -367,9 +355,7 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
         {/* Owned Parts Selector Grid */}
         <div className="mt-6">
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-            {locale === 'pt-BR'
-              ? 'Selecione as Peças que Você Já Possui'
-              : 'Select Components You Already Own'}
+            {t('upgradeSelectOwnedTitle', locale)}
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             <OwnedPartCard
@@ -517,28 +503,20 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
               <div>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 px-3 py-0.5 text-xs font-bold text-amber-300">
                   <Sparkles className="h-3.5 w-3.5" />
-                  {locale === 'pt-BR'
-                    ? '#1 Melhor Rota de Upgrade'
-                    : '#1 Top Recommended Upgrade Path'}
+                  {t('upgradeTopPathBadge', locale)}
                 </span>
                 <h4 className="text-xl font-black text-white mt-2">
                   {topUpgrade.upgradedPartCategories.length === 0
-                    ? locale === 'pt-BR'
-                      ? 'Manter Setup Atual (Sem Custo Adicional)'
-                      : 'Keep Current Setup (Zero Additional Cost)'
-                    : locale === 'pt-BR'
-                      ? `Upgrade: ${topUpgrade.upgradedPartCategories
-                          .map((c) => c.toUpperCase())
-                          .join(' + ')}`
-                      : `Upgrade: ${topUpgrade.upgradedPartCategories
-                          .map((c) => c.toUpperCase())
-                          .join(' + ')}`}
+                    ? t('upgradeKeepSetupZeroCost', locale)
+                    : `${t('upgradePrefix', locale)}${topUpgrade.upgradedPartCategories
+                        .map((c) => c.toUpperCase())
+                        .join(' + ')}`}
                 </h4>
               </div>
 
               <div className="text-right">
                 <span className="text-xs text-slate-400 block font-semibold">
-                  {locale === 'pt-BR' ? 'Custo do Upgrade' : 'Upgrade Cost'}
+                  {t('upgradeCostLabel', locale)}
                 </span>
                 <span className="text-2xl font-black text-emerald-400">
                   {formatCurrency(topUpgrade.upgradeCost, currency, locale)}
@@ -550,9 +528,7 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
               <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-3">
                 <span className="text-[11px] text-slate-400 font-semibold block">
-                  {locale === 'pt-BR'
-                    ? 'Desempenho no Alvo'
-                    : 'Target Workload Score'}
+                  {t('upgradeTargetScore', locale)}
                 </span>
                 <span className="text-lg font-black text-white">
                   {topUpgrade.build.workloadScore ??
@@ -565,13 +541,11 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
                 <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3">
                   <span className="text-[11px] text-emerald-400 font-semibold block flex items-center gap-1">
                     <TrendingUp className="h-3 w-3" />
-                    {locale === 'pt-BR'
-                      ? 'Salto vs. PC Atual'
-                      : 'Leap vs Current Setup'}
+                    {t('upgradeLeapCurrent', locale)}
                   </span>
                   <span className="text-lg font-black text-emerald-300">
                     +{Math.round(topUpgrade.percentGain)}%{' '}
-                    {locale === 'pt-BR' ? 'mais rápido' : 'faster'}
+                    {t('upgradeFaster', locale)}
                   </span>
                 </div>
               )}
@@ -579,18 +553,12 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
               <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-3">
                 <span className="text-[11px] text-slate-400 font-semibold block flex items-center gap-1">
                   <ShieldCheck className="h-3 w-3 text-teal-400" />
-                  {locale === 'pt-BR'
-                    ? 'Compatibilidade Física'
-                    : 'Physical Fit'}
+                  {t('upgradePhysicalFit', locale)}
                 </span>
                 <span className="text-xs font-bold text-teal-300">
                   {topUpgrade.build.powerHeadroomWatts >= 0
-                    ? locale === 'pt-BR'
-                      ? `Fonte segura (${topUpgrade.build.powerHeadroomWatts}W de folga)`
-                      : `Safe PSU (${topUpgrade.build.powerHeadroomWatts}W headroom)`
-                    : locale === 'pt-BR'
-                      ? 'Requer troca de fonte'
-                      : 'Requires PSU upgrade'}
+                    ? `${t('upgradeSafePsuHeadroom', locale)} (${topUpgrade.build.powerHeadroomWatts}${t('upgradeHeadroomSuffix', locale)})`
+                    : t('upgradeRequiresPsu', locale)}
                 </span>
               </div>
             </div>
@@ -598,9 +566,7 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
             {/* Component Status Grid: Kept vs Upgraded */}
             <div className="mt-4 border-t border-slate-800/80 pt-4">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 block">
-                {locale === 'pt-BR'
-                  ? 'Detalhamento do Que Fazer com Cada Peça'
-                  : 'Action Per Component'}
+                {t('upgradeActionsPerComponent', locale)}
               </span>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {componentActions.map((item) => {
@@ -626,12 +592,8 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
                           }`}
                         >
                           {isRetained
-                            ? locale === 'pt-BR'
-                              ? 'MANTER (R$ 0)'
-                              : 'KEEP ($0)'
-                            : locale === 'pt-BR'
-                              ? 'COMPRAR'
-                              : 'BUY NEW'}
+                            ? t('upgradeKeep0', locale)
+                            : t('upgradeBuy', locale)}
                         </span>
                       </div>
                       <span className="text-white font-medium truncate block">
@@ -650,27 +612,21 @@ export const UpgradePlannerModal: React.FC<UpgradePlannerModalProps> = ({
                 onClick={onClose}
                 className="rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-xs font-semibold text-slate-300 hover:text-white transition"
               >
-                {locale === 'pt-BR' ? 'Fechar' : 'Close'}
+                {t('upgradeClose', locale)}
               </button>
               <button
                 type="button"
                 onClick={() => onSelectBuild(topUpgrade.build)}
                 className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-500 px-5 py-2.5 text-xs font-bold text-slate-950 hover:brightness-110 shadow-lg transition"
               >
-                <span>
-                  {locale === 'pt-BR'
-                    ? 'Ver Este Build Completo no Explorador'
-                    : 'Inspect Full Build in Explorer'}
-                </span>
+                <span>{t('upgradeInspectFullBuild', locale)}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </div>
         ) : (
           <div className="mt-8 rounded-2xl border border-dashed border-slate-800 p-8 text-center text-slate-400">
-            {locale === 'pt-BR'
-              ? 'Nenhuma opção de upgrade compatível encontrada para este orçamento. Tente aumentar o teto ou liberar peças.'
-              : 'No compatible upgrade paths found for this budget. Try raising budget or unlocking parts.'}
+            {t('upgradeNoPathFound', locale)}
           </div>
         )}
       </div>

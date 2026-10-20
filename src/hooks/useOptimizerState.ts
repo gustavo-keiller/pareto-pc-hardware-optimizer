@@ -319,11 +319,7 @@ export function useOptimizerState() {
   // Selection & Hover
   const [hoveredGpuId, setHoveredGpuId] = useState<string | null>(null);
   const [selectedGpuIds, setSelectedGpuIds] = useState<string[]>(() =>
-    safeGetJSON('paretopc_selected_ids', [
-      'arc-b580',
-      'rx-7800-xt',
-      'rtx-4070-super',
-    ]),
+    safeGetJSON('paretopc_selected_ids', []),
   );
   const [hideTrapsInTable, setHideTrapsInTable] = useState<boolean>(() =>
     safeGetBool('paretopc_hide_traps', false),

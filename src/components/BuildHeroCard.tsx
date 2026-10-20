@@ -16,8 +16,8 @@ import {
   Check,
 } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
-import { formatCurrency } from '../utils/currency';
-import { AppLocale } from '../utils/i18n';
+import { formatCurrency, getEstimatedPriceNotice } from '../utils/currency';
+import { AppLocale, t } from '../utils/i18n';
 import { generateBuildShoppingReasons } from '../utils/shoppingReasons';
 import {
   copyTextToClipboard,
@@ -90,7 +90,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
-                #1 Recommended PC Build (Best Value)
+                {t('heroTopBuildHeader', locale)}
               </span>
               <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
                 {build.workloadMetricLabel ?? 'Max FPS Under Budget'}
@@ -98,46 +98,49 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               {build.bottleneckPct === 0 ? (
                 <span className="rounded bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-xs font-semibold text-emerald-300 flex items-center gap-1">
                   <ShieldCheck className="h-3.5 w-3.5" />
-                  100% GPU Throughput (0% Bottleneck)
+                  {t('buildThroughput100', locale)} (
+                  {t('estimateBadge', locale)})
                 </span>
               ) : (
                 <span className="rounded bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-xs font-semibold text-amber-300 flex items-center gap-1">
                   <AlertTriangle className="h-3.5 w-3.5" />
-                  {build.bottleneckPct}% CPU Bottleneck
+                  {build.bottleneckPct}% {t('buildCpuBottleneck', locale)} (
+                  {t('estimateBadge', locale)})
                 </span>
               )}
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3 mt-1">
-              <h3 className="text-2xl sm:text-3xl font-black text-white">
-                {formatCurrency(build.totalPrice, currency)}{' '}
-                <span className="text-lg font-normal text-slate-400">
-                  Total Hardware Cost
-                </span>
-              </h3>
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-black text-white">
+                  {formatCurrency(build.totalPrice, currency)}{' '}
+                  <span className="text-lg font-normal text-slate-400">
+                    {t('buildTotalHardwareCost', locale)}
+                  </span>
+                </h3>
+                {currency === 'BRL' && (
+                  <div className="text-[10px] text-amber-300/80 font-normal mt-0.5">
+                    {getEstimatedPriceNotice(locale, currency)}
+                  </div>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleCopyLink}
                   className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-bold text-slate-200 hover:text-white hover:border-slate-600 transition shadow-sm"
-                  title={
-                    locale === 'pt-BR'
-                      ? 'Copiar link desta build'
-                      : 'Copy shareable build link'
-                  }
+                  title={t('btnCopyBuildLink', locale)}
                 >
                   {copiedLink ? (
                     <>
                       <Check className="h-3.5 w-3.5 text-emerald-400" />
                       <span className="text-emerald-400">
-                        {locale === 'pt-BR' ? 'Link Copiado!' : 'Link Copied!'}
+                        {t('btnLinkCopied', locale)}
                       </span>
                     </>
                   ) : (
                     <>
                       <Share2 className="h-3.5 w-3.5 text-sky-400" />
-                      <span>
-                        {locale === 'pt-BR' ? 'Compartilhar' : 'Share Link'}
-                      </span>
+                      <span>{t('btnShare', locale)}</span>
                     </>
                   )}
                 </button>
@@ -145,27 +148,19 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
                   type="button"
                   onClick={handleCopySpecs}
                   className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-bold text-slate-200 hover:text-white hover:border-slate-600 transition shadow-sm"
-                  title={
-                    locale === 'pt-BR'
-                      ? 'Copiar lista de peças para Discord / WhatsApp / Reddit'
-                      : 'Copy parts list for Discord / Reddit'
-                  }
+                  title={t('btnCopySpecsTitle', locale)}
                 >
                   {copiedSpecs ? (
                     <>
                       <Check className="h-3.5 w-3.5 text-emerald-400" />
                       <span className="text-emerald-400">
-                        {locale === 'pt-BR'
-                          ? 'Lista Copiada!'
-                          : 'Specs Copied!'}
+                        {t('btnSpecsCopied', locale)}
                       </span>
                     </>
                   ) : (
                     <>
                       <Copy className="h-3.5 w-3.5 text-emerald-400" />
-                      <span>
-                        {locale === 'pt-BR' ? 'Copiar Peças' : 'Copy List'}
-                      </span>
+                      <span>{t('btnCopySpecs', locale)}</span>
                     </>
                   )}
                 </button>
@@ -175,44 +170,61 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
         </div>
 
         {/* Performance & Power Quick Telemetry */}
-        <div className="flex flex-wrap items-center gap-3 text-xs">
-          <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
-            <div className="text-slate-400 font-medium">
-              {build.workloadMetricLabel
-                ? 'Target Workload'
-                : 'Effective Gaming'}
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap items-center gap-3 text-xs">
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
+              <div className="text-slate-400 font-medium flex items-center gap-1.5">
+                <span>
+                  {build.workloadMetricLabel
+                    ? t('telemetryTargetWorkload', locale)
+                    : t('telemetryEffectiveGaming', locale)}
+                </span>
+                <span
+                  data-testid="workload-score-estimate-badge"
+                  className="rounded bg-slate-800 border border-slate-700 px-1 py-0.2 text-[9px] font-semibold text-slate-400 uppercase tracking-wider"
+                >
+                  {t('estimateBadge', locale)}
+                </span>
+              </div>
+              <div className="text-xl font-black text-emerald-400">
+                {build.workloadScore ?? build.effectiveFps1440p}{' '}
+                {build.workloadScore != null
+                  ? build.workloadProfile === 'creator-ai'
+                    ? 'pts'
+                    : 'FPS'
+                  : 'FPS'}
+              </div>
+              <div className="text-[10px] text-slate-400">
+                {build.workloadMetricLabel ?? '1440p Ultra Geomean'}
+              </div>
             </div>
-            <div className="text-xl font-black text-emerald-400">
-              {build.workloadScore ?? build.effectiveFps1440p}{' '}
-              {build.workloadScore != null
-                ? build.workloadProfile === 'creator-ai'
-                  ? 'pts'
-                  : 'FPS'
-                : 'FPS'}
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
+              <div className="text-slate-400 font-medium">
+                {t('buildRawGpuCapacity', locale)}
+              </div>
+              <div className="text-xl font-black text-slate-200">
+                {build.rawGpuFps1440p} FPS
+              </div>
+              <div className="text-[10px] text-slate-400">
+                {Math.round(build.bottleneckFactor * 100)}%{' '}
+                {t('buildFedByCpu', locale)} ({t('estimateBadge', locale)})
+              </div>
             </div>
-            <div className="text-[10px] text-slate-400">
-              {build.workloadMetricLabel ?? '1440p Ultra Geomean'}
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
+              <div className="text-slate-400 font-medium">
+                {t('buildEstimatedPowerDraw', locale)}
+              </div>
+              <div className="text-xl font-black text-teal-400">
+                {build.estimatedPowerDrawWatts} W
+              </div>
+              <div className="text-[10px] text-slate-400">
+                +{build.powerHeadroomWatts}W{' '}
+                {t('buildPsuHeadroomWatts', locale)}
+              </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
-            <div className="text-slate-400 font-medium">Raw GPU Capacity</div>
-            <div className="text-xl font-black text-slate-200">
-              {build.rawGpuFps1440p} FPS
-            </div>
-            <div className="text-[10px] text-slate-400">
-              {Math.round(build.bottleneckFactor * 100)}% Fed by CPU
-            </div>
-          </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2.5">
-            <div className="text-slate-400 font-medium">
-              Estimated Power Draw
-            </div>
-            <div className="text-xl font-black text-teal-400">
-              {build.estimatedPowerDrawWatts} W
-            </div>
-            <div className="text-[10px] text-slate-400">
-              +{build.powerHeadroomWatts}W PSU Headroom
-            </div>
+          <div className="text-[10px] text-slate-500 italic">
+            * {t('estimateExplanation', locale)}
           </div>
         </div>
       </div>
@@ -234,13 +246,13 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           </div>
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
-              Platform:{' '}
+              {t('cardPlatform', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.cpu.socket}
               </span>
             </div>
             <div>
-              Cores:{' '}
+              {t('cardCores', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.cpu.cores}C / {build.cpu.threads}T
               </span>
@@ -250,7 +262,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               <span className="text-slate-200 font-medium">
                 {build.cpu.tdpWatts}W
               </span>{' '}
-              · Score:{' '}
+              · {t('cardScore', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.cpu.gamingScore}/100
               </span>
@@ -265,7 +277,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-              <TrendingUp className="h-3.5 w-3.5" /> GPU
+              <TrendingUp className="h-3.5 w-3.5" /> {t('partGpu', locale)}
             </span>
             <span className="font-black text-white">
               {formatCurrency(build.gpu.price, currency)}
@@ -282,7 +294,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </span>
             </div>
             <div>
-              Raster:{' '}
+              {t('cardDesempenho', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.gpu.rasterFps1440p} FPS
               </span>
@@ -292,7 +304,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               <span className="text-slate-200 font-medium">
                 {build.gpu.tdpWatts}W
               </span>{' '}
-              · Vendor:{' '}
+              · {t('cardFabricante', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.gpu.vendor}
               </span>
@@ -307,7 +319,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-              <Layers className="h-3.5 w-3.5" /> Motherboard
+              <Layers className="h-3.5 w-3.5" /> {t('partMotherboard', locale)}
             </span>
             <span className="font-black text-white">
               {formatCurrency(build.motherboard.price, currency)}
@@ -324,13 +336,13 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </span>
             </div>
             <div>
-              RAM Slots:{' '}
+              {t('cardRamSlots', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.motherboard.ramSlots} ({build.motherboard.ramGeneration})
               </span>
             </div>
             <div>
-              Form Factor:{' '}
+              {t('cardFormFactor', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.motherboard.formFactor}
               </span>
@@ -345,7 +357,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-              <Zap className="h-3.5 w-3.5" /> Memory
+              <Zap className="h-3.5 w-3.5" /> {t('partRam', locale)}
             </span>
             <span className="font-black text-white">
               {formatCurrency(build.ram.price, currency)}
@@ -356,19 +368,20 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           </div>
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
-              Capacity:{' '}
+              {t('cardCapacity', locale)}{' '}
               <span className="text-slate-200 font-medium">
-                {build.ram.capacityGb} GB ({build.ram.modulesCount} sticks)
+                {build.ram.capacityGb} GB ({build.ram.modulesCount}{' '}
+                {t('cardSticks', locale)})
               </span>
             </div>
             <div>
-              Speed:{' '}
+              {t('cardSpeed', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.ram.speedMhz} MHz
               </span>
             </div>
             <div>
-              Generation:{' '}
+              {t('cardGeneration', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.ram.generation}
               </span>
@@ -383,7 +396,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-              <HardDrive className="h-3.5 w-3.5" /> Storage
+              <HardDrive className="h-3.5 w-3.5" /> {t('partStorage', locale)}
             </span>
             <span className="font-black text-white">
               {formatCurrency(build.storage.price, currency)}
@@ -394,7 +407,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           </div>
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
-              Capacity:{' '}
+              {t('cardCapacity', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.storage.capacityGb >= 1000
                   ? `${build.storage.capacityGb / 1000} TB`
@@ -402,14 +415,14 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               </span>
             </div>
             <div>
-              Type:{' '}
+              {t('cardType', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.storage.type}
               </span>
             </div>
             {build.storage.readSpeedMbps && (
               <div>
-                Read Speed:{' '}
+                {t('cardReadSpeed', locale)}{' '}
                 <span className="text-slate-200 font-medium">
                   {build.storage.readSpeedMbps} MB/s
                 </span>
@@ -425,7 +438,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-              <Wind className="h-3.5 w-3.5" /> CPU Cooler
+              <Wind className="h-3.5 w-3.5" /> {t('partCooler', locale)}
             </span>
             <span className="font-black text-white">
               {formatCurrency(build.cooler.price, currency)}
@@ -436,21 +449,23 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           </div>
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
-              Cooling TDP:{' '}
+              {t('cardCoolingTdp', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.cooler.maxTdpWatts} W
               </span>
             </div>
             <div>
-              Height:{' '}
+              {t('cardHeight', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.cooler.heightMm} mm
               </span>
             </div>
             <div>
-              Type:{' '}
+              {t('cardType', locale)}{' '}
               <span className="text-slate-200 font-medium">
-                {build.cooler.type ?? 'Air'}
+                {build.cooler.type === 'Air' || !build.cooler.type
+                  ? t('cardAir', locale)
+                  : build.cooler.type}
               </span>
             </div>
           </div>
@@ -463,7 +478,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
-              <Box className="h-3.5 w-3.5" /> PC Case
+              <Box className="h-3.5 w-3.5" /> {t('partCase', locale)}
             </span>
             <span className="font-black text-white">
               {formatCurrency(build.case.price, currency)}
@@ -474,19 +489,19 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           </div>
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
-              Max GPU:{' '}
+              {t('cardMaxGpu', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.case.maxGpuLengthMm} mm
               </span>
             </div>
             <div>
-              Max Cooler:{' '}
+              {t('cardMaxCooler', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.case.maxCpuCoolerHeightMm} mm
               </span>
             </div>
             <div>
-              Supports:{' '}
+              {t('cardSupports', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.case.supportedFormFactors.join(', ')}
               </span>
@@ -501,7 +516,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
-              <CheckCircle2 className="h-3.5 w-3.5" /> Power Supply
+              <CheckCircle2 className="h-3.5 w-3.5" /> {t('partPsu', locale)}
             </span>
             <span className="font-black text-white">
               {formatCurrency(build.psu.price, currency)}
@@ -512,21 +527,21 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           </div>
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
-              Capacity:{' '}
+              {t('cardPsuCapacity', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.psu.wattage} W
               </span>
             </div>
             <div>
-              Rating:{' '}
+              {t('cardRating', locale)}{' '}
               <span className="text-slate-200 font-medium">
                 {build.psu.efficiencyRating}
               </span>
             </div>
             <div>
-              Cables:{' '}
+              {t('cardCables', locale)}{' '}
               <span className="text-slate-200 font-medium">
-                {build.psu.modular} Modular
+                {build.psu.modular} {t('cardModular', locale)}
               </span>
             </div>
           </div>
@@ -540,12 +555,14 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
       <div className="mt-6 border-t border-slate-800/80 pt-5">
         <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
           <span className="font-semibold text-slate-300">
-            Component Budget Distribution
+            {t('budgetDistributionTitle', locale)}
           </span>
           <span>
-            GPU: {Math.round((build.gpu.price / build.totalPrice) * 100)}% ·
-            CPU: {Math.round((build.cpu.price / build.totalPrice) * 100)}% ·
-            Other Parts:{' '}
+            {t('partGpu', locale)}:{' '}
+            {Math.round((build.gpu.price / build.totalPrice) * 100)}% ·{' '}
+            {t('partCpu', locale)}:{' '}
+            {Math.round((build.cpu.price / build.totalPrice) * 100)}% ·{' '}
+            {t('budgetDistributionOtherParts', locale)}:{' '}
             {Math.round(
               ((build.totalPrice - build.gpu.price - build.cpu.price) /
                 build.totalPrice) *
@@ -560,56 +577,56 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
               width: `${(build.gpu.price / build.totalPrice) * 100}%`,
             }}
             className="bg-indigo-500"
-            title={`GPU: $${build.gpu.price}`}
+            title={`${t('partGpu', locale)}: ${formatCurrency(build.gpu.price, currency)}`}
           />
           <div
             style={{
               width: `${(build.cpu.price / build.totalPrice) * 100}%`,
             }}
             className="bg-emerald-500"
-            title={`CPU: $${build.cpu.price}`}
+            title={`${t('partCpu', locale)}: ${formatCurrency(build.cpu.price, currency)}`}
           />
           <div
             style={{
               width: `${(build.motherboard.price / build.totalPrice) * 100}%`,
             }}
             className="bg-amber-500"
-            title={`Motherboard: $${build.motherboard.price}`}
+            title={`${t('partMotherboard', locale)}: ${formatCurrency(build.motherboard.price, currency)}`}
           />
           <div
             style={{
               width: `${(build.ram.price / build.totalPrice) * 100}%`,
             }}
             className="bg-sky-500"
-            title={`RAM: $${build.ram.price}`}
+            title={`${t('partRam', locale)}: ${formatCurrency(build.ram.price, currency)}`}
           />
           <div
             style={{
               width: `${(build.storage.price / build.totalPrice) * 100}%`,
             }}
             className="bg-purple-500"
-            title={`Storage: $${build.storage.price}`}
+            title={`${t('partStorage', locale)}: ${formatCurrency(build.storage.price, currency)}`}
           />
           <div
             style={{
               width: `${(build.cooler.price / build.totalPrice) * 100}%`,
             }}
             className="bg-cyan-500"
-            title={`Cooler: $${build.cooler.price}`}
+            title={`${t('partCooler', locale)}: ${formatCurrency(build.cooler.price, currency)}`}
           />
           <div
             style={{
               width: `${(build.case.price / build.totalPrice) * 100}%`,
             }}
             className="bg-rose-500"
-            title={`Case: $${build.case.price}`}
+            title={`${t('partCase', locale)}: ${formatCurrency(build.case.price, currency)}`}
           />
           <div
             style={{
               width: `${(build.psu.price / build.totalPrice) * 100}%`,
             }}
             className="bg-teal-500"
-            title={`PSU: $${build.psu.price}`}
+            title={`${t('partPsu', locale)}: ${formatCurrency(build.psu.price, currency)}`}
           />
         </div>
       </div>

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
 
+import { AppLocale, t } from '../utils/i18n';
 import { UiMode } from '../hooks/useOptimizerState';
 
 interface GpuLeaderboardTableProps {
@@ -22,6 +23,8 @@ interface GpuLeaderboardTableProps {
   hideTrapsInTable: boolean;
   trapCount: number;
   uiMode: UiMode;
+  currency?: 'USD' | 'BRL';
+  locale?: AppLocale;
   onHoverGpu: (id: string | null) => void;
   onToggleSelectGpu: (id: string) => void;
   onToggleHideTraps: (hide: boolean) => void;
@@ -35,6 +38,8 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
   hideTrapsInTable,
   trapCount,
   uiMode,
+  currency = 'USD',
+  locale = 'pt-BR',
   onHoverGpu,
   onToggleSelectGpu,
   onToggleHideTraps,
@@ -45,13 +50,13 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
         <div>
           <h2 className="text-base font-bold text-white">
             {uiMode === 'simple'
-              ? 'Ranked GPU Recommendations & Value Traps to Avoid'
-              : 'Live-Sorted TOPSIS Leaderboard, Pareto Dominance & OLS Fair-Value Matrix'}
+              ? t('tableTitleSimple', locale)
+              : t('tableTitlePro', locale)}
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
             {uiMode === 'simple'
-              ? 'Sorted automatically for your budget and gaming style. Click any row to compare up to 4 cards side-by-side.'
-              : 'Ranked dynamically by Relative Closeness Cᵢ = dᵢ⁻ / (dᵢ⁺ + dᵢ⁻) alongside Hedonic log-linear OLS Fair Market Value.'}
+              ? t('tableSubtitleSimple', locale)
+              : t('tableSubtitlePro', locale)}
           </p>
         </div>
 
@@ -62,7 +67,7 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
             onChange={(e) => onToggleHideTraps(e.target.checked)}
             className="rounded accent-emerald-500"
           />
-          Hide Dominated "Trap" GPUs ({trapCount})
+          {t('tableHideTraps', locale)} ({trapCount})
         </label>
       </div>
 
@@ -70,17 +75,27 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[11px]">
-              <th className="py-3 px-3">Rank</th>
-              <th className="py-3 px-3">GPU Model</th>
-              <th className="py-3 px-3">Verdict</th>
-              <th className="py-3 px-3">Match Score</th>
-              <th className="py-3 px-3 text-right">Price</th>
-              <th className="py-3 px-3 text-right">Fair Value (OLS)</th>
-              <th className="py-3 px-3 text-right">1440p Raster</th>
-              <th className="py-3 px-3 text-right">1440p RT</th>
-              <th className="py-3 px-3 text-right">VRAM</th>
-              <th className="py-3 px-3 text-right">Power</th>
-              <th className="py-3 px-3 text-center">Compare</th>
+              <th className="py-3 px-3">{t('tableRank', locale)}</th>
+              <th className="py-3 px-3">{t('tableModel', locale)}</th>
+              <th className="py-3 px-3">{t('tableVerdict', locale)}</th>
+              <th className="py-3 px-3">{t('tableMatchScore', locale)}</th>
+              <th className="py-3 px-3 text-right">
+                {t('tablePrice', locale)}
+              </th>
+              <th className="py-3 px-3 text-right">
+                {t('tableFairValue', locale)}
+              </th>
+              <th className="py-3 px-3 text-right">
+                {t('tableRaster', locale)}
+              </th>
+              <th className="py-3 px-3 text-right">{t('tableRt', locale)}</th>
+              <th className="py-3 px-3 text-right">{t('tableVram', locale)}</th>
+              <th className="py-3 px-3 text-right">
+                {t('tablePower', locale)}
+              </th>
+              <th className="py-3 px-3 text-center">
+                {t('tableCompare', locale)}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/60">
@@ -182,8 +197,8 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                           <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">
                             <CheckCircle2 className="h-3 w-3" />
                             {uiMode === 'simple'
-                              ? 'Smart Buy'
-                              : 'Frontier Optimal'}
+                              ? t('verdictSmartBuy', locale)
+                              : t('verdictFrontierOptimal', locale)}
                           </span>
                         );
                       }
@@ -192,10 +207,10 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                         <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-400">
                           <ShieldAlert className="h-3 w-3" />
                           {uiMode === 'simple'
-                            ? 'Bad Value Trap'
+                            ? t('verdictTrap', locale)
                             : isTrap && !gpu.isDominated
-                              ? '5D Niche (Trap Risk)'
-                              : `Dominated (${gpu.dominatedBy.length})`}
+                              ? t('verdictNiche', locale)
+                              : `${t('verdictDominatedPrefix', locale)} (${gpu.dominatedBy.length})`}
                         </span>
                       );
                     })()}
@@ -227,14 +242,19 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono font-bold text-white">
-                    {formatCurrency(gpu.price, gpu.currency)}
+                    {formatCurrency(gpu.price, currency, false, locale)}
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono">
                     {val ? (
                       <div className="flex flex-col items-end">
                         <span className="text-slate-200">
-                          {formatCurrency(val.fairPrice, gpu.currency)}
+                          {formatCurrency(
+                            val.fairPrice,
+                            currency,
+                            false,
+                            locale,
+                          )}
                         </span>
                         <span
                           className={`inline-flex items-center gap-0.5 text-[10px] font-semibold ${

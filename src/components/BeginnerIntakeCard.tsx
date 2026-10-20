@@ -177,9 +177,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
             {t('intakeStep2Title', locale)}
           </span>
           <span className="text-xs text-slate-400">
-            {locale === 'pt-BR'
-              ? 'Ajusta prioridades para seus jogos'
-              : 'Tailors priorities to your games'}
+            {t('intakeStep2Subtitle', locale)}
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
@@ -225,7 +223,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
             {t('intakeStep3Title', locale)}
           </span>
           <span className="font-mono text-sm font-bold text-emerald-400">
-            {locale === 'pt-BR' ? 'Até ' : 'Up to '}
+            {t('intakeUpTo', locale)}
             {formatCurrency(budget, currency, false, locale)}
           </span>
         </div>
@@ -256,7 +254,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
                 : 'border-slate-800 bg-slate-950/90 text-slate-400 hover:border-slate-700 hover:text-slate-200'
             }`}
           >
-            {locale === 'pt-BR' ? 'Sem Limite' : 'All Limits'}
+            {t('intakeNoLimit', locale)}
           </button>
         </div>
       </div>

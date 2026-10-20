@@ -10,13 +10,9 @@
 
 **Shipped since the first roadmap:** Phase 0 (CI, lint, UI tests, `npm run snap`, glossary); the answer-first beginner flow ending in a graphics card or a whole PC (UX-01/02/11); trust fixes (UX-12/13); plain words, phone layout, pt-BR + reais (UX-03/05/06); shopping reasons (UX-04); step-up to Explorer (UX-07); an 8-part builder with fit checks (BLD-01/02), use-case scores (BLD-03), upgrade mode (BLD-06) and share links (BLD-07); code splitting and slim ECharts (PERF-01/02, first download ~108 KB gzipped).
 
-**Waiting to merge:** branch `fix/perf-engine-and-ci` (no PR yet). It makes the full-PC engine ~500× faster (R$ 18.000 in Montar PC: 11.4 s freeze → 0.4 s), removes lint warnings, hides the Pro table in Simple mode, labels converted prices, and finishes most of pt-BR. `npm run check`, build and e2e pass on it locally.
+**Waiting to merge:** branch `fix/perf-engine-and-ci` (PR pending). It makes the full-PC engine ~500× faster (R$ 18.000 in Montar PC: 11.4 s freeze → 0.4 s), removes lint warnings, hides the Pro table in Simple mode, labels converted prices, enforces safe partition-based pruning identical to brute force ([FIX-01]), reconstructs non-frontier shared builds cleanly ([FIX-02]), completes full pt-BR localization with zero inline ternaries ([FIX-03]), and labels model scores/bottlenecks as estimates ([FIX-04]). `npm run check`, build, and tests pass completely.
 
 **Known problems (see `TODO.md`):**
-- FIX-01: the faster engine prunes CPUs across sockets, so it recommends pricier builds than brute force (e.g. 116 FPS for $1,035 instead of $997).
-- FIX-02: shared links can silently open a different build.
-- FIX-03: some English left with PT selected (Montar PC table, header subtitle).
-- FIX-04: model estimates (workload FPS, bottleneck %) are shown as facts.
 - BRL prices are US prices × 5.7 (labelled as estimates); real Brazilian prices are Phase 3 (DATA-04).
 
 **Process:** `main` had 8 red CI runs out of 12 on 2026-10-19 because work was pushed straight to it. From now on everything goes through PRs (see "How work lands on `main`" in `AGENTS.md`); branch protection on `main` is still to be turned on.
@@ -122,9 +118,7 @@
 ## Next up, reprioritized (2026-10-20)
 
 1. **Merge `fix/perf-engine-and-ci` through a PR** once CI is green, and turn on branch protection for `main`.
-2. **FIX-01 (safe pruning + brute-force test):** recommendations must not get worse to get faster.
-3. **FIX-02 + FIX-03 + FIX-04:** small trust and language fixes on the beginner path.
-4. **UX-10:** test with 3–5 people who know nothing about PCs; their findings set what comes after.
-5. **Phase 3 data** (real BRL prices DATA-04, creator benchmarks DATA-02), then BLD-04 (Web Worker), then BLD-08.
+2. **UX-10:** test with 3–5 people who know nothing about PCs; their findings set what comes after.
+3. **Phase 3 data** (real BRL prices DATA-04, creator benchmarks DATA-02), then BLD-04 (Web Worker), then BLD-08.
 
 Then Phase 5 (launch) and Phase 6 (affiliates, later per gustavo). Expert depth (UX-08, BLD-08) is strong enough to wait.

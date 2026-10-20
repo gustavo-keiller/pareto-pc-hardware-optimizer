@@ -6,12 +6,14 @@ import {
   pruneDominatedCases,
   pruneDominatedCoolers,
   pruneDominatedCpus,
+  pruneDominatedGpus,
   pruneDominatedMotherboards,
   pruneDominatedPsus,
   pruneDominatedRam,
   pruneDominatedStorage,
 } from '../combinatorial';
 import {
+  BuildWorkloadProfile,
   CaseCandidate,
   CoolerCandidate,
   CpuCandidate,
@@ -269,6 +271,37 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
       const pruned = pruneDominatedCoolers(coolers);
       expect(pruned.some((c) => c.id === 'cooler-trap')).toBe(false);
       expect(pruned.some((c) => c.id === 'cooler-good')).toBe(true);
+    });
+
+    it('prunes dominated GPUs within vendor partition', () => {
+      const gpus: GpuCandidate[] = [
+        {
+          id: 'gpu-good',
+          name: 'Fast Efficient GPU',
+          vendor: 'AMD',
+          price: 250,
+          rasterFps1440p: 80,
+          rtFps1440p: 45,
+          vramGb: 12,
+          tdpWatts: 160,
+          lengthMm: 240,
+        },
+        {
+          id: 'gpu-trap',
+          name: 'Overpriced Slow Power-Hungry GPU',
+          vendor: 'AMD',
+          price: 300,
+          rasterFps1440p: 60,
+          rtFps1440p: 30,
+          vramGb: 8,
+          tdpWatts: 200,
+          lengthMm: 300,
+        },
+      ];
+
+      const pruned = pruneDominatedGpus(gpus, true);
+      expect(pruned.some((g) => g.id === 'gpu-trap')).toBe(false);
+      expect(pruned.some((g) => g.id === 'gpu-good')).toBe(true);
     });
   });
 
@@ -608,6 +641,88 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
         expect(prunedResult.optimalBuilds[i].effectiveFps1440p).toBe(
           unprunedOptimal[i].effectiveFps1440p,
         );
+      }
+    });
+
+    it('executes full 8-component seed catalog under highest budget preset ($3,200) efficiently without leaking full build objects', () => {
+      const startTime = performance.now();
+
+      const result = optimizeFullSystemBuilds(
+        {
+          cpus: SEED_CPUS,
+          gpus: REAL_WORLD_GPUS,
+          motherboards: SEED_MOTHERBOARDS,
+          ramKits: SEED_RAM_KITS,
+          psus: SEED_PSUS,
+          storages: SEED_STORAGES,
+          cases: SEED_CASES,
+          coolers: SEED_COOLERS,
+        },
+        {
+          maxBudget: 3200,
+        },
+      );
+
+      const durationMs = performance.now() - startTime;
+
+      // Assert pre-pruning preserves valid platform partitions without dropping parts by name
+      expect(result.prunedPartCounts.cpus).toBe(SEED_CPUS.length);
+      expect(result.prunedPartCounts.gpus).toBe(REAL_WORLD_GPUS.length);
+
+      // Assert memory safety: total count calculated without leaking >100 build objects
+      expect(result.totalCompatibleBuilds).toBeGreaterThan(0);
+      expect(result.allCompatibleBuilds.length).toBeLessThanOrEqual(100);
+
+      // Assert optimal builds exist and respect budget cap
+      expect(result.optimalBuilds.length).toBeGreaterThan(0);
+      for (const build of result.optimalBuilds) {
+        expect(build.totalPrice).toBeLessThanOrEqual(3200);
+      }
+
+      // Sanity bound to catch severe regressions while avoiding CPU contention flakes on CI
+      expect(durationMs).toBeLessThan(1000);
+    });
+
+    it('proves optimizeFullSystemBuilds equals unpruned brute-force frontier across workloads and budgets [FIX-01]', () => {
+      const catalog = {
+        cpus: SEED_CPUS,
+        gpus: REAL_WORLD_GPUS,
+        motherboards: SEED_MOTHERBOARDS,
+        ramKits: SEED_RAM_KITS,
+        psus: SEED_PSUS,
+        storages: SEED_STORAGES,
+        cases: SEED_CASES,
+        coolers: SEED_COOLERS,
+      };
+
+      const workloads: BuildWorkloadProfile[] = [
+        'sweetspot-1440p',
+        'esports-1080p',
+        'enthusiast-4k',
+        'creator-ai',
+      ];
+      const budgets = [800, 1200, 2000, 3200];
+
+      for (const profile of workloads) {
+        for (const maxBudget of budgets) {
+          const brute = evaluateBuildParetoFrontier(
+            generateCompatibleBuilds(catalog, { profile, maxBudget }),
+          ).optimalBuilds;
+
+          const opt = optimizeFullSystemBuilds(catalog, {
+            workloadProfile: profile,
+            maxBudget,
+          }).optimalBuilds;
+
+          expect(opt.length).toBe(brute.length);
+          for (let i = 0; i < opt.length; i++) {
+            expect(opt[i].totalPrice).toBe(brute[i].totalPrice);
+            const optScore = opt[i].workloadScore ?? opt[i].effectiveFps1440p;
+            const bruteScore =
+              brute[i].workloadScore ?? brute[i].effectiveFps1440p;
+            expect(optScore).toBeCloseTo(bruteScore, 1);
+          }
+        }
       }
     });
   });

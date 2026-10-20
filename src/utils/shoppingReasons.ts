@@ -149,9 +149,10 @@ export function generateBuildShoppingReasons(
     ? `${build.gpu.name}: entrega ${build.gpu.rasterFps1440p} FPS em 1440p com ${build.gpu.vramGb} GB de memória de vídeo.`
     : `${build.gpu.name}: delivers ${build.gpu.rasterFps1440p} FPS at 1440p with ${build.gpu.vramGb} GB video memory.`;
 
+  const m2Count = build.motherboard.m2Slots ?? 1;
   const motherboard = isPt
-    ? `${build.motherboard.name}: plataforma ${build.motherboard.socket} formato ${build.motherboard.formFactor} com ${build.motherboard.m2Slots} slot(s) M.2 NVMe.`
-    : `${build.motherboard.name}: ${build.motherboard.socket} platform in ${build.motherboard.formFactor} with ${build.motherboard.m2Slots} M.2 NVMe slot(s).`;
+    ? `${build.motherboard.name}: plataforma ${build.motherboard.socket} formato ${build.motherboard.formFactor} com ${m2Count} slot(s) M.2 NVMe.`
+    : `${build.motherboard.name}: ${build.motherboard.socket} platform in ${build.motherboard.formFactor} with ${m2Count} M.2 NVMe slot(s).`;
 
   const ram = isPt
     ? `${build.ram.name}: memórias em Dual-Channel (${build.ram.modulesCount} pentes) para largura de banda máxima e quadros estáveis.`
@@ -168,9 +169,12 @@ export function generateBuildShoppingReasons(
     ? `${build.storage.name}: SSD ${build.storage.type}${readSpeedText} para carregamentos rápidos.`
     : `${build.storage.name}: ${build.storage.type} SSD${readSpeedTextEn} for fast game loading.`;
 
+  const psuEfficiency = build.psu.efficiencyRating.startsWith('80+')
+    ? build.psu.efficiencyRating
+    : `80+ ${build.psu.efficiencyRating}`;
   const psu = isPt
-    ? `${build.psu.name}: ${build.psu.wattage}W com certificação 80+ ${build.psu.efficiencyRating} e +${build.powerHeadroomWatts}W de folga para segurança.`
-    : `${build.psu.name}: ${build.psu.wattage}W with 80+ ${build.psu.efficiencyRating} efficiency and +${build.powerHeadroomWatts}W headroom for safety.`;
+    ? `${build.psu.name}: ${build.psu.wattage}W com certificação ${psuEfficiency} e +${build.powerHeadroomWatts}W de folga para segurança.`
+    : `${build.psu.name}: ${build.psu.wattage}W with ${psuEfficiency} efficiency and +${build.powerHeadroomWatts}W headroom for safety.`;
 
   const casePart = isPt
     ? `${build.case.name}: gabinete com suporte a GPUs de até ${build.case.maxGpuLengthMm} mm e dissipadores de até ${build.case.maxCpuCoolerHeightMm} mm.`
