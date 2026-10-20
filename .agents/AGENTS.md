@@ -31,6 +31,8 @@ Mathematical pipelines must never produce `NaN`, `Infinity`, or throw on degener
 
 A full PC build tuple `(CPU, GPU, RAM, Motherboard, PSU)` grows multiplicatively ($N_{\text{CPU}} \times N_{\text{GPU}} \times N_{\text{RAM}} \times N_{\text{Mobo}} \times N_{\text{PSU}}$). Always apply Stage 1 hard constraints and Stage 2 intra-category Pareto pruning **before** generating combinations, and enforce socket, RAM generation, and PSU wattage compatibility during generation.
 
+Pruning must be **safe**: a part may only be dropped when another part dominates it *inside the same compatibility partition* (CPUs per socket, RAM per generation, GPUs per PSU/case fit), because a cheaper CPU on another socket can still make the whole build more expensive (board + RAM). Never prune by product name. Any change to pruning or search keeps a test that the optimized frontier equals the brute-force frontier on the seed catalog, for every workload profile.
+
 ## 7. Strict TypeScript Boundary
 
 Never use `any` or unchecked `as` casts. Use discriminated unions and `_exhaustive: never` in `switch` statements over `MetricKey` or hardware categories. External data (`localStorage`, imported JSON datasets, URL query params) enters as `unknown` and is validated before use.

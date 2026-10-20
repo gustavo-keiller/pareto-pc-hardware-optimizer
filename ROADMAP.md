@@ -1,38 +1,25 @@
 # ParetoPC — Master Roadmap & Todo List (`ROADMAP.md`)
 
 > Goal: the app can take anyone, from "I don't know what a GPU is" to "show me the 7D frontier", to a complete, compatible, well-priced dream PC.
-> Re-evaluated 2026-10-19 on `main` @ `86beb27`. Item IDs follow the repo's `TODO.md` convention so they can be pasted straight into it (delete from `TODO.md` + add to `DONE.md` when shipped).
+> Re-evaluated 2026-10-20 on `main` @ `f03d605` plus branch `fix/perf-engine-and-ci` @ `e0e44c2`. Item IDs follow the repo's `TODO.md` convention: active work is copied into `TODO.md`, shipped work moves to `DONE.md`, and this file is ticked in the same PR.
 > Order inside each phase = priority. Phases 0 and 1 can run in parallel; Phase 2 is the core product goal.
 
 ---
 
-## Where the project stands (re-checked 2026-10-19 on `main`)
+## Where the project stands (re-checked 2026-10-20)
 
-**What changed since the first roadmap:**
-- Phase 0 is merged (CI, lint, UI tests, `npm run snap`, glossary).
-- Antigravity shipped the full-PC builder engine and UI:
-  - `[P3-01]` Part schemas + compatibility (`buildTypes.ts`).
-  - `[P3-02]` Intra-category pruning & backtracking combination engine (`combinatorial.ts`).
-  - `[P3-03]` "4. Full Builds" mode (`FullBuildExplorer.tsx`, `BuildHeroCard.tsx`, `BuildLeaderboardTable.tsx`).
-  - `[P3-04]` Unified Combined Sandbox mode with live USD/BRL currency conversion.
-- `npm run check` passes (88 tests) and the build works cleanly.
+**Shipped since the first roadmap:** Phase 0 (CI, lint, UI tests, `npm run snap`, glossary); the answer-first beginner flow ending in a graphics card or a whole PC (UX-01/02/11); trust fixes (UX-12/13); plain words, phone layout, pt-BR + reais (UX-03/05/06); shopping reasons (UX-04); step-up to Explorer (UX-07); an 8-part builder with fit checks (BLD-01/02), use-case scores (BLD-03), upgrade mode (BLD-06) and share links (BLD-07); code splitting and slim ECharts (PERF-01/02, first download ~108 KB gzipped).
 
-**What a beginner sees today (screenshots at 1400px and phone size):**
-- **Simple mode is still the 5-step economics lesson.** The header still shows Real GPUs / My Deals / Sandbox, Import Deals and the 4 level buttons. On a phone the first recommendation is about 4 screens down, under a chart whose labels overlap. UX-01/02/03/05 are queued next.
-- **The default budget is "All ($1800)"**, so someone who skips the budget gets an $890 RX 7900 XTX as "#1 Top Pick".
-- **Every GPU is labelled "Smart Buy", even the ones named `[TRAP]`** (e.g. "RTX 4060 Ti 16GB [TRAP]"). In the default 5-metric mode every real card survives, so "Hide Trap GPUs" shows 0. This is the opposite of the app's promise ("we filter out overpriced traps") and is the most urgent trust bug.
-- **The full PC builder is the thing beginners need, but it sits behind "Level 4: Mario Kart Mode"**, after the Pro Lab, and talks about "Combinatorial", "Pareto Frontier", "CPU-GPU bottleneck telemetry".
+**Waiting to merge:** branch `fix/perf-engine-and-ci` (no PR yet). It makes the full-PC engine ~500× faster (R$ 18.000 in Montar PC: 11.4 s freeze → 0.4 s), removes lint warnings, hides the Pro table in Simple mode, labels converted prices, and finishes most of pt-BR. `npm run check`, build and e2e pass on it locally.
 
-**What the builder covers:**
-- 38 parts (CPU, GPU, motherboard, RAM, PSU) on AM4/AM5/LGA1700/LGA1851.
-- **No storage, case or CPU cooler yet**, so a "complete build" can't actually be assembled and case/cooler fit isn't checked.
-- One score only (1440p gaming FPS): no streaming, editing, AI or office use yet.
-- USD & BRL supported (with live exchange rate in Combined Sandbox), with English/Portuguese i18n queued.
+**Known problems (see `TODO.md`):**
+- FIX-01: the faster engine prunes CPUs across sockets, so it recommends pricier builds than brute force (e.g. 116 FPS for $1,035 instead of $997).
+- FIX-02: shared links can silently open a different build.
+- FIX-03: some English left with PT selected (Montar PC table, header subtitle).
+- FIX-04: model estimates (workload FPS, bottleneck %) are shown as facts.
+- BRL prices are US prices × 5.7 (labelled as estimates); real Brazilian prices are Phase 3 (DATA-04).
 
-**Engineering health:**
-- Bundle grew to 1.50 MB / **469 KB gzipped** in one file; code splitting (`PERF-01`) is queued.
-- `SimpleParetoGuide.tsx` ceiling currently in allowlist; decomposing it into focused sub-components is queued.
-- `npm run check` strictly enforces zero `any`, zero unchecked type assertions, Vitest suites, and file caps.
+**Process:** `main` had 8 red CI runs out of 12 on 2026-10-19 because work was pushed straight to it. From now on everything goes through PRs (see "How work lands on `main`" in `AGENTS.md`); branch protection on `main` is still to be turned on.
 
 ---
 
@@ -132,11 +119,12 @@
 
 ---
 
-## Next up, reprioritized (2026-10-19)
+## Next up, reprioritized (2026-10-20)
 
-1. **UX-12 + UX-13 (trust fixes):** no "Smart Buy" on trap cards, no "All" default budget. Small, and it's what makes the recommendations believable for everyone.
-2. **UX-01 + UX-02 + UX-11 (answer-first flow for GPU and whole PC):** three questions, one pick + 2 alternatives, expert controls hidden in Simple mode, and "a whole PC" as an answer, not a Level 4 mode.
-3. **UX-03 + UX-05 + UX-06 (plain words, phone layout, pt-BR + BRL):** done together with step 2 since it rewrites the same screens. Brazil-first testing needs reais and Portuguese before any real user sees it.
-4. **BLD-01/02 completion (storage, case, cooler + their fit checks, plain-language rejection reasons):** without these, "complete build" isn't actually complete.
-5. **PERF-01 + PERF-02 + PERF-03 (split by mode, slim ECharts, split the big files):** Simple mode shouldn't download the 3D/7D views.
-6. **UX-10 (test with 3–5 people who know nothing about PCs)** as soon as steps 1–3 land.
+1. **Merge `fix/perf-engine-and-ci` through a PR** once CI is green, and turn on branch protection for `main`.
+2. **FIX-01 (safe pruning + brute-force test):** recommendations must not get worse to get faster.
+3. **FIX-02 + FIX-03 + FIX-04:** small trust and language fixes on the beginner path.
+4. **UX-10:** test with 3–5 people who know nothing about PCs; their findings set what comes after.
+5. **Phase 3 data** (real BRL prices DATA-04, creator benchmarks DATA-02), then BLD-04 (Web Worker), then BLD-08.
+
+Then Phase 5 (launch) and Phase 6 (affiliates, later per gustavo). Expert depth (UX-08, BLD-08) is strong enough to wait.
