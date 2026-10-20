@@ -328,6 +328,7 @@ export const enUS: Translations = {
   noCompatibleBuildsFound: 'No Compatible Builds Found',
   noCompatibleBuildsDesc:
     'Try raising the maximum budget or relaxing socket and RAM generation filters to find valid hardware combinations.',
+  calculatingOptimizer: 'Calculating combinations...',
   btnSimpleGuide: 'Simple Guide',
   btnGpuExplorer: 'GPU Explorer',
   btnUpgradeMode: 'Upgrade Mode',

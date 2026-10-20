@@ -4,13 +4,20 @@
 
 ## 🔴 In Flight
 
-- None (Phase 1 engineering tasks complete; ready to proceed with Phase 2 completion `[BLD-04]` / `[BLD-05]` or Phase 3 Data `[DATA-01]`).
+- `feat/bld-04-worker-engine`: Finalizing Web Worker engine commit (`[BLD-04]`) and moving to interactive part swapper (`[BLD-05]`).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Web Worker Combinatorial Engine & Strict Time Budget (`[BLD-04]`, 2026-10-20):**
+  - Spun up dedicated Web Worker (`builderWorker.ts`) to execute `optimizeFullSystemBuilds` without dropping UI frames.
+  - Built custom React hook (`useFullSystemOptimizer`) with request ID serialization, race-condition mitigation, and synchronous fallback for Node/JSDOM.
+  - Added background activity indicator (`isCalculating`) in Full Build Explorer with localized status banner.
+  - Enforced a strict `< 300ms` time budget test on full seed catalog under the highest budget preset ($3,200).
+  - Backed by dedicated hook unit tests in `src/hooks/__tests__/useFullSystemOptimizer.test.ts`.
 
 - **Accessibility & Screen-Reader Alternatives (`[UX-09]`, 2026-10-20):**
   - Added skip-link navigation (`#main-content`) with keyboard focus rings for screen-reader and keyboard users.

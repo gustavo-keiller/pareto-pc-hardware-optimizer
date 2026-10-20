@@ -320,6 +320,7 @@ export interface Translations {
   sharedOverBudgetSuffix: string;
   noCompatibleBuildsFound: string;
   noCompatibleBuildsDesc: string;
+  calculatingOptimizer: string;
   btnSimpleGuide: string;
   btnGpuExplorer: string;
   btnUpgradeMode: string;

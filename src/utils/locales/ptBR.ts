@@ -328,6 +328,7 @@ export const ptBR: Translations = {
   noCompatibleBuildsFound: 'Nenhuma Configuração Compatível Encontrada',
   noCompatibleBuildsDesc:
     'Tente aumentar o limite de orçamento ou relaxar os filtros de soquete e geração de RAM para encontrar combinações válidas.',
+  calculatingOptimizer: 'Calculando combinações...',
   btnSimpleGuide: 'Guia Simples',
   btnGpuExplorer: 'Explorador de GPUs',
   btnUpgradeMode: 'Modo Upgrade',

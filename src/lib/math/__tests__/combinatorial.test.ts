@@ -679,8 +679,8 @@ describe('Combinatorial System Builder (Phase 3 Engine)', () => {
         expect(build.totalPrice).toBeLessThanOrEqual(3200);
       }
 
-      // Sanity bound to catch severe regressions while avoiding CPU contention flakes on CI
-      expect(durationMs).toBeLessThan(1000);
+      // Enforce strict time budget [BLD-04]: full 8-component seed catalog under highest budget ($3,200) completes in < 300ms
+      expect(durationMs).toBeLessThan(300);
     });
 
     it('proves optimizeFullSystemBuilds equals unpruned brute-force frontier across workloads and budgets [FIX-01]', () => {

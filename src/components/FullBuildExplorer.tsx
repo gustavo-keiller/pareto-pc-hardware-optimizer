@@ -13,10 +13,8 @@ import {
 } from '../lib/math/buildTypes';
 import { GpuCandidate, HardwareVendor } from '../lib/math/types';
 import { BudgetPreset } from '../data/budgetPresets';
-import {
-  BuildFilterCriteria,
-  optimizeFullSystemBuilds,
-} from '../lib/math/combinatorial';
+import { BuildFilterCriteria } from '../lib/math/combinatorial';
+import { useFullSystemOptimizer } from '../hooks/useFullSystemOptimizer';
 import { formatCurrency, getCurrencyAdjustedCatalogs } from '../utils/currency';
 import { AppLocale, t } from '../utils/i18n';
 import { decodeBuildShareUrl } from '../utils/shareBuild';
@@ -142,31 +140,33 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     selectedWorkload,
   ]);
 
-  const optimizationResult = useMemo(() => {
-    return optimizeFullSystemBuilds(
-      {
-        cpus: activeCpus,
-        gpus,
-        motherboards: activeMotherboards,
-        ramKits: activeRam,
-        psus: activePsus,
-        storages: activeStorages,
-        cases: activeCases,
-        coolers: activeCoolers,
-      },
-      filterCriteria,
-    );
-  }, [
-    activeCpus,
-    gpus,
-    activeMotherboards,
-    activeRam,
-    activePsus,
-    activeStorages,
-    activeCases,
-    activeCoolers,
+  const fullCatalogs = useMemo(
+    () => ({
+      cpus: activeCpus,
+      gpus,
+      motherboards: activeMotherboards,
+      ramKits: activeRam,
+      psus: activePsus,
+      storages: activeStorages,
+      cases: activeCases,
+      coolers: activeCoolers,
+    }),
+    [
+      activeCpus,
+      gpus,
+      activeMotherboards,
+      activeRam,
+      activePsus,
+      activeStorages,
+      activeCases,
+      activeCoolers,
+    ],
+  );
+
+  const { optimizationResult, isCalculating } = useFullSystemOptimizer({
+    catalogs: fullCatalogs,
     filterCriteria,
-  ]);
+  });
 
   const { optimalBuilds, allCompatibleBuilds, totalCompatibleBuilds } =
     optimizationResult;
@@ -467,6 +467,18 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
           onResetFilters={handleResetFilters}
         />
       </div>
+
+      {/* Web Worker Background Optimizer Activity Badge [BLD-04] */}
+      {isCalculating && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 animate-pulse"
+        >
+          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+          <span>{t('calculatingOptimizer', locale)}</span>
+        </div>
+      )}
 
       {/* Shared Build Fallback Notice */}
       {sharedBuildMissingParts && !dismissSharedNotice && (
