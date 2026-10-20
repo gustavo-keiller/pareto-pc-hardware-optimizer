@@ -4,13 +4,20 @@
 
 ## 🔴 In Flight
 
-- `feat/ux-08-pro-mode-extras`: Deliver Pro-mode extras (`[UX-08]`), including saved named weight profiles, CSV/JSON dataset export, and multi-criteria TOPSIS score breakdown.
+- None (Phase 1 engineering tasks complete; ready to proceed with Phase 2 completion `[BLD-04]` / `[BLD-05]` or Phase 3 Data `[DATA-01]`).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Accessibility & Screen-Reader Alternatives (`[UX-09]`, 2026-10-20):**
+  - Added skip-link navigation (`#main-content`) with keyboard focus rings for screen-reader and keyboard users.
+  - Added semantic landmark structures (`<main id="main-content">`) and accessible labels across chart regions.
+  - Created screen-reader table alternatives (`<table className="sr-only">`) alongside SVG/ECharts graphs (`SimpleGuideScatterPlot`, `ValueResidualsChart`, `ParetoScatterPlot`).
+  - Extracted `AppHeader.tsx` deep module, reducing `src/App.tsx` from 1029 lines to 817 lines and respecting Rule 7 file size limits.
+  - Backed by UI integration tests in `src/__tests__/App.ui.test.tsx`.
 
 - **Pro-Mode Extras: Saved Weight Profiles, Data Export & TOPSIS Breakdown (`[UX-08]`, 2026-10-20):**
   - Added named weight profiles management in Pro Lab with safe `localStorage` persistence (`CustomWeightProfilesManager`), enabling users to save, load, and delete custom weight calibrations.

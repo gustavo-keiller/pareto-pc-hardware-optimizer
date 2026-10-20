@@ -749,6 +749,8 @@ export const ParetoScatterPlot: React.FC<ParetoScatterPlotProps> = ({
 
   return (
     <div
+      role="region"
+      aria-label="2D Pareto Scatter Plot"
       className={`w-full ${
         isExpanded ? 'h-[82vh] min-h-[660px]' : 'h-[480px]'
       } relative`}

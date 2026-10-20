@@ -361,4 +361,17 @@ export const enUS: Translations = {
   breakdownColProximity: 'Proximity to Best',
   drawerBreakdownSummary:
     'Mathematical breakdown of vector Euclidean distance components and objective contributions to relative TOPSIS closeness (C_i).',
+
+  // Accessibility & Chart Alternatives (UX-09)
+  skipToContent: 'Skip to main content',
+  chartAriaScatterPlot: 'Interactive Price versus Performance scatter plot',
+  chartAriaValueResiduals: 'OLS fair-value residuals bar chart',
+  chartTableCaptionSimple:
+    'Accessible graphics cards table: Price versus Performance and value deal verdict',
+  chartTableCaptionResiduals:
+    'Accessible OLS residuals table: Actual price versus estimated fair market price',
+  chartTableColActual: 'Actual Price',
+  chartTableColPredicted: 'Fair Market Price',
+  chartTableColDiff: 'Difference',
+  chartTableColStatus: 'Valuation Tier',
 };

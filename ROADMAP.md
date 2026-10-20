@@ -53,7 +53,7 @@
 - [x] **`[UX-05]` Mobile layout fix:** compact header (one menu), chart labels that don't overlap, recommendation cards before charts. _Done 2026-10-19._
 - [x] **`[UX-07]` Smooth step-up between levels.** "See the math behind this" button on any pick opens the same item in Explorer/Pro with the same filters, so a beginner can grow into the deep views. _Done 2026-10-19._
 - [x] **`[UX-08]` Pro-mode extras:** save/load named weight profiles, export results (CSV/JSON), show the full score breakdown per item. _Done 2026-10-20._
-- [ ] **`[UX-09]` Accessibility:** keyboard navigation, contrast, and a table alternative for every chart (charts are invisible to screen readers).
+- [x] **`[UX-09]` Accessibility:** keyboard navigation, contrast, and a table alternative for every chart (charts are invisible to screen readers). _Done 2026-10-20._
 - [x] **`[UX-11]` One beginner flow that ends in a whole PC.** The three UX-01 questions lead to either "Just a graphics card" or "A whole PC", and the whole-PC answer uses the builder engine, shown as a plain parts list with a total and one reason per part. "Full Builds" stops being Level 4; the current Mario Kart view stays as the expert view of the same result. _Done 2026-10-19 in 7083b0f._
 - [ ] **`[UX-10]` Test with 3–5 people who know nothing about PCs.** Success = picks a part in under 2 minutes without help, and can say why. Feed findings back into UX-01..05.
 

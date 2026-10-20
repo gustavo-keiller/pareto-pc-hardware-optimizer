@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { EChartsRenderer } from './EChartsRenderer';
 import { RankedGpu } from '../lib/math/types';
+import { AppLocale, t } from '../utils/i18n';
 
 interface ValueResidualsChartProps {
   gpus: RankedGpu[];
@@ -8,6 +9,7 @@ interface ValueResidualsChartProps {
   hoveredGpuId: string | null;
   isExpanded?: boolean;
   hideDominatedNodes?: boolean;
+  locale?: AppLocale;
   onHoverGpu: (id: string | null) => void;
   onToggleSelectGpu: (id: string) => void;
 }
@@ -17,6 +19,7 @@ export const ValueResidualsChart: React.FC<ValueResidualsChartProps> = ({
   rSquared,
   isExpanded = false,
   hideDominatedNodes = false,
+  locale = 'pt-BR',
   onHoverGpu,
   onToggleSelectGpu,
 }) => {
@@ -143,6 +146,8 @@ export const ValueResidualsChart: React.FC<ValueResidualsChartProps> = ({
 
   return (
     <div
+      role="region"
+      aria-label={t('chartAriaValueResiduals', locale)}
       className={`w-full ${
         isExpanded ? 'h-[76vh] min-h-[580px]' : 'h-[460px]'
       } relative`}
@@ -159,6 +164,36 @@ export const ValueResidualsChart: React.FC<ValueResidualsChartProps> = ({
         onEvents={onEvents}
         notMerge={true}
       />
+
+      {/* Accessible Screen-Reader Table Alternative [UX-09] */}
+      <table className="sr-only">
+        <caption>{t('chartTableCaptionResiduals', locale)}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{t('tableModel', locale)}</th>
+            <th scope="col">{t('chartTableColActual', locale)}</th>
+            <th scope="col">{t('chartTableColPredicted', locale)}</th>
+            <th scope="col">{t('chartTableColDiff', locale)}</th>
+            <th scope="col">{t('chartTableColStatus', locale)}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedByValue.map((gpu) => (
+            <tr key={gpu.id}>
+              <td>{gpu.name}</td>
+              <td>${gpu.price}</td>
+              <td>${gpu.valuation?.fairPrice.toFixed(0) ?? ''}</td>
+              <td>
+                {(gpu.valuation?.residualUsd ?? 0) > 0 ? '+' : ''}$
+                {gpu.valuation?.residualUsd.toFixed(0) ?? ''} (
+                {(gpu.valuation?.residualPct ?? 0) > 0 ? '+' : ''}
+                {gpu.valuation?.residualPct.toFixed(1) ?? ''}%)
+              </td>
+              <td>{gpu.valuation?.valueTier ?? ''}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

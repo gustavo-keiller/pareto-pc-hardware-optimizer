@@ -351,4 +351,15 @@ export interface Translations {
   breakdownColWorst: string;
   breakdownColProximity: string;
   drawerBreakdownSummary: string;
+
+  // Accessibility & Chart Alternatives (UX-09)
+  skipToContent: string;
+  chartAriaScatterPlot: string;
+  chartAriaValueResiduals: string;
+  chartTableCaptionSimple: string;
+  chartTableCaptionResiduals: string;
+  chartTableColActual: string;
+  chartTableColPredicted: string;
+  chartTableColDiff: string;
+  chartTableColStatus: string;
 }

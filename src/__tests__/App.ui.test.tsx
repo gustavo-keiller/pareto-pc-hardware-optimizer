@@ -731,4 +731,47 @@ describe('App modes', () => {
     ).toBeDefined();
     expect(screen.getAllByText(/Cᵢ =/i).length).toBeGreaterThan(0);
   });
+
+  it('UX-09: provides accessible skip-link, semantic landmarks, and screen-reader table alternatives for visual charts', async () => {
+    localStorage.clear();
+    const user = userEvent.setup();
+    render(<App />);
+
+    // 1. Skip-to-content link exists and targets main
+    const skipLink = screen.getByRole('link', {
+      name: /Pular para o conteúdo|Skip to main content/i,
+    });
+    expect(skipLink).toBeDefined();
+    expect(skipLink.getAttribute('href')).toBe('#main-content');
+
+    // 2. Main landmark has id matching skip target
+    const mainLandmark = screen.getByRole('main');
+    expect(mainLandmark.getAttribute('id')).toBe('main-content');
+
+    // 3. Accessible table alternative exists in Simple Guide
+    const toggleMathBtn = screen.getByRole('button', {
+      name: /Entenda como o ParetoPC calcula|Understand how ParetoPC calculates/i,
+    });
+    await user.click(toggleMathBtn);
+
+    expect(
+      screen.getByText(
+        /Tabela acessível de placas de vídeo|Accessible graphics cards table/i,
+      ),
+    ).toBeDefined();
+
+    // 4. Switch to Pro mode and verify residuals table alternative
+    const proBtn = screen.getByRole('button', { name: /3\. Laborat|3\. Pro/i });
+    await user.click(proBtn);
+    const residualsViewBtn = screen.getByRole('button', {
+      name: /Fair Value \(OLS\)/i,
+    });
+    await user.click(residualsViewBtn);
+
+    expect(
+      await screen.findByText(
+        /Tabela acessível de resíduos OLS|Accessible OLS residuals table/i,
+      ),
+    ).toBeDefined();
+  });
 });

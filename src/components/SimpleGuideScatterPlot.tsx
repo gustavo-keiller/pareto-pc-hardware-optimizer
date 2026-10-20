@@ -2,12 +2,14 @@ import React, { useMemo } from 'react';
 import { Sparkles, ArrowLeft, ArrowRight } from 'lucide-react';
 import { MetricDefinition, MetricKey, RankedGpu } from '../lib/math/types';
 import { formatCurrency } from '../utils/currency';
+import { AppLocale, t } from '../utils/i18n';
 
 export type StoryStep = 1 | 2 | 3 | 4 | 5;
 
 export interface SimpleGuideScatterPlotProps {
   gpus: RankedGpu[];
   currency?: 'USD' | 'BRL';
+  locale?: AppLocale;
   activeStep: StoryStep;
   setActiveStep: (s: StoryStep | ((prev: StoryStep) => StoryStep)) => void;
   toStoryStep: (n: number) => StoryStep;
@@ -37,6 +39,7 @@ export interface SimpleGuideScatterPlotProps {
 export const SimpleGuideScatterPlot: React.FC<SimpleGuideScatterPlotProps> = ({
   gpus,
   currency = 'USD',
+  locale = 'pt-BR',
   activeStep,
   setActiveStep,
   toStoryStep,
@@ -156,6 +159,8 @@ export const SimpleGuideScatterPlot: React.FC<SimpleGuideScatterPlotProps> = ({
       {/* SVG Interactive Plot */}
       <div className="relative w-full overflow-hidden rounded-xl border border-slate-800/90 bg-slate-950">
         <svg
+          role="img"
+          aria-label={t('chartAriaScatterPlot', locale)}
           viewBox={`0 0 ${svgW} ${svgH}`}
           className="w-full h-auto select-none"
         >
@@ -480,6 +485,38 @@ export const SimpleGuideScatterPlot: React.FC<SimpleGuideScatterPlotProps> = ({
             );
           })}
         </svg>
+
+        {/* Accessible Screen-Reader Table Alternative [UX-09] */}
+        <table className="sr-only">
+          <caption>
+            {t('chartTableCaptionSimple', locale)} ({xDef.label} vs {yDef.label}
+            )
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">{t('tableModel', locale)}</th>
+              <th scope="col">{xDef.label}</th>
+              <th scope="col">{yDef.label}</th>
+              <th scope="col">{t('tableVerdict', locale)}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {gpus.map((gpu) => (
+              <tr key={gpu.id}>
+                <td>{gpu.name}</td>
+                <td>{formatCurrency(gpu.price, currency, false, locale)}</td>
+                <td>{gpu.rasterFps1440p} FPS</td>
+                <td>
+                  {gpu.isParetoOptimal
+                    ? t('verdictSmartBuy', locale)
+                    : gpu.isDominated
+                      ? t('verdictTrap', locale)
+                      : t('verdictNiche', locale)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
         {/* Hover Inspector Pill */}
         {hoveredGpu && (

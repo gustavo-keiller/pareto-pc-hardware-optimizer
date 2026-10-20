@@ -361,4 +361,18 @@ export const ptBR: Translations = {
   breakdownColProximity: 'Proximidade ao Ideal',
   drawerBreakdownSummary:
     'Detalhamento matemático dos vetores de distância Euclidiana e contribuição de cada critério para a pontuação relativa TOPSIS (Cᵢ).',
+
+  // Accessibility & Chart Alternatives (UX-09)
+  skipToContent: 'Pular para o conteúdo principal',
+  chartAriaScatterPlot:
+    'Gráfico interativo de dispersão Preço versus Desempenho',
+  chartAriaValueResiduals: 'Gráfico de resíduos de valor justo OLS',
+  chartTableCaptionSimple:
+    'Tabela acessível de placas de vídeo: Preço versus Desempenho e avaliação de negócio',
+  chartTableCaptionResiduals:
+    'Tabela acessível de resíduos OLS: Preço real versus Preço justo estimado',
+  chartTableColActual: 'Preço Real',
+  chartTableColPredicted: 'Preço Justo Estimado',
+  chartTableColDiff: 'Diferença',
+  chartTableColStatus: 'Classificação de Valor',
 };
