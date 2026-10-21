@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/knip@5/overview/configuration-types.json",
+  "entry": [
+    "src/workers/builderWorker.ts",
+    "scripts/**/*.{cjs,mjs}",
+    ".agents/scripts/**/*.cjs",
+    "e2e/**/*.spec.ts",
+    "src/**/__tests__/**/*.{ts,tsx}"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "scripts/**/*.{cjs,mjs}",
+    ".agents/scripts/**/*.cjs"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": ["tailwindcss"]
+}

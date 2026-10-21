@@ -114,8 +114,6 @@ export interface HardConstraints {
   requiredFeatures?: string[];
 }
 
-export type HardwareCategory = 'GPU' | 'CPU' | 'RAM' | 'Motherboard' | 'PSU';
-
 export interface FilterFacetOption {
   id: string;
   label: string;

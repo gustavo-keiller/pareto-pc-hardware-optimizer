@@ -59,5 +59,3 @@ export const EChartsRenderer = forwardRef<
 });
 
 EChartsRenderer.displayName = 'EChartsRenderer';
-
-export default EChartsRenderer;

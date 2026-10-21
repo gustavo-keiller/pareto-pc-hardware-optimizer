@@ -163,4 +163,30 @@ describe('DATA-01 & DATA-03: Versioned JSON Catalogs & Hardware Coverage', () =>
     expect(provCpu).toContain('Hardware Unboxed');
     expect(provCpu).toContain('TechPowerUp');
   });
+
+  it('provides store price offers and historical price trends for USD and BRL (DATA-01 & DATA-02)', async () => {
+    const { getRegionalStorePrices, getPriceHistory } =
+      await import('../storePrices');
+
+    const brlPrices = getRegionalStorePrices('BRL');
+    const usdPrices = getRegionalStorePrices('USD');
+
+    expect(brlPrices.length).toBeGreaterThan(0);
+    expect(usdPrices.length).toBeGreaterThan(0);
+
+    // Verify format of store offers
+    const firstBrl = brlPrices[0];
+    expect(firstBrl.componentId).toBeDefined();
+    expect(firstBrl.store).toBeDefined();
+    expect(firstBrl.price).toBeGreaterThan(0);
+
+    // Verify price history lookup
+    const rtx4060BrlHistory = getPriceHistory('rtx-4060', 'BRL');
+    expect(rtx4060BrlHistory.length).toBeGreaterThan(0);
+    expect(rtx4060BrlHistory[0].date).toBeDefined();
+    expect(rtx4060BrlHistory[0].price).toBeGreaterThan(0);
+
+    const nonExistentHistory = getPriceHistory('non-existent-sku', 'BRL');
+    expect(nonExistentHistory).toEqual([]);
+  });
 });

@@ -115,6 +115,7 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | Path | Purpose |
 | :--- | :--- |
 | `scripts/check-docs.cjs` | Validates `AGENTS.md` character cap (<12,000 chars), internal markdown links, `.agents/skills/` frontmatter, `.claude/skills/` stub parity, and the 600/800-line file cap (with a shrink-only allowlist) |
+| `knip.json` | **Dead Code & Dependency Analysis Configuration (`[PERF-04]`)** — configures `knip` static analysis for entry points, project boundaries, and dependency pruning, enforced via `npm run check:knip` |
 | `scripts/validate-catalogs.cjs` | Validates schema conformance, numeric bounds, ID uniqueness, source citations, audit dates, and cross-catalog compatibility for all JSON hardware catalogs (`[DATA-01]`) |
 | `scripts/add-part.cjs` | **Interactive & CLI Maintainer Tooling (`[DATA-06]`)** — interactive and CLI-driven maintainer script prompting for specs, validating schemas and ID uniqueness, and safely appending new components to JSON catalogs |
 | `.github/workflows/check.yml` | CI: `npm ci`, `npm run check`, `npm run build`, plus the Playwright e2e job, on every push to `main` and every PR |

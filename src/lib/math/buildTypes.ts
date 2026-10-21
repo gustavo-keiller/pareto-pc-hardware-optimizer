@@ -561,11 +561,10 @@ export function checkBuildCompatibility(components: {
 
 import {
   BuildWorkloadProfile,
-  WorkloadEvaluationResult,
   evaluateBuildForWorkload,
 } from './workloadModels';
 
-export type { BuildWorkloadProfile, WorkloadEvaluationResult };
+export type { BuildWorkloadProfile };
 export { evaluateBuildForWorkload };
 
 /**

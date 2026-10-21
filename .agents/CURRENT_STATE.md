@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- `[PERF-04]` Dead code removal via `knip` and CI integration.
+- None (ready for `[PERF-05]` Performance budget in CI).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Dead Code Elimination with Knip & CI Integration (`[PERF-04]`, 2026-10-20):**
+  - Integrated `knip` static analysis for dead code, unused exports, unused files, and unused dependencies.
+  - Uninstalled unused packages (`clsx`, `tailwind-merge`), removed duplicate exports in `App.tsx` and `EChartsRenderer.tsx`, cleaned up dead re-exports (`PSU_EFFICIENCY_TIER`, `WorkloadEvaluationResult`) and legacy types (`HardwareCategory`).
+  - Added `"check:knip": "knip"` script and integrated it into `npm run check`.
+  - Configured `knip.json` with entry points, ignoring Tailwind v4 CSS imports.
 
 - **Oversized Files Decomposition & Allowlist Elimination (`[PERF-03]`, 2026-10-20):**
   - Split `src/App.tsx` from 818 to 373 lines by extracting `VisualizerPanel.tsx` (541 lines).

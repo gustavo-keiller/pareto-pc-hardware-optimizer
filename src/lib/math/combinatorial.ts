@@ -29,7 +29,6 @@ import { GpuCandidate, HardwareVendor } from './types';
 import { searchOptimalBuildTuples } from './buildSearch';
 
 import {
-  PSU_EFFICIENCY_TIER,
   pruneDominatedCases,
   pruneDominatedCoolers,
   pruneDominatedCpus,
@@ -41,7 +40,6 @@ import {
 } from './intraCategoryPruning';
 
 export {
-  PSU_EFFICIENCY_TIER,
   pruneDominatedCases,
   pruneDominatedCoolers,
   pruneDominatedCpus,

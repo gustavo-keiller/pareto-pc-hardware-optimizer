@@ -28,7 +28,7 @@ const GpuDealImporterModal = lazy(() =>
   })),
 );
 
-export function App() {
+export default function App() {
   const {
     datasetMode,
     uiMode,
@@ -368,5 +368,3 @@ export function App() {
     </div>
   );
 }
-
-export default App;

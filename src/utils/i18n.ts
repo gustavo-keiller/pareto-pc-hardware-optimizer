@@ -90,19 +90,6 @@ export function getHeaderSubtitle(
   }
 }
 
-/**
- * Transparent currency conversion notice for Brazilian real estimates.
- */
-export function getEstimatedPriceNotice(
-  locale: AppLocale,
-  currency: 'USD' | 'BRL',
-): string {
-  if (currency !== 'BRL') return '';
-  return locale === 'pt-BR'
-    ? 'Preços estimados com base em paridade cambial e impostos médios (câmbio R$ 5,65 + 18% ICMS).'
-    : 'Estimated Brazilian Real prices based on currency parity and average duties.';
-}
-
 export function formatAltSavingsText(
   savingsFormatted: string,
   pctSavings: number,
