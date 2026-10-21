@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- None currently active. Phase 2 and Phase 3 `[DATA-01]` are merged into `main` and all feature branches deleted. Ready for `[DATA-02]`.
+- None (merging `feat/data-02-benchmark-sourcing` to `main`, next is `[DATA-03]`).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Public Creator Benchmark Sourcing & Normalization Engine (`[DATA-02]`, 2026-10-20):**
+  - Created public creator benchmark datasets from TechPowerUp, Hardware Unboxed, Gamers Nexus, and LTT Labs in `src/data/benchmarks/gpuBenchmarks.json` and `cpuBenchmarks.json`.
+  - Built pure mathematical normalization engine in `src/lib/math/benchmarkNormalization.ts` with anchor re-centering, transitive bridge chaining, and scale-invariant geometric mean aggregation across review publications.
+  - Attached benchmark run schema and score validation into `scripts/validate-catalogs.cjs`.
+  - Backed by property tests asserting ratio transitivity, inversion symmetry, and scale invariance in `src/lib/math/__tests__/benchmarkNormalization.test.ts`.
 
 - **Versioned JSON Catalogs with Schema Validation (`[DATA-01]`, 2026-10-20):**
   - Moved all 8 hardware component catalogs into versioned JSON files in `src/data/catalogs/` (`cpus.json`, `gpus.json`, `motherboards.json`, `ram.json`, `storage.json`, `coolers.json`, `cases.json`, `psus.json`).

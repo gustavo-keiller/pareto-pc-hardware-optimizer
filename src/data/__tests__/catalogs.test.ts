@@ -103,4 +103,44 @@ describe('DATA-01: Versioned JSON Catalogs & Schema Integrity', () => {
       expect(caseFormFactors.has(mobo.formFactor)).toBe(true);
     }
   });
+
+  it('loads public creator benchmark datasets and computes harmonized indexes (DATA-02)', async () => {
+    const {
+      CPU_BENCHMARK_RUNS,
+      GPU_BENCHMARK_RUNS,
+      HARMONIZED_CPU_SCORES,
+      HARMONIZED_GPU_SCORES,
+      getBenchmarkProvenance,
+    } = await import('../benchmarks');
+
+    expect(GPU_BENCHMARK_RUNS.length).toBeGreaterThanOrEqual(3);
+    expect(CPU_BENCHMARK_RUNS.length).toBeGreaterThanOrEqual(2);
+
+    // Harmonized score computed for key cards
+    expect(HARMONIZED_GPU_SCORES['rtx-4070'].harmonizedIndex).toBeCloseTo(
+      100,
+      1,
+    );
+    expect(HARMONIZED_GPU_SCORES['rtx-4090'].harmonizedIndex).toBeGreaterThan(
+      180,
+    );
+    expect(HARMONIZED_GPU_SCORES['rx-6600'].harmonizedIndex).toBeLessThan(50);
+
+    // Harmonized score computed for key CPUs
+    expect(
+      HARMONIZED_CPU_SCORES['cpu-ryzen-7800x3d'].harmonizedIndex,
+    ).toBeCloseTo(100, 1);
+    expect(
+      HARMONIZED_CPU_SCORES['cpu-i7-14700k'].harmonizedIndex,
+    ).toBeGreaterThan(90);
+
+    // Provenance citation returns reviewers list
+    const provGpu = getBenchmarkProvenance('rtx-4070');
+    expect(provGpu).toContain('TechPowerUp');
+    expect(provGpu).toContain('Hardware Unboxed');
+
+    const provCpu = getBenchmarkProvenance('cpu-ryzen-7800x3d');
+    expect(provCpu).toContain('Hardware Unboxed');
+    expect(provCpu).toContain('TechPowerUp');
+  });
 });

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "hub-cpu-gaming-1080p-2024",
+    "creator": "Hardware Unboxed",
+    "publicationTitle": "Hardware Unboxed 12-Game CPU Gaming Index (RTX 4090 Testbench)",
+    "url": "https://www.youtube.com/watch?v=hardware-unboxed-cpu-gaming-2024",
+    "date": "2024-07-20",
+    "resolution": "1080p",
+    "metric": "gamingScore",
+    "anchorItem": "cpu-ryzen-7800x3d",
+    "anchorValue": 100,
+    "scores": {
+      "cpu-ryzen-7800x3d": 100,
+      "cpu-i7-14700k": 92,
+      "cpu-ryzen-9700x": 88,
+      "cpu-ultra7-265k": 87,
+      "cpu-i5-13600k": 86,
+      "cpu-ryzen-7600x": 84,
+      "cpu-ryzen-7600": 82,
+      "cpu-ryzen-5700x3d": 82,
+      "cpu-ryzen-5600": 65,
+      "cpu-i5-12400f": 63,
+      "cpu-ryzen-5500": 56,
+      "cpu-i3-12100f": 54
+    }
+  },
+  {
+    "id": "tpu-cpu-gaming-1440p-2024",
+    "creator": "TechPowerUp",
+    "publicationTitle": "TechPowerUp CPU Gaming Performance Index (1440p)",
+    "url": "https://www.techpowerup.com/review/amd-ryzen-7-7800x3d/19.html",
+    "date": "2024-06-01",
+    "resolution": "1440p",
+    "metric": "gamingScore",
+    "anchorItem": "cpu-ryzen-7800x3d",
+    "anchorValue": 100,
+    "scores": {
+      "cpu-ryzen-7800x3d": 100,
+      "cpu-i7-14700k": 93,
+      "cpu-ryzen-9700x": 89,
+      "cpu-ultra7-265k": 87,
+      "cpu-i5-13600k": 87,
+      "cpu-ryzen-7600x": 85,
+      "cpu-ryzen-7600": 83,
+      "cpu-ryzen-5700x3d": 83,
+      "cpu-ryzen-5600": 66,
+      "cpu-i5-12400f": 64,
+      "cpu-ryzen-5500": 57,
+      "cpu-i3-12100f": 55
+    }
+  }
+]

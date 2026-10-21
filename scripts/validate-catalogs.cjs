@@ -335,6 +335,73 @@ for (const sock of cpuSockets) {
   }
 }
 
+// 11. Validate Public Creator Benchmarks (DATA-02)
+const BENCHMARKS_DIR = path.resolve(__dirname, '../src/data/benchmarks');
+function loadBenchmarkFile(file) {
+  const filePath = path.join(BENCHMARKS_DIR, file);
+  if (!fs.existsSync(filePath)) {
+    errors.push(`Missing benchmark file: ${file}`);
+    return [];
+  }
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      errors.push(`${file} must contain a non-empty array of benchmark runs`);
+      return [];
+    }
+    return parsed;
+  } catch (err) {
+    errors.push(
+      `JSON parse error in ${file}: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return [];
+  }
+}
+
+const VALID_CREATORS = new Set([
+  'TechPowerUp',
+  'Hardware Unboxed',
+  'Gamers Nexus',
+  'LTT Labs',
+]);
+
+const gpuBenchmarks = loadBenchmarkFile('gpuBenchmarks.json');
+const cpuBenchmarks = loadBenchmarkFile('cpuBenchmarks.json');
+
+for (const b of [...gpuBenchmarks, ...cpuBenchmarks]) {
+  const p = `[benchmark -> ${b?.id ?? 'UNKNOWN'}]`;
+  if (!b || typeof b !== 'object') {
+    errors.push(`${p} is not an object`);
+    continue;
+  }
+  if (!b.id || typeof b.id !== 'string') {
+    errors.push(`${p} missing id`);
+  }
+  if (!VALID_CREATORS.has(b.creator)) {
+    errors.push(`${p} invalid creator '${b.creator}'`);
+  }
+  if (!b.url || typeof b.url !== 'string' || !b.url.startsWith('http')) {
+    errors.push(`${p} missing or invalid citation url`);
+  }
+  if (!b.date || typeof b.date !== 'string' || !ISO_DATE_REGEX.test(b.date)) {
+    errors.push(`${p} missing or invalid ISO date`);
+  }
+  if (
+    !b.scores ||
+    typeof b.scores !== 'object' ||
+    Object.keys(b.scores).length < 5
+  ) {
+    errors.push(`${p} scores must contain at least 5 benchmarked items`);
+  } else {
+    for (const [k, v] of Object.entries(b.scores)) {
+      if (typeof v !== 'number' || !Number.isFinite(v) || v <= 0) {
+        errors.push(`${p} invalid score for '${k}': ${v}`);
+      }
+    }
+  }
+}
+
 const totalParts =
   cpus.length +
   motherboards.length +
@@ -353,6 +420,6 @@ if (errors.length > 0) {
   process.exit(1);
 } else {
   console.log(
-    `[validate-catalogs] OK — 8 catalogs verified (${totalParts} parts: ${cpus.length} CPUs, ${motherboards.length} Mobos, ${ramKits.length} RAM, ${storages.length} Storage, ${coolers.length} Coolers, ${cases.length} Cases, ${psus.length} PSUs, ${gpus.length} GPUs) with schema, bounds, source, and date integrity.`,
+    `[validate-catalogs] OK — 8 catalogs verified (${totalParts} parts: ${cpus.length} CPUs, ${motherboards.length} Mobos, ${ramKits.length} RAM, ${storages.length} Storage, ${coolers.length} Coolers, ${cases.length} Cases, ${psus.length} PSUs, ${gpus.length} GPUs) + ${gpuBenchmarks.length + cpuBenchmarks.length} creator benchmark runs with schema, bounds, source, and date integrity.`,
   );
 }

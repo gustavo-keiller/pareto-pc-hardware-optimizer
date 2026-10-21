@@ -76,6 +76,7 @@ export function searchOptimalBuildTuples(
   const hasBudgetCap = typeof maxBudget === 'number';
 
   // Branch-and-bound lower bound estimators: cheapest component in each category
+  const sortedPsus = [...psus].sort((a, b) => a.price - b.price);
   const minMobo = hasBudgetCap
     ? Math.min(...motherboards.map((m) => m.price))
     : 0;
@@ -86,7 +87,8 @@ export function searchOptimalBuildTuples(
   const minGpu = hasBudgetCap ? Math.min(...gpus.map((g) => g.price)) : 0;
   const minCooler = hasBudgetCap ? Math.min(...coolers.map((c) => c.price)) : 0;
   const minCase = hasBudgetCap ? Math.min(...cases.map((c) => c.price)) : 0;
-  const minPsu = hasBudgetCap ? Math.min(...psus.map((p) => p.price)) : 0;
+  const minPsu =
+    hasBudgetCap && sortedPsus.length > 0 ? sortedPsus[0].price : 0;
 
   const bestByPrice = new Map<
     number,
@@ -196,7 +198,9 @@ export function searchOptimalBuildTuples(
               gpu.tdpWatts,
             );
             const minPsuWattage = calculateRecommendedPsuWattage(systemLoad);
-            const matchingPsus = psus.filter((p) => p.wattage >= minPsuWattage);
+            const matchingPsus = sortedPsus.filter(
+              (p) => p.wattage >= minPsuWattage,
+            );
             if (matchingPsus.length === 0) continue;
 
             const gpuLength = gpu.lengthMm ?? 260;
@@ -255,13 +259,34 @@ export function searchOptimalBuildTuples(
                 for (const psu of matchingPsus) {
                   const totalPrice = costWithCase + psu.price;
                   if (hasBudgetCap && totalPrice > maxBudget) {
-                    continue;
+                    // Since matchingPsus is sorted by price ascending, any further PSUs will also exceed maxBudget
+                    break;
                   }
                   if (typeof minBudget === 'number' && totalPrice < minBudget) {
                     continue;
                   }
 
                   totalCompatibleBuilds++;
+
+                  const existing = bestByPrice.get(totalPrice);
+                  if (existing && score < existing.maxScore) {
+                    if (sampleTuples.length < 100) {
+                      sampleTuples.push({
+                        cpu,
+                        gpu,
+                        ram,
+                        mobo,
+                        psu,
+                        storage,
+                        pcCase,
+                        cooler,
+                        totalPrice,
+                        score,
+                        precomputed,
+                      });
+                    }
+                    continue;
+                  }
 
                   const tuple: CandidateBuildTuple = {
                     cpu,
@@ -277,7 +302,6 @@ export function searchOptimalBuildTuples(
                     precomputed,
                   };
 
-                  const existing = bestByPrice.get(totalPrice);
                   if (!existing) {
                     bestByPrice.set(totalPrice, {
                       maxScore: score,
