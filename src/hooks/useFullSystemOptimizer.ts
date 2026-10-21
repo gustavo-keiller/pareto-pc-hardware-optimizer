@@ -38,6 +38,39 @@ const EMPTY_RESULT: OptimizationResult = {
   },
 };
 
+const MAX_LRU_ENTRIES = 24;
+const OPTIMIZATION_CACHE = new Map<string, OptimizationResult>();
+
+function getCacheKey(
+  catalogs: ComponentCatalogs,
+  filterCriteria: BuildFilterCriteria,
+): string {
+  const catSig = `${catalogs.cpus.length}_${catalogs.gpus.length}_${catalogs.motherboards.length}_${catalogs.ramKits.length}_${catalogs.psus.length}_${catalogs.storages?.length ?? 0}_${catalogs.cases?.length ?? 0}_${catalogs.coolers?.length ?? 0}`;
+  return `${catSig}::${JSON.stringify(filterCriteria)}`;
+}
+
+function getCachedResult(key: string): OptimizationResult | undefined {
+  const result = OPTIMIZATION_CACHE.get(key);
+  if (result) {
+    // Refresh LRU access order
+    OPTIMIZATION_CACHE.delete(key);
+    OPTIMIZATION_CACHE.set(key, result);
+  }
+  return result;
+}
+
+function setCachedResult(key: string, result: OptimizationResult): void {
+  if (OPTIMIZATION_CACHE.size >= MAX_LRU_ENTRIES) {
+    const oldestKey = OPTIMIZATION_CACHE.keys().next().value;
+    if (oldestKey) OPTIMIZATION_CACHE.delete(oldestKey);
+  }
+  OPTIMIZATION_CACHE.set(key, result);
+}
+
+export function clearOptimizerCache(): void {
+  OPTIMIZATION_CACHE.clear();
+}
+
 export function useFullSystemOptimizer({
   catalogs,
   filterCriteria,
@@ -47,8 +80,14 @@ export function useFullSystemOptimizer({
   const [optimizationResult, setOptimizationResult] =
     useState<OptimizationResult>(() => {
       if (!enabled) return EMPTY_RESULT;
+      const key = getCacheKey(catalogs, filterCriteria);
+      const cached = getCachedResult(key);
+      if (cached) return cached;
+
       try {
-        return optimizeFullSystemBuilds(catalogs, filterCriteria);
+        const computed = optimizeFullSystemBuilds(catalogs, filterCriteria);
+        setCachedResult(key, computed);
+        return computed;
       } catch {
         return EMPTY_RESULT;
       }
@@ -57,6 +96,7 @@ export function useFullSystemOptimizer({
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const workerRef = useRef<Worker | null>(null);
   const requestIdRef = useRef<number>(0);
+  const activeDispatchKeyRef = useRef<string>('');
   const lastDispatchedKeyRef = useRef<string>(
     JSON.stringify({ filterCriteria, enabled }),
   );
@@ -78,6 +118,9 @@ export function useFullSystemOptimizer({
         const { requestId, result } = event.data;
         // Ignore stale responses to prevent out-of-order race conditions
         if (requestId === requestIdRef.current) {
+          if (activeDispatchKeyRef.current) {
+            setCachedResult(activeDispatchKeyRef.current, result);
+          }
           setOptimizationResult(result);
           setIsCalculating(false);
         }
@@ -117,6 +160,16 @@ export function useFullSystemOptimizer({
       return;
     }
 
+    // Check fast in-memory LRU cache to return instant 0ms result on previously visited budgets (PERF-06)
+    const cacheKey = getCacheKey(catalogs, filterCriteria);
+    const cached = getCachedResult(cacheKey);
+    if (cached) {
+      setOptimizationResult(cached);
+      setIsCalculating(false);
+      return;
+    }
+
+    activeDispatchKeyRef.current = cacheKey;
     const currentRequestId = ++requestIdRef.current;
 
     if (workerRef.current) {
@@ -131,6 +184,7 @@ export function useFullSystemOptimizer({
       // Fallback: synchronous execution on main thread
       try {
         const result = optimizeFullSystemBuilds(catalogs, filterCriteria);
+        setCachedResult(cacheKey, result);
         setOptimizationResult(result);
       } catch {
         setOptimizationResult(EMPTY_RESULT);

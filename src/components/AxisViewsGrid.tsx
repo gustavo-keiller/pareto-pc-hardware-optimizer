@@ -71,62 +71,126 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
       : activeSingleAxis;
 
   // Build ECharts option for any 2D slice (baseMetric on Bottom-Left -> Right vs. yMetric on Bottom-Left -> Top)
+  // Memoized 2D slice frontiers and extrapolation calculations independent of hover/selection (PERF-06)
+  const sliceCalculationCache = useMemo(() => {
+    const cache = new Map<
+      MetricKey,
+      {
+        frontierIdSet: Set<string>;
+        extendedCoords: [number, number][];
+        extrapLineCoords: [number, number][];
+        extrapDiagnostics: Record<
+          string,
+          import('../lib/math/extrapolation').GpuExtrapolationDiagnostic
+        >;
+        isSliceOptimal: (g: RankedGpu) => boolean;
+        sliceWinner: RankedGpu | null;
+        minX: number;
+        maxX: number;
+        minY: number;
+        maxY: number;
+      }
+    >();
+
+    const allMetrics: MetricKey[] = [
+      'price',
+      'rasterFps1440p',
+      'rtFps1440p',
+      'vramGb',
+      'tdpWatts',
+    ];
+
+    for (const yMetric of allMetrics) {
+      if (yMetric === baseMetric) continue;
+      const { frontierGpus, stepLineCoords } = get2DParetoFrontierCurve(
+        gpus,
+        baseMetric,
+        yMetric,
+      );
+      const frontierIdSet = new Set(frontierGpus.map((g) => g.id));
+      const extrapEval = evaluateLinearExtrapolation(
+        gpus,
+        baseMetric,
+        yMetric,
+        extrapolation,
+      );
+      const belowMarginSet = new Set(extrapEval.belowMarginIds);
+
+      const isSliceOptimal = (g: RankedGpu) =>
+        frontierIdSet.has(g.id) &&
+        (!extrapolation.enabled ||
+          !extrapolation.enforceAsTrap ||
+          !belowMarginSet.has(g.id));
+
+      const sliceWinner =
+        gpus.find((g) => isSliceOptimal(g)) ??
+        gpus.find((g) => g.id === frontierGpus[0]?.id) ??
+        null;
+
+      const xVals = gpus.map((g) => g[baseMetric]);
+      const yVals = gpus.map((g) => g[yMetric]);
+      const minX = Math.max(0, Math.floor(Math.min(...xVals) * 0.92));
+      const maxX = Math.ceil(Math.max(...xVals) * 1.06);
+      const minY = Math.max(0, Math.floor(Math.min(...yVals) * 0.88));
+      const maxY = Math.ceil(Math.max(...yVals) * 1.08);
+
+      const extendedCoords = [...stepLineCoords];
+      if (extendedCoords.length > 0) {
+        const last = extendedCoords[extendedCoords.length - 1];
+        if (baseDef.direction === 'min' && maxX > last[0]) {
+          extendedCoords.push([maxX, last[1]]);
+        } else if (baseDef.direction === 'max' && minX < last[0]) {
+          extendedCoords.unshift([minX, extendedCoords[0][1]]);
+        }
+      }
+
+      const extrapLineCoords = extrapolation.enabled
+        ? getExtrapolationCurvePoints(
+            extrapEval.evaluateCutoffY,
+            minX,
+            maxX,
+            minY,
+            maxY,
+          )
+        : [];
+
+      cache.set(yMetric, {
+        frontierIdSet,
+        extendedCoords,
+        extrapLineCoords,
+        extrapDiagnostics: extrapEval.diagnostics,
+        isSliceOptimal,
+        sliceWinner,
+        minX,
+        maxX,
+        minY,
+        maxY,
+      });
+    }
+
+    return cache;
+  }, [gpus, baseMetric, extrapolation, baseDef.direction]);
+
   const buildSliceOption = (
     yMetric: MetricKey,
     accentColor: string,
     isLargeInspector = false,
   ) => {
     const yDef = METRIC_DEFINITIONS[yMetric];
-    const { frontierGpus, stepLineCoords } = get2DParetoFrontierCurve(
-      gpus,
-      baseMetric,
-      yMetric,
-    );
-    const frontierIdSet = new Set(frontierGpus.map((g) => g.id));
+    const cachedSlice = sliceCalculationCache.get(yMetric);
+    if (!cachedSlice) return {};
 
-    const extrapEval = evaluateLinearExtrapolation(
-      gpus,
-      baseMetric,
-      yMetric,
-      extrapolation,
-    );
-    const belowMarginSet = new Set(extrapEval.belowMarginIds);
-
-    const isSliceOptimal = (g: RankedGpu) =>
-      frontierIdSet.has(g.id) &&
-      (!extrapolation.enabled ||
-        !extrapolation.enforceAsTrap ||
-        !belowMarginSet.has(g.id));
-
-    const sliceWinner =
-      gpus.find((g) => isSliceOptimal(g)) ?? frontierGpus[0] ?? null;
-
-    const xVals = gpus.map((g) => g[baseMetric]);
-    const yVals = gpus.map((g) => g[yMetric]);
-    const minX = Math.max(0, Math.floor(Math.min(...xVals) * 0.92));
-    const maxX = Math.ceil(Math.max(...xVals) * 1.06);
-    const minY = Math.max(0, Math.floor(Math.min(...yVals) * 0.88));
-    const maxY = Math.ceil(Math.max(...yVals) * 1.08);
-
-    const extendedCoords = [...stepLineCoords];
-    if (extendedCoords.length > 0) {
-      const last = extendedCoords[extendedCoords.length - 1];
-      if (baseDef.direction === 'min' && maxX > last[0]) {
-        extendedCoords.push([maxX, last[1]]);
-      } else if (baseDef.direction === 'max' && minX < last[0]) {
-        extendedCoords.unshift([minX, extendedCoords[0][1]]);
-      }
-    }
-
-    const extrapLineCoords = extrapolation.enabled
-      ? getExtrapolationCurvePoints(
-          extrapEval.evaluateCutoffY,
-          minX,
-          maxX,
-          minY,
-          maxY,
-        )
-      : [];
+    const {
+      extendedCoords,
+      extrapLineCoords,
+      extrapDiagnostics,
+      isSliceOptimal,
+      sliceWinner,
+      minX,
+      maxX,
+      minY,
+      maxY,
+    } = cachedSlice;
 
     const visibleGpus = hideDominatedNodes
       ? gpus.filter((g) => isSliceOptimal(g))
@@ -191,7 +255,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
           const g = params.data?.gpu;
           if (!g) return '';
           const isOpt = isSliceOptimal(g);
-          const diag = extrapEval.diagnostics[g.id];
+          const diag = extrapDiagnostics[g.id];
           const ratio = (g[baseMetric] / Math.max(1e-6, g[yMetric])).toFixed(2);
           const ratioStr =
             baseDef.unit === '$'
@@ -318,30 +382,15 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
   // Efficiency Leaderboard for the Single-Axis Inspector (sorted by Spec per Base unit)
   const efficiencyRanking = useMemo(() => {
     const yDef = METRIC_DEFINITIONS[effectiveSingleAxis];
-    const { frontierGpus } = get2DParetoFrontierCurve(
-      gpus,
-      baseMetric,
-      effectiveSingleAxis,
-    );
-    const frontierIds = new Set(frontierGpus.map((g) => g.id));
-    const extrapEval = evaluateLinearExtrapolation(
-      gpus,
-      baseMetric,
-      effectiveSingleAxis,
-      extrapolation,
-    );
-    const belowSet = new Set(extrapEval.belowMarginIds);
+    const cachedSlice = sliceCalculationCache.get(effectiveSingleAxis);
+    const isSliceOptimal = cachedSlice?.isSliceOptimal ?? (() => false);
 
     return [...gpus]
       .map((g) => {
         const bx = Math.max(1e-6, g[baseMetric]);
         const sy = Math.max(1e-6, g[effectiveSingleAxis]);
         const costPerSpec = bx / sy;
-        const isOpt =
-          frontierIds.has(g.id) &&
-          (!extrapolation.enabled ||
-            !extrapolation.enforceAsTrap ||
-            !belowSet.has(g.id));
+        const isOpt = isSliceOptimal(g);
         return { gpu: g, costPerSpec, isOpt, yDef };
       })
       .sort((a, b) =>
@@ -349,7 +398,7 @@ export const AxisViewsGrid: React.FC<AxisViewsGridProps> = ({
           ? a.costPerSpec - b.costPerSpec
           : a.gpu[effectiveSingleAxis] - b.gpu[effectiveSingleAxis],
       );
-  }, [gpus, baseMetric, effectiveSingleAxis, extrapolation]);
+  }, [gpus, baseMetric, effectiveSingleAxis, sliceCalculationCache]);
 
   const onEvents = useMemo(
     () => ({

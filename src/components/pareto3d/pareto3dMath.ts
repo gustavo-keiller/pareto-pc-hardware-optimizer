@@ -146,7 +146,25 @@ export function computeCubeLines(
   });
 }
 
-export interface DominatedBoundaryOptions {
+export interface RawDominatedFace {
+  quad: [Vec3, Vec3, Vec3, Vec3];
+  isFrontierInterface: boolean;
+}
+
+export interface DominatedCornerTickCoords {
+  id: string;
+  origin: Vec3;
+  tx: Vec3;
+  ty: Vec3;
+  tz: Vec3;
+}
+
+export interface DominatedMeshGeometry {
+  rawFaces: RawDominatedFace[];
+  cornerTicks: DominatedCornerTickCoords[];
+}
+
+export interface DominatedGeometryOptions {
   gpus: RankedGpu[];
   viewOptimalityMap: Map<
     string,
@@ -160,11 +178,18 @@ export interface DominatedBoundaryOptions {
   yDef: MetricDefinition;
   zDef: MetricDefinition;
   activePreset: CameraPresetId | 'custom';
-  projectPoint: (nx: number, ny: number, nz: number) => ProjectedPoint;
   showDominatedZoneMesh: boolean;
 }
 
-export function computeDominatedBoundary({
+export interface DominatedBoundaryOptions extends DominatedGeometryOptions {
+  projectPoint: (nx: number, ny: number, nz: number) => ProjectedPoint;
+}
+
+/**
+ * Computes 3D voxel grid and unprojected boundary face geometry in normalized space [-1, 1].
+ * Memoized per data and active metrics, independent of camera rotation/pan/zoom (PERF-06).
+ */
+export function computeDominatedGeometry({
   gpus,
   viewOptimalityMap,
   xMetric,
@@ -175,11 +200,10 @@ export function computeDominatedBoundary({
   yDef,
   zDef,
   activePreset,
-  projectPoint,
   showDominatedZoneMesh,
-}: DominatedBoundaryOptions) {
+}: DominatedGeometryOptions): DominatedMeshGeometry {
   if (!showDominatedZoneMesh || gpus.length === 0) {
-    return { fillFaces: [], cornerTicks: [] };
+    return { rawFaces: [], cornerTicks: [] };
   }
 
   const optimalGpus = gpus
@@ -333,7 +357,30 @@ export function computeDominatedBoundary({
     }
   }
 
-  const fillFaces = rawFaces
+  const dxTick = xMinDir ? 0.22 : -0.22;
+  const dyTick = yMaxDir ? -0.22 : 0.22;
+  const dzTick = zMaxDir ? -0.22 : 0.22;
+
+  const cornerTicks: DominatedCornerTickCoords[] = optimalGpus.map((g) => ({
+    id: g.id,
+    origin: { x: g.nx, y: g.ny, z: g.nz },
+    tx: { x: Math.max(-1, Math.min(1, g.nx + dxTick)), y: g.ny, z: g.nz },
+    ty: { x: g.nx, y: Math.max(-1, Math.min(1, g.ny + dyTick)), z: g.nz },
+    tz: { x: g.nx, y: g.ny, z: Math.max(-1, Math.min(1, g.nz + dzTick)) },
+  }));
+
+  return { rawFaces, cornerTicks };
+}
+
+/**
+ * Projects precomputed 3D dominated boundary faces and ticks to screen coordinates.
+ * High-frequency projection executed during camera yaw/pitch/pan/zoom (PERF-06).
+ */
+export function projectDominatedBoundary(
+  geometry: DominatedMeshGeometry,
+  projectPoint: (nx: number, ny: number, nz: number) => ProjectedPoint,
+) {
+  const fillFaces = geometry.rawFaces
     .map((f, idx) => {
       const proj = f.quad.map((v) => projectPoint(v.x, v.y, v.z));
       const depthIntoScreen =
@@ -351,29 +398,18 @@ export function computeDominatedBoundary({
     })
     .sort((a, b) => b.depthIntoScreen - a.depthIntoScreen);
 
-  const dxTick = xMinDir ? 0.22 : -0.22;
-  const dyTick = yMaxDir ? -0.22 : 0.22;
-  const dzTick = zMaxDir ? -0.22 : 0.22;
-
-  const cornerTicks = optimalGpus.map((g) => {
-    const origin = projectPoint(g.nx, g.ny, g.nz);
-    const tx = projectPoint(
-      Math.max(-1, Math.min(1, g.nx + dxTick)),
-      g.ny,
-      g.nz,
-    );
-    const ty = projectPoint(
-      g.nx,
-      Math.max(-1, Math.min(1, g.ny + dyTick)),
-      g.nz,
-    );
-    const tz = projectPoint(
-      g.nx,
-      g.ny,
-      Math.max(-1, Math.min(1, g.nz + dzTick)),
-    );
-    return { id: g.id, origin, tx, ty, tz };
-  });
+  const cornerTicks = geometry.cornerTicks.map((ct) => ({
+    id: ct.id,
+    origin: projectPoint(ct.origin.x, ct.origin.y, ct.origin.z),
+    tx: projectPoint(ct.tx.x, ct.tx.y, ct.tx.z),
+    ty: projectPoint(ct.ty.x, ct.ty.y, ct.ty.z),
+    tz: projectPoint(ct.tz.x, ct.tz.y, ct.tz.z),
+  }));
 
   return { fillFaces, cornerTicks };
+}
+
+export function computeDominatedBoundary(options: DominatedBoundaryOptions) {
+  const geometry = computeDominatedGeometry(options);
+  return projectDominatedBoundary(geometry, options.projectPoint);
 }

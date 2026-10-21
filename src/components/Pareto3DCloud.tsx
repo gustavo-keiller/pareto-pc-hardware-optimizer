@@ -12,7 +12,8 @@ import {
   normalizeVal,
   createProjectPoint,
   computeCubeLines,
-  computeDominatedBoundary,
+  computeDominatedGeometry,
+  projectDominatedBoundary,
 } from './pareto3d/pareto3dMath';
 import { Pareto3DToolbar } from './pareto3d/Pareto3DToolbar';
 
@@ -161,9 +162,10 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
     [projectPoint],
   );
 
-  const mergedDominatedBoundary = useMemo(
+  // 3D voxel grid and unprojected boundary face geometry memoized independent of camera transforms (PERF-06)
+  const dominatedGeometry = useMemo(
     () =>
-      computeDominatedBoundary({
+      computeDominatedGeometry({
         gpus,
         viewOptimalityMap,
         xMetric,
@@ -174,7 +176,6 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
         yDef,
         zDef,
         activePreset,
-        projectPoint,
         showDominatedZoneMesh,
       }),
     [
@@ -188,9 +189,14 @@ export const Pareto3DCloud: React.FC<Pareto3DCloudProps> = ({
       yDef,
       zDef,
       activePreset,
-      projectPoint,
       showDominatedZoneMesh,
     ],
+  );
+
+  // High-frequency viewport projection executed on camera rotations (yaw/pitch/zoom/pan)
+  const mergedDominatedBoundary = useMemo(
+    () => projectDominatedBoundary(dominatedGeometry, projectPoint),
+    [dominatedGeometry, projectPoint],
   );
 
   const projectedGpus = useMemo(() => {

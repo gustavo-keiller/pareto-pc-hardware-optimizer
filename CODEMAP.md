@@ -124,6 +124,7 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | `src/__tests__/App.ui.test.tsx` | UI smoke tests (jsdom + Testing Library): each mode renders, budget changes the Simple top pick, share buttons copy links and feedback badges |
 | `src/__tests__/PartSwapper.ui.test.tsx` | UI integration test (jsdom + Testing Library): interactive part swapping in Full Builds mode and live build metric updates (`[BLD-05]`) |
 | `src/__tests__/checkPerfBudget.test.ts` | **Vitest Performance Budget Suite (`[PERF-05]`)** — 5 property tests verifying bundle sizes, worker limits, ECharts vendor cap, and lazy chunk ceilings |
+| `src/lib/math/__tests__/perfMathMemoization.test.ts` | **Vitest Math Memoization Suite (`[PERF-06]`)** — property tests verifying TOPSIS normalization memoization, 3D boundary geometry decoupling from camera projection, and zero-leak cache isolation |
 | `src/data/__tests__/catalogs.test.ts` | Vitest catalog suite (`[DATA-01]`): verifies all 8 JSON catalogs load, maintain unique IDs, include source/date metadata, and satisfy cross-platform compatibility |
 | `src/data/__tests__/addPart.test.ts` | **Vitest Add-Part Suite (`[DATA-06]`)** — 6 property and schema tests verifying component validation, duplicate detection, dry-run appending, and error handling |
 | `src/lib/math/__tests__/benchmarkNormalization.test.ts` | **Vitest Benchmark Normalization Suite (`[DATA-02]`)** — 7 property tests verifying anchor re-centering, scale invariance, transitive bridge chaining, and geometric mean bounds |

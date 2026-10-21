@@ -61,6 +61,16 @@ export function normalizeWeights(
   };
 }
 
+interface CachedNormalizedCandidate {
+  candidate: ParetoEvaluatedGpu;
+  normalizedMetrics: Record<MetricKey, number>;
+}
+
+const NORMALIZED_MATRIX_CACHE = new WeakMap<
+  ParetoEvaluatedGpu[],
+  readonly CachedNormalizedCandidate[]
+>();
+
 /**
  * Stage 3: TOPSIS Ranking (Technique for Order of Preference by Similarity to Ideal Solution)
  *
@@ -85,24 +95,36 @@ export function rankByTopsis(
 
   const weights = normalizeWeights(rawWeights);
 
-  // Step 1: Compute Euclidean column norms sqrt(sum x_ij^2)
-  const columnNorms = zeroMetricRecord();
+  // Fast-path memoization: reuse precomputed Euclidean column norms and normalized candidate vectors (PERF-06)
+  let normalizedList = NORMALIZED_MATRIX_CACHE.get(candidates);
+  if (!normalizedList) {
+    // Step 1: Compute Euclidean column norms sqrt(sum x_ij^2)
+    const columnNorms = zeroMetricRecord();
+    for (const metric of ALL_METRIC_KEYS) {
+      const sumSq = candidates.reduce(
+        (acc, c) => acc + c[metric] * c[metric],
+        0,
+      );
+      columnNorms[metric] = Math.sqrt(sumSq);
+    }
 
-  for (const metric of ALL_METRIC_KEYS) {
-    const sumSq = candidates.reduce((acc, c) => acc + c[metric] * c[metric], 0);
-    columnNorms[metric] = Math.sqrt(sumSq);
+    normalizedList = candidates.map((candidate) => {
+      const normalizedMetrics = zeroMetricRecord();
+      for (const metric of ALL_METRIC_KEYS) {
+        const norm = columnNorms[metric];
+        normalizedMetrics[metric] = norm > 0 ? candidate[metric] / norm : 0;
+      }
+      return { candidate, normalizedMetrics };
+    });
+
+    NORMALIZED_MATRIX_CACHE.set(candidates, normalizedList);
   }
 
-  // Step 1 & 2: Compute r_ij and v_ij = w_j * r_ij for each candidate
-  const matrices = candidates.map((candidate) => {
-    const normalizedMetrics = zeroMetricRecord();
+  // Step 2: Compute weighted metrics v_ij = w_j * r_ij for each candidate
+  const matrices = normalizedList.map(({ candidate, normalizedMetrics }) => {
     const weightedMetrics = zeroMetricRecord();
-
     for (const metric of ALL_METRIC_KEYS) {
-      const norm = columnNorms[metric];
-      const r_ij = norm > 0 ? candidate[metric] / norm : 0;
-      normalizedMetrics[metric] = r_ij;
-      weightedMetrics[metric] = weights[metric] * r_ij;
+      weightedMetrics[metric] = weights[metric] * normalizedMetrics[metric];
     }
 
     return {

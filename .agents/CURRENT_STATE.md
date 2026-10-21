@@ -4,13 +4,20 @@
 
 ## 🔴 In Flight
 
-- None (ready for `[PERF-06]` Heavy math off main thread & input memoization).
+- None (Phase 4 100% completed; ready for UX-10 / Phase 5 Launch).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Math Off-Main-Thread & Input Memoization Optimization (`[PERF-06]`, 2026-10-20):**
+  - Added 24-entry LRU cache to `useFullSystemOptimizer` returning 0ms instant responses for repeated budget presets without redundant worker round-trips.
+  - Implemented `WeakMap` normalized matrix memoization in TOPSIS ranking engine, reusing column norms and normalized candidate vectors across weight slider moves.
+  - Decoupled 3D voxel boundary mesh generation from camera projection in `Pareto3DCloud` (`computeDominatedGeometry` vs. `projectDominatedBoundary`), eliminating 3D voxel recalculations on camera orbit/zoom.
+  - Memoized 2D slice Pareto frontiers and linear extrapolation curves in `AxisViewsGrid` to eliminate recalculations on hover.
+  - Backed by property tests in `src/lib/math/__tests__/perfMathMemoization.test.ts` and `src/hooks/__tests__/useFullSystemOptimizer.test.ts`.
 
 - **Performance Budget & CI Bundle Size Enforcement (`[PERF-05]`, 2026-10-20):**
   - Created performance budget checker in `scripts/check-perf-budget.cjs` runnable via `npm run check:perf`.

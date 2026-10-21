@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useFullSystemOptimizer } from '../useFullSystemOptimizer';
+import {
+  clearOptimizerCache,
+  useFullSystemOptimizer,
+} from '../useFullSystemOptimizer';
 import {
   SEED_CPUS,
   SEED_MOTHERBOARDS,
@@ -30,6 +33,7 @@ describe('useFullSystemOptimizer Hook [BLD-04]', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    clearOptimizerCache();
   });
 
   afterEach(() => {
@@ -248,5 +252,80 @@ describe('useFullSystemOptimizer Hook [BLD-04]', () => {
 
     expect(result.current.isCalculating).toBe(false);
     expect(result.current.optimizationResult.totalCompatibleBuilds).toBe(222);
+  });
+
+  it('reuses memoized LRU cache on repeated budget inputs without re-dispatching to Worker (PERF-06)', () => {
+    let messageHandler: ((event: MessageEvent) => void) | null = null;
+    const postMessageSpy = vi.fn();
+
+    class MockWorker {
+      set onmessage(handler: (event: MessageEvent) => void) {
+        messageHandler = handler;
+      }
+      postMessage = postMessageSpy;
+      terminate = vi.fn();
+    }
+
+    // @ts-expect-error mock worker
+    globalThis.Worker = MockWorker;
+
+    const { result, rerender } = renderHook(
+      ({ budget }) =>
+        useFullSystemOptimizer({
+          catalogs: testCatalogs,
+          filterCriteria: { maxBudget: budget },
+        }),
+      { initialProps: { budget: 2000 } },
+    );
+
+    // Switch to budget 1400 (cache miss -> dispatches to worker)
+    act(() => {
+      rerender({ budget: 1400 });
+    });
+    expect(postMessageSpy).toHaveBeenCalledTimes(1);
+
+    // Worker replies with result for 1400
+    act(() => {
+      if (messageHandler) {
+        messageHandler({
+          data: {
+            requestId: 1,
+            result: {
+              allCompatibleBuilds: [],
+              totalCompatibleBuilds: 999,
+              optimalBuilds: [],
+              prunedPartCounts: {
+                cpus: 1,
+                gpus: 1,
+                motherboards: 1,
+                ramKits: 1,
+                psus: 1,
+                storages: 1,
+                cases: 1,
+                coolers: 1,
+              },
+            },
+          },
+        } as MessageEvent);
+      }
+    });
+
+    expect(result.current.optimizationResult.totalCompatibleBuilds).toBe(999);
+
+    // Switch to budget 1800 (cache miss -> dispatches to worker)
+    act(() => {
+      rerender({ budget: 1800 });
+    });
+    expect(postMessageSpy).toHaveBeenCalledTimes(2);
+
+    // Now switch BACK to budget 1400 (CACHE HIT: must not dispatch to worker again!)
+    act(() => {
+      rerender({ budget: 1400 });
+    });
+
+    // Post message spy count remains 2 (zero new worker calls!)
+    expect(postMessageSpy).toHaveBeenCalledTimes(2);
+    expect(result.current.isCalculating).toBe(false);
+    expect(result.current.optimizationResult.totalCompatibleBuilds).toBe(999);
   });
 });
