@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- None (All Phase 3 data milestones completed and merged; next up is Phase 4 code optimization & UX-10 testing).
+- `[PERF-04]` Dead code removal via `knip` and CI integration.
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Oversized Files Decomposition & Allowlist Elimination (`[PERF-03]`, 2026-10-20):**
+  - Split `src/App.tsx` from 818 to 373 lines by extracting `VisualizerPanel.tsx` (541 lines).
+  - Modularized `Pareto3DCloud.tsx` from 1169 lines to 640 lines by extracting tensor-product grid math into `src/components/pareto3d/pareto3dMath.ts` and camera controls into `src/components/pareto3d/Pareto3DToolbar.tsx`.
+  - Decomposed `HyperDimensionalExplorer.tsx` from 1490 lines to 301 lines across structured sub-views in `src/components/hyper/` (`hyperTypes.ts`, `HyperHeaderControls.tsx`, `ParallelDominanceView.tsx`, `StarGlyphScatterView.tsx`, and `RadVizGravityArena.tsx`).
+  - Emptied `OVERSIZED_FILE_ALLOWLIST = {}` in `scripts/check-docs.cjs`.
 
 - **Maintainer Tooling via `npm run add-part` (`[DATA-06]`, 2026-10-20):**
   - Created interactive CLI wizard and non-interactive maintainer tooling in `scripts/add-part.cjs`.
