@@ -4,7 +4,7 @@
 
 ## 🔴 In Flight
 
-- `feat/data-01-json-catalogs`: Finalizing `[DATA-01]` (versioned JSON catalogs with schema validation in `npm run check`).
+- None currently active. Phase 2 and Phase 3 `[DATA-01]` are merged into `main` and all feature branches deleted. Ready for `[DATA-02]`.
 
 ## 🔶 Decisions Made Without Validation
 
