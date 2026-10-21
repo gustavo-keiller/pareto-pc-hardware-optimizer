@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- None (ready for `[PERF-05]` Performance budget in CI).
+- None (ready for `[PERF-06]` Heavy math off main thread & input memoization).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Performance Budget & CI Bundle Size Enforcement (`[PERF-05]`, 2026-10-20):**
+  - Created performance budget checker in `scripts/check-perf-budget.cjs` runnable via `npm run check:perf`.
+  - Enforces strict gzip limits: critical initial bundle $\le 160\text{ KB}$, index JS $\le 140\text{ KB}$, index CSS $\le 20\text{ KB}$, worker $\le 10\text{ KB}$, ECharts vendor $\le 250\text{ KB}$, lazy chunks $\le 30\text{ KB}$ each.
+  - Added CI check in `.github/workflows/check.yml` to automatically reject regressions.
+  - Added Vitest property tests in `src/__tests__/checkPerfBudget.test.ts` and Playwright performance/DOM health audits in `e2e/perf.spec.ts`.
 
 - **Dead Code Elimination with Knip & CI Integration (`[PERF-04]`, 2026-10-20):**
   - Integrated `knip` static analysis for dead code, unused exports, unused files, and unused dependencies.

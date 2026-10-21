@@ -19,6 +19,7 @@
     "check:docs": "node scripts/check-docs.cjs",
     "check:catalogs": "node scripts/validate-catalogs.cjs",
     "check:knip": "knip",
+    "check:perf": "node scripts/check-perf-budget.cjs",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run check:docs && npm run check:catalogs && npm run check:knip",
     "preview": "vite preview"
   },

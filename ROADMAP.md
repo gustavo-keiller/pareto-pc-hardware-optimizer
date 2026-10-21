@@ -88,7 +88,7 @@
 - [x] **`[PERF-02]` Import only the ECharts parts used** (`echarts/core` + the specific charts/components, via `echarts-for-react/lib/core`). Shipped centralized `EChartsRenderer.tsx` registering only required charts (`Scatter`, `EffectScatter`, `Line`, `Lines`, `Bar`, `Radar`, `Parallel`) and components, reducing vendor chunk by 392 kB. _Done 2026-10-19._
 - [x] **`[PERF-03]` Split the oversized files** (`SimpleParetoGuide`, `HyperDimensionalExplorer`, `Pareto3DCloud`, and `App` decomposed into modular sub-views and deep containers). Pure 3D math moved to `src/components/pareto3d/pareto3dMath.ts`, hyper-dimensional projections decomposed into `src/components/hyper/`, visualizer panel extracted into `src/components/VisualizerPanel.tsx`, and `OVERSIZED_FILE_ALLOWLIST` in `scripts/check-docs.cjs` successfully reduced to empty `{}`. _Done 2026-10-20._
 - [x] **`[PERF-04]` Remove dead code** with `knip` (unused exports/files/deps) and add it to CI. Uninstalled unused dependencies (`clsx`, `tailwind-merge`), removed duplicate exports and dead types, integrated `check:knip` into `npm run check`. _Done 2026-10-20._
-- [ ] **`[PERF-05]` Performance budget in CI:** bundle size limit and a Lighthouse score floor on the built site.
+- [x] **`[PERF-05]` Performance budget in CI:** bundle size limit and a Lighthouse score floor on the built site. Implemented `scripts/check-perf-budget.cjs` (`npm run check:perf`), bundle size property tests in `src/__tests__/checkPerfBudget.test.ts`, and Playwright DOM/runtime performance audits in `e2e/perf.spec.ts`. _Done 2026-10-20._
 - [ ] **`[PERF-06]` Heavy math off the main thread** (shared with BLD-04) and memoized per input, so sliders stay smooth on cheap phones.
 
 ---

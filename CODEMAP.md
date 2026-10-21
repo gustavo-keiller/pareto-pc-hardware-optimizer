@@ -115,13 +115,15 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | Path | Purpose |
 | :--- | :--- |
 | `scripts/check-docs.cjs` | Validates `AGENTS.md` character cap (<12,000 chars), internal markdown links, `.agents/skills/` frontmatter, `.claude/skills/` stub parity, and the 600/800-line file cap (with a shrink-only allowlist) |
+| `scripts/check-perf-budget.cjs` | **Performance Budget & Bundle Size Validator (`[PERF-05]`)** — enforces strict payload and gzip boundaries across critical path, worker, ECharts, and lazy feature chunks (`npm run check:perf`) |
 | `knip.json` | **Dead Code & Dependency Analysis Configuration (`[PERF-04]`)** — configures `knip` static analysis for entry points, project boundaries, and dependency pruning, enforced via `npm run check:knip` |
 | `scripts/validate-catalogs.cjs` | Validates schema conformance, numeric bounds, ID uniqueness, source citations, audit dates, and cross-catalog compatibility for all JSON hardware catalogs (`[DATA-01]`) |
 | `scripts/add-part.cjs` | **Interactive & CLI Maintainer Tooling (`[DATA-06]`)** — interactive and CLI-driven maintainer script prompting for specs, validating schemas and ID uniqueness, and safely appending new components to JSON catalogs |
-| `.github/workflows/check.yml` | CI: `npm ci`, `npm run check`, `npm run build`, plus the Playwright e2e job, on every push to `main` and every PR |
+| `.github/workflows/check.yml` | CI: `npm ci`, `npm run check`, `npm run build`, `npm run check:perf`, plus the Playwright e2e job, on every push to `main` and every PR |
 | `scripts/snap.mjs` | `npm run snap`: starts Vite and saves desktop + phone screenshots of each mode to `snapshots/` (gitignored) |
 | `src/__tests__/App.ui.test.tsx` | UI smoke tests (jsdom + Testing Library): each mode renders, budget changes the Simple top pick, share buttons copy links and feedback badges |
 | `src/__tests__/PartSwapper.ui.test.tsx` | UI integration test (jsdom + Testing Library): interactive part swapping in Full Builds mode and live build metric updates (`[BLD-05]`) |
+| `src/__tests__/checkPerfBudget.test.ts` | **Vitest Performance Budget Suite (`[PERF-05]`)** — 5 property tests verifying bundle sizes, worker limits, ECharts vendor cap, and lazy chunk ceilings |
 | `src/data/__tests__/catalogs.test.ts` | Vitest catalog suite (`[DATA-01]`): verifies all 8 JSON catalogs load, maintain unique IDs, include source/date metadata, and satisfy cross-platform compatibility |
 | `src/data/__tests__/addPart.test.ts` | **Vitest Add-Part Suite (`[DATA-06]`)** — 6 property and schema tests verifying component validation, duplicate detection, dry-run appending, and error handling |
 | `src/lib/math/__tests__/benchmarkNormalization.test.ts` | **Vitest Benchmark Normalization Suite (`[DATA-02]`)** — 7 property tests verifying anchor re-centering, scale invariance, transitive bridge chaining, and geometric mean bounds |
@@ -129,6 +131,7 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | `src/utils/__tests__/shareBuild.test.ts` | Unit tests for build share URL encoding/decoding, parameter sanitization, and plain-text clipboard formatting |
 | `src/utils/__tests__/plainLanguage.test.tsx` | Plain-language buyer copy regression tests ([`UX-03`]): asserts zero forbidden math jargon in Simple mode in pt-BR and en-US |
 | `e2e/beginner.spec.ts` | Playwright e2e (`npm run test:e2e`): "a beginner gets a recommendation" on desktop and phone |
+| `e2e/perf.spec.ts` | **Playwright Performance & DOM Health Audits (`[PERF-05]`)** — verifies DOM node count <1,000 in Simple mode, <2,000 in Full Builds mode, and zero uncaught runtime errors |
 | `eslint.config.js` / `.prettierrc.json` | Lint (zero `any`, zero type assertions except `as const`, hooks rules) and formatting, both part of `npm run check` |
 | `scripts/sync-claude-skills.cjs` | Generates/updates `.claude/skills/<name>/SKILL.md` pointer stubs from `.agents/skills/` (`npm run sync:skills`) |
 | `.agents/scripts/block-dangerous-git.cjs` | PreToolUse hook blocking destructive git commands (`reset --hard`, `clean -f`, `checkout .`, force-push) |
