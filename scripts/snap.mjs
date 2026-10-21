@@ -53,8 +53,9 @@ try {
       const page = await context.newPage();
       const errors = [];
       page.on('pageerror', (err) => errors.push(err.message));
-      await page.goto(url, { waitUntil: 'networkidle' });
-      await page.waitForTimeout(800); // let ECharts finish its entry animation
+      await page.goto(url, { waitUntil: 'load' });
+      await page.waitForSelector('#root > div', { timeout: 10000 });
+      await page.waitForTimeout(1000); // let ECharts finish its entry animation
       const file = path.join(OUT_DIR, `${mode}-${device}.png`);
       await page.screenshot({ path: file, fullPage: true });
       console.log(
