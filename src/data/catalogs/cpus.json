@@ -1,5 +1,20 @@
 [
   {
+    "id": "cpu-ryzen-3600",
+    "name": "AMD Ryzen 5 3600",
+    "vendor": "AMD",
+    "price": 70,
+    "socket": "AM4",
+    "cores": 6,
+    "threads": 12,
+    "tdpWatts": 65,
+    "gamingScore": 50,
+    "supportedRamGenerations": ["DDR4"],
+    "notes": "Mature AM4 legend for ultra-budget starter builds and second-hand upgrades.",
+    "source": "TechPowerUp CPU Database / AMD Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "cpu-ryzen-5500",
     "name": "AMD Ryzen 5 5500",
     "vendor": "AMD",
@@ -30,6 +45,21 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "cpu-ryzen-5700x",
+    "name": "AMD Ryzen 7 5700X",
+    "vendor": "AMD",
+    "price": 155,
+    "socket": "AM4",
+    "cores": 8,
+    "threads": 16,
+    "tdpWatts": 65,
+    "gamingScore": 70,
+    "supportedRamGenerations": ["DDR4"],
+    "notes": "Efficient 8-core 16-thread processor on AM4 with 65W TDP.",
+    "source": "TechPowerUp CPU Database / AMD Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "cpu-ryzen-5700x3d",
     "name": "AMD Ryzen 7 5700X3D",
     "vendor": "AMD",
@@ -42,6 +72,36 @@
     "supportedRamGenerations": ["DDR4"],
     "notes": "Maximum gaming performance on mature AM4 platform with 3D V-Cache.",
     "source": "TechPowerUp CPU Database / AMD Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cpu-ryzen-5800x3d",
+    "name": "AMD Ryzen 7 5800X3D",
+    "vendor": "AMD",
+    "price": 280,
+    "socket": "AM4",
+    "cores": 8,
+    "threads": 16,
+    "tdpWatts": 105,
+    "gamingScore": 85,
+    "supportedRamGenerations": ["DDR4"],
+    "notes": "Original 3D V-Cache milestone CPU for existing AM4 systems.",
+    "source": "TechPowerUp CPU Database / AMD Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cpu-ryzen-7500f",
+    "name": "AMD Ryzen 5 7500F",
+    "vendor": "AMD",
+    "price": 145,
+    "socket": "AM5",
+    "cores": 6,
+    "threads": 12,
+    "tdpWatts": 65,
+    "gamingScore": 80,
+    "supportedRamGenerations": ["DDR5"],
+    "notes": "Budget discrete-graphics AM5 gaming CPU with 6 Zen 4 cores.",
+    "source": "Hardware Unboxed Review / AMD Specs",
     "checkedAt": "2026-10-20"
   },
   {
@@ -75,18 +135,18 @@
     "checkedAt": "2026-10-20"
   },
   {
-    "id": "cpu-ryzen-7800x3d",
-    "name": "AMD Ryzen 7 7800X3D",
+    "id": "cpu-ryzen-9600x",
+    "name": "AMD Ryzen 5 9600X",
     "vendor": "AMD",
-    "price": 430,
+    "price": 250,
     "socket": "AM5",
-    "cores": 8,
-    "threads": 16,
-    "tdpWatts": 120,
-    "gamingScore": 100,
+    "cores": 6,
+    "threads": 12,
+    "tdpWatts": 65,
+    "gamingScore": 86,
     "supportedRamGenerations": ["DDR5"],
-    "notes": "The undisputed desktop gaming performance benchmark anchor.",
-    "source": "TechPowerUp CPU Database / AMD Official Specs",
+    "notes": "Zen 5 6-core processor with high single-thread IPC and low power draw.",
+    "source": "Hardware Unboxed / TechPowerUp Zen 5 Review",
     "checkedAt": "2026-10-20"
   },
   {
@@ -102,6 +162,51 @@
     "supportedRamGenerations": ["DDR5"],
     "notes": "Zen 5 8-core CPU with superior single-thread efficiency.",
     "source": "TechPowerUp CPU Database / AMD Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cpu-ryzen-7800x3d",
+    "name": "AMD Ryzen 7 7800X3D",
+    "vendor": "AMD",
+    "price": 430,
+    "socket": "AM5",
+    "cores": 8,
+    "threads": 16,
+    "tdpWatts": 120,
+    "gamingScore": 94,
+    "supportedRamGenerations": ["DDR5"],
+    "notes": "Previous 3D V-Cache benchmark champ, high efficiency 8-core gaming powerhouse.",
+    "source": "TechPowerUp CPU Database / AMD Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cpu-ryzen-9800x3d",
+    "name": "AMD Ryzen 7 9800X3D",
+    "vendor": "AMD",
+    "price": 479,
+    "socket": "AM5",
+    "cores": 8,
+    "threads": 16,
+    "tdpWatts": 120,
+    "gamingScore": 100,
+    "supportedRamGenerations": ["DDR5"],
+    "notes": "Zen 5 2nd-gen 3D V-Cache architecture with under-die cache for high clock speeds.",
+    "source": "Hardware Unboxed 9800X3D Benchmark / TechPowerUp",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cpu-ryzen-9950x",
+    "name": "AMD Ryzen 9 9950X",
+    "vendor": "AMD",
+    "price": 599,
+    "socket": "AM5",
+    "cores": 16,
+    "threads": 32,
+    "tdpWatts": 170,
+    "gamingScore": 94,
+    "supportedRamGenerations": ["DDR5"],
+    "notes": "Flagship 16-core 32-thread Zen 5 processor for creator workloads and code compilation.",
+    "source": "TechPowerUp Zen 5 Full Review / AMD Specs",
     "checkedAt": "2026-10-20"
   },
   {
@@ -135,6 +240,21 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "cpu-i5-13400f",
+    "name": "Intel Core i5-13400F",
+    "vendor": "Intel",
+    "price": 160,
+    "socket": "LGA1700",
+    "cores": 10,
+    "threads": 16,
+    "tdpWatts": 65,
+    "gamingScore": 72,
+    "supportedRamGenerations": ["DDR4", "DDR5"],
+    "notes": "10-core (6P+4E) hybrid CPU offering balanced gaming and multitasking.",
+    "source": "Intel Ark / Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "cpu-i5-13600k",
     "name": "Intel Core i5-13600K",
     "vendor": "Intel",
@@ -146,6 +266,21 @@
     "gamingScore": 86,
     "supportedRamGenerations": ["DDR4", "DDR5"],
     "notes": "Hybrid architecture powerhouse for gaming and multithreaded apps.",
+    "source": "Intel Ark / Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cpu-i5-14600k",
+    "name": "Intel Core i5-14600K",
+    "vendor": "Intel",
+    "price": 285,
+    "socket": "LGA1700",
+    "cores": 14,
+    "threads": 20,
+    "tdpWatts": 125,
+    "gamingScore": 88,
+    "supportedRamGenerations": ["DDR4", "DDR5"],
+    "notes": "14-core (6P+8E) refreshed Raptor Lake desktop processor.",
     "source": "Intel Ark / Official Specs",
     "checkedAt": "2026-10-20"
   },
@@ -165,6 +300,36 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "cpu-i9-14900k",
+    "name": "Intel Core i9-14900K",
+    "vendor": "Intel",
+    "price": 520,
+    "socket": "LGA1700",
+    "cores": 24,
+    "threads": 32,
+    "tdpWatts": 125,
+    "gamingScore": 96,
+    "supportedRamGenerations": ["DDR4", "DDR5"],
+    "notes": "Top-tier 24-core LGA1700 processor with 6.0 GHz boost capability.",
+    "source": "Intel Ark / TechPowerUp Benchmark",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cpu-ultra5-245k",
+    "name": "Intel Core Ultra 5 245K",
+    "vendor": "Intel",
+    "price": 295,
+    "socket": "LGA1851",
+    "cores": 14,
+    "threads": 14,
+    "tdpWatts": 125,
+    "gamingScore": 82,
+    "supportedRamGenerations": ["DDR5"],
+    "notes": "Arrow Lake LGA1851 14-core processor with Lion Cove / Skymont architecture.",
+    "source": "Intel Ark / Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "cpu-ultra7-265k",
     "name": "Intel Core Ultra 7 265K",
     "vendor": "Intel",
@@ -176,6 +341,21 @@
     "gamingScore": 87,
     "supportedRamGenerations": ["DDR5"],
     "notes": "Arrow Lake LGA1851 processor with dedicated NPU.",
+    "source": "Intel Ark / Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cpu-ultra9-285k",
+    "name": "Intel Core Ultra 9 285K",
+    "vendor": "Intel",
+    "price": 589,
+    "socket": "LGA1851",
+    "cores": 24,
+    "threads": 24,
+    "tdpWatts": 125,
+    "gamingScore": 90,
+    "supportedRamGenerations": ["DDR5"],
+    "notes": "Flagship 24-core Arrow Lake LGA1851 processor for content creation and high compute efficiency.",
     "source": "Intel Ark / Official Specs",
     "checkedAt": "2026-10-20"
   }

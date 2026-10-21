@@ -9,8 +9,24 @@
     "speedMhz": 3200,
     "casLatency": 16,
     "modulesCount": 2,
+    "rgb": false,
     "notes": "Cheapest viable dual-channel DDR4 memory kit.",
     "source": "PCPartPicker Market Baseline / Silicon Power Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "ram-kingston-fury-16gb-d4-rgb",
+    "name": "Kingston Fury Beast RGB 16GB (2x8GB) DDR4-3200 CL16",
+    "vendor": "Kingston",
+    "price": 42,
+    "generation": "DDR4",
+    "capacityGb": 16,
+    "speedMhz": 3200,
+    "casLatency": 16,
+    "modulesCount": 2,
+    "rgb": true,
+    "notes": "Affordable dual-channel DDR4 with customizable RGB light strip.",
+    "source": "Kingston Official Specs / Retail Baseline",
     "checkedAt": "2026-10-20"
   },
   {
@@ -23,6 +39,7 @@
     "speedMhz": 3200,
     "casLatency": 16,
     "modulesCount": 2,
+    "rgb": false,
     "notes": "Sub-$60 32GB sweet spot kit for AM4 and budget LGA1700.",
     "source": "PCPartPicker Market Baseline / TeamGroup Specs",
     "checkedAt": "2026-10-20"
@@ -37,6 +54,7 @@
     "speedMhz": 3600,
     "casLatency": 18,
     "modulesCount": 2,
+    "rgb": false,
     "notes": "Low profile 3600MHz RAM with 1:1 Infinity Fabric clock on AM4.",
     "source": "Corsair Official Specs / Retail Baseline",
     "checkedAt": "2026-10-20"
@@ -51,6 +69,7 @@
     "speedMhz": 3600,
     "casLatency": 18,
     "modulesCount": 2,
+    "rgb": false,
     "notes": "High capacity DDR4 workstation kit.",
     "source": "Corsair Official Specs / Retail Baseline",
     "checkedAt": "2026-10-20"
@@ -65,6 +84,7 @@
     "speedMhz": 5600,
     "casLatency": 46,
     "modulesCount": 2,
+    "rgb": false,
     "notes": "JEDEC standard budget DDR5 kit.",
     "source": "Crucial Official Specs / JEDEC Standard",
     "checkedAt": "2026-10-20"
@@ -79,6 +99,7 @@
     "speedMhz": 6000,
     "casLatency": 30,
     "modulesCount": 2,
+    "rgb": false,
     "notes": "Optimal AMD AM5 memory timing sweet spot (EXPO profile).",
     "source": "Hardware Unboxed AM5 Memory Guide / TeamGroup Specs",
     "checkedAt": "2026-10-20"
@@ -93,6 +114,7 @@
     "speedMhz": 6000,
     "casLatency": 30,
     "modulesCount": 2,
+    "rgb": false,
     "notes": "Low-profile AMD EXPO kit designed for large dual-tower air coolers.",
     "source": "G.Skill Official Specs / AMD EXPO Verified",
     "checkedAt": "2026-10-20"
@@ -113,17 +135,33 @@
     "checkedAt": "2026-10-20"
   },
   {
-    "id": "ram-corsair-64gb-d5-6000",
-    "name": "Corsair Vengeance 64GB (2x32GB) DDR5-6000 CL30",
-    "vendor": "Corsair",
+    "id": "ram-gskill-ripjaws-64gb-d5-6000",
+    "name": "G.Skill Ripjaws S5 64GB (2x32GB) DDR5-6000 CL30",
+    "vendor": "G.Skill",
+    "price": 190,
+    "generation": "DDR5",
+    "capacityGb": 64,
+    "speedMhz": 6000,
+    "casLatency": 30,
+    "modulesCount": 2,
+    "rgb": false,
+    "notes": "High capacity 64GB dual-channel DDR5 kit with tight CL30 timings for creator workstations.",
+    "source": "G.Skill Official Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "ram-gskill-trident-64gb-d5-6000",
+    "name": "G.Skill Trident Z5 Neo RGB 64GB (2x32GB) DDR5-6000 CL30",
+    "vendor": "G.Skill",
     "price": 210,
     "generation": "DDR5",
     "capacityGb": 64,
     "speedMhz": 6000,
     "casLatency": 30,
     "modulesCount": 2,
-    "notes": "High-density DDR5 kit for modern heavy workloads and gaming.",
-    "source": "Corsair Official Specs / Retail Baseline",
+    "rgb": true,
+    "notes": "Flagship 64GB high-capacity DDR5 with AMD EXPO certification and matte aluminum heatspreaders.",
+    "source": "G.Skill Official Specs / Retail Baseline",
     "checkedAt": "2026-10-20"
   }
 ]

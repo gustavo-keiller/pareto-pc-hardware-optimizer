@@ -14,6 +14,20 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "case-montech-air100",
+    "name": "Montech Air 100 ARGB Micro-ATX",
+    "vendor": "Montech",
+    "price": 59,
+    "supportedFormFactors": ["Micro-ATX", "Mini-ITX"],
+    "maxGpuLengthMm": 330,
+    "maxCpuCoolerHeightMm": 161,
+    "isSff": false,
+    "rgb": true,
+    "notes": "Compact high-airflow Micro-ATX case with 4 pre-installed ARGB fans and magnetic mesh.",
+    "source": "Montech Official Specs Sheet",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "case-montech-air903",
     "name": "Montech Air 903 Base Mid-Tower",
     "vendor": "Montech",
@@ -28,6 +42,20 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "case-lianli-a3-matx",
+    "name": "Lian Li DAN Cases A3-mATX",
+    "vendor": "Lian Li",
+    "price": 70,
+    "supportedFormFactors": ["Micro-ATX", "Mini-ITX"],
+    "maxGpuLengthMm": 415,
+    "maxCpuCoolerHeightMm": 165,
+    "isSff": false,
+    "rgb": false,
+    "notes": "Versatile 26L small form factor micro-ATX chassis with 360mm AIO and 4-slot GPU support.",
+    "source": "Lian Li Official Specs Sheet",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "case-montech-air903-max",
     "name": "Montech Air 903 MAX ARGB",
     "vendor": "Montech",
@@ -39,6 +67,20 @@
     "rgb": true,
     "notes": "High-airflow mesh mid-tower with 4 pre-installed 140mm ARGB PWM fans.",
     "source": "Montech Official Specs Sheet",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "case-fractal-pop-air",
+    "name": "Fractal Design Pop Air RGB ATX",
+    "vendor": "Fractal Design",
+    "price": 85,
+    "supportedFormFactors": ["ATX", "Micro-ATX", "Mini-ITX"],
+    "maxGpuLengthMm": 405,
+    "maxCpuCoolerHeightMm": 170,
+    "isSff": false,
+    "rgb": true,
+    "notes": "Modern Swedish design mesh case with vivid ARGB lighting and hidden 5.25 drawer.",
+    "source": "Fractal Design Official Specifications",
     "checkedAt": "2026-10-20"
   },
   {
@@ -67,6 +109,20 @@
     "rgb": false,
     "notes": "Iconic 18L SFF chassis with high compatibility and tool-free panels.",
     "source": "Cooler Master Specs / SFF Network Database",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "case-fractal-terra",
+    "name": "Fractal Design Terra SFF",
+    "vendor": "Fractal Design",
+    "price": 179,
+    "supportedFormFactors": ["Mini-ITX"],
+    "maxGpuLengthMm": 322,
+    "maxCpuCoolerHeightMm": 77,
+    "isSff": true,
+    "rgb": false,
+    "notes": "Boutique 10.4L SFF chassis with anodized aluminum and FSC-certified walnut trim.",
+    "source": "Fractal Design Official Specifications",
     "checkedAt": "2026-10-20"
   }
 ]

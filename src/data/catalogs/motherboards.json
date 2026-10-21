@@ -32,6 +32,22 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "mobo-asrock-b550-itx",
+    "name": "ASRock B550M-ITX/ac",
+    "vendor": "ASRock",
+    "price": 125,
+    "socket": "AM4",
+    "chipset": "B550",
+    "ramGeneration": "DDR4",
+    "ramSlots": 2,
+    "m2Slots": 1,
+    "formFactor": "Mini-ITX",
+    "pcieGeneration": 4,
+    "notes": "Compact Mini-ITX motherboard for Small Form Factor (SFF) AM4 budget builds.",
+    "source": "ASRock Official Specs / SFF Network Baseline",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "mobo-msi-b550-tomahawk",
     "name": "MSI MAG B550 TOMAHAWK MAX WIFI",
     "vendor": "MSI",
@@ -64,6 +80,22 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "mobo-gigabyte-b650m-ds3h",
+    "name": "Gigabyte B650M DS3H",
+    "vendor": "Gigabyte",
+    "price": 135,
+    "socket": "AM5",
+    "chipset": "B650",
+    "ramGeneration": "DDR5",
+    "ramSlots": 4,
+    "m2Slots": 2,
+    "formFactor": "Micro-ATX",
+    "pcieGeneration": 4,
+    "notes": "4-slot DDR5 Micro-ATX board with 6+2+1 phase digital VRM.",
+    "source": "Gigabyte Official Specs / Retail Baseline",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "mobo-gigabyte-b650-gaming-x",
     "name": "Gigabyte B650 GAMING X AX",
     "vendor": "Gigabyte",
@@ -77,6 +109,22 @@
     "pcieGeneration": 4,
     "notes": "Mainstream 4-slot ATX AM5 board with integrated Wi-Fi.",
     "source": "Gigabyte Official Specs / Retail Baseline",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "mobo-asrock-b650i-lightning",
+    "name": "ASRock B650I Lightning WiFi",
+    "vendor": "ASRock",
+    "price": 195,
+    "socket": "AM5",
+    "chipset": "B650",
+    "ramGeneration": "DDR5",
+    "ramSlots": 2,
+    "m2Slots": 2,
+    "formFactor": "Mini-ITX",
+    "pcieGeneration": 4,
+    "notes": "Premium AM5 Mini-ITX board for compact Small Form Factor (SFF) builds.",
+    "source": "ASRock Official Specs / SFF Network Baseline",
     "checkedAt": "2026-10-20"
   },
   {
@@ -144,6 +192,22 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "mobo-asrock-b760i-lightning",
+    "name": "ASRock B760I Lightning WiFi",
+    "vendor": "ASRock",
+    "price": 185,
+    "socket": "LGA1700",
+    "chipset": "B760",
+    "ramGeneration": "DDR5",
+    "ramSlots": 2,
+    "m2Slots": 2,
+    "formFactor": "Mini-ITX",
+    "pcieGeneration": 5,
+    "notes": "High-end Intel LGA1700 Mini-ITX motherboard with DDR5 support.",
+    "source": "ASRock Official Specs / SFF Network Baseline",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "mobo-asus-rog-b760-f",
     "name": "ASUS ROG STRIX B760-F GAMING WIFI",
     "vendor": "ASUS",
@@ -160,35 +224,19 @@
     "checkedAt": "2026-10-20"
   },
   {
-    "id": "mobo-asrock-b650i-lightning",
-    "name": "ASRock B650I Lightning WiFi",
-    "vendor": "ASRock",
-    "price": 195,
-    "socket": "AM5",
-    "chipset": "B650",
-    "ramGeneration": "DDR5",
-    "ramSlots": 2,
-    "m2Slots": 2,
-    "formFactor": "Mini-ITX",
-    "pcieGeneration": 4,
-    "notes": "Premium AM5 Mini-ITX board for compact Small Form Factor (SFF) builds.",
-    "source": "ASRock Official Specs / SFF Network Baseline",
-    "checkedAt": "2026-10-20"
-  },
-  {
-    "id": "mobo-asrock-b760i-lightning",
-    "name": "ASRock B760I Lightning WiFi",
+    "id": "mobo-asrock-z890m-riptide",
+    "name": "ASRock Z890M Riptide WiFi",
     "vendor": "ASRock",
     "price": 185,
-    "socket": "LGA1700",
-    "chipset": "B760",
+    "socket": "LGA1851",
+    "chipset": "Z890",
     "ramGeneration": "DDR5",
-    "ramSlots": 2,
-    "m2Slots": 2,
-    "formFactor": "Mini-ITX",
+    "ramSlots": 4,
+    "m2Slots": 3,
+    "formFactor": "Micro-ATX",
     "pcieGeneration": 5,
-    "notes": "High-end Intel LGA1700 Mini-ITX motherboard with DDR5 support.",
-    "source": "ASRock Official Specs / SFF Network Baseline",
+    "notes": "Compact Micro-ATX Arrow Lake LGA1851 motherboard with PCIe 5.0 and Wi-Fi 7.",
+    "source": "ASRock Official Specs / Intel Ark",
     "checkedAt": "2026-10-20"
   },
   {

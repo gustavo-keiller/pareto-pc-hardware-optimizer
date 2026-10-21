@@ -1,5 +1,44 @@
 [
   {
+    "id": "arc-a580",
+    "name": "Intel Arc A580 8GB",
+    "vendor": "Intel",
+    "price": 160,
+    "rasterFps1440p": 45,
+    "rtFps1440p": 30,
+    "vramGb": 8,
+    "tdpWatts": 185,
+    "notes": "Budget 256-bit bus 8GB graphics card with hardware AV1 encode.",
+    "source": "TechPowerUp GPU Database / Intel Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "rtx-3050-6gb",
+    "name": "GeForce RTX 3050 6GB [TRAP]",
+    "vendor": "NVIDIA",
+    "price": 175,
+    "rasterFps1440p": 35,
+    "rtFps1440p": 20,
+    "vramGb": 6,
+    "tdpWatts": 70,
+    "notes": "Cut-down 96-bit 6GB card: severely outperformed by RX 6600 at similar pricing.",
+    "source": "TechPowerUp 2024 GPU Benchmark / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "arc-a750",
+    "name": "Intel Arc A750 8GB",
+    "vendor": "Intel",
+    "price": 190,
+    "rasterFps1440p": 56,
+    "rtFps1440p": 40,
+    "vramGb": 8,
+    "tdpWatts": 225,
+    "notes": "Capable entry-level 1440p graphics card with strong Ray Tracing cores.",
+    "source": "TechPowerUp GPU Database / Hardware Unboxed",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "rx-6600",
     "name": "Radeon RX 6600 8GB",
     "vendor": "AMD",
@@ -10,6 +49,45 @@
     "tdpWatts": 132,
     "notes": "Sub-$200 entry 1080p/1440p budget anchor",
     "source": "TechPowerUp 2024 GPU Benchmark / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "rtx-3050-8gb",
+    "name": "GeForce RTX 3050 8GB [TRAP]",
+    "vendor": "NVIDIA",
+    "price": 210,
+    "rasterFps1440p": 42,
+    "rtFps1440p": 25,
+    "vramGb": 8,
+    "tdpWatts": 130,
+    "notes": "Outclassed by both RX 6600 and Arc B580 on price-performance.",
+    "source": "TechPowerUp GPU Database / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "arc-b570",
+    "name": "Intel Arc B570 10GB",
+    "vendor": "Intel",
+    "price": 219,
+    "rasterFps1440p": 62,
+    "rtFps1440p": 44,
+    "vramGb": 10,
+    "tdpWatts": 150,
+    "notes": "Battlemage 10GB entry disruptor with Xe2 architecture.",
+    "source": "Intel Official Launch Specs / TechPowerUp",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "rx-6650-xt",
+    "name": "Radeon RX 6650 XT 8GB",
+    "vendor": "AMD",
+    "price": 230,
+    "rasterFps1440p": 60,
+    "rtFps1440p": 28,
+    "vramGb": 8,
+    "tdpWatts": 180,
+    "notes": "Fast 1080p high-refresh raster performer for budget builds.",
+    "source": "TechPowerUp GPU Database / MSRP",
     "checkedAt": "2026-10-20"
   },
   {
@@ -39,6 +117,32 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "arc-a770-16gb",
+    "name": "Intel Arc A770 16GB",
+    "vendor": "Intel",
+    "price": 270,
+    "rasterFps1440p": 65,
+    "rtFps1440p": 48,
+    "vramGb": 16,
+    "tdpWatts": 225,
+    "notes": "Affordable 16GB VRAM creator accelerator for local LLM inference.",
+    "source": "TechPowerUp GPU Database / Intel Ark",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "rtx-3060-12gb",
+    "name": "GeForce RTX 3060 12GB [TRAP]",
+    "vendor": "NVIDIA",
+    "price": 285,
+    "rasterFps1440p": 56,
+    "rtFps1440p": 35,
+    "vramGb": 12,
+    "tdpWatts": 170,
+    "notes": "Legacy pricing trap: beaten by Arc B580 ($35 cheaper and +32% faster)",
+    "source": "TechPowerUp 2024 GPU Benchmark / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "rtx-4060",
     "name": "GeForce RTX 4060 8GB",
     "vendor": "NVIDIA",
@@ -52,15 +156,41 @@
     "checkedAt": "2026-10-20"
   },
   {
-    "id": "rtx-3060-12gb",
-    "name": "GeForce RTX 3060 12GB [TRAP]",
+    "id": "rtx-3060-ti",
+    "name": "GeForce RTX 3060 Ti 8GB",
     "vendor": "NVIDIA",
-    "price": 285,
-    "rasterFps1440p": 56,
-    "rtFps1440p": 35,
+    "price": 310,
+    "rasterFps1440p": 74,
+    "rtFps1440p": 50,
+    "vramGb": 8,
+    "tdpWatts": 200,
+    "notes": "Solid previous-gen 1440p performer on Ampere architecture.",
+    "source": "TechPowerUp GPU Database / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "rx-6700-xt",
+    "name": "Radeon RX 6700 XT 12GB",
+    "vendor": "AMD",
+    "price": 310,
+    "rasterFps1440p": 80,
+    "rtFps1440p": 42,
     "vramGb": 12,
-    "tdpWatts": 170,
-    "notes": "Legacy pricing trap: beaten by Arc B580 ($35 cheaper and +32% faster)",
+    "tdpWatts": 230,
+    "notes": "12GB VRAM previous-gen workhorse with strong 1440p capabilities.",
+    "source": "TechPowerUp GPU Database / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "rx-7600-xt",
+    "name": "Radeon RX 7600 XT 16GB",
+    "vendor": "AMD",
+    "price": 315,
+    "rasterFps1440p": 69,
+    "rtFps1440p": 36,
+    "vramGb": 16,
+    "tdpWatts": 190,
+    "notes": "Dominated on 2D Price/Raster by Arc B580, but 5D-optimal as the cheapest 16GB VRAM card",
     "source": "TechPowerUp 2024 GPU Benchmark / MSRP",
     "checkedAt": "2026-10-20"
   },
@@ -78,16 +208,16 @@
     "checkedAt": "2026-10-20"
   },
   {
-    "id": "rx-7600-xt",
-    "name": "Radeon RX 7600 XT 16GB",
-    "vendor": "AMD",
-    "price": 315,
-    "rasterFps1440p": 69,
-    "rtFps1440p": 36,
-    "vramGb": 16,
-    "tdpWatts": 190,
-    "notes": "Dominated on 2D Price/Raster by Arc B580, but 5D-optimal as the cheapest 16GB VRAM card",
-    "source": "TechPowerUp 2024 GPU Benchmark / MSRP",
+    "id": "rtx-3070",
+    "name": "GeForce RTX 3070 8GB",
+    "vendor": "NVIDIA",
+    "price": 360,
+    "rasterFps1440p": 86,
+    "rtFps1440p": 58,
+    "vramGb": 8,
+    "tdpWatts": 220,
+    "notes": "Balanced Ampere 1440p gaming card with 8GB VRAM limitation.",
+    "source": "TechPowerUp GPU Database / MSRP",
     "checkedAt": "2026-10-20"
   },
   {
@@ -117,6 +247,19 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "rx-6800-xt",
+    "name": "Radeon RX 6800 XT 16GB",
+    "vendor": "AMD",
+    "price": 440,
+    "rasterFps1440p": 118,
+    "rtFps1440p": 62,
+    "vramGb": 16,
+    "tdpWatts": 300,
+    "notes": "Previous-gen 16GB flagship killer with outstanding raster performance.",
+    "source": "TechPowerUp GPU Database / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "rtx-4060-ti-16gb",
     "name": "GeForce RTX 4060 Ti 16GB [TRAP]",
     "vendor": "NVIDIA",
@@ -130,6 +273,19 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "rtx-3080-10gb",
+    "name": "GeForce RTX 3080 10GB",
+    "vendor": "NVIDIA",
+    "price": 450,
+    "rasterFps1440p": 112,
+    "rtFps1440p": 82,
+    "vramGb": 10,
+    "tdpWatts": 320,
+    "notes": "High bandwidth GDDR6X 1440p/4K performer with 320W power draw.",
+    "source": "TechPowerUp GPU Database / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "rx-7800-xt",
     "name": "Radeon RX 7800 XT 16GB",
     "vendor": "AMD",
@@ -139,6 +295,19 @@
     "vramGb": 16,
     "tdpWatts": 263,
     "notes": "1440p sweet-spot Pareto champion (16GB VRAM + high raster)",
+    "source": "TechPowerUp 2024 GPU Benchmark / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "rtx-4070",
+    "name": "GeForce RTX 4070 12GB",
+    "vendor": "NVIDIA",
+    "price": 520,
+    "rasterFps1440p": 112,
+    "rtFps1440p": 88,
+    "vramGb": 12,
+    "tdpWatts": 200,
+    "notes": "Efficient 1440p GPU with DLSS 3 frame generation and low 200W TDP.",
     "source": "TechPowerUp 2024 GPU Benchmark / MSRP",
     "checkedAt": "2026-10-20"
   },
@@ -169,6 +338,19 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "rtx-5070",
+    "name": "GeForce RTX 5070 12GB",
+    "vendor": "NVIDIA",
+    "price": 649,
+    "rasterFps1440p": 138,
+    "rtFps1440p": 118,
+    "vramGb": 12,
+    "tdpWatts": 250,
+    "notes": "Blackwell architecture 12GB GPU with DLSS 4 and advanced neural rendering.",
+    "source": "NVIDIA Blackwell Launch Specs / TechPowerUp",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "rx-7900-xt",
     "name": "Radeon RX 7900 XT 20GB",
     "vendor": "AMD",
@@ -182,6 +364,19 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "rtx-4070-ti",
+    "name": "GeForce RTX 4070 Ti 12GB [TRAP]",
+    "vendor": "NVIDIA",
+    "price": 720,
+    "rasterFps1440p": 135,
+    "rtFps1440p": 108,
+    "vramGb": 12,
+    "tdpWatts": 285,
+    "notes": "Superceded by RTX 4070 Ti Super with 16GB VRAM and wider memory bus.",
+    "source": "TechPowerUp GPU Database / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "rtx-4070-ti-super",
     "name": "GeForce RTX 4070 Ti Super 16GB",
     "vendor": "NVIDIA",
@@ -192,6 +387,19 @@
     "tdpWatts": 285,
     "notes": "Dominated on 2D Price/Raster by RX 7900 XT, but 5D Pareto-optimal for heavy 1440p/4K Ray Tracing",
     "source": "TechPowerUp 2024 GPU Benchmark / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "rtx-5070-ti",
+    "name": "GeForce RTX 5070 Ti 16GB",
+    "vendor": "NVIDIA",
+    "price": 849,
+    "rasterFps1440p": 168,
+    "rtFps1440p": 145,
+    "vramGb": 16,
+    "tdpWatts": 300,
+    "notes": "High-tier Blackwell GPU with 16GB GDDR7 memory and 5th-Gen Tensor cores.",
+    "source": "NVIDIA Blackwell Launch Specs / TechPowerUp",
     "checkedAt": "2026-10-20"
   },
   {
@@ -221,6 +429,19 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "rtx-5080",
+    "name": "GeForce RTX 5080 16GB",
+    "vendor": "NVIDIA",
+    "price": 1199,
+    "rasterFps1440p": 205,
+    "rtFps1440p": 178,
+    "vramGb": 16,
+    "tdpWatts": 400,
+    "notes": "Enthusiast Blackwell card with 32 Gbps GDDR7 memory and high ray tracing throughput.",
+    "source": "NVIDIA Official Specs / TechPowerUp",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "rtx-4090",
     "name": "GeForce RTX 4090 24GB",
     "vendor": "NVIDIA",
@@ -231,6 +452,19 @@
     "tdpWatts": 450,
     "notes": "Uncontested halo performance anchor (highest Raster, RT, and VRAM)",
     "source": "TechPowerUp 2024 GPU Benchmark / MSRP",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "rtx-5090",
+    "name": "GeForce RTX 5090 32GB",
+    "vendor": "NVIDIA",
+    "price": 1999,
+    "rasterFps1440p": 290,
+    "rtFps1440p": 260,
+    "vramGb": 32,
+    "tdpWatts": 600,
+    "notes": "Next-generation halo Blackwell GPU with 32GB GDDR7 on 512-bit bus.",
+    "source": "NVIDIA Blackwell Launch Specs / TechPowerUp",
     "checkedAt": "2026-10-20"
   }
 ]

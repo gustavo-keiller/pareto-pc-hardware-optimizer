@@ -11,19 +11,39 @@ import {
   SEED_STORAGES,
 } from '../seedComponents';
 
-describe('DATA-01: Versioned JSON Catalogs & Schema Integrity', () => {
+describe('DATA-01 & DATA-03: Versioned JSON Catalogs & Hardware Coverage', () => {
   it('loads all hardware categories from versioned JSON with expected catalog counts', () => {
-    expect(SEED_CPUS.length).toBe(12);
-    expect(SEED_MOTHERBOARDS.length).toBe(13);
-    expect(SEED_RAM_KITS.length).toBe(9);
-    expect(SEED_STORAGES.length).toBe(3);
-    expect(SEED_COOLERS.length).toBe(5);
-    expect(SEED_CASES.length).toBe(5);
-    expect(SEED_PSUS.length).toBe(7);
-    expect(REAL_WORLD_GPUS.length).toBe(18);
+    expect(SEED_CPUS.length).toBe(24);
+    expect(SEED_MOTHERBOARDS.length).toBe(16);
+    expect(SEED_RAM_KITS.length).toBe(11);
+    expect(SEED_STORAGES.length).toBe(8);
+    expect(SEED_COOLERS.length).toBe(10);
+    expect(SEED_CASES.length).toBe(9);
+    expect(SEED_PSUS.length).toBe(10);
+    expect(REAL_WORLD_GPUS.length).toBe(36);
 
     expect(SEED_COMPONENTS.cpus).toBe(SEED_CPUS);
     expect(SEED_COMPONENTS.motherboards).toBe(SEED_MOTHERBOARDS);
+  });
+
+  it('guarantees comprehensive market coverage across CPU sockets and GPU families [DATA-03]', () => {
+    // CPUs cover AM4, AM5, LGA1700, and LGA1851
+    const sockets = new Set(SEED_CPUS.map((c) => c.socket));
+    expect(sockets.has('AM4')).toBe(true);
+    expect(sockets.has('AM5')).toBe(true);
+    expect(sockets.has('LGA1700')).toBe(true);
+    expect(sockets.has('LGA1851')).toBe(true);
+
+    // GPUs cover NVIDIA, AMD, and Intel
+    const vendors = new Set(REAL_WORLD_GPUS.map((g) => g.vendor));
+    expect(vendors.has('NVIDIA')).toBe(true);
+    expect(vendors.has('AMD')).toBe(true);
+    expect(vendors.has('Intel')).toBe(true);
+
+    // GPU coverage spans entry (<$200) to enthusiast halo (RTX 5090 / RTX 4090)
+    const gpuPrices = REAL_WORLD_GPUS.map((g) => g.price);
+    expect(Math.min(...gpuPrices)).toBeLessThanOrEqual(200);
+    expect(Math.max(...gpuPrices)).toBeGreaterThanOrEqual(1999);
   });
 
   it('guarantees unique IDs across every component catalog', () => {
@@ -61,7 +81,7 @@ describe('DATA-01: Versioned JSON Catalogs & Schema Integrity', () => {
       ...REAL_WORLD_GPUS,
     ];
 
-    expect(allItems.length).toBe(72);
+    expect(allItems.length).toBe(124);
 
     for (const item of allItems) {
       expect(typeof item.source).toBe('string');

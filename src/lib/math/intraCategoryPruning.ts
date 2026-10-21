@@ -46,14 +46,17 @@ export function pruneDominatedCpus(
 
       const priceBetterOrEqual = other.price <= candidate.price;
       const scoreBetterOrEqual = other.gamingScore >= candidate.gamingScore;
+      const coresBetterOrEqual = (other.cores ?? 6) >= (candidate.cores ?? 6);
       const tdpBetterOrEqual = other.tdpWatts <= candidate.tdpWatts;
       const atLeastOneStrict =
         other.price < candidate.price ||
-        other.gamingScore > candidate.gamingScore;
+        other.gamingScore > candidate.gamingScore ||
+        (other.cores ?? 6) > (candidate.cores ?? 6);
 
       return (
         priceBetterOrEqual &&
         scoreBetterOrEqual &&
+        coresBetterOrEqual &&
         tdpBetterOrEqual &&
         atLeastOneStrict
       );

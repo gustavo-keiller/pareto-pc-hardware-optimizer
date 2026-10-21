@@ -129,12 +129,7 @@ export function generateCompatibleBuilds(
   if (options?.preferredFormFactor && options.preferredFormFactor !== 'ALL') {
     if (options.preferredFormFactor === 'SFF') {
       motherboards = motherboards.filter((m) => m.formFactor === 'Mini-ITX');
-      cases = cases.filter(
-        (c) =>
-          c.isSff === true ||
-          (c.supportedFormFactors.includes('Mini-ITX') &&
-            !c.supportedFormFactors.includes('ATX')),
-      );
+      cases = cases.filter((c) => c.isSff === true);
     } else if (options.preferredFormFactor === 'Micro-ATX') {
       motherboards = motherboards.filter((m) => m.formFactor === 'Micro-ATX');
       cases = cases.filter(
@@ -563,12 +558,7 @@ export function optimizeFullSystemBuilds(
   if (criteria?.preferredFormFactor && criteria.preferredFormFactor !== 'ALL') {
     if (criteria.preferredFormFactor === 'SFF') {
       motherboards = motherboards.filter((m) => m.formFactor === 'Mini-ITX');
-      cases = cases.filter(
-        (c) =>
-          c.isSff === true ||
-          (c.supportedFormFactors.includes('Mini-ITX') &&
-            !c.supportedFormFactors.includes('ATX')),
-      );
+      cases = cases.filter((c) => c.isSff === true);
     } else if (criteria.preferredFormFactor === 'Micro-ATX') {
       motherboards = motherboards.filter((m) => m.formFactor === 'Micro-ATX');
       cases = cases.filter(
@@ -679,7 +669,7 @@ export function optimizeFullSystemBuilds(
             t.precomputed,
           ),
         )
-      : optimalBuilds.slice();
+      : optimalBuilds.slice(0, 100);
 
   const dominatedBuilds: PcBuild[] = [];
 

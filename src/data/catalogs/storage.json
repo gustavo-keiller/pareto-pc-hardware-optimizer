@@ -1,5 +1,18 @@
 [
   {
+    "id": "storage-kingston-nv2-500gb",
+    "name": "Kingston NV2 500GB M.2 NVMe",
+    "vendor": "Kingston",
+    "price": 38,
+    "type": "NVMe M.2",
+    "formFactor": "M.2-2280",
+    "capacityGb": 500,
+    "readSpeedMbps": 3000,
+    "notes": "Lowest-cost entry PCIe 4.0 NVMe SSD for tight budget setups.",
+    "source": "Kingston Official Specs / Retail Baseline",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "storage-kingston-nv2-1tb",
     "name": "Kingston NV2 1TB M.2 NVMe",
     "vendor": "Kingston",
@@ -10,6 +23,19 @@
     "readSpeedMbps": 3500,
     "notes": "Value king PCIe 4.0 NVMe SSD for fast boot and game loading.",
     "source": "Kingston Official Specs / CrystalDiskMark Baseline",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "storage-crucial-p3plus-1tb",
+    "name": "Crucial P3 Plus 1TB M.2 NVMe",
+    "vendor": "Crucial",
+    "price": 68,
+    "type": "NVMe M.2",
+    "formFactor": "M.2-2280",
+    "capacityGb": 1000,
+    "readSpeedMbps": 5000,
+    "notes": "Mainstream Gen4 NVMe with reliable Micron NAND flash.",
+    "source": "Crucial Official Specs / Tom's Hardware SSD Review",
     "checkedAt": "2026-10-20"
   },
   {
@@ -26,6 +52,19 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "storage-crucial-p3plus-2tb",
+    "name": "Crucial P3 Plus 2TB M.2 NVMe",
+    "vendor": "Crucial",
+    "price": 118,
+    "type": "NVMe M.2",
+    "formFactor": "M.2-2280",
+    "capacityGb": 2000,
+    "readSpeedMbps": 5000,
+    "notes": "Sub-$120 2TB high-capacity Gen4 NVMe for deep game libraries.",
+    "source": "Crucial Official Specs / Retail Baseline",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "storage-wd-sn850x-2tb",
     "name": "WD Black SN850X 2TB M.2 NVMe",
     "vendor": "Western Digital",
@@ -36,6 +75,32 @@
     "readSpeedMbps": 7300,
     "notes": "Flagship enthusiast PCIe 4.0 with dedicated DRAM cache.",
     "source": "Tom's Hardware SSD Review / Western Digital Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "storage-samsung-990pro-2tb",
+    "name": "Samsung 990 PRO 2TB M.2 NVMe",
+    "vendor": "Samsung",
+    "price": 175,
+    "type": "NVMe M.2",
+    "formFactor": "M.2-2280",
+    "capacityGb": 2000,
+    "readSpeedMbps": 7450,
+    "notes": "Elite PCIe 4.0 read/write speed leader with Samsung Pascal controller and LPDDR4 cache.",
+    "source": "Samsung Official Specs / AnandTech Storage Review",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "storage-lexar-nm790-4tb",
+    "name": "Lexar NM790 4TB M.2 NVMe",
+    "vendor": "Lexar",
+    "price": 255,
+    "type": "NVMe M.2",
+    "formFactor": "M.2-2280",
+    "capacityGb": 4000,
+    "readSpeedMbps": 7400,
+    "notes": "Massive 4TB single M.2 drive with Maxiotech MAP1602 controller and fast Gen4 throughput.",
+    "source": "TechPowerUp SSD Review / Lexar Specs",
     "checkedAt": "2026-10-20"
   }
 ]

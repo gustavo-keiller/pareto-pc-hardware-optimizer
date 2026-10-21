@@ -138,9 +138,19 @@ describe('Hardware Capabilities & Ecosystem Technology Engine', () => {
       const amdOpt = vendorFacet.options.find((o) => o.id === 'AMD');
       const intelOpt = vendorFacet.options.find((o) => o.id === 'Intel');
 
-      expect(nvidiaOpt?.count).toBe(8);
-      expect(amdOpt?.count).toBe(9);
-      expect(intelOpt?.count).toBe(1);
+      const expectedNvidia = REAL_WORLD_GPUS.filter(
+        (g) => g.vendor === 'NVIDIA' && g.tdpWatts <= 500,
+      ).length;
+      const expectedAmd = REAL_WORLD_GPUS.filter(
+        (g) => g.vendor === 'AMD' && g.tdpWatts <= 500,
+      ).length;
+      const expectedIntel = REAL_WORLD_GPUS.filter(
+        (g) => g.vendor === 'Intel' && g.tdpWatts <= 500,
+      ).length;
+
+      expect(nvidiaOpt?.count).toBe(expectedNvidia);
+      expect(amdOpt?.count).toBe(expectedAmd);
+      expect(intelOpt?.count).toBe(expectedIntel);
 
       expect(techFacet.id).toBe('technologies');
       const dlssOpt = techFacet.options.find(
@@ -160,8 +170,14 @@ describe('Hardware Capabilities & Ecosystem Technology Engine', () => {
 
       const vendorFacet = budgetCapped.find((f) => f.id === 'vendors');
       const nvidiaOpt = vendorFacet?.options.find((o) => o.id === 'NVIDIA');
-      // At <= $300, only RTX 4060 and RTX 3060 12GB are under $300
-      expect(nvidiaOpt?.count).toBeLessThanOrEqual(2);
+      const expectedBudgetNvidia = REAL_WORLD_GPUS.filter(
+        (g) =>
+          g.vendor === 'NVIDIA' &&
+          g.price <= 300 &&
+          g.vramGb >= 8 &&
+          g.tdpWatts <= 200,
+      ).length;
+      expect(nvidiaOpt?.count).toBe(expectedBudgetNvidia);
     });
 
     it('defines distinct technologies with valid descriptions and badges', () => {

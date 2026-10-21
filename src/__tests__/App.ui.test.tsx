@@ -655,7 +655,7 @@ describe('App modes', () => {
     // Verify top build card updates with SFF case and Mini-ITX motherboard
     const topBuildCard = await screen.findByTestId('top-build-card');
     expect(topBuildCard.textContent).toContain('MasterBox NR200P');
-    expect(topBuildCard.textContent).toMatch(/B650I|B760I/);
+    expect(topBuildCard.textContent).toMatch(/B650I|B760I|B550M-ITX/);
 
     // 2. Filter by Cooler Type: AIO
     const coolerSelect = screen.getByRole('combobox', {

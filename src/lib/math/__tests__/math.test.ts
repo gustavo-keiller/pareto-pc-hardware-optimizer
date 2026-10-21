@@ -48,28 +48,38 @@ describe('Stage 1: Hard-Constraint Filtering (filterByHardConstraints)', () => {
   });
 
   it('filters by brand / vendor when selectedVendors is provided', () => {
+    const expectedNvidia = REAL_WORLD_GPUS.filter(
+      (g) => g.vendor === 'NVIDIA',
+    ).length;
+    const expectedAmd = REAL_WORLD_GPUS.filter(
+      (g) => g.vendor === 'AMD',
+    ).length;
+    const expectedIntel = REAL_WORLD_GPUS.filter(
+      (g) => g.vendor === 'Intel',
+    ).length;
+
     const nvidiaOnly = filterByHardConstraints(REAL_WORLD_GPUS, {
       selectedVendors: ['NVIDIA'],
     });
-    expect(nvidiaOnly).toHaveLength(8);
+    expect(nvidiaOnly).toHaveLength(expectedNvidia);
     expect(nvidiaOnly.every((g) => g.vendor === 'NVIDIA')).toBe(true);
 
     const amdOnly = filterByHardConstraints(REAL_WORLD_GPUS, {
       selectedVendors: ['AMD'],
     });
-    expect(amdOnly).toHaveLength(9);
+    expect(amdOnly).toHaveLength(expectedAmd);
     expect(amdOnly.every((g) => g.vendor === 'AMD')).toBe(true);
 
     const intelOnly = filterByHardConstraints(REAL_WORLD_GPUS, {
       selectedVendors: ['Intel'],
     });
-    expect(intelOnly).toHaveLength(1);
-    expect(intelOnly[0].id).toBe('arc-b580');
+    expect(intelOnly).toHaveLength(expectedIntel);
+    expect(intelOnly.every((g) => g.vendor === 'Intel')).toBe(true);
 
     const multiVendor = filterByHardConstraints(REAL_WORLD_GPUS, {
       selectedVendors: ['AMD', 'Intel'],
     });
-    expect(multiVendor).toHaveLength(10);
+    expect(multiVendor).toHaveLength(expectedAmd + expectedIntel);
   });
 
   it('filters by proprietary technology requirements (e.g. DLSS 3+ Frame Gen, AV1 Video Encode)', () => {

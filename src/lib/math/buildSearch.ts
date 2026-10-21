@@ -175,45 +175,49 @@ export function searchOptimalBuildTuples(
           continue;
         }
 
-        for (const storage of matchingStorages) {
-          const costWithStorage = costWithRam + storage.price;
+        for (const gpu of gpus) {
+          const costWithGpu = costWithRam + gpu.price;
           if (
             hasBudgetCap &&
-            costWithStorage + minGpu + minCooler + minCase + minPsu > maxBudget
+            costWithGpu + minStorage + minCooler + minCase + minPsu > maxBudget
           ) {
             continue;
           }
 
-          for (const gpu of gpus) {
-            const costWithGpu = costWithStorage + gpu.price;
+          const systemLoad = calculateEstimatedPowerDraw(
+            cpu.tdpWatts,
+            gpu.tdpWatts,
+          );
+          const minPsuWattage = calculateRecommendedPsuWattage(systemLoad);
+          const matchingPsus = sortedPsus.filter(
+            (p) => p.wattage >= minPsuWattage,
+          );
+          if (matchingPsus.length === 0) continue;
+
+          const minRequiredPsuPrice = matchingPsus[0].price;
+
+          const gpuLength = gpu.lengthMm ?? 260;
+
+          const requiredCpu = estimateGpuRequiredCpuScore(gpu);
+          const { bottleneckFactor, bottleneckPct } = computeCpuGpuBottleneck(
+            cpu.gamingScore,
+            requiredCpu,
+            elasticity,
+          );
+          const rawGpuFps1440p = Math.max(0, gpu.rasterFps1440p);
+          const effectiveFps1440p =
+            Math.round(rawGpuFps1440p * bottleneckFactor * 10) / 10;
+
+          for (const storage of matchingStorages) {
+            const costWithStorage = costWithGpu + storage.price;
             if (
               hasBudgetCap &&
-              costWithGpu + minCooler + minCase + minPsu > maxBudget
+              costWithStorage + minCooler + minCase + minRequiredPsuPrice >
+                maxBudget
             ) {
               continue;
             }
 
-            const systemLoad = calculateEstimatedPowerDraw(
-              cpu.tdpWatts,
-              gpu.tdpWatts,
-            );
-            const minPsuWattage = calculateRecommendedPsuWattage(systemLoad);
-            const matchingPsus = sortedPsus.filter(
-              (p) => p.wattage >= minPsuWattage,
-            );
-            if (matchingPsus.length === 0) continue;
-
-            const gpuLength = gpu.lengthMm ?? 260;
-
-            const requiredCpu = estimateGpuRequiredCpuScore(gpu);
-            const { bottleneckFactor, bottleneckPct } = computeCpuGpuBottleneck(
-              cpu.gamingScore,
-              requiredCpu,
-              elasticity,
-            );
-            const rawGpuFps1440p = Math.max(0, gpu.rasterFps1440p);
-            const effectiveFps1440p =
-              Math.round(rawGpuFps1440p * bottleneckFactor * 10) / 10;
             const workloadEval = evaluateBuildForWorkload(
               { cpu, gpu, ram, storage },
               profile,
@@ -239,10 +243,10 @@ export function searchOptimalBuildTuples(
             };
 
             for (const cooler of matchingCoolers) {
-              const costWithCooler = costWithGpu + cooler.price;
+              const costWithCooler = costWithStorage + cooler.price;
               if (
                 hasBudgetCap &&
-                costWithCooler + minCase + minPsu > maxBudget
+                costWithCooler + minCase + minRequiredPsuPrice > maxBudget
               ) {
                 continue;
               }
@@ -252,9 +256,14 @@ export function searchOptimalBuildTuples(
                 if (pcCase.maxCpuCoolerHeightMm < cooler.heightMm) continue;
 
                 const costWithCase = costWithCooler + pcCase.price;
-                if (hasBudgetCap && costWithCase + minPsu > maxBudget) {
+                if (
+                  hasBudgetCap &&
+                  costWithCase + minRequiredPsuPrice > maxBudget
+                ) {
                   continue;
                 }
+
+                let minPsuPriceSeen = Infinity;
 
                 for (const psu of matchingPsus) {
                   const totalPrice = costWithCase + psu.price;
@@ -267,6 +276,29 @@ export function searchOptimalBuildTuples(
                   }
 
                   totalCompatibleBuilds++;
+
+                  // Only the cheapest PSU(s) for a given (cpu, gpu, ram, mobo, storage, cooler, case)
+                  // can be Pareto-optimal. Any more expensive PSU with identical components
+                  // produces a strictly dominated build with higher cost and identical score.
+                  if (psu.price > minPsuPriceSeen) {
+                    if (sampleTuples.length < 100) {
+                      sampleTuples.push({
+                        cpu,
+                        gpu,
+                        ram,
+                        mobo,
+                        psu,
+                        storage,
+                        pcCase,
+                        cooler,
+                        totalPrice,
+                        score,
+                        precomputed,
+                      });
+                    }
+                    continue;
+                  }
+                  minPsuPriceSeen = psu.price;
 
                   const existing = bestByPrice.get(totalPrice);
                   if (existing && score < existing.maxScore) {

@@ -12,6 +12,18 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "psu-msi-a650bn",
+    "name": "MSI MAG A650BN 650W",
+    "vendor": "MSI",
+    "price": 65,
+    "wattage": 650,
+    "efficiencyRating": "80+ Bronze",
+    "modular": "Non",
+    "notes": "Cost-effective 650W power supply for mainstream mid-tier gaming rigs.",
+    "source": "MSI Official Specs / Cultists Tier List Tier C",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "psu-corsair-cx650m",
     "name": "Corsair CX650M 650W",
     "vendor": "Corsair",
@@ -48,6 +60,18 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "psu-montech-titan-850",
+    "name": "Montech TITAN GOLD 850W",
+    "vendor": "Montech",
+    "price": 110,
+    "wattage": 850,
+    "efficiencyRating": "80+ Gold",
+    "modular": "Full",
+    "notes": "High-value Cybenetics Platinum/Gold certified ATX 3.0 power supply.",
+    "source": "Cybenetics Report / Hardware Busters Review",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "psu-bequiet-850",
     "name": "be quiet! Pure Power 12 M 850W",
     "vendor": "be quiet!",
@@ -69,6 +93,18 @@
     "modular": "Full",
     "notes": "Top-tier Japanese capacitors and zero-RPM fan mode.",
     "source": "Corsair Specs / Hardware Busters Testing",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "psu-corsair-rm1000e",
+    "name": "Corsair RM1000e 1000W ATX 3.0",
+    "vendor": "Corsair",
+    "price": 160,
+    "wattage": 1000,
+    "efficiencyRating": "80+ Gold",
+    "modular": "Full",
+    "notes": "Compact 140mm depth 1000W ATX 3.0 PSU for high-power RTX 4090/5090 configurations.",
+    "source": "Corsair Official Specs / Cybenetics Gold Report",
     "checkedAt": "2026-10-20"
   },
   {

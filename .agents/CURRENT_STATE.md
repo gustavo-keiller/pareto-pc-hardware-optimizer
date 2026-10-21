@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- None (merging `feat/data-02-benchmark-sourcing` to `main`, next is `[DATA-03]`).
+- None (merging `feat/data-03-catalog-coverage` to `main`, next is `[DATA-04]`).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Hardware Catalog Coverage Expansion across All 8 Categories (`[DATA-03]`, 2026-10-20):**
+  - Expanded all 8 hardware catalogs from 72 items to 124 fully-specified components with verified manufacturer clearances, thermal capacities, and audit citations.
+  - Covers current and previous generation hardware across GPUs (NVIDIA RTX 50/40/30 series, AMD RX 7000/6000 series, Intel Arc Battlemage/Alchemist), CPUs (AMD AM5/AM4, Intel LGA1700/LGA1851), motherboards (ATX, Micro-ATX, Mini-ITX across B550, B650, B760, Z890), RAM kits (DDR4/DDR5 RGB & low-profile stealth), NVMe Gen4/Gen3 SSDs (500GB up to 4TB), air and AIO liquid coolers, and 550W-1000W ATX 3.0 power supplies.
+  - Protected multi-core productivity in CPU pruning (`coresBetterOrEqual`) and optimized combinatorial build search order to evaluate 31.5 million build combinations without memory allocation overhead.
+  - Backed by catalog schema tests in `src/data/__tests__/catalogs.test.ts` and combinatorial property tests in `src/lib/math/__tests__/combinatorial.test.ts`.
 
 - **Public Creator Benchmark Sourcing & Normalization Engine (`[DATA-02]`, 2026-10-20):**
   - Created public creator benchmark datasets from TechPowerUp, Hardware Unboxed, Gamers Nexus, and LTT Labs in `src/data/benchmarks/gpuBenchmarks.json` and `cpuBenchmarks.json`.

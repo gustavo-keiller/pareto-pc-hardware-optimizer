@@ -28,6 +28,20 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "cooler-deepcool-ag400",
+    "name": "DeepCool AG400 ARGB",
+    "vendor": "DeepCool",
+    "price": 25,
+    "supportedSockets": ["AM4", "AM5", "LGA1700", "LGA1851"],
+    "heightMm": 150,
+    "maxTdpWatts": 220,
+    "type": "Air",
+    "rgb": true,
+    "notes": "Value direct-contact 4 heatpipe tower with addressable RGB fan.",
+    "source": "DeepCool Official Specs Sheet",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "cooler-thermalright-peerless-assassin",
     "name": "Thermalright Peerless Assassin 120 SE",
     "vendor": "Thermalright",
@@ -39,6 +53,34 @@
     "rgb": false,
     "notes": "Dual-tower champion, handles 7800X3D and Core i7 effortlessly.",
     "source": "Hardware Canucks / Gamers Nexus Air Cooler Benchmark",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cooler-thermalright-phantom-spirit",
+    "name": "Thermalright Phantom Spirit 120 SE",
+    "vendor": "Thermalright",
+    "price": 38,
+    "supportedSockets": ["AM4", "AM5", "LGA1700", "LGA1851"],
+    "heightMm": 154,
+    "maxTdpWatts": 280,
+    "type": "Air",
+    "rgb": false,
+    "notes": "Upgraded 7-heatpipe successor to Peerless Assassin, elite thermal dissipation.",
+    "source": "Hardware Canucks Cooler Test / Thermalright Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cooler-noctua-nh-l9a",
+    "name": "Noctua NH-L9a-AM5 Low Profile",
+    "vendor": "Noctua",
+    "price": 45,
+    "supportedSockets": ["AM4", "AM5"],
+    "heightMm": 37,
+    "maxTdpWatts": 95,
+    "type": "Air",
+    "rgb": false,
+    "notes": "Ultra-compact 37mm low-profile cooler designed for ultra-small form factor cases.",
+    "source": "Noctua Official Specifications",
     "checkedAt": "2026-10-20"
   },
   {
@@ -56,6 +98,20 @@
     "checkedAt": "2026-10-20"
   },
   {
+    "id": "cooler-thermalright-frozen-prism-360",
+    "name": "Thermalright Frozen Prism 360 ARGB",
+    "vendor": "Thermalright",
+    "price": 68,
+    "supportedSockets": ["AM4", "AM5", "LGA1700", "LGA1851"],
+    "heightMm": 52,
+    "maxTdpWatts": 320,
+    "type": "AIO",
+    "rgb": true,
+    "notes": "High-capacity 360mm AIO liquid cooler for Core i9 and Ryzen 9 multithreaded loads.",
+    "source": "Thermalright Official Specs Sheet",
+    "checkedAt": "2026-10-20"
+  },
+  {
     "id": "cooler-arctic-lf3-240-black",
     "name": "Arctic Liquid Freezer III 240 Black",
     "vendor": "Arctic",
@@ -67,6 +123,20 @@
     "rgb": false,
     "notes": "Thick 38mm radiator with VRM cooling fan for silent high-thermal dissipation.",
     "source": "Gamers Nexus Liquid Cooler of the Year / Arctic Specs",
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "id": "cooler-arctic-lf3-360-black",
+    "name": "Arctic Liquid Freezer III 360 Black",
+    "vendor": "Arctic",
+    "price": 100,
+    "supportedSockets": ["AM4", "AM5", "LGA1700", "LGA1851"],
+    "heightMm": 65,
+    "maxTdpWatts": 350,
+    "type": "AIO",
+    "rgb": false,
+    "notes": "Class-leading 360mm radiator with integrated VRM blower and pressure-optimized P12 fans.",
+    "source": "Gamers Nexus Review / Arctic Official Specs",
     "checkedAt": "2026-10-20"
   }
 ]

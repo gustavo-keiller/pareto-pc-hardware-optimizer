@@ -75,7 +75,7 @@
 
 - [x] **`[DATA-01]` Move catalogs from `.ts` files into versioned JSON** with a validation step in `npm run check` (schema check, no missing fields, source + date on every row). _Done 2026-10-20._
 - [x] **`[DATA-02]` Benchmark sourcing from public creators (D-3).** Prefer creators who publish written charts/tables (LTT Labs, Hardware Unboxed, Gamers Nexus, TechPowerUp). Store numbers with source citation, normalize to relative performance vs reference card. _Done 2026-10-20._
-- [ ] **`[DATA-03]` Coverage:** from 18 real GPUs to all current and previous generation parts in every BLD-01 category.
+- [x] **`[DATA-03]` Coverage:** from 18 real GPUs to all current and previous generation parts in every BLD-01 category (124 components across all 8 categories). _Done 2026-10-20._
 - [ ] **`[DATA-04]` Prices as JSON in the repo, per store and region** (`data/prices/br.json` first), each with a "checked on" date. No live scraping (D-2).
 - [ ] **`[DATA-05]` Price history for free:** git history of price commits tracks price shifts over time.
 - [ ] **`[DATA-06]` Maintainer tooling:** `npm run add-part` script that asks for specs, validates, and writes the JSON.
