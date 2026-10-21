@@ -10,10 +10,10 @@
 
 **Shipped since the first roadmap:** Phase 0 (CI, lint, UI tests, `npm run snap`, glossary); the answer-first beginner flow ending in a graphics card or a whole PC (UX-01/02/11); trust fixes (UX-12/13); plain words, phone layout, pt-BR + reais (UX-03/05/06); shopping reasons (UX-04); step-up to Explorer (UX-07); accessibility and pro extras (UX-08/09); full 8-part PC builder with clearance fit checks (BLD-01/02), use-case scores (BLD-03), background Web Worker engine (BLD-04), interactive part swapper (BLD-05), upgrade mode (BLD-06), share links (BLD-07), and enthusiast constraints (BLD-08); code splitting and slim ECharts (PERF-01/02, first download ~108 KB gzipped).
 
-**Phase status:** Phase 0, Phase 1, and Phase 2 are 100% complete. In Phase 3, `[DATA-01]` (versioned JSON catalogs & validation) is shipped; next up is `[DATA-02]` (benchmark sourcing from public creators).
+**Phase status:** Phase 0, Phase 1, Phase 2, and Phase 3 are 100% complete. In Phase 3, all milestones (`[DATA-01]`, `[DATA-02]`, `[DATA-03]`, `[DATA-04]`, `[DATA-05]`, `[DATA-06]`) are fully shipped with 124 components across 8 categories, public creator benchmarks, regional retail store pricing in BRL and USD, price history tracking, and maintainer CLI tooling (`npm run add-part`). Next up is Phase 4 (Code optimization & performance) and UX-10 user testing.
 
 **Known problems (see `TODO.md`):**
-- BRL prices are US prices × 5.7 (labelled as estimates); real Brazilian prices are Phase 3 (DATA-04).
+- Real retail price catalogs are established for key hardware; expanding coverage to remaining long-tail components over time via `npm run add-part`.
 
 **Process:** `main` had 8 red CI runs out of 12 on 2026-10-19 because work was pushed straight to it. From now on everything goes through PRs (see "How work lands on `main`" in `AGENTS.md`); branch protection on `main` is still to be turned on.
 
@@ -23,7 +23,7 @@
 
 - [x] **D-1 Market:** country-agnostic app, **Brazil first** for testing. Every price carries a currency and a region; nothing hardcodes BRL or USD. UI starts in pt-BR with English as a second language.
 - [x] **D-2 No live prices, no server for now.** The GitHub repo is the database: catalogs and prices are JSON files, updated by commits/PRs (by hand, or through the existing deal importer exporting JSON). The app reads them at build time. A server only comes back if affiliate click tracking (AFF-06) needs one.
-- [ ] **D-3 Benchmarks: leaning towards public creator results** (YouTube channels like Linus Tech Tips, plus others). See DATA-02 for how to make that work.
+- [x] **D-3 Benchmarks: leaning towards public creator results** (YouTube channels like Linus Tech Tips, Hardware Unboxed, Gamers Nexus, TechPowerUp). Harmonized normalization engine shipped in DATA-02.
 - [ ] **D-4 Name/brand & domain:** open; not needed until LAUNCH-01.
 
 ---
@@ -78,7 +78,7 @@
 - [x] **`[DATA-03]` Coverage:** from 18 real GPUs to all current and previous generation parts in every BLD-01 category (124 components across all 8 categories). _Done 2026-10-20._
 - [x] **`[DATA-04]` Prices as JSON in the repo, per store and region** (`src/data/prices/br.json` and `us.json`), each with a "checked on" date and store URLs. _Done 2026-10-20._
 - [x] **`[DATA-05]` Price history for free:** git history and snapshot price series track price shifts over time (`src/utils/priceHistory.ts`, `src/data/prices/history.json`). _Done 2026-10-20._
-- [ ] **`[DATA-06]` Maintainer tooling:** `npm run add-part` script that asks for specs, validates, and writes the JSON.
+- [x] **`[DATA-06]` Maintainer tooling:** `npm run add-part` script that asks for specs, validates, and writes the JSON (`scripts/add-part.cjs`). _Done 2026-10-20._
 
 ---
 
@@ -117,8 +117,8 @@
 
 ## Next up, reprioritized (2026-10-20)
 
-1. **Merge `fix/perf-engine-and-ci` through a PR** once CI is green, and turn on branch protection for `main`.
-2. **UX-10:** test with 3–5 people who know nothing about PCs; their findings set what comes after.
-3. **Phase 3 data** (real BRL prices DATA-04, creator benchmarks DATA-02), then BLD-04 (Web Worker).
+1. **UX-10:** test with 3–5 people who know nothing about PCs; their findings set what comes after.
+2. **Phase 4 code optimization & performance** (`[PERF-03]` split oversized files, `[PERF-04]` knip dead code removal, `[PERF-05]` CI performance budget).
+3. **Phase 5 launch foundations** (`[LAUNCH-01]` hosting & domain, `[LAUNCH-02]` error tracking, `[LAUNCH-03]` legal pages).
 
 Then Phase 5 (launch) and Phase 6 (affiliates, later per gustavo). Expert depth (UX-08) is strong enough to wait.

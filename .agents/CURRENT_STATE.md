@@ -4,13 +4,20 @@
 
 ## 🔴 In Flight
 
-- `[DATA-06]` Maintainer Tooling (`npm run add-part` CLI for interactive, schema-validated catalog updates).
+- None (All Phase 3 data milestones completed and merged; next up is Phase 4 code optimization & UX-10 testing).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Maintainer Tooling via `npm run add-part` (`[DATA-06]`, 2026-10-20):**
+  - Created interactive CLI wizard and non-interactive maintainer tooling in `scripts/add-part.cjs`.
+  - Prompts maintainers for component specs across all 8 BLD-01 hardware categories, validates against schema bounds and existing catalog IDs, and formats JSON cleanly.
+  - Automatically executes `scripts/validate-catalogs.cjs` before committing writes, rolling back safely if errors occur.
+  - Added `"add-part": "node scripts/add-part.cjs"` to `package.json`.
+  - Backed by 6 Vitest unit tests in `src/data/__tests__/addPart.test.ts`.
 
 - **Price History Engine & Market Trend Tracking (`[DATA-05]`, 2026-10-20):**
   - Created price history and market trend analysis engine in `src/utils/priceHistory.ts`.

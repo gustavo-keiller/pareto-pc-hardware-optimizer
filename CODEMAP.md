@@ -116,11 +116,13 @@ Vite + React 18 + Tailwind CSS v4 + Apache ECharts:
 | :--- | :--- |
 | `scripts/check-docs.cjs` | Validates `AGENTS.md` character cap (<12,000 chars), internal markdown links, `.agents/skills/` frontmatter, `.claude/skills/` stub parity, and the 600/800-line file cap (with a shrink-only allowlist) |
 | `scripts/validate-catalogs.cjs` | Validates schema conformance, numeric bounds, ID uniqueness, source citations, audit dates, and cross-catalog compatibility for all JSON hardware catalogs (`[DATA-01]`) |
+| `scripts/add-part.cjs` | **Interactive & CLI Maintainer Tooling (`[DATA-06]`)** — interactive and CLI-driven maintainer script prompting for specs, validating schemas and ID uniqueness, and safely appending new components to JSON catalogs |
 | `.github/workflows/check.yml` | CI: `npm ci`, `npm run check`, `npm run build`, plus the Playwright e2e job, on every push to `main` and every PR |
 | `scripts/snap.mjs` | `npm run snap`: starts Vite and saves desktop + phone screenshots of each mode to `snapshots/` (gitignored) |
 | `src/__tests__/App.ui.test.tsx` | UI smoke tests (jsdom + Testing Library): each mode renders, budget changes the Simple top pick, share buttons copy links and feedback badges |
 | `src/__tests__/PartSwapper.ui.test.tsx` | UI integration test (jsdom + Testing Library): interactive part swapping in Full Builds mode and live build metric updates (`[BLD-05]`) |
 | `src/data/__tests__/catalogs.test.ts` | Vitest catalog suite (`[DATA-01]`): verifies all 8 JSON catalogs load, maintain unique IDs, include source/date metadata, and satisfy cross-platform compatibility |
+| `src/data/__tests__/addPart.test.ts` | **Vitest Add-Part Suite (`[DATA-06]`)** — 6 property and schema tests verifying component validation, duplicate detection, dry-run appending, and error handling |
 | `src/lib/math/__tests__/benchmarkNormalization.test.ts` | **Vitest Benchmark Normalization Suite (`[DATA-02]`)** — 7 property tests verifying anchor re-centering, scale invariance, transitive bridge chaining, and geometric mean bounds |
 | `src/lib/math/__tests__/upgradeOptimizer.test.ts` | **Vitest Upgrade Optimizer Suite** — 9 property and boundary tests verifying 0-cost accounting, socket preservation, PSU wattage guards, compact case clearance, and Pareto monotonicity |
 | `src/utils/__tests__/shareBuild.test.ts` | Unit tests for build share URL encoding/decoding, parameter sanitization, and plain-text clipboard formatting |

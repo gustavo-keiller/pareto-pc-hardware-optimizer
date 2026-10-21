@@ -19,12 +19,6 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (top to bottom; reprioritized 2026-10-20 from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[DATA-06]` Maintainer Tooling (`npm run add-part`):**
-  Create interactive CLI script (`scripts/add-part.cjs`) prompting maintainers for component specs, validating against schema bounds, and safely appending to the corresponding catalog JSON.
-  - **Files likely touched:** `scripts/add-part.cjs`, `package.json`, `CODEMAP.md`
-  - **Done when:** Script guides through additions and enforces schema rules before write.
-  - **Test to add:** Schema validation via `npm run check:catalogs`.
-
 - **`[UX-10]` Test with 3–5 people who know nothing about PCs:**
   Success = they pick a graphics card or a whole PC in under 2 minutes without help and can say why. Findings become `TODO.md` items.
   - **Files likely touched:** `TODO.md`, `ROADMAP.md`
