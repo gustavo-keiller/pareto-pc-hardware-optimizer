@@ -4,13 +4,20 @@
 
 ## 🔴 In Flight
 
-- None (merging `feat/data-04-store-prices` to `main`, next is `[DATA-05]`).
+- `[DATA-06]` Maintainer Tooling (`npm run add-part` CLI for interactive, schema-validated catalog updates).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Price History Engine & Market Trend Tracking (`[DATA-05]`, 2026-10-20):**
+  - Created price history and market trend analysis engine in `src/utils/priceHistory.ts`.
+  - Calculates all-time-low (ATL) price baselines, peak prices, average prices, percentage deltas from ATL, and trend momentum (`dropping`, `rising`, `stable`).
+  - Added structured price history dataset `src/data/prices/history.json` and retrieval helper `getPriceHistory` in `src/data/storePrices.ts`.
+  - Enforced price history schema validation and chronological ordering in `scripts/validate-catalogs.cjs`.
+  - Backed by 6 Vitest unit tests in `src/utils/__tests__/priceHistory.test.ts`.
 
 - **Regional Store Prices JSON & Regional Pricing Overlay Engine (`[DATA-04]`, 2026-10-20):**
   - Created versioned static regional retail price datasets in `src/data/prices/br.json` (KaBuM!, TerabyteShop, Pichau) and `us.json` (Newegg, Amazon US, Best Buy, B&H) with store URLs, PIX/cash prices, and audit dates.

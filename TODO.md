@@ -19,12 +19,6 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (top to bottom; reprioritized 2026-10-20 from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[DATA-05]` Price History Engine via Git History & Commit Tracking:**
-  Build a pure price history tracker (`src/utils/priceHistory.ts`) that inspects price evolution commits, computes all-time-low (ATL) price baselines, and flags whether current prices are at or near historic minimums.
-  - **Files likely touched:** `src/utils/priceHistory.ts`, `src/utils/__tests__/priceHistory.test.ts`, `CODEMAP.md`
-  - **Done when:** Price history utility correctly tracks price delta records and identifies all-time low discounts.
-  - **Test to add:** Price history resolution unit tests in `src/utils/__tests__/priceHistory.test.ts`.
-
 - **`[DATA-06]` Maintainer Tooling (`npm run add-part`):**
   Create interactive CLI script (`scripts/add-part.cjs`) prompting maintainers for component specs, validating against schema bounds, and safely appending to the corresponding catalog JSON.
   - **Files likely touched:** `scripts/add-part.cjs`, `package.json`, `CODEMAP.md`

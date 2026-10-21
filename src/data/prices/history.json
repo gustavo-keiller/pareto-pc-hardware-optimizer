@@ -1,0 +1,55 @@
+[
+  {
+    "componentId": "rx-6600",
+    "currency": "BRL",
+    "history": [
+      { "date": "2024-01-15", "price": 1699, "store": "KaBuM!" },
+      { "date": "2024-06-20", "price": 1499, "store": "KaBuM!" },
+      { "date": "2026-10-20", "price": 1399, "store": "KaBuM!" }
+    ]
+  },
+  {
+    "componentId": "arc-b580",
+    "currency": "BRL",
+    "history": [
+      { "date": "2024-12-12", "price": 1999, "store": "TerabyteShop" },
+      { "date": "2026-10-20", "price": 1849, "store": "TerabyteShop" }
+    ]
+  },
+  {
+    "componentId": "rtx-4060",
+    "currency": "BRL",
+    "history": [
+      { "date": "2023-07-01", "price": 2399, "store": "KaBuM!" },
+      { "date": "2024-03-10", "price": 2149, "store": "KaBuM!" },
+      { "date": "2026-10-20", "price": 1999, "store": "KaBuM!" }
+    ]
+  },
+  {
+    "componentId": "rx-7800-xt",
+    "currency": "BRL",
+    "history": [
+      { "date": "2023-09-15", "price": 4299, "store": "KaBuM!" },
+      { "date": "2024-05-18", "price": 3799, "store": "KaBuM!" },
+      { "date": "2026-10-20", "price": 3499, "store": "KaBuM!" }
+    ]
+  },
+  {
+    "componentId": "cpu-ryzen-5700x3d",
+    "currency": "BRL",
+    "history": [
+      { "date": "2024-02-01", "price": 1699, "store": "KaBuM!" },
+      { "date": "2024-07-15", "price": 1449, "store": "KaBuM!" },
+      { "date": "2026-10-20", "price": 1349, "store": "KaBuM!" }
+    ]
+  },
+  {
+    "componentId": "cpu-ryzen-7800x3d",
+    "currency": "BRL",
+    "history": [
+      { "date": "2023-04-10", "price": 3499, "store": "KaBuM!" },
+      { "date": "2024-02-20", "price": 2799, "store": "KaBuM!" },
+      { "date": "2026-10-20", "price": 2899, "store": "KaBuM!" }
+    ]
+  }
+]

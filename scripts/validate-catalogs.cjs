@@ -500,6 +500,36 @@ for (const offer of [...brPrices, ...usPrices]) {
   }
 }
 
+// 13. Validate Price History (DATA-05)
+const priceHistory = loadPriceFile('history.json');
+for (const entry of priceHistory) {
+  const p = `[priceHistory -> ${entry?.componentId ?? 'UNKNOWN'} (${entry?.currency ?? 'UNKNOWN'})]`;
+  if (!entry || typeof entry !== 'object') {
+    errors.push(`${p} is not an object`);
+    continue;
+  }
+  if (!entry.componentId || !allValidPartIds.has(entry.componentId)) {
+    errors.push(
+      `${p} references non-existent componentId '${entry?.componentId}'`,
+    );
+  }
+  if (!['USD', 'BRL'].includes(entry.currency)) {
+    errors.push(`${p} invalid currency '${entry.currency}'`);
+  }
+  if (!Array.isArray(entry.history) || entry.history.length === 0) {
+    errors.push(`${p} history must be a non-empty array`);
+  } else {
+    for (const point of entry.history) {
+      if (!point.date || !ISO_DATE_REGEX.test(point.date)) {
+        errors.push(`${p} invalid history date '${point?.date}'`);
+      }
+      if (typeof point.price !== 'number' || point.price <= 0) {
+        errors.push(`${p} invalid history price '${point?.price}'`);
+      }
+    }
+  }
+}
+
 const totalParts =
   cpus.length +
   motherboards.length +
@@ -518,6 +548,6 @@ if (errors.length > 0) {
   process.exit(1);
 } else {
   console.log(
-    `[validate-catalogs] OK — 8 catalogs verified (${totalParts} parts: ${cpus.length} CPUs, ${motherboards.length} Mobos, ${ramKits.length} RAM, ${storages.length} Storage, ${coolers.length} Coolers, ${cases.length} Cases, ${psus.length} PSUs, ${gpus.length} GPUs) + ${gpuBenchmarks.length + cpuBenchmarks.length} creator benchmark runs + ${brPrices.length + usPrices.length} regional store price offers verified.`,
+    `[validate-catalogs] OK — 8 catalogs verified (${totalParts} parts: ${cpus.length} CPUs, ${motherboards.length} Mobos, ${ramKits.length} RAM, ${storages.length} Storage, ${coolers.length} Coolers, ${cases.length} Cases, ${psus.length} PSUs, ${gpus.length} GPUs) + ${gpuBenchmarks.length + cpuBenchmarks.length} creator benchmark runs + ${brPrices.length + usPrices.length} regional store price offers + ${priceHistory.length} price history series verified.`,
   );
 }
