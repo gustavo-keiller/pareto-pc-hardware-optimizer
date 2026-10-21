@@ -402,6 +402,104 @@ for (const b of [...gpuBenchmarks, ...cpuBenchmarks]) {
   }
 }
 
+// 12. Validate Regional Store Prices (DATA-04)
+const PRICES_DIR = path.resolve(__dirname, '../src/data/prices');
+function loadPriceFile(file) {
+  const filePath = path.join(PRICES_DIR, file);
+  if (!fs.existsSync(filePath)) {
+    errors.push(`Missing price file: ${file}`);
+    return [];
+  }
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      errors.push(`${file} must contain a non-empty array of store prices`);
+      return [];
+    }
+    return parsed;
+  } catch (err) {
+    errors.push(
+      `JSON parse error in ${file}: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return [];
+  }
+}
+
+const allValidPartIds = new Set([
+  ...cpuIds,
+  ...moboIds,
+  ...ramIds,
+  ...storageIds,
+  ...coolerIds,
+  ...caseIds,
+  ...psuIds,
+  ...gpuIds,
+]);
+
+const brPrices = loadPriceFile('br.json');
+const usPrices = loadPriceFile('us.json');
+
+for (const offer of [...brPrices, ...usPrices]) {
+  const p = `[price -> ${offer?.componentId ?? 'UNKNOWN'} @ ${offer?.store ?? 'UNKNOWN'}]`;
+  if (!offer || typeof offer !== 'object') {
+    errors.push(`${p} is not an object`);
+    continue;
+  }
+  if (!offer.componentId || typeof offer.componentId !== 'string') {
+    errors.push(`${p} missing componentId`);
+  } else if (!allValidPartIds.has(offer.componentId)) {
+    errors.push(
+      `${p} references non-existent componentId '${offer.componentId}'`,
+    );
+  }
+  if (
+    !offer.store ||
+    typeof offer.store !== 'string' ||
+    offer.store.trim().length === 0
+  ) {
+    errors.push(`${p} missing or empty store name`);
+  }
+  if (
+    typeof offer.price !== 'number' ||
+    !Number.isFinite(offer.price) ||
+    offer.price <= 0
+  ) {
+    errors.push(
+      `${p} price must be positive finite number (got ${offer.price})`,
+    );
+  }
+  if (
+    !offer.url ||
+    typeof offer.url !== 'string' ||
+    !offer.url.startsWith('http')
+  ) {
+    errors.push(`${p} missing or invalid store url (must start with http)`);
+  }
+  if (typeof offer.inStock !== 'boolean') {
+    errors.push(`${p} inStock must be a boolean`);
+  }
+  if (
+    !offer.checkedAt ||
+    typeof offer.checkedAt !== 'string' ||
+    !ISO_DATE_REGEX.test(offer.checkedAt)
+  ) {
+    errors.push(`${p} missing or invalid checkedAt ISO date`);
+  }
+  if (
+    offer.cashPrice !== undefined &&
+    (typeof offer.cashPrice !== 'number' || offer.cashPrice <= 0)
+  ) {
+    errors.push(`${p} cashPrice must be positive number if defined`);
+  }
+  if (
+    offer.installmentPrice !== undefined &&
+    (typeof offer.installmentPrice !== 'number' || offer.installmentPrice <= 0)
+  ) {
+    errors.push(`${p} installmentPrice must be positive number if defined`);
+  }
+}
+
 const totalParts =
   cpus.length +
   motherboards.length +
@@ -420,6 +518,6 @@ if (errors.length > 0) {
   process.exit(1);
 } else {
   console.log(
-    `[validate-catalogs] OK — 8 catalogs verified (${totalParts} parts: ${cpus.length} CPUs, ${motherboards.length} Mobos, ${ramKits.length} RAM, ${storages.length} Storage, ${coolers.length} Coolers, ${cases.length} Cases, ${psus.length} PSUs, ${gpus.length} GPUs) + ${gpuBenchmarks.length + cpuBenchmarks.length} creator benchmark runs with schema, bounds, source, and date integrity.`,
+    `[validate-catalogs] OK — 8 catalogs verified (${totalParts} parts: ${cpus.length} CPUs, ${motherboards.length} Mobos, ${ramKits.length} RAM, ${storages.length} Storage, ${coolers.length} Coolers, ${cases.length} Cases, ${psus.length} PSUs, ${gpus.length} GPUs) + ${gpuBenchmarks.length + cpuBenchmarks.length} creator benchmark runs + ${brPrices.length + usPrices.length} regional store price offers verified.`,
   );
 }

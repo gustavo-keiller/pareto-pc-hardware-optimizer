@@ -4,13 +4,19 @@
 
 ## 🔴 In Flight
 
-- None (merging `feat/data-03-catalog-coverage` to `main`, next is `[DATA-04]`).
+- None (merging `feat/data-04-store-prices` to `main`, next is `[DATA-05]`).
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
 
 ## 🟡 Recently Completed
+
+- **Regional Store Prices JSON & Regional Pricing Overlay Engine (`[DATA-04]`, 2026-10-20):**
+  - Created versioned static regional retail price datasets in `src/data/prices/br.json` (KaBuM!, TerabyteShop, Pichau) and `us.json` (Newegg, Amazon US, Best Buy, B&H) with store URLs, PIX/cash prices, and audit dates.
+  - Implemented pure mathematical pricing overlay engine in `src/lib/math/pricingEngine.ts` with cash/PIX discount awareness and honest uncertainty labeling (`isEstimated: false` with store attribution; `isEstimated: true` when falling back to currency multiplier).
+  - Wired regional price dataset validation into `scripts/validate-catalogs.cjs`.
+  - Backed by 7 property tests in `src/lib/math/__tests__/pricingEngine.test.ts`.
 
 - **Hardware Catalog Coverage Expansion across All 8 Categories (`[DATA-03]`, 2026-10-20):**
   - Expanded all 8 hardware catalogs from 72 items to 124 fully-specified components with verified manufacturer clearances, thermal capacities, and audit citations.

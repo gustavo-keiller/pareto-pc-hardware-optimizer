@@ -1,0 +1,202 @@
+[
+  {
+    "componentId": "rx-6600",
+    "store": "Amazon US",
+    "price": 194.99,
+    "url": "https://www.amazon.com/dp/B09HHLX543",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "arc-b580",
+    "store": "Newegg",
+    "price": 249.99,
+    "url": "https://www.newegg.com/p/N82E16814156037",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "rx-7600",
+    "store": "Best Buy",
+    "price": 264.99,
+    "url": "https://www.bestbuy.com/site/6544458.p",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "rtx-4060",
+    "store": "Newegg",
+    "price": 294.99,
+    "url": "https://www.newegg.com/p/N82E16814137803",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "rx-6750-xt",
+    "store": "Newegg",
+    "price": 329.99,
+    "url": "https://www.newegg.com/p/N82E16814137735",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "rx-7700-xt",
+    "store": "Amazon US",
+    "price": 389.99,
+    "url": "https://www.amazon.com/dp/B0CFWRP773",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "rx-7800-xt",
+    "store": "Newegg",
+    "price": 479.99,
+    "url": "https://www.newegg.com/p/N82E16814131853",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "rtx-4070-super",
+    "store": "Best Buy",
+    "price": 589.99,
+    "url": "https://www.bestbuy.com/site/6570271.p",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "rtx-4070-ti-super",
+    "store": "Amazon US",
+    "price": 789.99,
+    "url": "https://www.amazon.com/dp/B0CSBD4T9H",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "rx-7900-xtx",
+    "store": "Newegg",
+    "price": 889.99,
+    "url": "https://www.newegg.com/p/N82E16814202428",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "rtx-4080-super",
+    "store": "B&H",
+    "price": 994.99,
+    "url": "https://www.bhphotovideo.com/c/product/1806326-REG",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "rtx-4090",
+    "store": "B&H",
+    "price": 1789.99,
+    "url": "https://www.bhphotovideo.com/c/product/1730076-REG",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "cpu-ryzen-5600",
+    "store": "Amazon US",
+    "price": 124.99,
+    "url": "https://www.amazon.com/dp/B09VCHR1VH",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "cpu-ryzen-5700x3d",
+    "store": "Newegg",
+    "price": 204.99,
+    "url": "https://www.newegg.com/p/N82E16819113812",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "cpu-ryzen-7600",
+    "store": "Amazon US",
+    "price": 184.99,
+    "url": "https://www.amazon.com/dp/B0BMQJWBDQ",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "cpu-ryzen-7800x3d",
+    "store": "Best Buy",
+    "price": 429.99,
+    "url": "https://www.bestbuy.com/site/6537004.p",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "cpu-i5-12400f",
+    "store": "Newegg",
+    "price": 109.99,
+    "url": "https://www.newegg.com/p/N82E16819118360",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "mobo-msi-b550-a-pro",
+    "store": "Amazon US",
+    "price": 109.99,
+    "url": "https://www.amazon.com/dp/B089CZ3884",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "mobo-asrock-b650m-hdv",
+    "store": "Newegg",
+    "price": 109.99,
+    "url": "https://www.newegg.com/p/N82E16813162121",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "ram-team-32gb-d4-3200",
+    "store": "Amazon US",
+    "price": 53.99,
+    "url": "https://www.amazon.com/dp/B086693X5R",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "ram-team-32gb-d5-6000-cl30",
+    "store": "Amazon US",
+    "price": 91.99,
+    "url": "https://www.amazon.com/dp/B0C3RYHZJQ",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "storage-kingston-nv2-1tb",
+    "store": "Amazon US",
+    "price": 59.99,
+    "url": "https://www.amazon.com/dp/B0BBWH1R8H",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "cooler-thermalright-assassin-x",
+    "store": "Amazon US",
+    "price": 19.99,
+    "url": "https://www.amazon.com/dp/B09LHB5PN8",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "case-montech-air903-max",
+    "store": "Newegg",
+    "price": 74.99,
+    "url": "https://www.newegg.com/p/2AM-00CN-00057",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  },
+  {
+    "componentId": "psu-msi-a650bn",
+    "store": "Amazon US",
+    "price": 64.99,
+    "url": "https://www.amazon.com/dp/B0991W1HKT",
+    "inStock": true,
+    "checkedAt": "2026-10-20"
+  }
+]

@@ -19,11 +19,17 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (top to bottom; reprioritized 2026-10-20 from [`ROADMAP.md`](ROADMAP.md))
 
-- **`[DATA-04]` Regional Store Prices JSON & Regional Pricing Overlay Engine:**
-  Create store-specific pricing datasets (`src/data/prices/br.json` and `us.json`) with checked dates, store URLs (KaBuM, Pichau, Terabyte, Amazon), cash/PIX and installment prices, replacing flat currency multiplication with real retail pricing.
-  - **Files likely touched:** `src/data/prices/*.json`, `src/lib/math/pricingEngine.ts`, `src/lib/math/__tests__/pricingEngine.test.ts`, `scripts/validate-catalogs.cjs`, `CODEMAP.md`
-  - **Done when:** Store price datasets pass validation, and regional pricing overlay engine provides live retail pricing and merchant links.
-  - **Test to add:** Regional price resolution and fallback unit tests in `src/lib/math/__tests__/pricingEngine.test.ts`.
+- **`[DATA-05]` Price History Engine via Git History & Commit Tracking:**
+  Build a pure price history tracker (`src/utils/priceHistory.ts`) that inspects price evolution commits, computes all-time-low (ATL) price baselines, and flags whether current prices are at or near historic minimums.
+  - **Files likely touched:** `src/utils/priceHistory.ts`, `src/utils/__tests__/priceHistory.test.ts`, `CODEMAP.md`
+  - **Done when:** Price history utility correctly tracks price delta records and identifies all-time low discounts.
+  - **Test to add:** Price history resolution unit tests in `src/utils/__tests__/priceHistory.test.ts`.
+
+- **`[DATA-06]` Maintainer Tooling (`npm run add-part`):**
+  Create interactive CLI script (`scripts/add-part.cjs`) prompting maintainers for component specs, validating against schema bounds, and safely appending to the corresponding catalog JSON.
+  - **Files likely touched:** `scripts/add-part.cjs`, `package.json`, `CODEMAP.md`
+  - **Done when:** Script guides through additions and enforces schema rules before write.
+  - **Test to add:** Schema validation via `npm run check:catalogs`.
 
 - **`[UX-10]` Test with 3–5 people who know nothing about PCs:**
   Success = they pick a graphics card or a whole PC in under 2 minutes without help and can say why. Findings become `TODO.md` items.
