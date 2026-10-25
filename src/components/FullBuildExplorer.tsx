@@ -22,6 +22,7 @@ import { GpuCandidate, HardwareVendor } from '../lib/math/types';
 import { BudgetPreset } from '../data/budgetPresets';
 import { BuildFilterCriteria } from '../lib/math/combinatorial';
 import { useFullSystemOptimizer } from '../hooks/useFullSystemOptimizer';
+import { useUserPrices } from '../hooks/useUserPrices';
 import { formatCurrency, getCurrencyAdjustedCatalogs } from '../utils/currency';
 import { AppLocale, t } from '../utils/i18n';
 import { decodeBuildShareUrl } from '../utils/shareBuild';
@@ -124,6 +125,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     }
   }, [isBrl, maxBudget, initialShare]);
 
+  const { userPrices } = useUserPrices(currency);
   const {
     cpus: activeCpus,
     motherboards: activeMotherboards,
@@ -132,7 +134,10 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     storages: activeStorages,
     cases: activeCases,
     coolers: activeCoolers,
-  } = useMemo(() => getCurrencyAdjustedCatalogs(currency), [currency]);
+  } = useMemo(
+    () => getCurrencyAdjustedCatalogs(currency, undefined, userPrices),
+    [currency, userPrices],
+  );
 
   // Compute Full Systems using combinatorial optimization
   const filterCriteria: BuildFilterCriteria = useMemo(() => {

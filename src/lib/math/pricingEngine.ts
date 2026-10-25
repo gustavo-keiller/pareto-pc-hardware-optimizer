@@ -22,10 +22,17 @@ export interface RegionalPriceOffer {
 
 export type SupportedPricingCurrency = 'USD' | 'BRL';
 
+/** Where an effective price came from, in order of precedence. */
+export type PriceSource = 'user' | 'store' | 'estimate';
+
+/** Prices the user typed in, keyed by component id, in the active currency. */
+export type UserPriceMap = Readonly<Record<string, number>>;
+
 export interface ResolvedPriceInfo {
   readonly effectivePrice: number;
   readonly currency: SupportedPricingCurrency;
   readonly isEstimated: boolean;
+  readonly source: PriceSource;
   readonly store?: string;
   readonly storeUrl?: string;
   readonly cashPrice?: number;
@@ -38,6 +45,7 @@ export interface PricingResolutionOptions {
   readonly currency?: SupportedPricingCurrency;
   readonly exchangeRate?: number;
   readonly preferCashDiscount?: boolean;
+  readonly userPrices?: UserPriceMap;
 }
 
 export const DEFAULT_USD_TO_BRL_RATE = 5.7;
@@ -46,7 +54,9 @@ export const DEFAULT_USD_TO_BRL_RATE = 5.7;
  * Resolves the effective purchasing price for a component given a regional price dataset.
  *
  * Algorithm:
- * 1. Looks up the item by `componentId` in the regional store offers list.
+ * 0. A positive finite price the user typed in wins (`source: 'user'`); the
+ *    cheapest store offer, if any, is still attached so its link stays visible.
+ * 1. Looks up the cheapest in-stock offer for `componentId` across all stores.
  * 2. If a matching in-stock store offer exists:
  *    - Uses `cashPrice` if `preferCashDiscount` is true and `cashPrice` is defined; otherwise uses `price`.
  *    - Flags `isEstimated: false`.
@@ -68,18 +78,31 @@ export function resolveRegionalPrice(
       : DEFAULT_USD_TO_BRL_RATE;
   const preferCash = options?.preferCashDiscount ?? true;
 
-  const match = storeOffers.find((o) => o.componentId === item.id && o.inStock);
+  const match = cheapestInStockOffer(item.id, storeOffers, preferCash);
+  const userPrice = options?.userPrices?.[item.id];
 
-  if (match) {
-    const effectivePrice =
-      preferCash && typeof match.cashPrice === 'number' && match.cashPrice > 0
-        ? match.cashPrice
-        : match.price;
-
+  if (
+    typeof userPrice === 'number' &&
+    Number.isFinite(userPrice) &&
+    userPrice > 0
+  ) {
     return {
-      effectivePrice,
+      effectivePrice: userPrice,
       currency,
       isEstimated: false,
+      source: 'user',
+      store: match?.store,
+      storeUrl: match?.url,
+      checkedAt: match?.checkedAt,
+    };
+  }
+
+  if (match) {
+    return {
+      effectivePrice: offerPrice(match, preferCash),
+      currency,
+      isEstimated: false,
+      source: 'store',
       store: match.store,
       storeUrl: match.url,
       cashPrice: match.cashPrice,
@@ -98,7 +121,105 @@ export function resolveRegionalPrice(
     effectivePrice,
     currency,
     isEstimated: true,
+    source: 'estimate',
   };
+}
+
+function offerPrice(offer: RegionalPriceOffer, preferCash: boolean): number {
+  return preferCash &&
+    typeof offer.cashPrice === 'number' &&
+    offer.cashPrice > 0
+    ? offer.cashPrice
+    : offer.price;
+}
+
+function cheapestInStockOffer(
+  componentId: string,
+  storeOffers: readonly RegionalPriceOffer[],
+  preferCash: boolean,
+): RegionalPriceOffer | undefined {
+  let best: RegionalPriceOffer | undefined;
+  for (const offer of storeOffers) {
+    if (offer.componentId !== componentId || !offer.inStock) continue;
+    if (!(offer.price > 0) || !Number.isFinite(offer.price)) continue;
+    if (!best || offerPrice(offer, preferCash) < offerPrice(best, preferCash)) {
+      best = offer;
+    }
+  }
+  return best;
+}
+
+const MS_PER_DAY = 86_400_000;
+
+/** Default age after which a store price is shown as possibly outdated. */
+export const DEFAULT_PRICE_MAX_AGE_DAYS = 14;
+
+/**
+ * Whole days between an ISO `YYYY-MM-DD` check date and `today` (also ISO).
+ * Returns `Infinity` for a missing or malformed date so it reads as stale.
+ */
+export function priceAgeDays(
+  checkedAt: string | undefined,
+  today: string,
+): number {
+  if (!checkedAt) return Infinity;
+  const checked = Date.parse(`${checkedAt}T00:00:00Z`);
+  const now = Date.parse(`${today}T00:00:00Z`);
+  if (!Number.isFinite(checked) || !Number.isFinite(now)) return Infinity;
+  return Math.max(0, Math.floor((now - checked) / MS_PER_DAY));
+}
+
+export function isPriceStale(
+  checkedAt: string | undefined,
+  today: string,
+  maxAgeDays: number = DEFAULT_PRICE_MAX_AGE_DAYS,
+): boolean {
+  return priceAgeDays(checkedAt, today) > maxAgeDays;
+}
+
+export interface PriceSourceSummary {
+  readonly user: number;
+  readonly store: number;
+  readonly estimate: number;
+  /** Oldest `checkedAt` among parts priced from a store, if any. */
+  readonly oldestStoreCheck?: string;
+}
+
+/**
+ * Counts how the parts of a build were priced. Parts without `priceInfo`
+ * (catalogs that never went through the overlay) count as estimates.
+ */
+export function summarizePriceSources(
+  parts: readonly { readonly priceInfo?: ResolvedPriceInfo }[],
+): PriceSourceSummary {
+  let user = 0;
+  let store = 0;
+  let estimate = 0;
+  let oldestStoreCheck: string | undefined;
+  for (const part of parts) {
+    const source: PriceSource = part.priceInfo?.source ?? 'estimate';
+    switch (source) {
+      case 'user':
+        user += 1;
+        break;
+      case 'store': {
+        store += 1;
+        const checked = part.priceInfo?.checkedAt;
+        if (checked && (!oldestStoreCheck || checked < oldestStoreCheck)) {
+          oldestStoreCheck = checked;
+        }
+        break;
+      }
+      case 'estimate':
+        estimate += 1;
+        break;
+      default: {
+        const _exhaustive: never = source;
+        return _exhaustive;
+      }
+    }
+  }
+  return { user, store, estimate, oldestStoreCheck };
 }
 
 /**

@@ -171,14 +171,15 @@ describe('DATA-01 & DATA-03: Versioned JSON Catalogs & Hardware Coverage', () =>
     const brlPrices = getRegionalStorePrices('BRL');
     const usdPrices = getRegionalStorePrices('USD');
 
-    expect(brlPrices.length).toBeGreaterThan(0);
-    expect(usdPrices.length).toBeGreaterThan(0);
-
-    // Verify format of store offers
-    const firstBrl = brlPrices[0];
-    expect(firstBrl.componentId).toBeDefined();
-    expect(firstBrl.store).toBeDefined();
-    expect(firstBrl.price).toBeGreaterThan(0);
+    // Store price files are written by `npm run prices:update` and may be
+    // empty; every entry they hold must be usable.
+    for (const offer of [...brlPrices, ...usdPrices]) {
+      expect(offer.componentId).toBeTruthy();
+      expect(offer.store).toBeTruthy();
+      expect(offer.price).toBeGreaterThan(0);
+      expect(offer.url).toMatch(/^https?:\/\//);
+      expect(offer.checkedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
 
     // Verify price history lookup
     const rtx4060BrlHistory = getPriceHistory('rtx-4060', 'BRL');

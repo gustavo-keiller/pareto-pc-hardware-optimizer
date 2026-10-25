@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PHASE1_SEED_GPUS } from '../data/seedGpus';
-import { REAL_WORLD_GPUS } from '../data/realGpus';
 import {
   GpuCandidate,
   HardConstraints,
@@ -28,7 +27,12 @@ import {
   safeGetString,
   safeSetJSON,
 } from '../utils/storage';
-import { DEFAULT_USD_TO_BRL_RATE, convertUsdToBrl } from '../utils/currency';
+import {
+  DEFAULT_USD_TO_BRL_RATE,
+  convertUsdToBrl,
+  getPricedRealGpus,
+} from '../utils/currency';
+import { useUserPrices } from './useUserPrices';
 import { AppLocale, DEFAULT_LOCALE } from '../utils/i18n';
 
 export type DatasetMode = 'real' | 'custom' | 'synthetic' | 'combined';
@@ -369,6 +373,9 @@ export function useOptimizerState() {
     safeSetJSON('paretopc_usd_to_brl', Math.round(exchangeRateUsdToBrl * 100));
   }, [exchangeRateUsdToBrl]);
 
+  const { userPrices: brlUserPrices } = useUserPrices('BRL');
+  const { userPrices: usdUserPrices } = useUserPrices('USD');
+
   // Raw catalog based on datasetMode
   const rawCatalog = useMemo(() => {
     if (datasetMode === 'custom') {
@@ -377,30 +384,33 @@ export function useOptimizerState() {
     if (datasetMode === 'combined') {
       const deals = customGpus.length > 0 ? customGpus : DEFAULT_CUSTOM_GPUS;
       // Convert real GPUs to BRL so both live store deals and US benchmarks share the same currency
-      const convertedBaselineGpus: GpuCandidate[] = REAL_WORLD_GPUS.map(
-        (g) => ({
-          ...g,
-          id: `ref-${g.id}`,
-          name: `${g.name} (Ref)`,
-          originalUsdPrice: g.price,
-          price: convertUsdToBrl(g.price, exchangeRateUsdToBrl),
-          currency: 'BRL',
-          isBenchmarkRef: true,
-          notes: `US Baseline Ref: $${g.price} × R$ ${exchangeRateUsdToBrl.toFixed(2)} | ${g.notes ?? ''}`,
-        }),
-      );
+      const convertedBaselineGpus: GpuCandidate[] = getPricedRealGpus(
+        'BRL',
+        exchangeRateUsdToBrl,
+        brlUserPrices,
+      ).map((g) => ({
+        ...g,
+        id: `ref-${g.id}`,
+        name: `${g.name} (Ref)`,
+        isBenchmarkRef: true,
+        notes: `US Baseline Ref: $${g.originalUsdPrice ?? g.price} × R$ ${exchangeRateUsdToBrl.toFixed(2)} | ${g.notes ?? ''}`,
+      }));
       return [...deals, ...convertedBaselineGpus];
     }
-    if (locale === 'pt-BR' && datasetMode === 'real') {
-      return REAL_WORLD_GPUS.map((g) => ({
-        ...g,
-        originalUsdPrice: g.price,
-        price: convertUsdToBrl(g.price, exchangeRateUsdToBrl),
-        currency: 'BRL' as const,
-      }));
+    if (datasetMode === 'real') {
+      return locale === 'pt-BR'
+        ? getPricedRealGpus('BRL', exchangeRateUsdToBrl, brlUserPrices)
+        : getPricedRealGpus('USD', exchangeRateUsdToBrl, usdUserPrices);
     }
-    return datasetMode === 'real' ? REAL_WORLD_GPUS : PHASE1_SEED_GPUS;
-  }, [datasetMode, customGpus, exchangeRateUsdToBrl, locale]);
+    return PHASE1_SEED_GPUS;
+  }, [
+    datasetMode,
+    customGpus,
+    exchangeRateUsdToBrl,
+    locale,
+    brlUserPrices,
+    usdUserPrices,
+  ]);
 
   // Detected active currency ('BRL' or 'USD')
   const activeCurrency = useMemo<'USD' | 'BRL'>(() => {

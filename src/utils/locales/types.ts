@@ -379,4 +379,24 @@ export interface Translations {
   swapIncompatible: string;
   swapCustomizedBuildBadge: string;
   swapResetToRecommended: string;
+  // Prices: sources, user prices and store links
+  priceSourceUser: string;
+  priceSourceStore: string;
+  priceSourceEstimateConverted: string;
+  priceSourceEstimateList: string;
+  priceCheckedOn: string;
+  priceMaybeOutdated: string;
+  pricePanelOpen: string;
+  priceYourPriceLabel: string;
+  priceSave: string;
+  priceClear: string;
+  priceOpenStorePage: string;
+  priceSearchIn: string;
+  priceSavedNote: string;
+  buildPricesFromStores: string;
+  buildPricesEstimated: string;
+  buildPricesEstimatedList: string;
+  buildPricesOf: string;
+  buildPricesParts: string;
+  buildPricesYours: string;
 }

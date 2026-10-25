@@ -14,12 +14,12 @@ import {
   Share2,
   Copy,
   Check,
-  RefreshCw,
   Wrench,
 } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
 import { SwappableCategory } from './PartSwapperModal';
-import { formatCurrency, getEstimatedPriceNotice } from '../utils/currency';
+import { PartCardHeader } from './PartCardHeader';
+import { formatCurrency, getBuildPriceNotice } from '../utils/currency';
 import { AppLocale, t } from '../utils/i18n';
 import { generateBuildShoppingReasons } from '../utils/shoppingReasons';
 import {
@@ -51,6 +51,25 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
   const reasons = useMemo(() => {
     return generateBuildShoppingReasons(build, currency, locale);
   }, [build, currency, locale]);
+
+  const priceNotice = useMemo(
+    () =>
+      getBuildPriceNotice(
+        [
+          build.cpu,
+          build.gpu,
+          build.motherboard,
+          build.ram,
+          build.storage,
+          build.cooler,
+          build.case,
+          build.psu,
+        ],
+        currency,
+        locale,
+      ),
+    [build, currency, locale],
+  );
 
   const shareUrl = useMemo(() => {
     return encodeBuildShareUrl({
@@ -126,9 +145,12 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
                     {t('buildTotalHardwareCost', locale)}
                   </span>
                 </h3>
-                {currency === 'BRL' && (
-                  <div className="text-[10px] text-amber-300/80 font-normal mt-0.5">
-                    {getEstimatedPriceNotice(locale, currency)}
+                {priceNotice.text && (
+                  <div
+                    data-testid="build-price-notice"
+                    className={`text-[10px] font-normal mt-0.5 ${priceNotice.isEstimate ? 'text-amber-300/80' : 'text-emerald-300/80'}`}
+                  >
+                    {priceNotice.text}
                   </div>
                 )}
               </div>
@@ -261,28 +283,16 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* CPU Card */}
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-              <Cpu className="h-3.5 w-3.5" /> CPU
-            </span>
-            <div className="flex items-center gap-1.5">
-              {onSwapPart && (
-                <button
-                  type="button"
-                  onClick={() => onSwapPart('cpu')}
-                  className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-300 hover:bg-emerald-500/20 hover:text-emerald-300 transition"
-                  aria-label={`${t('swapPart', locale)} ${t('partCpu', locale)}`}
-                  title={`${t('swapPart', locale)} ${t('partCpu', locale)}`}
-                >
-                  <RefreshCw className="h-2.5 w-2.5 inline mr-1" />
-                  {t('swapPart', locale)}
-                </button>
-              )}
-              <span className="font-black text-white">
-                {formatCurrency(build.cpu.price, currency)}
-              </span>
-            </div>
-          </div>
+          <PartCardHeader
+            tone="emerald"
+            part={build.cpu}
+            partLabel={t('partCpu', locale)}
+            onSwap={onSwapPart ? () => onSwapPart('cpu') : undefined}
+            currency={currency}
+            locale={locale}
+          >
+            <Cpu className="h-3.5 w-3.5" /> CPU
+          </PartCardHeader>
           <div className="text-sm font-bold text-white leading-tight">
             {build.cpu.name}
           </div>
@@ -317,28 +327,16 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
 
         {/* GPU Card */}
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-              <TrendingUp className="h-3.5 w-3.5" /> {t('partGpu', locale)}
-            </span>
-            <div className="flex items-center gap-1.5">
-              {onSwapPart && (
-                <button
-                  type="button"
-                  onClick={() => onSwapPart('gpu')}
-                  className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-300 hover:bg-indigo-500/20 hover:text-indigo-300 transition"
-                  aria-label={`${t('swapPart', locale)} ${t('partGpu', locale)}`}
-                  title={`${t('swapPart', locale)} ${t('partGpu', locale)}`}
-                >
-                  <RefreshCw className="h-2.5 w-2.5 inline mr-1" />
-                  {t('swapPart', locale)}
-                </button>
-              )}
-              <span className="font-black text-white">
-                {formatCurrency(build.gpu.price, currency)}
-              </span>
-            </div>
-          </div>
+          <PartCardHeader
+            tone="indigo"
+            part={build.gpu}
+            partLabel={t('partGpu', locale)}
+            onSwap={onSwapPart ? () => onSwapPart('gpu') : undefined}
+            currency={currency}
+            locale={locale}
+          >
+            <TrendingUp className="h-3.5 w-3.5" /> {t('partGpu', locale)}
+          </PartCardHeader>
           <div className="text-sm font-bold text-white leading-tight">
             {build.gpu.name}
           </div>
@@ -373,28 +371,16 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
 
         {/* Motherboard Card */}
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-              <Layers className="h-3.5 w-3.5" /> {t('partMotherboard', locale)}
-            </span>
-            <div className="flex items-center gap-1.5">
-              {onSwapPart && (
-                <button
-                  type="button"
-                  onClick={() => onSwapPart('motherboard')}
-                  className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-300 hover:bg-amber-500/20 hover:text-amber-300 transition"
-                  aria-label={`${t('swapPart', locale)} ${t('partMotherboard', locale)}`}
-                  title={`${t('swapPart', locale)} ${t('partMotherboard', locale)}`}
-                >
-                  <RefreshCw className="h-2.5 w-2.5 inline mr-1" />
-                  {t('swapPart', locale)}
-                </button>
-              )}
-              <span className="font-black text-white">
-                {formatCurrency(build.motherboard.price, currency)}
-              </span>
-            </div>
-          </div>
+          <PartCardHeader
+            tone="amber"
+            part={build.motherboard}
+            partLabel={t('partMotherboard', locale)}
+            onSwap={onSwapPart ? () => onSwapPart('motherboard') : undefined}
+            currency={currency}
+            locale={locale}
+          >
+            <Layers className="h-3.5 w-3.5" /> {t('partMotherboard', locale)}
+          </PartCardHeader>
           <div className="text-sm font-bold text-white leading-tight">
             {build.motherboard.name}
           </div>
@@ -425,28 +411,16 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
 
         {/* RAM Card */}
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-              <Zap className="h-3.5 w-3.5" /> {t('partRam', locale)}
-            </span>
-            <div className="flex items-center gap-1.5">
-              {onSwapPart && (
-                <button
-                  type="button"
-                  onClick={() => onSwapPart('ram')}
-                  className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-300 hover:bg-sky-500/20 hover:text-sky-300 transition"
-                  aria-label={`${t('swapPart', locale)} ${t('partRam', locale)}`}
-                  title={`${t('swapPart', locale)} ${t('partRam', locale)}`}
-                >
-                  <RefreshCw className="h-2.5 w-2.5 inline mr-1" />
-                  {t('swapPart', locale)}
-                </button>
-              )}
-              <span className="font-black text-white">
-                {formatCurrency(build.ram.price, currency)}
-              </span>
-            </div>
-          </div>
+          <PartCardHeader
+            tone="sky"
+            part={build.ram}
+            partLabel={t('partRam', locale)}
+            onSwap={onSwapPart ? () => onSwapPart('ram') : undefined}
+            currency={currency}
+            locale={locale}
+          >
+            <Zap className="h-3.5 w-3.5" /> {t('partRam', locale)}
+          </PartCardHeader>
           <div className="text-sm font-bold text-white leading-tight">
             {build.ram.name}
           </div>
@@ -478,28 +452,16 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
 
         {/* Storage Card */}
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-              <HardDrive className="h-3.5 w-3.5" /> {t('partStorage', locale)}
-            </span>
-            <div className="flex items-center gap-1.5">
-              {onSwapPart && (
-                <button
-                  type="button"
-                  onClick={() => onSwapPart('storage')}
-                  className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-300 hover:bg-purple-500/20 hover:text-purple-300 transition"
-                  aria-label={`${t('swapPart', locale)} ${t('partStorage', locale)}`}
-                  title={`${t('swapPart', locale)} ${t('partStorage', locale)}`}
-                >
-                  <RefreshCw className="h-2.5 w-2.5 inline mr-1" />
-                  {t('swapPart', locale)}
-                </button>
-              )}
-              <span className="font-black text-white">
-                {formatCurrency(build.storage.price, currency)}
-              </span>
-            </div>
-          </div>
+          <PartCardHeader
+            tone="purple"
+            part={build.storage}
+            partLabel={t('partStorage', locale)}
+            onSwap={onSwapPart ? () => onSwapPart('storage') : undefined}
+            currency={currency}
+            locale={locale}
+          >
+            <HardDrive className="h-3.5 w-3.5" /> {t('partStorage', locale)}
+          </PartCardHeader>
           <div className="text-sm font-bold text-white leading-tight">
             {build.storage.name}
           </div>
@@ -534,28 +496,16 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
 
         {/* Cooler Card */}
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-              <Wind className="h-3.5 w-3.5" /> {t('partCooler', locale)}
-            </span>
-            <div className="flex items-center gap-1.5">
-              {onSwapPart && (
-                <button
-                  type="button"
-                  onClick={() => onSwapPart('cooler')}
-                  className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-300 transition"
-                  aria-label={`${t('swapPart', locale)} ${t('partCooler', locale)}`}
-                  title={`${t('swapPart', locale)} ${t('partCooler', locale)}`}
-                >
-                  <RefreshCw className="h-2.5 w-2.5 inline mr-1" />
-                  {t('swapPart', locale)}
-                </button>
-              )}
-              <span className="font-black text-white">
-                {formatCurrency(build.cooler.price, currency)}
-              </span>
-            </div>
-          </div>
+          <PartCardHeader
+            tone="cyan"
+            part={build.cooler}
+            partLabel={t('partCooler', locale)}
+            onSwap={onSwapPart ? () => onSwapPart('cooler') : undefined}
+            currency={currency}
+            locale={locale}
+          >
+            <Wind className="h-3.5 w-3.5" /> {t('partCooler', locale)}
+          </PartCardHeader>
           <div className="text-sm font-bold text-white leading-tight">
             {build.cooler.name}
           </div>
@@ -588,28 +538,16 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
 
         {/* Case Card */}
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
-              <Box className="h-3.5 w-3.5" /> {t('partCase', locale)}
-            </span>
-            <div className="flex items-center gap-1.5">
-              {onSwapPart && (
-                <button
-                  type="button"
-                  onClick={() => onSwapPart('case')}
-                  className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-300 hover:bg-rose-500/20 hover:text-rose-300 transition"
-                  aria-label={`${t('swapPart', locale)} ${t('partCase', locale)}`}
-                  title={`${t('swapPart', locale)} ${t('partCase', locale)}`}
-                >
-                  <RefreshCw className="h-2.5 w-2.5 inline mr-1" />
-                  {t('swapPart', locale)}
-                </button>
-              )}
-              <span className="font-black text-white">
-                {formatCurrency(build.case.price, currency)}
-              </span>
-            </div>
-          </div>
+          <PartCardHeader
+            tone="rose"
+            part={build.case}
+            partLabel={t('partCase', locale)}
+            onSwap={onSwapPart ? () => onSwapPart('case') : undefined}
+            currency={currency}
+            locale={locale}
+          >
+            <Box className="h-3.5 w-3.5" /> {t('partCase', locale)}
+          </PartCardHeader>
           <div className="text-sm font-bold text-white leading-tight">
             {build.case.name}
           </div>
@@ -640,28 +578,16 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
 
         {/* PSU Card */}
         <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
-              <CheckCircle2 className="h-3.5 w-3.5" /> {t('partPsu', locale)}
-            </span>
-            <div className="flex items-center gap-1.5">
-              {onSwapPart && (
-                <button
-                  type="button"
-                  onClick={() => onSwapPart('psu')}
-                  className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-300 hover:bg-teal-500/20 hover:text-teal-300 transition"
-                  aria-label={`${t('swapPart', locale)} ${t('partPsu', locale)}`}
-                  title={`${t('swapPart', locale)} ${t('partPsu', locale)}`}
-                >
-                  <RefreshCw className="h-2.5 w-2.5 inline mr-1" />
-                  {t('swapPart', locale)}
-                </button>
-              )}
-              <span className="font-black text-white">
-                {formatCurrency(build.psu.price, currency)}
-              </span>
-            </div>
-          </div>
+          <PartCardHeader
+            tone="teal"
+            part={build.psu}
+            partLabel={t('partPsu', locale)}
+            onSwap={onSwapPart ? () => onSwapPart('psu') : undefined}
+            currency={currency}
+            locale={locale}
+          >
+            <CheckCircle2 className="h-3.5 w-3.5" /> {t('partPsu', locale)}
+          </PartCardHeader>
           <div className="text-sm font-bold text-white leading-tight">
             {build.psu.name}
           </div>

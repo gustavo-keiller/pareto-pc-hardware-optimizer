@@ -1,4 +1,5 @@
 import { GpuCandidate, HardwareVendor } from './types';
+import { ResolvedPriceInfo } from './pricingEngine';
 
 /**
  * Supported CPU sockets for modern desktop platforms.
@@ -162,6 +163,8 @@ export interface CpuCandidate {
   notes?: string;
   source?: string;
   checkedAt?: string;
+  /** How `price` was resolved (user, store or estimate), set by the price overlay. */
+  priceInfo?: ResolvedPriceInfo;
 }
 
 /**
@@ -183,6 +186,8 @@ export interface MotherboardCandidate {
   notes?: string;
   source?: string;
   checkedAt?: string;
+  /** How `price` was resolved (user, store or estimate), set by the price overlay. */
+  priceInfo?: ResolvedPriceInfo;
 }
 
 /**
@@ -202,6 +207,8 @@ export interface RamCandidate {
   notes?: string;
   source?: string;
   checkedAt?: string;
+  /** How `price` was resolved (user, store or estimate), set by the price overlay. */
+  priceInfo?: ResolvedPriceInfo;
 }
 
 /**
@@ -222,6 +229,8 @@ export interface StorageCandidate {
   notes?: string;
   source?: string;
   checkedAt?: string;
+  /** How `price` was resolved (user, store or estimate), set by the price overlay. */
+  priceInfo?: ResolvedPriceInfo;
 }
 
 /**
@@ -240,6 +249,8 @@ export interface CaseCandidate {
   notes?: string;
   source?: string;
   checkedAt?: string;
+  /** How `price` was resolved (user, store or estimate), set by the price overlay. */
+  priceInfo?: ResolvedPriceInfo;
 }
 
 /**
@@ -260,6 +271,8 @@ export interface CoolerCandidate {
   notes?: string;
   source?: string;
   checkedAt?: string;
+  /** How `price` was resolved (user, store or estimate), set by the price overlay. */
+  priceInfo?: ResolvedPriceInfo;
 }
 
 /**
@@ -276,6 +289,8 @@ export interface PsuCandidate {
   notes?: string;
   source?: string;
   checkedAt?: string;
+  /** How `price` was resolved (user, store or estimate), set by the price overlay. */
+  priceInfo?: ResolvedPriceInfo;
 }
 
 /**

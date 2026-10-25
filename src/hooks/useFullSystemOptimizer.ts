@@ -45,7 +45,18 @@ function getCacheKey(
   catalogs: ComponentCatalogs,
   filterCriteria: BuildFilterCriteria,
 ): string {
-  const catSig = `${catalogs.cpus.length}_${catalogs.gpus.length}_${catalogs.motherboards.length}_${catalogs.ramKits.length}_${catalogs.psus.length}_${catalogs.storages?.length ?? 0}_${catalogs.cases?.length ?? 0}_${catalogs.coolers?.length ?? 0}`;
+  // Ids and prices, so a price the user typed in or a store update recomputes.
+  const parts = [
+    ...catalogs.cpus,
+    ...catalogs.gpus,
+    ...catalogs.motherboards,
+    ...catalogs.ramKits,
+    ...catalogs.psus,
+    ...(catalogs.storages ?? []),
+    ...(catalogs.cases ?? []),
+    ...(catalogs.coolers ?? []),
+  ];
+  const catSig = parts.map((p) => `${p.id}:${p.price}`).join('|');
   return `${catSig}::${JSON.stringify(filterCriteria)}`;
 }
 

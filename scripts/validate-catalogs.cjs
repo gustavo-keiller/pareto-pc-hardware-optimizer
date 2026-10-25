@@ -404,7 +404,9 @@ for (const b of [...gpuBenchmarks, ...cpuBenchmarks]) {
 
 // 12. Validate Regional Store Prices (DATA-04)
 const PRICES_DIR = path.resolve(__dirname, '../src/data/prices');
-function loadPriceFile(file) {
+// Store price files are written by `npm run prices:update` and may be empty
+// (every part then falls back to an estimate). History must have data.
+function loadPriceFile(file, { allowEmpty = false } = {}) {
   const filePath = path.join(PRICES_DIR, file);
   if (!fs.existsSync(filePath)) {
     errors.push(`Missing price file: ${file}`);
@@ -413,8 +415,10 @@ function loadPriceFile(file) {
   try {
     const raw = fs.readFileSync(filePath, 'utf8');
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      errors.push(`${file} must contain a non-empty array of store prices`);
+    if (!Array.isArray(parsed) || (!allowEmpty && parsed.length === 0)) {
+      errors.push(
+        `${file} must contain ${allowEmpty ? 'an' : 'a non-empty'} array`,
+      );
       return [];
     }
     return parsed;
@@ -437,8 +441,32 @@ const allValidPartIds = new Set([
   ...gpuIds,
 ]);
 
-const brPrices = loadPriceFile('br.json');
-const usPrices = loadPriceFile('us.json');
+const brPrices = loadPriceFile('br.json', { allowEmpty: true });
+const usPrices = loadPriceFile('us.json', { allowEmpty: true });
+
+// Product links the weekly price script reads (src/data/prices/sources/).
+for (const region of ['br', 'us']) {
+  const sources = loadPriceFile(path.join('sources', `${region}.json`), {
+    allowEmpty: true,
+  });
+  const seen = new Set();
+  for (const s of sources) {
+    const p = `[price source ${region} -> ${s?.componentId ?? 'UNKNOWN'}]`;
+    if (!s || typeof s.componentId !== 'string') {
+      errors.push(`${p} missing componentId`);
+      continue;
+    }
+    if (!allValidPartIds.has(s.componentId)) {
+      errors.push(`${p} references non-existent componentId`);
+    }
+    if (typeof s.url !== 'string' || !/^https?:\/\//.test(s.url)) {
+      errors.push(`${p} url must start with http(s)://`);
+    } else if (seen.has(s.url)) {
+      errors.push(`${p} duplicate url ${s.url}`);
+    }
+    seen.add(s.url);
+  }
+}
 
 for (const offer of [...brPrices, ...usPrices]) {
   const p = `[price -> ${offer?.componentId ?? 'UNKNOWN'} @ ${offer?.store ?? 'UNKNOWN'}]`;

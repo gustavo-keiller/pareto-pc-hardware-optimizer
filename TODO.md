@@ -19,6 +19,12 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks (top to bottom; reprioritized 2026-10-20 from [`ROADMAP.md`](ROADMAP.md))
 
+- **`[DATA-08]` Store links for every part, refreshed weekly:**
+  Store prices only show once the script has read them. Find a product page per part (KaBuM!, Pichau or Terabyte) and refresh weekly. The 25 starting links in `src/data/prices/sources/` came from the old unverified price files and may be dead.
+  - **Files likely touched:** `src/data/prices/sources/br.json`, `src/data/prices/br.json`, `src/data/prices/history.json`
+  - **Done when:** `npm run prices:update -- --missing` lists no part, and a weekly run leaves no link failing.
+  - **Test to add:** none (data); `npm run check:catalogs` validates the files.
+
 - **`[UX-10]` Test with 3–5 people who know nothing about PCs:**
   Success = they pick a graphics card or a whole PC in under 2 minutes without help and can say why. Findings become `TODO.md` items.
   - **Files likely touched:** `TODO.md`, `ROADMAP.md`
