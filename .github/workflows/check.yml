@@ -20,8 +20,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run check
+      # Build first: the perf budget test in `npm run check` reads dist/.
       - run: npm run build
+      - run: npm run check
       - run: npm run check:perf
 
   e2e:
