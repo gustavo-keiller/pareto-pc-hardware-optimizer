@@ -1,3 +1,4 @@
+import type { ResolvedPriceInfo } from './pricingEngine';
 export type HardwareVendor = 'NVIDIA' | 'AMD' | 'Intel' | 'Synthetic' | 'Other';
 
 export interface GpuCandidate {
@@ -33,6 +34,8 @@ export interface GpuCandidate {
   // Provenance & Audit Metadata (DATA-01)
   source?: string;
   checkedAt?: string;
+  /** How `price` was resolved (user, store or estimate), set by the price overlay. */
+  priceInfo?: ResolvedPriceInfo;
 }
 
 export type MetricKey =

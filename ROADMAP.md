@@ -13,7 +13,7 @@
 **Phase status:** Phase 0, Phase 1, Phase 2, and Phase 3 are 100% complete. In Phase 3, all milestones (`[DATA-01]`, `[DATA-02]`, `[DATA-03]`, `[DATA-04]`, `[DATA-05]`, `[DATA-06]`) are fully shipped with 124 components across 8 categories, public creator benchmarks, regional retail store pricing in BRL and USD, price history tracking, and maintainer CLI tooling (`npm run add-part`). Next up is Phase 4 (Code optimization & performance) and UX-10 user testing.
 
 **Known problems (see `TODO.md`):**
-- Real retail price catalogs are established for key hardware; expanding coverage to remaining long-tail components over time via `npm run add-part`.
+- Store prices only exist once `npm run prices:update` has read them; until then parts show estimates (USD × rate). Most parts still need a product link (`npm run prices:update -- --missing`). Buyers can type their own price and open store searches from any part (`[DATA-07]`).
 
 **Process:** `main` had 8 red CI runs out of 12 on 2026-10-19 because work was pushed straight to it. From now on everything goes through PRs (see "How work lands on `main`" in `AGENTS.md`); branch protection on `main` is still to be turned on.
 
@@ -77,6 +77,8 @@
 - [x] **`[DATA-02]` Benchmark sourcing from public creators (D-3).** Prefer creators who publish written charts/tables (LTT Labs, Hardware Unboxed, Gamers Nexus, TechPowerUp). Store numbers with source citation, normalize to relative performance vs reference card. _Done 2026-10-20._
 - [x] **`[DATA-03]` Coverage:** from 18 real GPUs to all current and previous generation parts in every BLD-01 category (124 components across all 8 categories). _Done 2026-10-20._
 - [x] **`[DATA-04]` Prices as JSON in the repo, per store and region** (`src/data/prices/br.json` and `us.json`), each with a "checked on" date and store URLs. _Done 2026-10-20._
+- [x] **`[DATA-07]` Real prices:** the user's own price, a weekly store refresh script (`npm run prices:update`), and store links on every part. _Done 2026-10-25._
+- [ ] **`[DATA-08]` Store links for every part** and a weekly refresh habit (see `TODO.md`).
 - [x] **`[DATA-05]` Price history for free:** git history and snapshot price series track price shifts over time (`src/utils/priceHistory.ts`, `src/data/prices/history.json`). _Done 2026-10-20._
 - [x] **`[DATA-06]` Maintainer tooling:** `npm run add-part` script that asks for specs, validates, and writes the JSON (`scripts/add-part.cjs`). _Done 2026-10-20._
 
@@ -117,8 +119,9 @@
 
 ## Next up, reprioritized (2026-10-20)
 
-1. **UX-10:** test with 3–5 people who know nothing about PCs; their findings set what comes after.
-2. **Phase 5 launch foundations** (`[LAUNCH-01]` hosting & domain, `[LAUNCH-02]` error tracking, `[LAUNCH-03]` legal pages).
-3. **Phase 6 affiliate links & partnerships** (later per gustavo).
+1. **DATA-08:** add store links for every part and run `npm run prices:update` weekly, so prices are real, not estimates.
+2. **UX-10:** test with 3–5 people who know nothing about PCs; their findings set what comes after.
+3. **Phase 5 launch foundations** (`[LAUNCH-01]` hosting & domain, `[LAUNCH-02]` error tracking, `[LAUNCH-03]` legal pages).
+4. **Phase 6 affiliate links & partnerships** (later per gustavo); affiliate feeds can then replace scraping.
 
 Then Phase 5 (launch) and Phase 6 (affiliates, later per gustavo). Expert depth (UX-08) is strong enough to wait.

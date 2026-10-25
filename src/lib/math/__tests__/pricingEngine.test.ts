@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_USD_TO_BRL_RATE,
   RegionalPriceOffer,
+  isPriceStale,
   overlayRegionalPrices,
+  priceAgeDays,
   resolveRegionalPrice,
+  summarizePriceSources,
 } from '../pricingEngine';
 
 describe('DATA-04: Regional Pricing Overlay Engine', () => {
@@ -134,5 +137,88 @@ describe('DATA-04: Regional Pricing Overlay Engine', () => {
     expect(overlaid[1].price).toBe(Math.round(100 * DEFAULT_USD_TO_BRL_RATE));
     expect(overlaid[1].priceInfo.isEstimated).toBe(true);
     expect(overlaid[1].vramGb).toBe(16);
+  });
+
+  it('a positive price the user typed in always wins, and keeps the store link', () => {
+    const item = { id: 'rx-6600', price: 195 };
+    const resolved = resolveRegionalPrice(item, mockOffers, {
+      currency: 'BRL',
+      userPrices: { 'rx-6600': 1250 },
+    });
+    expect(resolved.source).toBe('user');
+    expect(resolved.effectivePrice).toBe(1250);
+    expect(resolved.isEstimated).toBe(false);
+    expect(resolved.storeUrl).toBe('https://kabum.com.br/rx6600');
+  });
+
+  it('ignores zero, negative or non-finite user prices', () => {
+    const item = { id: 'rx-6600', price: 195 };
+    for (const bad of [0, -10, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const resolved = resolveRegionalPrice(item, mockOffers, {
+        currency: 'BRL',
+        userPrices: { 'rx-6600': bad },
+      });
+      expect(resolved.source).toBe('store');
+      expect(resolved.effectivePrice).toBe(1399);
+    }
+  });
+
+  it('picks the cheapest in-stock offer whatever the order of the file', () => {
+    const offers: RegionalPriceOffer[] = [
+      { ...mockOffers[0], store: 'A', price: 1500, cashPrice: undefined },
+      { ...mockOffers[0], store: 'B', price: 1300, cashPrice: undefined },
+      { ...mockOffers[0], store: 'C', price: 900, inStock: false },
+    ];
+    const item = { id: 'rx-6600', price: 195 };
+    const forward = resolveRegionalPrice(item, offers, { currency: 'BRL' });
+    const reversed = resolveRegionalPrice(item, [...offers].reverse(), {
+      currency: 'BRL',
+    });
+    expect(forward.store).toBe('B');
+    expect(reversed.store).toBe('B');
+    expect(forward.effectivePrice).toBe(1300);
+  });
+
+  it('every resolved price is labelled with exactly one source', () => {
+    const items = [
+      { id: 'rx-6600', price: 195 },
+      { id: 'rtx-4060', price: 300 },
+      { id: 'unlisted', price: 100 },
+    ];
+    const overlaid = overlayRegionalPrices(items, mockOffers, {
+      currency: 'BRL',
+      userPrices: { 'rtx-4060': 1800 },
+    });
+    expect(overlaid.map((o) => o.priceInfo.source)).toEqual([
+      'store',
+      'user',
+      'estimate',
+    ]);
+    for (const o of overlaid) {
+      expect(o.priceInfo.isEstimated).toBe(o.priceInfo.source === 'estimate');
+      expect(o.price).toBe(o.priceInfo.effectivePrice);
+    }
+    expect(summarizePriceSources(overlaid)).toEqual({
+      user: 1,
+      store: 1,
+      estimate: 1,
+      oldestStoreCheck: '2026-10-20',
+    });
+    expect(summarizePriceSources([{}])).toEqual({
+      user: 0,
+      store: 0,
+      estimate: 1,
+      oldestStoreCheck: undefined,
+    });
+  });
+
+  it('price age is monotone in time and unknown dates read as stale', () => {
+    expect(priceAgeDays('2026-10-20', '2026-10-20')).toBe(0);
+    expect(priceAgeDays('2026-10-20', '2026-10-27')).toBe(7);
+    expect(priceAgeDays('2026-10-20', '2026-10-10')).toBe(0);
+    expect(isPriceStale('2026-10-20', '2026-11-03')).toBe(false);
+    expect(isPriceStale('2026-10-20', '2026-11-04')).toBe(true);
+    expect(isPriceStale(undefined, '2026-10-20')).toBe(true);
+    expect(isPriceStale('not-a-date', '2026-10-20')).toBe(true);
   });
 });

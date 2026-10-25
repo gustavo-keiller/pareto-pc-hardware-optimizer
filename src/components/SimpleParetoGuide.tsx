@@ -16,6 +16,7 @@ import { SimpleGuidePickHero } from './SimpleGuidePickHero';
 import { FullBuildPickHero } from './FullBuildPickHero';
 import { SimpleGuideMathWalkthrough } from './SimpleGuideMathWalkthrough';
 import { useFullSystemOptimizer } from '../hooks/useFullSystemOptimizer';
+import { useUserPrices } from '../hooks/useUserPrices';
 import { AppLocale, t } from '../utils/i18n';
 import { getCurrencyAdjustedCatalogs } from '../utils/currency';
 
@@ -174,6 +175,7 @@ export function SimpleParetoGuide({
     };
   }, [gpus, constraints.maxPrice]);
 
+  const { userPrices } = useUserPrices(currency);
   // Combinatorial PC build optimization for Whole PC Goal (UX-11)
   const {
     cpus: effectiveCpus,
@@ -183,7 +185,10 @@ export function SimpleParetoGuide({
     storages: effectiveStorages,
     cases: effectiveCases,
     coolers: effectiveCoolers,
-  } = useMemo(() => getCurrencyAdjustedCatalogs(currency), [currency]);
+  } = useMemo(
+    () => getCurrencyAdjustedCatalogs(currency, undefined, userPrices),
+    [currency, userPrices],
+  );
 
   const fullSystemCatalogs = useMemo(
     () => ({

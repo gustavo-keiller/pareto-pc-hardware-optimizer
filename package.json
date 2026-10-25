@@ -16,6 +16,7 @@
     "snap": "node scripts/snap.mjs",
     "sync:skills": "node scripts/sync-claude-skills.cjs",
     "add-part": "node scripts/add-part.cjs",
+    "prices:update": "node scripts/update-prices.mjs",
     "check:docs": "node scripts/check-docs.cjs",
     "check:catalogs": "node scripts/validate-catalogs.cjs",
     "check:knip": "knip",
