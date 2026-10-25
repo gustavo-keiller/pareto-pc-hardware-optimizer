@@ -33,3 +33,6 @@ __pycache__/
 test-results/
 playwright-report/
 snapshots/
+
+# Browser profile kept by `npm run prices:update -- --headed`
+.prices-browser/

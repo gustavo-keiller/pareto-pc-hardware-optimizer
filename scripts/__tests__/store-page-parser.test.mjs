@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   extractOfferFromHtml,
   isSuspiciousJump,
+  modelTokens,
+  nameMatchesPart,
   parsePriceValue,
   storeNameFromUrl,
 } from '../lib/store-page-parser.mjs';
@@ -101,5 +103,69 @@ describe('store page parser (weekly price script)', () => {
     expect(isSuspiciousJump(1500, 15000)).toBe(true);
     expect(isSuspiciousJump(1500, 150)).toBe(true);
     expect(isSuspiciousJump(0, 150)).toBe(false);
+  });
+});
+
+describe('product name check (store reused a product id)', () => {
+  it('accepts store titles for the same model', () => {
+    expect(
+      nameMatchesPart(
+        'Processador AMD Ryzen 7 5700X3D, 3.0GHz (4.1GHz Max Turbo), AM4',
+        'AMD Ryzen 7 5700X3D',
+      ),
+    ).toBe(true);
+    expect(
+      nameMatchesPart(
+        'Fonte MSI MAG A650BN, 650W, 80 Plus Bronze, PFC Ativo',
+        'MSI MAG A650BN 650W',
+      ),
+    ).toBe(true);
+    expect(
+      nameMatchesPart(
+        'Memória Kingston Fury Beast, RGB, 16GB (2x8GB), 3200MHz, DDR4, CL16',
+        'Kingston Fury Beast RGB 16GB (2x8GB) DDR4-3200 CL16',
+      ),
+    ).toBe(true);
+    expect(
+      nameMatchesPart(
+        'Placa de Vídeo RX 6750 XT ASRock Challenger, 12GB GDDR6',
+        'Radeon RX 6750 XT 12GB',
+      ),
+    ).toBe(true);
+  });
+
+  it('rejects other products and other variants', () => {
+    // Real cases from the first run: KaBuM ids now pointing elsewhere.
+    expect(
+      nameMatchesPart(
+        'Fechadura Digital Intelbras FR 101',
+        'GeForce RTX 4080 SUPER 16GB',
+      ),
+    ).toBe(false);
+    expect(
+      nameMatchesPart(
+        'Placa Mãe MSI B550M Pro-VDH WiFi, AMD AM4, mATX, DDR4',
+        'MSI B550-A PRO',
+      ),
+    ).toBe(false);
+    expect(
+      nameMatchesPart(
+        'Placa de Vídeo RTX 4070 Gigabyte',
+        'GeForce RTX 4070 SUPER 12GB',
+      ),
+    ).toBe(false);
+    expect(nameMatchesPart(null, 'AMD Ryzen 5 5600')).toBe(false);
+  });
+
+  it('every catalog part matches its own name', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const dir = path.resolve(__dirname, '../../src/data/catalogs');
+    for (const file of fs.readdirSync(dir)) {
+      for (const part of JSON.parse(fs.readFileSync(path.join(dir, file)))) {
+        expect(modelTokens(part.name).length, part.name).toBeGreaterThan(0);
+        expect(nameMatchesPart(part.name, part.name), part.name).toBe(true);
+      }
+    }
   });
 });

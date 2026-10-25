@@ -28,16 +28,8 @@
     "url": "https://www.terabyteshop.com.br/produto/23472/processador-amd-ryzen-5-7600-38ghz-51ghz-turbo-6-cores-12-threads-am5"
   },
   {
-    "componentId": "cpu-ryzen-7800x3d",
-    "url": "https://www.kabum.com.br/produto/444038/processador-amd-ryzen-7-7800x3d-4-2ghz-5-0ghz-max-turbo-am5"
-  },
-  {
     "componentId": "mobo-asrock-b650m-hdv",
     "url": "https://www.terabyteshop.com.br/produto/25330/placa-mae-asrock-b650m-hdvm2-chipset-b650-amd-am5-matx-ddr5"
-  },
-  {
-    "componentId": "mobo-msi-b550-a-pro",
-    "url": "https://www.kabum.com.br/produto/114338/placa-mae-msi-b550-a-pro-amd-am4-atx"
   },
   {
     "componentId": "psu-msi-a650bn",
@@ -52,20 +44,8 @@
     "url": "https://www.terabyteshop.com.br/produto/25619/memoria-ddr5-team-group-t-create-expert-32gb-2x16gb-6000mhz-cl30"
   },
   {
-    "componentId": "rtx-4060",
-    "url": "https://www.kabum.com.br/produto/475438/placa-de-video-rtx-4060-1-click-oc-2x-galax-geforce-8gb-gddr6"
-  },
-  {
     "componentId": "rtx-4070-super",
     "url": "https://www.pichau.com.br/placa-de-video-galax-geforce-rtx-4070-super-1-click-oc-2x-12gb"
-  },
-  {
-    "componentId": "rtx-4070-ti-super",
-    "url": "https://www.kabum.com.br/produto/520697/placa-de-video-rtx-4070-ti-super-galax-geforce-16gb"
-  },
-  {
-    "componentId": "rtx-4080-super",
-    "url": "https://www.kabum.com.br/produto/520699/placa-de-video-rtx-4080-super-sg-1-click-oc-galax-geforce-16gb"
   },
   {
     "componentId": "rtx-4090",
@@ -88,15 +68,7 @@
     "url": "https://www.terabyteshop.com.br/produto/placa-de-video-sapphire-pulse-amd-radeon-rx-7700-xt-12gb"
   },
   {
-    "componentId": "rx-7800-xt",
-    "url": "https://www.kabum.com.br/produto/496014/placa-de-video-rx-7800-xt-challenger-asrock-amd-radeon-16gb"
-  },
-  {
     "componentId": "rx-7900-xtx",
     "url": "https://www.terabyteshop.com.br/produto/placa-de-video-sapphire-nitro-plus-amd-radeon-rx-7900-xtx-vapor-x-24gb"
-  },
-  {
-    "componentId": "storage-kingston-nv2-1tb",
-    "url": "https://www.kabum.com.br/produto/386847/ssd-1-tb-kingston-nv2-m-2-2280-pcie-nvme-leitura-3500mb-s"
   }
 ]

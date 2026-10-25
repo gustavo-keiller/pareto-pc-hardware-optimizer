@@ -8,6 +8,8 @@
 //   npm run prices:update -- --add rx-7600 https://www.kabum.com.br/produto/...
 //   npm run prices:update -- --missing         # parts with no store link yet
 //   npm run prices:update -- --dry-run         # fetch and report, write nothing
+//   npm run prices:update -- --headed          # visible browser, for stores
+//                                              # behind a Cloudflare check
 //
 // Reads product links from src/data/prices/sources/<region>.json, opens each
 // page in a real Chromium (Playwright, already a dev dependency; run
@@ -15,6 +17,15 @@
 // schema.org data, and writes src/data/prices/<region>.json plus a point in
 // src/data/prices/history.json. A link that fails keeps its last price and
 // date, so the app shows it as possibly out of date instead of dropping it.
+//
+// A price is refused (kept as before) when the page's product title does not
+// name the catalog part (stores reuse product ids), or when it is far from
+// the last price or, for a new link, from the catalog estimate.
+// --accept-jumps / --accept-names override these after you check the page.
+//
+// Pichau and TerabyteShop answer headless browsers with a Cloudflare check.
+// --headed opens a visible browser with a profile kept in .prices-browser/;
+// solve the check once when it appears and later runs reuse it.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,12 +33,17 @@ import { fileURLToPath } from 'node:url';
 import {
   extractOfferFromHtml,
   isSuspiciousJump,
+  nameMatchesPart,
   storeNameFromUrl,
 } from './lib/store-page-parser.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PRICES_DIR = path.join(ROOT, 'src/data/prices');
 const CATALOG_DIR = path.join(ROOT, 'src/data/catalogs');
+const PROFILE_DIR = path.join(ROOT, '.prices-browser');
+// Same rate the app uses for estimates (DEFAULT_USD_TO_BRL_RATE).
+const USD_TO_BRL = 5.7;
+const CHALLENGE_TITLE = /um momento|just a moment|attention required/i;
 
 function parseArgs(argv) {
   const args = {
@@ -37,6 +53,8 @@ function parseArgs(argv) {
     missing: false,
     dryRun: false,
     acceptJumps: false,
+    acceptNames: false,
+    headed: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -46,6 +64,8 @@ function parseArgs(argv) {
     else if (a === '--missing') args.missing = true;
     else if (a === '--dry-run') args.dryRun = true;
     else if (a === '--accept-jumps') args.acceptJumps = true;
+    else if (a === '--accept-names') args.acceptNames = true;
+    else if (a === '--headed') args.headed = true;
     else {
       console.error(`Unknown option: ${a}`);
       process.exit(2);
@@ -68,7 +88,11 @@ function loadCatalogParts() {
   for (const file of fs.readdirSync(CATALOG_DIR)) {
     if (!file.endsWith('.json')) continue;
     for (const p of readJson(path.join(CATALOG_DIR, file), [])) {
-      parts.set(p.id, { name: p.name, category: file.replace('.json', '') });
+      parts.set(p.id, {
+        name: p.name,
+        usdPrice: p.price,
+        category: file.replace('.json', ''),
+      });
     }
   }
   return parts;
@@ -89,22 +113,31 @@ function searchLinks(name, region) {
     : [`https://www.newegg.com/p/pl?d=${q}`, `https://www.amazon.com/s?k=${q}`];
 }
 
-async function fetchPage(browser, url) {
-  const context = await browser.newContext({
-    locale: 'pt-BR',
-    viewport: { width: 1366, height: 900 },
-  });
+async function fetchPage(context, url, headed) {
   const page = await context.newPage();
   try {
-    const response = await page.goto(url, {
+    let response = await page.goto(url, {
       waitUntil: 'domcontentloaded',
       timeout: 45_000,
     });
+    if (headed && CHALLENGE_TITLE.test(await page.title())) {
+      console.log(
+        `        ${new URL(url).hostname} is showing a check: solve it in the browser window (waiting up to 2 minutes)...`,
+      );
+      const deadline = Date.now() + 120_000;
+      while (
+        Date.now() < deadline &&
+        CHALLENGE_TITLE.test(await page.title())
+      ) {
+        await page.waitForTimeout(2_000);
+      }
+      response = await page.reload({ waitUntil: 'domcontentloaded' });
+    }
     // Let client-rendered stores finish writing their product data.
     await page.waitForTimeout(2_500);
     return { status: response?.status() ?? 0, html: await page.content() };
   } finally {
-    await context.close();
+    await page.close();
   }
 }
 
@@ -158,18 +191,55 @@ async function main() {
   const previousByUrl = new Map(previous.map((o) => [o.url, o]));
   const todo = sources.filter((s) => !args.only || s.componentId === args.only);
   const results = [];
-  const browser = await chromium.launch();
+  const options = { locale: 'pt-BR', viewport: { width: 1366, height: 900 } };
+  // --headed keeps cookies between runs, so a store's check is solved once.
+  const context = args.headed
+    ? await chromium.launchPersistentContext(PROFILE_DIR, {
+        ...options,
+        headless: false,
+      })
+    : await (await chromium.launch()).newContext(options);
 
   try {
     for (const source of todo) {
       const store = source.store ?? storeNameFromUrl(source.url);
       const old = previousByUrl.get(source.url);
+      const part = parts.get(source.componentId);
+      const estimate =
+        (part?.usdPrice ?? 0) * (args.region === 'br' ? USD_TO_BRL : 1);
       let outcome;
       try {
-        const { status, html } = await fetchPage(browser, source.url);
+        const { status, html } = await fetchPage(
+          context,
+          source.url,
+          args.headed,
+        );
         const offer = status < 400 ? extractOfferFromHtml(html) : null;
         if (!offer) {
-          outcome = { kind: 'failed', why: `HTTP ${status}, no price on page` };
+          const blocked = /cf-chl|challenge-platform/.test(html);
+          outcome = {
+            kind: 'failed',
+            why: blocked
+              ? `HTTP ${status}, blocked by a Cloudflare check (try --headed)`
+              : `HTTP ${status}, no price on page`,
+          };
+        } else if (
+          !args.acceptNames &&
+          !nameMatchesPart(offer.name, part?.name ?? '')
+        ) {
+          outcome = {
+            kind: 'failed',
+            why: `page is "${offer.name ?? 'untitled'}", not ${part?.name}; fix the link (or --accept-names if it is right)`,
+          };
+        } else if (
+          !old &&
+          !args.acceptJumps &&
+          isSuspiciousJump(estimate, offer.price)
+        ) {
+          outcome = {
+            kind: 'failed',
+            why: `price ${offer.price} is far from the estimate ${Math.round(estimate)}; check the page, then rerun with --accept-jumps`,
+          };
         } else if (
           old &&
           !args.acceptJumps &&
@@ -211,7 +281,9 @@ async function main() {
       console.log(results[results.length - 1].line);
     }
   } finally {
-    await browser.close();
+    const browser = context.browser();
+    await context.close();
+    await browser?.close();
   }
 
   const refreshedUrls = new Set(todo.map((s) => s.url));

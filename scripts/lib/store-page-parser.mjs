@@ -169,3 +169,64 @@ export function isSuspiciousJump(previous, next) {
   const ratio = next / previous;
   return ratio < 0.4 || ratio > 2.5;
 }
+
+const UNIT_SUFFIX = /(mhz|ghz|gb|tb|mm|w)$/;
+const VARIANT_WORDS = new Set(['super', 'ti', 'xt', 'xtx']);
+const GENERIC_WORDS = new Set([
+  'rgb',
+  'argb',
+  'atx',
+  'matx',
+  'itx',
+  'mid',
+  'tower',
+  'micro',
+  'mini',
+  'wifi',
+  'stock',
+]);
+
+function tokens(text) {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+}
+
+/**
+ * The words that identify a catalog part's model: tokens with digits
+ * ("5700x3d", "b550", "a650bn", "3200") and variant words ("super", "ti",
+ * "xt"). Sizes and speeds ("16gb", "2x8gb", "cl16", "650w") are left out
+ * because store titles write them in too many ways.
+ */
+export function modelTokens(partName) {
+  const words = tokens(partName.replace(/\[[^\]]*\]/g, ' '));
+  const model = words.filter((t) => {
+    if (VARIANT_WORDS.has(t)) return true;
+    if (!/\d/.test(t)) return false;
+    if (/^\d+(x\d+)?(mhz|ghz|gb|tb|mm|w)$/.test(t)) return false;
+    if (/^cl\d+$/.test(t)) return false;
+    return /[a-z]/.test(t) || t.length >= 3;
+  });
+  if (model.length > 0) return model;
+  // Names without model numbers ("Fractal Design Pop Air RGB ATX"): use the
+  // brand and product words instead.
+  return words.filter((t) => t.length >= 3 && !GENERIC_WORDS.has(t));
+}
+
+/**
+ * True when a store page's product title names the same model as the
+ * catalog part: every model token appears as a whole word. Guards against
+ * a store reusing a product id for something else (a monitor, a door lock).
+ */
+export function nameMatchesPart(pageName, partName) {
+  if (typeof pageName !== 'string' || pageName.trim() === '') return false;
+  const required = modelTokens(partName);
+  if (required.length === 0) return false;
+  const page = new Set(
+    tokens(pageName).flatMap((t) => [t, t.replace(UNIT_SUFFIX, '')]),
+  );
+  return required.every((t) => page.has(t));
+}
