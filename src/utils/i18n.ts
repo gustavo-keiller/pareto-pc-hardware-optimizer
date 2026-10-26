@@ -7,6 +7,10 @@
 import { enUS } from './locales/enUS';
 import { ptBR } from './locales/ptBR';
 import { AppLocale, Translations } from './locales/types';
+import {
+  PRIORITY_TRANSLATIONS,
+  PriorityTranslations,
+} from './locales/priorities';
 
 export type { AppLocale, Translations } from './locales/types';
 export { DEFAULT_LOCALE, isAppLocale } from './locales/types';
@@ -25,6 +29,22 @@ export function t(
 ): string {
   const dict = TRANSLATIONS[locale] ?? TRANSLATIONS['pt-BR'];
   return dict[key] ?? TRANSLATIONS['pt-BR'][key] ?? String(key);
+}
+
+/**
+ * Priority-panel strings (PRI-07) with `{name}` placeholders filled from `vars`.
+ */
+export function tp(
+  key: keyof PriorityTranslations,
+  locale: AppLocale = 'pt-BR',
+  vars: Record<string, string | number> = {},
+): string {
+  const dict = PRIORITY_TRANSLATIONS[locale] ?? PRIORITY_TRANSLATIONS['pt-BR'];
+  const template =
+    dict[key] ?? PRIORITY_TRANSLATIONS['pt-BR'][key] ?? String(key);
+  return template.replace(/\{(\w+)\}/g, (m, name: string) =>
+    name in vars ? String(vars[name]) : m,
+  );
 }
 
 /**

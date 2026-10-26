@@ -28,6 +28,7 @@ import {
   safeGetString,
   safeSetJSON,
 } from '../utils/storage';
+import { usePriorityProfile } from './usePriorityProfile';
 import { DEFAULT_USD_TO_BRL_RATE, convertUsdToBrl } from '../utils/currency';
 import { AppLocale, DEFAULT_LOCALE } from '../utils/i18n';
 
@@ -310,10 +311,13 @@ export function useOptimizerState() {
     }),
   );
 
-  // Stage 3: TOPSIS Weights
-  const [weights, setWeights] = useState<PreferenceWeights>(() =>
-    safeGetJSON('paretopc_weights', DEFAULT_PREFERENCE_WEIGHTS),
-  );
+  // Stage 3: priorities (one profile for every mode; TOPSIS weights are its five-metric slice)
+  const {
+    profile: priorityProfile,
+    setProfile: setPriorityProfile,
+    weights,
+    setWeights,
+  } = usePriorityProfile();
   const [activePresetId, setActivePresetId] = useState<string>('balanced');
 
   // Selection & Hover
@@ -348,10 +352,6 @@ export function useOptimizerState() {
   useEffect(() => {
     safeSetJSON('paretopc_extrapolation', extrapolation);
   }, [extrapolation]);
-
-  useEffect(() => {
-    safeSetJSON('paretopc_weights', weights);
-  }, [weights]);
 
   useEffect(() => {
     safeSetJSON('paretopc_selected_ids', selectedGpuIds);
@@ -671,6 +671,8 @@ export function useOptimizerState() {
     setExtrapolation,
     weights,
     setWeights,
+    priorityProfile,
+    setPriorityProfile,
     activePresetId,
     setActivePresetId,
     hoveredGpuId,

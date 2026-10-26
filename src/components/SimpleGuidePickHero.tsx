@@ -23,6 +23,10 @@ export interface SimpleGuidePickHeroProps {
   onToggleSelectGpu: (id: string) => void;
   onOpenAccordion: () => void;
   onInspectInExplorer?: (id: string) => void;
+  /** Replaces the old match-% badge: the score for the user's priorities. */
+  scoreBadges?: React.ReactNode;
+  /** "Why this pick" details shown under the shopping reasons. */
+  insights?: React.ReactNode;
 }
 
 export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
@@ -35,6 +39,8 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
   onToggleSelectGpu,
   onOpenAccordion,
   onInspectInExplorer,
+  scoreBadges,
+  insights,
 }) => {
   const shoppingReasons = useMemo(() => {
     if (!topPick) return null;
@@ -78,10 +84,12 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
                 <span className="rounded-md bg-amber-400 px-2 py-0.5 text-xs font-black uppercase text-slate-950">
                   {t('heroTopPickBadge', locale)}
                 </span>
-                <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
-                  {topPick.topsisScorePct.toFixed(0)}%{' '}
-                  {t('heroMatchScore', locale)}
-                </span>
+                {scoreBadges ?? (
+                  <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
+                    {topPick.topsisScorePct.toFixed(0)}%{' '}
+                    {t('heroMatchScore', locale)}
+                  </span>
+                )}
                 <span className="rounded bg-sky-500/20 px-2 py-0.5 text-xs font-bold text-sky-300 border border-sky-500/30 flex items-center gap-1">
                   <ShieldCheck className="h-3.5 w-3.5" />
                   {t('heroGoodDealBadge', locale)}
@@ -118,6 +126,8 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
             {shoppingReasons.vramLongevity}
           </p>
         </div>
+
+        {insights}
 
         {/* Specs Grid */}
         <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">

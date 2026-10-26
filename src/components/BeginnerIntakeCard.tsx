@@ -18,6 +18,8 @@ export interface BeginnerIntakeCardProps {
   onSelectGoal: (goal: BeginnerGoal) => void;
   onSelectUseCase: (useCase: BeginnerUseCase) => void;
   onSelectBudget: (budget: number) => void;
+  /** Rendered right after the use-case choice: the "What matters to you" panel (PRI-07). */
+  priorityPanel?: React.ReactNode;
 }
 
 interface UseCaseOption {
@@ -72,6 +74,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
   onSelectGoal,
   onSelectUseCase,
   onSelectBudget,
+  priorityPanel,
 }) => {
   const isBrl = currency === 'BRL';
   const budgetPresets =
@@ -215,6 +218,8 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
           })}
         </div>
       </div>
+
+      {priorityPanel}
 
       {/* Step 3: Budget Selector */}
       <div>
