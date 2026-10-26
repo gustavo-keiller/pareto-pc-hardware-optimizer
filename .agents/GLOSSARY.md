@@ -18,6 +18,11 @@
 | 2D frontier (`frontier2D`) | Best deals when you only compare these two things | Melhores negócios comparando só essas duas coisas | 2D slice frontier |
 | N-D frontier (`paretoOptimalND`), 5D specialist | Good deal because of something else (more memory, better ray tracing, less power) | Bom negócio por outro motivo (mais memória, ray tracing, menos consumo) | N-D optimal / 5D specialist |
 | Preference weights, `PreferenceWeights` | What matters most to you | O que mais importa para você | Weights $w_j$ |
+| Priority profile, `PriorityProfile` / importance stars | What matters to you (0–5 stars) | O que importa para você (0–5 estrelas) | Priority weights $w_j$ on fixed scales |
+| Priority score $S_i$, `scoreByPriorities()` | "7.8/10 for you" (always out of 10, never a %) | "Nota 7,8/10 para você" | Weighted value score (MAUT) |
+| `findBetterAlternatives()` | Set aside: another card is as good or better on everything you picked | Deixada de lado: outra placa é igual ou melhor em tudo o que você escolheu | Dominated on weighted criteria (3% tolerance) |
+| Flip point, `findFlipPoint()` | "Raise Ray tracing to 35% and X takes the lead" | "Suba Ray tracing para 35% e a X passa à frente" | Weight sensitivity / stability interval |
+| `isPracticalTie()` | Practically tied | Praticamente empatada | Within benchmark noise (< 0.2 pts) |
 | TOPSIS closeness $C_i$, `topsisScorePct` | Match: how well it fits what you asked for (0–100%) | Combina: o quanto atende ao que você pediu (0–100%) | TOPSIS closeness $C_i$ |
 | Ideal best / worst $A^+$ / $A^-$ | — (don't show) | — (não mostrar) | Positive / negative ideal solution |
 | Utility $u_{i,d}$ (normalized 0–1) | Score on this spec (100% = best on the market) | Nota neste item (100% = melhor do mercado) | Normalized utility |

@@ -49,6 +49,8 @@ export default function App() {
     setExtrapolation,
     weights,
     setWeights,
+    priorityProfile,
+    setPriorityProfile,
     activePresetId,
     setActivePresetId,
     hoveredGpuId,
@@ -168,6 +170,8 @@ export default function App() {
             onSelectYMetric={setYMetric}
             onSelectZMetric={setZMetric}
             weights={weights}
+            priorityProfile={priorityProfile}
+            onChangePriorityProfile={setPriorityProfile}
             onChangeWeights={setWeights}
             selectedGpuIds={selectedGpuIds}
             onToggleSelectGpu={handleToggleSelectGpu}
