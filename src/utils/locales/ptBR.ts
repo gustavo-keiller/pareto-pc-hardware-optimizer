@@ -2,15 +2,33 @@ import { Translations } from './types';
 
 export const ptBR: Translations = {
   // Navigation & Mode Bar
-  modeSimple: '1. Guia Simples',
-  modeExplorer: '2. Explorador',
-  modePro: '3. Laboratório Pro',
-  modeBuilds: '4. Montar PC',
-  datasetReal: 'GPUs Reais (18)',
+  modeSimple: 'Guia Simples',
+  modeExplorer: 'Explorador',
+  modePro: 'Laboratório Pro',
+  modeBuilds: 'Montar PC',
+  modeSimpleShort: 'Guia',
+  modeBuildsShort: 'Montar PC',
+  modeExplorerShort: 'Explorar',
+  modeProShort: 'Pro',
+  navGroupBuy: 'Para comprar',
+  navGroupExpert: 'Para especialistas',
+  navLabel: 'Escolha uma visão',
+  buildMoreFilters: 'Mais filtros: plataforma, memória, marca, gabinete',
+  buildActiveFilter: 'ativo',
+  buildActiveFilters: 'ativos',
+  datasetReal: 'GPUs Reais',
   datasetCustom: 'Meus Preços',
-  datasetSynthetic: 'Didático (10)',
-  datasetCombined: 'Sandbox Brasil',
-  importDeals: '+ Importar Preços',
+  datasetSynthetic: 'Didático',
+  datasetCombined: 'Sandbox Combinado',
+  importDeals: 'Importar Preços',
+  datasetCustomTitle: 'Suas ofertas importadas da Pichau, Terabyte, KaBuM etc.',
+  datasetCombinedTitle:
+    'Compare suas ofertas com os preços de referência dos EUA convertidos para R$',
+  datasetSyntheticTitle:
+    'Conjunto didático com vencedoras e armadilhas conhecidas',
+  importDealsTitle:
+    'Cole anúncios da Pichau, Terabyte, KaBuM, PCYes, Amazon etc.',
+  exchangeRateLabel: 'Câmbio de dólar para real',
   languageToggle: 'Idioma',
   appResetTitle: 'Restaurar filtros e pesos para os padrões',
   appResetButton: 'Redefinir',
@@ -130,7 +148,7 @@ export const ptBR: Translations = {
   mathGuideToggleHide: 'Ocultar detalhes matemáticos',
   mathGuideHeading: 'Como calculamos a melhor recomendação para você',
   mathGuideSubheading:
-    'Filtros excludentes, Fronteira de Pareto e proximidade multicritério TOPSIS explicados passo a passo.',
+    'Os limites que você escolheu, as placas que nunca perdem para outra mais barata e como pesamos suas prioridades, passo a passo.',
 
   // Simple Mode Controls & Notices
   showAllGpusButton: 'Ver Todas as Placas de Vídeo (Tabela Completa)',
@@ -146,7 +164,7 @@ export const ptBR: Translations = {
   specFutureProof: 'Para texturas no ultra sem engasgos',
   specPowerDraw: 'Consumo Máximo (TBP)',
   specRatedPower: 'Energia exigida da fonte',
-  specFpsPer100: 'FPS por R$ 100',
+  specFpsPer100: 'FPS por',
   savePrefix: 'Economize',
   moreSuffix: 'a mais',
 
@@ -337,7 +355,7 @@ export const ptBR: Translations = {
   // Estimate labels (FIX-04)
   estimateBadge: 'estimativa',
   estimateExplanation:
-    'Desempenho e gargalo calculados por modelo estimado até calibração com dados reais de benchmark (DATA-02).',
+    'Desempenho e gargalo calculados por modelo estimado até calibração com dados reais de benchmark.',
 
   // Pro-Mode Extras (UX-08)
   weightsProfilesTitle: 'Perfis Salvos de Pesos',
@@ -393,4 +411,163 @@ export const ptBR: Translations = {
   swapIncompatible: 'Incompatível',
   swapCustomizedBuildBadge: 'Configuração Personalizada',
   swapResetToRecommended: 'Restaurar Recomendação Automática',
+
+  // Social Share Card & Creator Studio (SHARE-01)
+  btnShareCard: 'Card & Link p/ Grupos',
+  socialModalTitle: 'Estúdio de Card & Link (Influenciadores e Grupos)',
+  socialModalSubtitle:
+    'Baixe a imagem com especificações e porcentagem dos melhores negócios + texto pronto com seu link.',
+  socialCreatorHandleLabel: 'Seu @ ou Nome do Grupo (Opcional)',
+  socialCreatorHandlePlaceholder: 'Ex: @OfertasHardwareBR',
+  socialAmazonTagLabel: 'Tag de Afiliado Amazon (Opcional)',
+  socialAmazonTagPlaceholder: 'Ex: seucanal-20',
+  socialAffiliateUrlLabel: 'Seu Link de Afiliado da Loja (Opcional)',
+  socialAffiliateUrlPlaceholder:
+    'Cole seu link da Amazon / KaBuM / Terabyte / Pichau...',
+  socialSiteBrandLabel: 'Nome e Domínio do Site no Card',
+  socialDownloadPngBtn: 'Baixar Imagem PNG (HD)',
+  socialCopyCaptionBtn: 'Copiar Texto + Link Pronto',
+  socialCaptionCopied: 'Texto e Link Copiados!',
+  socialBundleBtn: 'Baixar Imagem + Copiar Texto (1-Clique)',
+  socialBundleDone: 'Imagem Baixada & Texto Copiado!',
+  socialPreviewCaptionTitle:
+    'Prévia do Texto para WhatsApp / Telegram / Discord / YouTube',
+  socialFrontierWeightsLabel: 'Porcentagem das Prioridades',
+  socialCloseModal: 'Fechar estúdio de compartilhamento',
+
+  // Regional Store Pricing Attribution (DATA-04)
+  verifiedStorePriceBadge: 'Preço Verificado na Loja',
+  viewAtStore: 'Ver na Loja',
+  pixCashLabel: 'à vista no PIX',
+  installmentUpTo: 'ou até',
+
+  // Launch Foundations & Creator Attribution (LAUNCH-02/03/05 & AFF-03/05)
+  errorBoundaryTitle: 'Algo deu errado ao carregar esta visualização',
+  errorBoundaryDesc:
+    'Recarregue a página para restaurar seus filtros e recomendações com segurança.',
+  errorBoundaryReload: 'Recarregar página',
+  creatorBannerBadge: 'Curadoria com',
+  creatorBannerNotice:
+    'Links das lojas preservam o código de afiliado deste criador. A ordem matemática das peças nunca muda.',
+  creatorBannerDismiss: 'Remover atribuição do parceiro',
+  footerAffiliateDisclosure:
+    'Transparência: podemos receber comissão por links de parceiros. Isso nunca altera o cálculo ou a posição das peças.',
+  footerLegalBtn: 'Privacidade (LGPD/GDPR) & Termos',
+  footerFeedbackBtn: 'Reportar Preço / Sugestão',
+  legalModalTitle: 'Privacidade, Cookies e Transparência (LGPD / GDPR)',
+  legalPrivacyBody:
+    'Não usamos cookies de rastreamento nem vendemos dados pessoais. Suas preferências e ofertas importadas ficam apenas no navegador (localStorage). Links externos podem conter códigos de afiliado para criadores ou manutenção do projeto, sem qualquer influência nos cálculos matemáticos.',
+  legalCloseBtn: 'Fechar',
+  feedbackModalTitle: 'Reportar Preço Desatualizado ou Erro',
+  feedbackModalSubtitle:
+    'Encontrou uma peça fora de estoque, preço errado na loja ou erro de encaixe? Copie o relatório ou registre abaixo.',
+  feedbackPlaceholder: 'Ex: RX 6600 subiu para R$ 1.499 na KaBuM! hoje...',
+  feedbackSubmitBtn: 'Copiar & Registrar Relatório',
+  feedbackSubmittedMsg:
+    'Relatório registrado e copiado para a área de transferência!',
+
+  // Explorer & Pro Lab panels
+  xpWinnerTitle: 'Etapa 3 · Recomendação Ideal (#1 no TOPSIS)',
+  xpCloseness: 'Proximidade',
+  xpBelowFair: 'abaixo do preço justo',
+  xpAboveFair: 'acima do preço justo',
+  xpIdealDistance: 'Distância ao ideal',
+  xpAntiIdealDistance: 'Distância ao anti-ideal',
+  xpStat1440p: 'Jogos em 1440p',
+  xpStatRt: 'Ray Tracing',
+  xpStatPower: 'Consumo',
+  xpStage1Title: 'Etapa 1: Filtros Obrigatórios',
+  xpGpusFit: 'placas passam',
+  xpMaxBudget: 'Orçamento Máximo',
+  xpAll: 'Todas',
+  xpMinVram: 'VRAM Mínima',
+  xpMaxPower: 'Consumo Máximo da Placa (Limite da Fonte)',
+  xpLowPower: 'Baixo Consumo',
+  xpNoLimit: 'Sem Limite',
+  xpBrandFilters: 'Filtros de Marca e Tecnologia',
+  xpClearFilters: 'Limpar Filtros',
+  xpClearFiltersTitle: 'Remove os filtros de marca e tecnologia',
+  xpChipMaker: 'Fabricante do Chip:',
+  xpAllBrands: 'Mostrando Todas as Marcas',
+  xpSelectedCount: 'selecionadas',
+  xpBrandTech: 'Tecnologias Exclusivas:',
+  xpEcosystem: 'Recursos de Ecossistema',
+  xpBrandTechDesc:
+    'Exija recursos ligados a uma marca que não dá para comparar em um eixo numérico.',
+  xpStage3Title: 'Etapa 3: Pesos de Prioridade (TOPSIS)',
+  xpPresetsLabel: 'Perfis Prontos de Comprador:',
+  xpActive: 'Ativo',
+  xpIndividualWeights: 'Pesos Individuais por Critério:',
+  xpPresetBalancedLabel: 'Equilíbrio 1440p (Ponto Ideal)',
+  xpPresetBalancedDesc:
+    'Melhor mistura de preço, FPS e 12–16 GB de VRAM para durar',
+  xpPresetBudgetLabel: 'Caçador de Custo-Benefício',
+  xpPresetBudgetDesc: 'Máximo de FPS por real e baixo consumo',
+  xpPresetEsportsLabel: 'FPS Puro / Competitivo',
+  xpPresetEsportsDesc: 'Prioriza FPS bruto em 1440p acima de Ray Tracing',
+  xpPresetPathtracingLabel: 'Ray Tracing Pesado & 16 GB+ de VRAM',
+  xpPresetPathtracingDesc:
+    'Feito para path tracing em Cyberpunk/Alan Wake e IA local',
+  xpMetricPrice: 'Preço',
+  xpMetricRaster: 'FPS 1440p',
+  xpMetricRt: 'RT 1440p',
+  xpMetricVram: 'VRAM',
+  xpMetricPower: 'Consumo (TBP)',
+  xpDirMin: 'mín',
+  xpDirMax: 'máx',
+  xpTitle2d: 'Fronteira Preço × Desempenho (Detector de Armadilhas)',
+  xpTitle3d: 'Cubo 3D da Fronteira Multiobjetivo (Preço × FPS × VRAM/RT)',
+  xpTitleHyper: 'Explorador 4D–7D (Pareto N-Dimensional e Projeções)',
+  xpTitleAxes: 'Visões por Eixo e por Medida',
+  xpTitleResiduals: 'Fase 2: Preço Justo × Preço de Loja (OLS Hedônico)',
+  xpDesc2d5d:
+    'Círculos verdes = fronteira 2D. Losangos ciano = especialistas 5D (salvos por muita VRAM, Ray Tracing ou baixo consumo). Vermelho = armadilhas dominadas.',
+  xpDesc2dStrict:
+    'Modo 2D: toda placa abaixo da escada verde perde nos dois eixos ao mesmo tempo.',
+  xpDesc3d:
+    'Poliedro 3D exato em degraus + câmeras rápidas para X×Y, Z×Y e X×Z.',
+  xpDescHyper:
+    'Compare até 7 dimensões de hardware ao mesmo tempo com coordenadas paralelas, glifos estrela ou RadViz.',
+  xpDescAxes:
+    'Veja as 4 fronteiras Preço × Medida lado a lado ou isole cada medida em 1D.',
+  xpDescResiduals:
+    'Barras verdes à esquerda estão baratas para o desempenho; barras vermelhas à direita estão caras.',
+  xpTab2d: 'Fronteira 2D',
+  xpTab3d: 'Nuvem 3D',
+  xpTabHyper: 'Hiper-Gráfico 4D–7D',
+  xpTabHyperTitle: 'Compare de 4 a 7 dimensões de hardware de uma vez',
+  xpTabAxes: 'Visões por Eixo',
+  xpTabAxesTitle:
+    'Veja cada eixo de medida sozinho ou numa matriz de 4 painéis',
+  xpTabResiduals: 'Preço Justo (OLS)',
+  xpExpand: 'Ampliar Gráfico',
+  xpExpandTitle: 'Ampliar o gráfico para a largura total',
+  xpShrink: 'Reduzir',
+  xpShrinkTitle: 'Voltar ao layout lado a lado',
+  xpTrapRule: 'Regra de Armadilha:',
+  xpTrapRule5d: 'Todas as 5 Medidas (5D)',
+  xpTrapRule2d: 'Só os 2 Eixos (2D)',
+  xpShadeOn: 'Sombrear Zona Dominada: SIM',
+  xpShadeOff: 'Sombrear Zona Dominada: NÃO',
+  xpShadeTitle: 'Pinta a região dominada com uma cor translúcida',
+  xpTrapsHidden: 'Armadilhas Ocultas',
+  xpHideTraps: 'Ocultar Armadilhas',
+  xpHideTrapsTitle: 'Esconde do gráfico os pontos dominados',
+  xpBaseAxis: 'Eixo Base (Inferior Esquerdo):',
+  xpYAxis: '↑ Eixo Y:',
+  xpNoFitTitle: 'Nenhuma Placa Cabe nos Limites Atuais',
+  xpNoFitDesc:
+    'Aumente o Orçamento Máximo, reduza a VRAM Mínima ou aumente o limite de consumo.',
+  xpTrapDetected: 'Armadilha de valor',
+  xpTrapBeaten: 'perde em tudo para outra placa',
+  xpSmartBuy: 'Compra inteligente',
+  xp5dOptimal: 'ótima em Pareto 5D',
+  xp2dOptimal: 'ótima na fronteira 2D',
+  xpMatchScore: 'Compatibilidade',
+  xpRank: 'Posição',
+  xpOlsFair: 'Preço justo (OLS)',
+  xpTip:
+    'Dica: passe o mouse sobre uma placa para ver por que ela é uma compra inteligente ou uma armadilha. Use Ampliar Gráfico para ver em tela cheia.',
+  xpOptimalCount: 'ideais',
+  xpTrapsFlagged: 'armadilhas',
 };

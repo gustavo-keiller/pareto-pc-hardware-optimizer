@@ -22,6 +22,7 @@ export interface FullBuildPickHeroProps {
   currency: 'USD' | 'BRL';
   locale?: AppLocale;
   onSwitchToBuilds: () => void;
+  onOpenShareCard?: (build: PcBuild) => void;
 }
 
 export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
@@ -31,6 +32,7 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
   currency,
   locale = 'pt-BR',
   onSwitchToBuilds,
+  onOpenShareCard,
 }) => {
   if (!topBuild) {
     return (
@@ -49,7 +51,12 @@ export const FullBuildPickHero: React.FC<FullBuildPickHeroProps> = ({
   return (
     <div data-testid="full-build-pick-hero" className="space-y-4">
       {/* Top Build Hero Card */}
-      <BuildHeroCard build={topBuild} currency={currency} locale={locale} />
+      <BuildHeroCard
+        build={topBuild}
+        currency={currency}
+        locale={locale}
+        onOpenShareCard={onOpenShareCard}
+      />
 
       {/* Primary Action Button */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-900/90 px-5 py-3.5">

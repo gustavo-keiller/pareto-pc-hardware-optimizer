@@ -10,6 +10,8 @@ import { UiMode, ChartViewMode } from '../hooks/useOptimizerState';
 import { ALL_METRIC_KEYS } from '../lib/math/topsis';
 import { ExtrapolationConfig } from '../lib/math/extrapolation';
 import { ExtrapolationToolbar } from './ExtrapolationToolbar';
+import { formatCurrency } from '../utils/currency';
+import { AppLocale, getMetricShortLabel, t } from '../utils/i18n';
 import { ChartLoadingFallback } from './LoadingFallbacks';
 import {
   BarChart3,
@@ -83,6 +85,7 @@ export interface VisualizerPanelProps {
   hoveredGpu: RankedGpu | null;
   optimalCount: number;
   trapCount: number;
+  locale?: AppLocale;
 }
 
 export function VisualizerPanel({
@@ -114,7 +117,15 @@ export function VisualizerPanel({
   hoveredGpu,
   optimalCount,
   trapCount,
+  locale = 'pt-BR',
 }: VisualizerPanelProps) {
+  const currency = rankedGpus[0]?.currency ?? 'USD';
+  const unitLabel = (k: MetricKey): string =>
+    k === 'price'
+      ? currency === 'BRL'
+        ? 'R$'
+        : '$'
+      : METRIC_DEFINITIONS[k].unit;
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl">
       {/* Top Visualization Mode Switcher & Expand Button */}
@@ -124,28 +135,28 @@ export function VisualizerPanel({
             <BarChart3 className="h-5 w-5 text-emerald-400" />
             <h2 className="text-base font-bold text-white">
               {chartView === '2d'
-                ? 'Price vs. Performance Frontier (Value Trap Detector)'
+                ? t('xpTitle2d', locale)
                 : chartView === '3d'
-                  ? '3D Multi-Objective Frontier Cube (Price × FPS × VRAM/RT)'
+                  ? t('xpTitle3d', locale)
                   : chartView === 'hyper'
-                    ? '4D–7D Hyper-Space Explorer (N-Dimensional Pareto & Projections)'
+                    ? t('xpTitleHyper', locale)
                     : chartView === 'axes'
-                      ? 'Multi-Axis & Individual Measurement Views'
-                      : 'Phase 2: Fair Market Value vs. Street Price (Hedonic OLS)'}
+                      ? t('xpTitleAxes', locale)
+                      : t('xpTitleResiduals', locale)}
             </h2>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
             {chartView === '2d'
               ? paretoMode === 'all-5d'
-                ? 'Green circles = 2D Frontier. Cyan diamonds = 5D Specialists (cards saved by high VRAM, Ray Tracing, or low Watts). Red = Strictly Dominated Traps.'
-                : '2D Slice Mode: Every card below the green staircase is beaten on both axes simultaneously.'
+                ? t('xpDesc2d5d', locale)
+                : t('xpDesc2dStrict', locale)
               : chartView === '3d'
-                ? 'Exact 3D step-corner polyhedron + quick camera views for X×Y, Z×Y, and X×Z.'
+                ? t('xpDesc3d', locale)
                 : chartView === 'hyper'
-                  ? 'Compare up to 7 hardware dimensions simultaneously via N-D Parallel Dominance, Star-Glyph Scatter, or RadViz Gravity Springs.'
+                  ? t('xpDescHyper', locale)
                   : chartView === 'axes'
-                    ? 'Inspect all 4 Price vs. Spec frontiers side-by-side or isolate each hardware measurement individually in 1D.'
-                    : 'Green bars on the left are underpriced bargains relative to their benchmark specs; red bars on the right are overpriced.'}
+                    ? t('xpDescAxes', locale)
+                    : t('xpDescResiduals', locale)}
           </p>
         </div>
 
@@ -154,6 +165,7 @@ export function VisualizerPanel({
           <div className="inline-flex flex-wrap rounded-lg border border-slate-800 bg-slate-950 p-1">
             <button
               type="button"
+              aria-pressed={chartView === '2d'}
               onClick={() => setChartView('2d')}
               className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
                 chartView === '2d'
@@ -162,10 +174,11 @@ export function VisualizerPanel({
               }`}
             >
               <BarChart3 className="h-3.5 w-3.5" />
-              2D Frontier
+              {t('xpTab2d', locale)}
             </button>
             <button
               type="button"
+              aria-pressed={chartView === '3d'}
               onClick={() => setChartView('3d')}
               className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
                 chartView === '3d'
@@ -174,33 +187,35 @@ export function VisualizerPanel({
               }`}
             >
               <Box className="h-3.5 w-3.5" />
-              3D Cloud
+              {t('xpTab3d', locale)}
             </button>
             <button
               type="button"
+              aria-pressed={chartView === 'hyper'}
               onClick={() => setChartView('hyper')}
               className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
                 chartView === 'hyper'
                   ? 'bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/40 shadow-sm shadow-fuchsia-500/20'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
-              title="Compare 4 to 7 hardware dimensions at once (Parallel Dominance, Star-Glyphs & RadViz Gravity)"
+              title={t('xpTabHyperTitle', locale)}
             >
               <Sparkles className="h-3.5 w-3.5" />
-              4D–7D Hyper-Graph
+              {t('xpTabHyper', locale)}
             </button>
             <button
               type="button"
+              aria-pressed={chartView === 'axes'}
               onClick={() => setChartView('axes')}
               className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
                 chartView === 'axes'
                   ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
-              title="See every measurement axis individually or as a 4-panel matrix"
+              title={t('xpTabAxesTitle', locale)}
             >
               <LayoutGrid className="h-3.5 w-3.5" />
-              Axis Views
+              {t('xpTabAxes', locale)}
             </button>
             {uiMode === 'pro' && (
               <button
@@ -213,7 +228,7 @@ export function VisualizerPanel({
                 }`}
               >
                 <TrendingDown className="h-3.5 w-3.5" />
-                Fair Value (OLS)
+                {t('xpTabResiduals', locale)}
               </button>
             )}
           </div>
@@ -229,19 +244,19 @@ export function VisualizerPanel({
             }`}
             title={
               isChartExpanded
-                ? 'Restore standard side-by-side layout'
-                : 'Expand graphic into full-width Cinema View'
+                ? t('xpShrinkTitle', locale)
+                : t('xpExpandTitle', locale)
             }
           >
             {isChartExpanded ? (
               <>
                 <Minimize2 className="h-3.5 w-3.5" />
-                Shrink View
+                {t('xpShrink', locale)}
               </>
             ) : (
               <>
                 <Maximize2 className="h-3.5 w-3.5" />
-                Expand Graphic
+                {t('xpExpand', locale)}
               </>
             )}
           </button>
@@ -255,7 +270,9 @@ export function VisualizerPanel({
             {/* Trap Rule 5D vs 2D shown in both Explorer and Pro modes */}
             {(uiMode === 'pro' || uiMode === 'explorer') && (
               <>
-                <span className="text-slate-400 font-medium">Trap Rule:</span>
+                <span className="text-slate-400 font-medium">
+                  {t('xpTrapRule', locale)}
+                </span>
                 <div className="inline-flex rounded-lg border border-slate-800 bg-slate-900 p-0.5">
                   <button
                     type="button"
@@ -266,7 +283,7 @@ export function VisualizerPanel({
                         : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
-                    All 5 Specs (5D)
+                    {t('xpTrapRule5d', locale)}
                   </button>
                   <button
                     type="button"
@@ -277,7 +294,7 @@ export function VisualizerPanel({
                         : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
-                    Strict 2D Axes
+                    {t('xpTrapRule2d', locale)}
                   </button>
                 </div>
               </>
@@ -292,12 +309,12 @@ export function VisualizerPanel({
                   ? 'border-rose-500/40 bg-rose-500/15 text-rose-300'
                   : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-slate-200'
               }`}
-              title="Paint the merged unoptimized/dominated region with a single translucent color"
+              title={t('xpShadeTitle', locale)}
             >
               <Layers className="h-3.5 w-3.5" />
               {showDominatedZoneMesh
-                ? 'Shade Unoptimized Zone: ON'
-                : 'Shade Unoptimized Zone: OFF'}
+                ? t('xpShadeOn', locale)
+                : t('xpShadeOff', locale)}
             </button>
 
             {/* Hide Trap Points Toggle */}
@@ -309,12 +326,12 @@ export function VisualizerPanel({
                   ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
                   : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-slate-200'
               }`}
-              title="Make dominated trap points disappear from the graphic"
+              title={t('xpHideTrapsTitle', locale)}
             >
               <EyeOff className="h-3.5 w-3.5" />
               {hideDominatedNodes
-                ? `Traps Hidden (${trapCount})`
-                : `Hide Trap Points (${trapCount})`}
+                ? `${t('xpTrapsHidden', locale)} (${trapCount})`
+                : `${t('xpHideTraps', locale)} (${trapCount})`}
             </button>
           </div>
 
@@ -322,10 +339,10 @@ export function VisualizerPanel({
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1 rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-1">
               <span className="text-emerald-300 font-medium">
-                Base Axis (Bottom-Left):
+                {t('xpBaseAxis', locale)}
               </span>
               <select
-                aria-label="Base (Bottom-Left) Metric"
+                aria-label={t('xpBaseAxis', locale)}
                 value={xMetric}
                 onChange={(e) =>
                   isMetricKey(e.target.value) && setXMetric(e.target.value)
@@ -338,16 +355,15 @@ export function VisualizerPanel({
                     value={k}
                     className="bg-slate-900 text-slate-100"
                   >
-                    {METRIC_DEFINITIONS[k].shortLabel} (
-                    {METRIC_DEFINITIONS[k].unit})
+                    {getMetricShortLabel(k, locale)} ({unitLabel(k)})
                   </option>
                 ))}
               </select>
             </div>
             <div className="flex items-center gap-1 rounded border border-slate-800 bg-slate-900 px-2 py-1">
-              <span className="text-slate-400">↑ Y-Axis:</span>
+              <span className="text-slate-400">{t('xpYAxis', locale)}</span>
               <select
-                aria-label="Y-Axis Metric"
+                aria-label={t('xpYAxis', locale)}
                 value={yMetric}
                 onChange={(e) =>
                   isMetricKey(e.target.value) && setYMetric(e.target.value)
@@ -360,7 +376,7 @@ export function VisualizerPanel({
                     value={k}
                     className="bg-slate-900 text-slate-100"
                   >
-                    {METRIC_DEFINITIONS[k].shortLabel}
+                    {getMetricShortLabel(k, locale)}
                   </option>
                 ))}
               </select>
@@ -467,11 +483,10 @@ export function VisualizerPanel({
         <div className="flex h-[420px] flex-col items-center justify-center text-center p-6">
           <ShieldAlert className="h-10 w-10 text-rose-400 mb-2" />
           <h3 className="text-base font-bold text-white">
-            No GPUs Fit Your Current Limits
+            {t('xpNoFitTitle', locale)}
           </h3>
           <p className="text-xs text-slate-400 max-w-md mt-1">
-            Raise your Maximum Budget slider, lower the Minimum VRAM floor, or
-            increase your Power Draw limit.
+            {t('xpNoFitDesc', locale)}
           </p>
         </div>
       )}
@@ -484,8 +499,9 @@ export function VisualizerPanel({
               <ShieldAlert className="h-5 w-5 text-rose-400 shrink-0 mt-0.5" />
               <div className="text-xs">
                 <div className="font-bold text-rose-300">
-                  VALUE TRAP DETECTED: {hoveredGpu.name} (${hoveredGpu.price})
-                  is strictly beaten!
+                  {t('xpTrapDetected', locale)}: {hoveredGpu.name} (
+                  {formatCurrency(hoveredGpu.price, hoveredGpu.currency)}){' '}
+                  {t('xpTrapBeaten', locale)}
                 </div>
                 <ul className="mt-1 space-y-0.5 text-slate-300">
                   {hoveredGpu.dominanceReasons.slice(0, 3).map((r) => (
@@ -499,21 +515,26 @@ export function VisualizerPanel({
               <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
               <div className="text-xs">
                 <div className="font-bold text-emerald-300">
-                  SMART BUY (
+                  {t('xpSmartBuy', locale)} (
                   {paretoMode === 'all-5d'
-                    ? '5D Pareto Optimal'
-                    : '2D Frontier Optimal'}
-                  ): {hoveredGpu.name} (${hoveredGpu.price})
+                    ? t('xp5dOptimal', locale)
+                    : t('xp2dOptimal', locale)}
+                  ): {hoveredGpu.name} (
+                  {formatCurrency(hoveredGpu.price, hoveredGpu.currency)})
                 </div>
                 <p className="text-slate-300 mt-0.5">
-                  {hoveredGpu.notes} • Match Score:{' '}
+                  {hoveredGpu.notes} • {t('xpMatchScore', locale)}:{' '}
                   <strong className="text-amber-400">
                     {hoveredGpu.topsisScorePct.toFixed(1)}%
                   </strong>{' '}
-                  (Rank #{hoveredGpu.rank}).
+                  ({t('xpRank', locale)} #{hoveredGpu.rank}).
                   {hoveredGpu.valuation && (
                     <span className="ml-2 text-sky-300">
-                      OLS Fair Value: ${hoveredGpu.valuation.fairPrice}
+                      {t('xpOlsFair', locale)}:{' '}
+                      {formatCurrency(
+                        hoveredGpu.valuation.fairPrice,
+                        hoveredGpu.currency,
+                      )}
                     </span>
                   )}
                 </p>
@@ -524,14 +545,11 @@ export function VisualizerPanel({
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
             <div className="flex items-center gap-2">
               <Info className="h-4 w-4 text-sky-400 shrink-0" />
-              <span>
-                <strong>Tip:</strong> Hover any GPU to see why it is a Smart Buy
-                or a Value Trap. Click <strong>Expand Graphic</strong> for a
-                full-screen theater view.
-              </span>
+              <span>{t('xpTip', locale)}</span>
             </div>
             <span className="font-mono text-[11px] text-slate-500">
-              {optimalCount} Optimal • {trapCount} Traps Flagged
+              {optimalCount} {t('xpOptimalCount', locale)} • {trapCount}{' '}
+              {t('xpTrapsFlagged', locale)}
             </span>
           </div>
         )}

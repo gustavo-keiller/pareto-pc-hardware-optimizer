@@ -2,6 +2,7 @@ import React from 'react';
 import { HardConstraints, GpuCandidate } from '../lib/math/types';
 import { DatasetMode } from '../hooks/useOptimizerState';
 import { formatCurrency } from '../utils/currency';
+import { AppLocale, t } from '../utils/i18n';
 import { HardwareFilterPanel } from './HardwareFilterPanel';
 import { Filter, DollarSign, Zap } from 'lucide-react';
 
@@ -16,6 +17,7 @@ export interface DealbreakerFilterPanelProps {
   maxBudgetBound: number;
   maxWattsBound: number;
   datasetMode: DatasetMode;
+  locale?: AppLocale;
 }
 
 export const DealbreakerFilterPanel: React.FC<DealbreakerFilterPanelProps> = ({
@@ -27,18 +29,24 @@ export const DealbreakerFilterPanel: React.FC<DealbreakerFilterPanelProps> = ({
   maxBudgetBound,
   maxWattsBound,
   datasetMode,
+  locale = 'pt-BR',
 }) => {
+  const minBudget =
+    activeCurrency === 'BRL' ? 1000 : datasetMode === 'custom' ? 500 : 200;
+  const budgetStep =
+    activeCurrency === 'BRL' || datasetMode === 'custom' ? 50 : 10;
+
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-emerald-400" />
           <h2 className="text-sm font-bold uppercase tracking-wider text-white">
-            Stage 1: Hard Dealbreakers
+            {t('xpStage1Title', locale)}
           </h2>
         </div>
         <span className="text-[11px] font-medium text-emerald-400">
-          {validGpus.length}/{rawCatalog.length} GPUs Fit
+          {validGpus.length}/{rawCatalog.length} {t('xpGpusFit', locale)}
         </span>
       </div>
 
@@ -51,7 +59,7 @@ export const DealbreakerFilterPanel: React.FC<DealbreakerFilterPanelProps> = ({
               className="font-medium text-slate-300 flex items-center gap-1"
             >
               <DollarSign className="h-3.5 w-3.5 text-emerald-400" />
-              Maximum Budget
+              {t('xpMaxBudget', locale)}
             </label>
             <span className="font-mono font-bold text-emerald-400">
               {formatCurrency(constraints.maxPrice, activeCurrency)}
@@ -60,9 +68,9 @@ export const DealbreakerFilterPanel: React.FC<DealbreakerFilterPanelProps> = ({
           <input
             id="max-budget-slider"
             type="range"
-            min={datasetMode === 'custom' ? 500 : 200}
+            min={minBudget}
             max={maxBudgetBound}
-            step={datasetMode === 'custom' ? 50 : 10}
+            step={budgetStep}
             value={Math.min(constraints.maxPrice, maxBudgetBound)}
             onChange={(e) =>
               onChangeConstraints((prev) => ({
@@ -73,16 +81,14 @@ export const DealbreakerFilterPanel: React.FC<DealbreakerFilterPanelProps> = ({
             className="w-full accent-emerald-500 cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
-            <span>
-              {formatCurrency(
-                datasetMode === 'custom' ? 500 : 200,
-                activeCurrency,
-              )}
-            </span>
+            <span>{formatCurrency(minBudget, activeCurrency)}</span>
             <span>
               {formatCurrency(Math.round(maxBudgetBound / 2), activeCurrency)}
             </span>
-            <span>{formatCurrency(maxBudgetBound, activeCurrency)} (All)</span>
+            <span>
+              {formatCurrency(maxBudgetBound, activeCurrency)} (
+              {t('xpAll', locale)})
+            </span>
           </div>
         </div>
 
@@ -90,7 +96,7 @@ export const DealbreakerFilterPanel: React.FC<DealbreakerFilterPanelProps> = ({
         <div>
           <div className="flex justify-between text-xs mb-1.5">
             <span className="font-medium text-slate-300">
-              Minimum VRAM Required
+              {t('xpMinVram', locale)}
             </span>
             <span className="font-mono font-bold text-sky-400">
               {constraints.minVram} GB+
@@ -101,6 +107,7 @@ export const DealbreakerFilterPanel: React.FC<DealbreakerFilterPanelProps> = ({
               <button
                 key={vram}
                 type="button"
+                aria-pressed={constraints.minVram === vram}
                 onClick={() =>
                   onChangeConstraints((prev) => ({
                     ...prev,
@@ -127,7 +134,7 @@ export const DealbreakerFilterPanel: React.FC<DealbreakerFilterPanelProps> = ({
               className="font-medium text-slate-300 flex items-center gap-1"
             >
               <Zap className="h-3.5 w-3.5 text-amber-400" />
-              Max GPU Power Draw (PSU Limit)
+              {t('xpMaxPower', locale)}
             </label>
             <span className="font-mono font-bold text-amber-400">
               {constraints.maxWatts} W
@@ -149,9 +156,11 @@ export const DealbreakerFilterPanel: React.FC<DealbreakerFilterPanelProps> = ({
             className="w-full accent-amber-500 cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
-            <span>120W (Low Power)</span>
+            <span>120W ({t('xpLowPower', locale)})</span>
             <span>260W</span>
-            <span>{maxWattsBound}W (No Limit)</span>
+            <span>
+              {maxWattsBound}W ({t('xpNoLimit', locale)})
+            </span>
           </div>
         </div>
 
@@ -161,6 +170,7 @@ export const DealbreakerFilterPanel: React.FC<DealbreakerFilterPanelProps> = ({
             candidates={rawCatalog}
             constraints={constraints}
             onChangeConstraints={onChangeConstraints}
+            locale={locale}
           />
         </div>
       </div>

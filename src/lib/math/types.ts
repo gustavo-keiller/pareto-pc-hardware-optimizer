@@ -22,6 +22,8 @@ export interface GpuCandidate {
   currency?: 'USD' | 'BRL';
   priceCash?: number;
   priceInstallment?: number;
+  installments?: number;
+  isPriceEstimated?: boolean;
   originalPrice?: number;
   chip?: string;
   brand?: string;

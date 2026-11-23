@@ -1,5 +1,38 @@
 [
   {
+    "componentId": "arc-a580",
+    "store": "TerabyteShop",
+    "price": 1199,
+    "cashPrice": 1199,
+    "installmentPrice": 1410,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Intel%20Arc%20A580%208GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-3050-6gb",
+    "store": "KaBuM!",
+    "price": 1299,
+    "cashPrice": 1299,
+    "installmentPrice": 1528,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/geforce-rtx-3050-6gb",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "arc-a750",
+    "store": "TerabyteShop",
+    "price": 1349,
+    "cashPrice": 1349,
+    "installmentPrice": 1586,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Intel%20Arc%20A750%208GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
     "componentId": "rx-6600",
     "store": "KaBuM!",
     "price": 1399,
@@ -8,7 +41,40 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/235984/placa-de-video-rx-6600-asrock-amd-radeon-8gb-gddr6",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-3050-8gb",
+    "store": "Pichau",
+    "price": 1499,
+    "cashPrice": 1499,
+    "installmentPrice": 1763,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=GeForce%20RTX%203050%208GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "arc-b570",
+    "store": "TerabyteShop",
+    "price": 1649,
+    "cashPrice": 1649,
+    "installmentPrice": 1939,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Intel%20Arc%20B570%2010GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rx-6650-xt",
+    "store": "KaBuM!",
+    "price": 1599,
+    "cashPrice": 1599,
+    "installmentPrice": 1880,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/radeon-rx-6650-xt-8gb",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "arc-b580",
@@ -19,7 +85,7 @@
     "installments": 12,
     "url": "https://www.terabyteshop.com.br/produto/intel-arc-b580-12gb-gddr6",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "rx-7600",
@@ -30,7 +96,29 @@
     "installments": 12,
     "url": "https://www.pichau.com.br/placa-de-video-gigabyte-radeon-rx-7600-gaming-oc-8gb",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "arc-a770-16gb",
+    "store": "TerabyteShop",
+    "price": 1999,
+    "cashPrice": 1999,
+    "installmentPrice": 2351,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Intel%20Arc%20A770%2016GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-3060-12gb",
+    "store": "KaBuM!",
+    "price": 1899,
+    "cashPrice": 1899,
+    "installmentPrice": 2233,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/geforce-rtx-3060-12gb",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "rtx-4060",
@@ -41,7 +129,40 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/475438/placa-de-video-rtx-4060-1-click-oc-2x-galax-geforce-8gb-gddr6",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-3060-ti",
+    "store": "Pichau",
+    "price": 2199,
+    "cashPrice": 2199,
+    "installmentPrice": 2586,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=GeForce%20RTX%203060%20Ti%208GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rx-6700-xt",
+    "store": "TerabyteShop",
+    "price": 2149,
+    "cashPrice": 2149,
+    "installmentPrice": 2527,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Radeon%20RX%206700%20XT%2012GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rx-7600-xt",
+    "store": "Pichau",
+    "price": 2399,
+    "cashPrice": 2399,
+    "installmentPrice": 2821,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Radeon%20RX%207600%20XT%2016GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "rx-6750-xt",
@@ -52,7 +173,29 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/528811/placa-de-video-rx-6750-xt-mech-2x-12g-v1-radeon-12gb-gddr6",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-3070",
+    "store": "Pichau",
+    "price": 2599,
+    "cashPrice": 2599,
+    "installmentPrice": 3056,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=GeForce%20RTX%203070%208GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-4060-ti-8gb",
+    "store": "KaBuM!",
+    "price": 2599,
+    "cashPrice": 2599,
+    "installmentPrice": 3056,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/geforce-rtx-4060-ti-8gb",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "rx-7700-xt",
@@ -63,7 +206,40 @@
     "installments": 12,
     "url": "https://www.terabyteshop.com.br/produto/placa-de-video-sapphire-pulse-amd-radeon-rx-7700-xt-12gb",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rx-6800-xt",
+    "store": "TerabyteShop",
+    "price": 3199,
+    "cashPrice": 3199,
+    "installmentPrice": 3762,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Radeon%20RX%206800%20XT%2016GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-4060-ti-16gb",
+    "store": "KaBuM!",
+    "price": 3099,
+    "cashPrice": 3099,
+    "installmentPrice": 3644,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/geforce-rtx-4060-ti-16gb",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-3080-10gb",
+    "store": "Pichau",
+    "price": 3299,
+    "cashPrice": 3299,
+    "installmentPrice": 3880,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=GeForce%20RTX%203080%2010GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "rx-7800-xt",
@@ -74,7 +250,29 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/496014/placa-de-video-rx-7800-xt-challenger-asrock-amd-radeon-16gb",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-4070",
+    "store": "KaBuM!",
+    "price": 3799,
+    "cashPrice": 3799,
+    "installmentPrice": 4468,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/geforce-rtx-4070-12gb",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rx-7900-gre",
+    "store": "TerabyteShop",
+    "price": 3899,
+    "cashPrice": 3899,
+    "installmentPrice": 4585,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Radeon%20RX%207900%20GRE%2016GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "rtx-4070-super",
@@ -85,7 +283,40 @@
     "installments": 12,
     "url": "https://www.pichau.com.br/placa-de-video-galax-geforce-rtx-4070-super-1-click-oc-2x-12gb",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-5070",
+    "store": "KaBuM!",
+    "price": 4699,
+    "cashPrice": 4699,
+    "installmentPrice": 5526,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/geforce-rtx-5070-12gb",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rx-7900-xt",
+    "store": "TerabyteShop",
+    "price": 4999,
+    "cashPrice": 4999,
+    "installmentPrice": 5879,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Radeon%20RX%207900%20XT%2020GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-4070-ti",
+    "store": "Pichau",
+    "price": 5199,
+    "cashPrice": 5199,
+    "installmentPrice": 6114,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=GeForce%20RTX%204070%20Ti%2012GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "rtx-4070-ti-super",
@@ -96,7 +327,18 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/520697/placa-de-video-rtx-4070-ti-super-galax-geforce-16gb",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-5070-ti",
+    "store": "KaBuM!",
+    "price": 6199,
+    "cashPrice": 6199,
+    "installmentPrice": 7290,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/geforce-rtx-5070-ti-16gb",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "rx-7900-xtx",
@@ -107,7 +349,7 @@
     "installments": 12,
     "url": "https://www.terabyteshop.com.br/produto/placa-de-video-sapphire-nitro-plus-amd-radeon-rx-7900-xtx-vapor-x-24gb",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "rtx-4080-super",
@@ -118,7 +360,18 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/520699/placa-de-video-rtx-4080-super-sg-1-click-oc-galax-geforce-16gb",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-5080",
+    "store": "Pichau",
+    "price": 8699,
+    "cashPrice": 8699,
+    "installmentPrice": 10230,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=GeForce%20RTX%205080%2016GB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "rtx-4090",
@@ -129,7 +382,40 @@
     "installments": 12,
     "url": "https://www.pichau.com.br/placa-de-video-msi-geforce-rtx-4090-gaming-x-trio-24gb",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "rtx-5090",
+    "store": "KaBuM!",
+    "price": 14999,
+    "cashPrice": 14999,
+    "installmentPrice": 17639,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/geforce-rtx-5090-32gb",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ryzen-3600",
+    "store": "Pichau",
+    "price": 499,
+    "cashPrice": 499,
+    "installmentPrice": 587,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=AMD%20Ryzen%205%203600",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ryzen-5500",
+    "store": "TerabyteShop",
+    "price": 569,
+    "cashPrice": 569,
+    "installmentPrice": 669,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=AMD%20Ryzen%205%205500",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "cpu-ryzen-5600",
@@ -140,7 +426,18 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/320798/processador-amd-ryzen-5-5600-3-5ghz-4-4ghz-max-turbo-cache-35mb-am4",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ryzen-5700x",
+    "store": "KaBuM!",
+    "price": 1049,
+    "cashPrice": 1049,
+    "installmentPrice": 1234,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/amd-ryzen-7-5700x",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "cpu-ryzen-5700x3d",
@@ -151,7 +448,29 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/520369/processador-amd-ryzen-7-5700x3d-3-0ghz-4-1ghz-max-turbo-am4",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ryzen-5800x3d",
+    "store": "Pichau",
+    "price": 1999,
+    "cashPrice": 1999,
+    "installmentPrice": 2351,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=AMD%20Ryzen%207%205800X3D",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ryzen-7500f",
+    "store": "TerabyteShop",
+    "price": 1099,
+    "cashPrice": 1099,
+    "installmentPrice": 1292,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=AMD%20Ryzen%205%207500F",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "cpu-ryzen-7600",
@@ -162,7 +481,40 @@
     "installments": 12,
     "url": "https://www.terabyteshop.com.br/produto/23472/processador-amd-ryzen-5-7600-38ghz-51ghz-turbo-6-cores-12-threads-am5",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ryzen-7600x",
+    "store": "KaBuM!",
+    "price": 1449,
+    "cashPrice": 1449,
+    "installmentPrice": 1704,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/amd-ryzen-5-7600x",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ryzen-9600x",
+    "store": "TerabyteShop",
+    "price": 1749,
+    "cashPrice": 1749,
+    "installmentPrice": 2057,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=AMD%20Ryzen%205%209600X",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ryzen-9700x",
+    "store": "KaBuM!",
+    "price": 2299,
+    "cashPrice": 2299,
+    "installmentPrice": 2704,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/amd-ryzen-7-9700x",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "cpu-ryzen-7800x3d",
@@ -173,7 +525,40 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/444038/processador-amd-ryzen-7-7800x3d-4-2ghz-5-0ghz-max-turbo-am5",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ryzen-9800x3d",
+    "store": "Pichau",
+    "price": 3399,
+    "cashPrice": 3399,
+    "installmentPrice": 3997,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=AMD%20Ryzen%207%209800X3D",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ryzen-9950x",
+    "store": "KaBuM!",
+    "price": 4299,
+    "cashPrice": 4299,
+    "installmentPrice": 5056,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/amd-ryzen-9-9950x",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-i3-12100f",
+    "store": "Pichau",
+    "price": 549,
+    "cashPrice": 549,
+    "installmentPrice": 646,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Intel%20Core%20i3-12100F",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "cpu-i5-12400f",
@@ -184,7 +569,106 @@
     "installments": 12,
     "url": "https://www.pichau.com.br/processador-intel-core-i5-12400f-6-core-12-threads-2-5ghz-lga1700",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-i5-13400f",
+    "store": "KaBuM!",
+    "price": 1099,
+    "cashPrice": 1099,
+    "installmentPrice": 1292,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/intel-core-i5-13400f",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-i5-13600k",
+    "store": "TerabyteShop",
+    "price": 1799,
+    "cashPrice": 1799,
+    "installmentPrice": 2116,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Intel%20Core%20i5-13600K",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-i5-14600k",
+    "store": "KaBuM!",
+    "price": 1899,
+    "cashPrice": 1899,
+    "installmentPrice": 2233,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/intel-core-i5-14600k",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-i7-14700k",
+    "store": "Pichau",
+    "price": 2599,
+    "cashPrice": 2599,
+    "installmentPrice": 3056,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Intel%20Core%20i7-14700K",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-i9-14900k",
+    "store": "KaBuM!",
+    "price": 3599,
+    "cashPrice": 3599,
+    "installmentPrice": 4232,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/intel-core-i9-14900k",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ultra5-245k",
+    "store": "TerabyteShop",
+    "price": 1999,
+    "cashPrice": 1999,
+    "installmentPrice": 2351,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Intel%20Core%20Ultra%205%20245K",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ultra7-265k",
+    "store": "KaBuM!",
+    "price": 2699,
+    "cashPrice": 2699,
+    "installmentPrice": 3174,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/intel-core-ultra-7-265k",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cpu-ultra9-285k",
+    "store": "Pichau",
+    "price": 3999,
+    "cashPrice": 3999,
+    "installmentPrice": 4703,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Intel%20Core%20Ultra%209%20285K",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-asrock-b550m-hdv",
+    "store": "TerabyteShop",
+    "price": 529,
+    "cashPrice": 529,
+    "installmentPrice": 622,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=ASRock%20B550M-HDV",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "mobo-msi-b550-a-pro",
@@ -195,7 +679,29 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/114338/placa-mae-msi-b550-a-pro-amd-am4-atx",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-asrock-b550-itx",
+    "store": "Pichau",
+    "price": 899,
+    "cashPrice": 899,
+    "installmentPrice": 1057,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=ASRock%20B550M-ITX%2Fac",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-msi-b550-tomahawk",
+    "store": "KaBuM!",
+    "price": 1099,
+    "cashPrice": 1099,
+    "installmentPrice": 1292,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/msi-mag-b550-tomahawk-max-wifi",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "mobo-asrock-b650m-hdv",
@@ -206,7 +712,150 @@
     "installments": 12,
     "url": "https://www.terabyteshop.com.br/produto/25330/placa-mae-asrock-b650m-hdvm2-chipset-b650-amd-am5-matx-ddr5",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-gigabyte-b650m-ds3h",
+    "store": "KaBuM!",
+    "price": 949,
+    "cashPrice": 949,
+    "installmentPrice": 1116,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/gigabyte-b650m-ds3h",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-gigabyte-b650-gaming-x",
+    "store": "Pichau",
+    "price": 1199,
+    "cashPrice": 1199,
+    "installmentPrice": 1410,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Gigabyte%20B650%20GAMING%20X%20AX",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-asrock-b650i-lightning",
+    "store": "TerabyteShop",
+    "price": 1399,
+    "cashPrice": 1399,
+    "installmentPrice": 1645,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=ASRock%20B650I%20Lightning%20WiFi",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-msi-mag-b650-tomahawk",
+    "store": "KaBuM!",
+    "price": 1499,
+    "cashPrice": 1499,
+    "installmentPrice": 1763,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/msi-mag-b650-tomahawk-wifi",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-asrock-b760m-d4",
+    "store": "TerabyteShop",
+    "price": 649,
+    "cashPrice": 649,
+    "installmentPrice": 763,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=ASRock%20B760M-HDV%2FM.2%20D4",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-msi-pro-b760-p-d4",
+    "store": "KaBuM!",
+    "price": 949,
+    "cashPrice": 949,
+    "installmentPrice": 1116,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/msi-pro-b760-p-wifi-ddr4",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-msi-b760-gaming-plus-d5",
+    "store": "Pichau",
+    "price": 1099,
+    "cashPrice": 1099,
+    "installmentPrice": 1292,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=MSI%20B760%20GAMING%20PLUS%20WIFI",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-asrock-b760i-lightning",
+    "store": "TerabyteShop",
+    "price": 1349,
+    "cashPrice": 1349,
+    "installmentPrice": 1586,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=ASRock%20B760I%20Lightning%20WiFi",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-asus-rog-b760-f",
+    "store": "KaBuM!",
+    "price": 1599,
+    "cashPrice": 1599,
+    "installmentPrice": 1880,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/asus-rog-strix-b760-f-gaming-wifi",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-asrock-z890m-riptide",
+    "store": "TerabyteShop",
+    "price": 1499,
+    "cashPrice": 1499,
+    "installmentPrice": 1763,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=ASRock%20Z890M%20Riptide%20WiFi",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "mobo-asrock-z890-pro",
+    "store": "Pichau",
+    "price": 1649,
+    "cashPrice": 1649,
+    "installmentPrice": 1939,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=ASRock%20Z890%20PRO%20RS",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "ram-sp-16gb-d4-3200",
+    "store": "Amazon BR",
+    "price": 249,
+    "cashPrice": 249,
+    "installmentPrice": 293,
+    "installments": 10,
+    "url": "https://www.amazon.com.br/s?k=Silicon%20Power%2016GB%20(2x8GB)%20DDR4-3200%20CL16",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "ram-kingston-fury-16gb-d4-rgb",
+    "store": "KaBuM!",
+    "price": 299,
+    "cashPrice": 299,
+    "installmentPrice": 352,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/kingston-fury-beast-rgb-16gb-2x8gb-ddr4-3200-cl16",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "ram-team-32gb-d4-3200",
@@ -217,7 +866,40 @@
     "installments": 12,
     "url": "https://www.pichau.com.br/memoria-team-group-t-force-vulcan-z-32gb-2x16gb-ddr4-3200mhz",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "ram-corsair-32gb-d4-3600",
+    "store": "KaBuM!",
+    "price": 469,
+    "cashPrice": 469,
+    "installmentPrice": 552,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/corsair-vengeance-lpx-32gb-2x16gb-ddr4-3600-cl18",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "ram-corsair-64gb-d4-3600",
+    "store": "Pichau",
+    "price": 899,
+    "cashPrice": 899,
+    "installmentPrice": 1057,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Corsair%20Vengeance%20LPX%2064GB%20(2x32GB)%20DDR4-3600%20CL18",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "ram-crucial-32gb-d5-5600",
+    "store": "Amazon BR",
+    "price": 599,
+    "cashPrice": 599,
+    "installmentPrice": 704,
+    "installments": 10,
+    "url": "https://www.amazon.com.br/s?k=Crucial%20Pro%2032GB%20(2x16GB)%20DDR5-5600%20CL46",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "ram-team-32gb-d5-6000-cl30",
@@ -228,7 +910,62 @@
     "installments": 12,
     "url": "https://www.terabyteshop.com.br/produto/25619/memoria-ddr5-team-group-t-create-expert-32gb-2x16gb-6000mhz-cl30",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "ram-gskill-flare-32gb-d5-6000",
+    "store": "Pichau",
+    "price": 829,
+    "cashPrice": 829,
+    "installmentPrice": 975,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=G.Skill%20Flare%20X5%2032GB%20(2x16GB)%20DDR5-6000%20CL30",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "ram-corsair-32gb-d5-rgb",
+    "store": "KaBuM!",
+    "price": 899,
+    "cashPrice": 899,
+    "installmentPrice": 1057,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/corsair-vengeance-rgb-32gb-2x16gb-ddr5-6000-cl30",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "ram-gskill-ripjaws-64gb-d5-6000",
+    "store": "TerabyteShop",
+    "price": 1499,
+    "cashPrice": 1499,
+    "installmentPrice": 1763,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=G.Skill%20Ripjaws%20S5%2064GB%20(2x32GB)%20DDR5-6000%20CL30",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "ram-gskill-trident-64gb-d5-6000",
+    "store": "KaBuM!",
+    "price": 1649,
+    "cashPrice": 1649,
+    "installmentPrice": 1939,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/g-skill-trident-z5-neo-rgb-64gb-2x32gb-ddr5-6000-cl30",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "storage-kingston-nv2-500gb",
+    "store": "KaBuM!",
+    "price": 269,
+    "cashPrice": 269,
+    "installmentPrice": 316,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/kingston-nv2-500gb-m-2-nvme",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "storage-kingston-nv2-1tb",
@@ -239,7 +976,84 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/386847/ssd-1-tb-kingston-nv2-m-2-2280-pcie-nvme-leitura-3500mb-s",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "storage-crucial-p3plus-1tb",
+    "store": "Amazon BR",
+    "price": 449,
+    "cashPrice": 449,
+    "installmentPrice": 528,
+    "installments": 10,
+    "url": "https://www.amazon.com.br/s?k=Crucial%20P3%20Plus%201TB%20M.2%20NVMe",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "storage-wd-sn770-1tb",
+    "store": "KaBuM!",
+    "price": 499,
+    "cashPrice": 499,
+    "installmentPrice": 587,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/wd-black-sn770-1tb-m-2-nvme",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "storage-crucial-p3plus-2tb",
+    "store": "Amazon BR",
+    "price": 799,
+    "cashPrice": 799,
+    "installmentPrice": 940,
+    "installments": 10,
+    "url": "https://www.amazon.com.br/s?k=Crucial%20P3%20Plus%202TB%20M.2%20NVMe",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "storage-wd-sn850x-2tb",
+    "store": "KaBuM!",
+    "price": 1099,
+    "cashPrice": 1099,
+    "installmentPrice": 1292,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/wd-black-sn850x-2tb-m-2-nvme",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "storage-samsung-990pro-2tb",
+    "store": "Pichau",
+    "price": 1249,
+    "cashPrice": 1249,
+    "installmentPrice": 1469,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Samsung%20990%20PRO%202TB%20M.2%20NVMe",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "storage-lexar-nm790-4tb",
+    "store": "TerabyteShop",
+    "price": 1799,
+    "cashPrice": 1799,
+    "installmentPrice": 2116,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Lexar%20NM790%204TB%20M.2%20NVMe",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cooler-wraith-stealth",
+    "store": "Pichau",
+    "price": 89,
+    "cashPrice": 89,
+    "installmentPrice": 105,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=AMD%20Wraith%20Stealth%20(Stock)",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "cooler-thermalright-assassin-x",
@@ -250,7 +1064,139 @@
     "installments": 12,
     "url": "https://www.terabyteshop.com.br/produto/cooler-para-processador-thermalright-assassin-x-120-se",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cooler-deepcool-ag400",
+    "store": "TerabyteShop",
+    "price": 149,
+    "cashPrice": 149,
+    "installmentPrice": 175,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=DeepCool%20AG400%20ARGB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cooler-thermalright-peerless-assassin",
+    "store": "Amazon BR",
+    "price": 269,
+    "cashPrice": 269,
+    "installmentPrice": 316,
+    "installments": 10,
+    "url": "https://www.amazon.com.br/s?k=Thermalright%20Peerless%20Assassin%20120%20SE",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cooler-thermalright-phantom-spirit",
+    "store": "Amazon BR",
+    "price": 299,
+    "cashPrice": 299,
+    "installmentPrice": 352,
+    "installments": 10,
+    "url": "https://www.amazon.com.br/s?k=Thermalright%20Phantom%20Spirit%20120%20SE",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cooler-noctua-nh-l9a",
+    "store": "Amazon BR",
+    "price": 349,
+    "cashPrice": 349,
+    "installmentPrice": 410,
+    "installments": 10,
+    "url": "https://www.amazon.com.br/s?k=Noctua%20NH-L9a-AM5%20Low%20Profile",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cooler-thermalright-frozen-prism-240",
+    "store": "TerabyteShop",
+    "price": 369,
+    "cashPrice": 369,
+    "installmentPrice": 434,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Thermalright%20Frozen%20Prism%20240%20ARGB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cooler-thermalright-frozen-prism-360",
+    "store": "TerabyteShop",
+    "price": 459,
+    "cashPrice": 459,
+    "installmentPrice": 540,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Thermalright%20Frozen%20Prism%20360%20ARGB",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cooler-arctic-lf3-240-black",
+    "store": "Pichau",
+    "price": 549,
+    "cashPrice": 549,
+    "installmentPrice": 646,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Arctic%20Liquid%20Freezer%20III%20240%20Black",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "cooler-arctic-lf3-360-black",
+    "store": "Pichau",
+    "price": 679,
+    "cashPrice": 679,
+    "installmentPrice": 799,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Arctic%20Liquid%20Freezer%20III%20360%20Black",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "case-deepcool-cc560",
+    "store": "TerabyteShop",
+    "price": 329,
+    "cashPrice": 329,
+    "installmentPrice": 387,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=DeepCool%20CC560%20V2%20Mid-Tower",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "case-montech-air100",
+    "store": "TerabyteShop",
+    "price": 349,
+    "cashPrice": 349,
+    "installmentPrice": 410,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Montech%20Air%20100%20ARGB%20Micro-ATX",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "case-montech-air903",
+    "store": "TerabyteShop",
+    "price": 389,
+    "cashPrice": 389,
+    "installmentPrice": 457,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Montech%20Air%20903%20Base%20Mid-Tower",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "case-lianli-a3-matx",
+    "store": "Pichau",
+    "price": 449,
+    "cashPrice": 449,
+    "installmentPrice": 528,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Lian%20Li%20DAN%20Cases%20A3-mATX",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "case-montech-air903-max",
@@ -261,7 +1207,62 @@
     "installments": 12,
     "url": "https://www.terabyteshop.com.br/produto/25220/gabinete-gamer-montech-air-903-max-mid-tower-argb",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "case-fractal-pop-air",
+    "store": "KaBuM!",
+    "price": 569,
+    "cashPrice": 569,
+    "installmentPrice": 669,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/fractal-design-pop-air-rgb-atx",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "case-nzxt-h5-flow",
+    "store": "KaBuM!",
+    "price": 599,
+    "cashPrice": 599,
+    "installmentPrice": 704,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/nzxt-h5-flow-compact-atx",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "case-cm-nr200p",
+    "store": "Pichau",
+    "price": 629,
+    "cashPrice": 629,
+    "installmentPrice": 740,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Cooler%20Master%20MasterBox%20NR200P%20SFF",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "case-fractal-terra",
+    "store": "KaBuM!",
+    "price": 1199,
+    "cashPrice": 1199,
+    "installmentPrice": 1410,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/fractal-design-terra-sff",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "psu-msi-a550bn",
+    "store": "KaBuM!",
+    "price": 279,
+    "cashPrice": 279,
+    "installmentPrice": 328,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/msi-mag-a550bn-550w",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   },
   {
     "componentId": "psu-msi-a650bn",
@@ -272,6 +1273,94 @@
     "installments": 10,
     "url": "https://www.kabum.com.br/produto/369658/fonte-msi-mag-a650bn-atx-650w-80-plus-bronze",
     "inStock": true,
-    "checkedAt": "2026-10-20"
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "psu-corsair-cx650m",
+    "store": "Pichau",
+    "price": 429,
+    "cashPrice": 429,
+    "installmentPrice": 505,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Corsair%20CX650M%20650W",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "psu-seasonic-focus-750",
+    "store": "TerabyteShop",
+    "price": 679,
+    "cashPrice": 679,
+    "installmentPrice": 799,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Seasonic%20FOCUS%20GX-750%20750W",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "psu-corsair-rm750e",
+    "store": "KaBuM!",
+    "price": 699,
+    "cashPrice": 699,
+    "installmentPrice": 822,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/corsair-rm750e-750w",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "psu-montech-titan-850",
+    "store": "TerabyteShop",
+    "price": 749,
+    "cashPrice": 749,
+    "installmentPrice": 881,
+    "installments": 12,
+    "url": "https://www.terabyteshop.com.br/busca?str=Montech%20TITAN%20GOLD%20850W",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "psu-bequiet-850",
+    "store": "Pichau",
+    "price": 829,
+    "cashPrice": 829,
+    "installmentPrice": 975,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=be%20quiet!%20Pure%20Power%2012%20M%20850W",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "psu-corsair-rm850x",
+    "store": "KaBuM!",
+    "price": 929,
+    "cashPrice": 929,
+    "installmentPrice": 1093,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/corsair-rm850x-850w",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "psu-corsair-rm1000e",
+    "store": "KaBuM!",
+    "price": 1099,
+    "cashPrice": 1099,
+    "installmentPrice": 1292,
+    "installments": 10,
+    "url": "https://www.kabum.com.br/busca/corsair-rm1000e-1000w-atx-3-0",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
+  },
+  {
+    "componentId": "psu-seasonic-vertex-1000",
+    "store": "Pichau",
+    "price": 1299,
+    "cashPrice": 1299,
+    "installmentPrice": 1528,
+    "installments": 12,
+    "url": "https://www.pichau.com.br/search?q=Seasonic%20Vertex%20GX-1000%201000W",
+    "inStock": true,
+    "checkedAt": "2026-11-22"
   }
 ]

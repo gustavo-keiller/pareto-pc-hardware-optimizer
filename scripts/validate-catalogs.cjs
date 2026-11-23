@@ -500,6 +500,22 @@ for (const offer of [...brPrices, ...usPrices]) {
   }
 }
 
+// Enforce 100% regional store price coverage across all catalog parts
+const brOfferIds = new Set(brPrices.map((o) => o.componentId));
+const usOfferIds = new Set(usPrices.map((o) => o.componentId));
+for (const partId of allValidPartIds) {
+  if (!brOfferIds.has(partId)) {
+    errors.push(
+      `[price -> ${partId}] missing BRL store offer in src/data/prices/br.json`,
+    );
+  }
+  if (!usOfferIds.has(partId)) {
+    errors.push(
+      `[price -> ${partId}] missing USD store offer in src/data/prices/us.json`,
+    );
+  }
+}
+
 // 13. Validate Price History (DATA-05)
 const priceHistory = loadPriceFile('history.json');
 for (const entry of priceHistory) {

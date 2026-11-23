@@ -138,9 +138,22 @@ export function isPsuEfficiencyRating(
 export type PsuModularity = 'Non' | 'Semi' | 'Full';
 
 /**
+ * Optional verified regional store provenance & pricing overlay metadata (DATA-04).
+ */
+export interface StorePriceMetadata {
+  store?: string;
+  url?: string;
+  currency?: 'USD' | 'BRL';
+  priceCash?: number;
+  priceInstallment?: number;
+  installments?: number;
+  isPriceEstimated?: boolean;
+}
+
+/**
  * CPU candidate schema with socket, architecture, power, and gaming performance.
  */
-export interface CpuCandidate {
+export interface CpuCandidate extends StorePriceMetadata {
   id: string;
   name: string;
   vendor: HardwareVendor;
@@ -167,7 +180,7 @@ export interface CpuCandidate {
 /**
  * Motherboard candidate schema with socket and RAM generation matching.
  */
-export interface MotherboardCandidate {
+export interface MotherboardCandidate extends StorePriceMetadata {
   id: string;
   name: string;
   price: number;
@@ -188,7 +201,7 @@ export interface MotherboardCandidate {
 /**
  * RAM candidate schema with memory generation, capacity, speed, and stick count.
  */
-export interface RamCandidate {
+export interface RamCandidate extends StorePriceMetadata {
   id: string;
   name: string;
   price: number;
@@ -210,7 +223,7 @@ export interface RamCandidate {
 export type StorageType = 'NVMe M.2' | 'SATA 2.5"';
 export type StorageFormFactor = 'M.2-2280' | '2.5-inch';
 
-export interface StorageCandidate {
+export interface StorageCandidate extends StorePriceMetadata {
   id: string;
   name: string;
   price: number;
@@ -227,7 +240,7 @@ export interface StorageCandidate {
 /**
  * PC Case candidate schema with form factor compatibility and physical clearance limits.
  */
-export interface CaseCandidate {
+export interface CaseCandidate extends StorePriceMetadata {
   id: string;
   name: string;
   price: number;
@@ -247,7 +260,7 @@ export interface CaseCandidate {
  */
 export type CoolerType = 'Air' | 'AIO';
 
-export interface CoolerCandidate {
+export interface CoolerCandidate extends StorePriceMetadata {
   id: string;
   name: string;
   price: number;
@@ -265,7 +278,7 @@ export interface CoolerCandidate {
 /**
  * Power supply candidate schema with wattage and efficiency rating.
  */
-export interface PsuCandidate {
+export interface PsuCandidate extends StorePriceMetadata {
   id: string;
   name: string;
   price: number;

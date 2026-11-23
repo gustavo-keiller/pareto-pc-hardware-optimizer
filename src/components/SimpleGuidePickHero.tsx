@@ -6,7 +6,10 @@ import {
   Check,
   ChevronDown,
   Compass,
+  ExternalLink,
+  ImageDown,
   ShieldCheck,
+  Store,
 } from 'lucide-react';
 import { RankedGpu } from '../lib/math/types';
 import { formatCurrency, getEstimatedPriceNotice } from '../utils/currency';
@@ -23,6 +26,7 @@ export interface SimpleGuidePickHeroProps {
   onToggleSelectGpu: (id: string) => void;
   onOpenAccordion: () => void;
   onInspectInExplorer?: (id: string) => void;
+  onOpenShareCard?: (gpu: RankedGpu, reason: string) => void;
 }
 
 export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
@@ -35,6 +39,7 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
   onToggleSelectGpu,
   onOpenAccordion,
   onInspectInExplorer,
+  onOpenShareCard,
 }) => {
   const shoppingReasons = useMemo(() => {
     if (!topPick) return null;
@@ -90,6 +95,17 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
               <h4 className="text-xl sm:text-3xl font-black text-white mt-1 break-words">
                 {topPick.name}
               </h4>
+              {topPick.store && (
+                <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+                  <span
+                    data-testid="top-pick-store-badge"
+                    className="inline-flex items-center gap-1 rounded-md border border-indigo-500/30 bg-indigo-500/15 px-2 py-0.5 font-bold text-indigo-300"
+                  >
+                    <Store className="h-3 w-3" />
+                    {topPick.store}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -97,15 +113,35 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
             <div className="text-2xl sm:text-3xl font-black text-emerald-400">
               {formatCurrency(topPick.price, currency)}
             </div>
-            {currency === 'BRL' && (
+            {currency === 'BRL' && topPick.priceCash && (
+              <div className="text-[11px] text-emerald-300/90 font-medium">
+                {t('pixCashLabel', locale)}
+                {topPick.priceInstallment && topPick.installments
+                  ? ` • ${t('installmentUpTo', locale)} ${topPick.installments}x (${formatCurrency(topPick.priceInstallment, currency)})`
+                  : ''}
+              </div>
+            )}
+            {currency === 'BRL' && topPick.isPriceEstimated && (
               <div className="text-[10px] text-amber-300/80 font-normal">
-                {getEstimatedPriceNotice(locale, currency)}
+                {getEstimatedPriceNotice(locale, currency, true)}
               </div>
             )}
             <div className="text-xs text-slate-400 mt-0.5 font-medium">
               {fpsPer100} {t('specFpsPer100', locale)}{' '}
               {currency === 'BRL' ? 'R$ 100' : '$100'}
             </div>
+            {topPick.url && (
+              <a
+                href={topPick.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="top-pick-store-cta"
+                className="mt-3 inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-black text-slate-950 shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 transition"
+              >
+                {t('viewAtStore', locale)}
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
           </div>
         </div>
 
@@ -179,6 +215,20 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
           </button>
 
           <div className="flex flex-wrap items-center gap-2">
+            {onOpenShareCard && (
+              <button
+                type="button"
+                data-testid="open-gpu-share-card"
+                onClick={() =>
+                  onOpenShareCard(topPick, shoppingReasons.topPickSummary)
+                }
+                className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/50 bg-emerald-500/20 px-3.5 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/30 transition shadow-sm"
+              >
+                <ImageDown className="h-4 w-4" />
+                {t('btnShareCard', locale)}
+              </button>
+            )}
+
             {onInspectInExplorer && (
               <button
                 type="button"
@@ -235,11 +285,18 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
                   )}
                 </span>
               </div>
-              <div className="flex items-baseline justify-between">
-                <h4 className="text-sm font-bold text-white">
-                  {stepDownAlt.name}
-                </h4>
-                <span className="font-mono font-bold text-slate-200">
+              <div className="flex items-baseline justify-between gap-2">
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-white">
+                    {stepDownAlt.name}
+                  </h4>
+                  {stepDownAlt.store && (
+                    <span className="inline-block text-[10px] font-semibold text-indigo-300">
+                      {stepDownAlt.store}
+                    </span>
+                  )}
+                </div>
+                <span className="font-mono font-bold text-slate-200 shrink-0">
                   {formatCurrency(stepDownAlt.price, currency)}
                 </span>
               </div>
@@ -290,11 +347,18 @@ export const SimpleGuidePickHero: React.FC<SimpleGuidePickHeroProps> = ({
                   {t('moreSuffix', locale)}
                 </span>
               </div>
-              <div className="flex items-baseline justify-between">
-                <h4 className="text-sm font-bold text-white">
-                  {stepUpAlt.name}
-                </h4>
-                <span className="font-mono font-bold text-slate-200">
+              <div className="flex items-baseline justify-between gap-2">
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-white">
+                    {stepUpAlt.name}
+                  </h4>
+                  {stepUpAlt.store && (
+                    <span className="inline-block text-[10px] font-semibold text-indigo-300">
+                      {stepUpAlt.store}
+                    </span>
+                  )}
+                </div>
+                <span className="font-mono font-bold text-slate-200 shrink-0">
                   {formatCurrency(stepUpAlt.price, currency)}
                 </span>
               </div>

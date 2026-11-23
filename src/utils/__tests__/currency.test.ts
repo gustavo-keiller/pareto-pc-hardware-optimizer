@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_USD_TO_BRL_RATE,
+  applyRegionalGpuOverlay,
   convertBrlToUsd,
   convertUsdToBrl,
   formatCurrency,
+  getCurrencyAdjustedCatalogs,
   getCurrencySymbol,
+  getEstimatedPriceNotice,
 } from '../currency';
+import { REAL_WORLD_GPUS } from '../../data/realGpus';
 
 describe('currency utilities (src/utils/currency.ts)', () => {
   it('formats USD and BRL currencies cleanly', () => {
@@ -35,5 +39,31 @@ describe('currency utilities (src/utils/currency.ts)', () => {
     // Boundary safety: if rate is 0 or negative, returns amount unchanged without throwing or dividing by zero
     expect(convertBrlToUsd(100, 0)).toBe(100);
     expect(convertBrlToUsd(100, -1)).toBe(100);
+  });
+
+  it('overlays verified regional store prices and attribution onto GPUs and full-build catalogs', () => {
+    const brlGpus = applyRegionalGpuOverlay(REAL_WORLD_GPUS, 'BRL');
+    const rx6600Brl = brlGpus.find((g) => g.id === 'rx-6600');
+    expect(rx6600Brl?.price).toBe(1399);
+    expect(rx6600Brl?.store).toBe('KaBuM!');
+    expect(rx6600Brl?.isPriceEstimated).toBe(false);
+    expect(rx6600Brl?.url).toContain('kabum.com.br');
+
+    const brlCatalogs = getCurrencyAdjustedCatalogs('BRL');
+    const r5600Brl = brlCatalogs.cpus.find((c) => c.id === 'cpu-ryzen-5600');
+    expect(r5600Brl?.price).toBe(799);
+    expect(r5600Brl?.store).toBe('KaBuM!');
+    expect(r5600Brl?.isPriceEstimated).toBe(false);
+
+    const usdCatalogs = getCurrencyAdjustedCatalogs('USD');
+    const r5600Usd = usdCatalogs.cpus.find((c) => c.id === 'cpu-ryzen-5600');
+    expect(r5600Usd?.store).toBe('Amazon US');
+    expect(r5600Usd?.isPriceEstimated).toBe(false);
+
+    // Honest notice only appears when price is truly estimated
+    expect(getEstimatedPriceNotice('pt-BR', 'BRL', false)).toBe('');
+    expect(getEstimatedPriceNotice('pt-BR', 'BRL', true)).toContain(
+      'Preço estimado',
+    );
   });
 });

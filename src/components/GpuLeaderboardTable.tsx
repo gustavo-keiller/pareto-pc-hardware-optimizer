@@ -297,7 +297,22 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono font-bold text-white">
-                    {formatCurrency(gpu.price, currency, false, locale)}
+                    <div>
+                      {formatCurrency(gpu.price, currency, false, locale)}
+                    </div>
+                    {currency === 'BRL' &&
+                      gpu.priceInstallment &&
+                      gpu.installments && (
+                        <div className="text-[10px] font-normal text-slate-400">
+                          {gpu.installments}x{' '}
+                          {formatCurrency(
+                            gpu.priceInstallment,
+                            currency,
+                            false,
+                            locale,
+                          )}
+                        </div>
+                      )}
                   </td>
 
                   <td className="py-3 px-3 text-right font-mono">
@@ -325,13 +340,20 @@ export const GpuLeaderboardTable: React.FC<GpuLeaderboardTableProps> = ({
                               <TrendingDown className="h-2.5 w-2.5" />-
                               {formatCurrency(
                                 Math.abs(val.residualUsd),
-                                gpu.currency,
+                                currency,
+                                false,
+                                locale,
                               )}
                             </>
                           ) : (
                             <>
                               <TrendingUp className="h-2.5 w-2.5" />+
-                              {formatCurrency(val.residualUsd, gpu.currency)}
+                              {formatCurrency(
+                                val.residualUsd,
+                                currency,
+                                false,
+                                locale,
+                              )}
                             </>
                           )}
                         </span>

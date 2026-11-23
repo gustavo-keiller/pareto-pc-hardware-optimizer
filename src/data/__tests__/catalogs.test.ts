@@ -171,8 +171,26 @@ describe('DATA-01 & DATA-03: Versioned JSON Catalogs & Hardware Coverage', () =>
     const brlPrices = getRegionalStorePrices('BRL');
     const usdPrices = getRegionalStorePrices('USD');
 
-    expect(brlPrices.length).toBeGreaterThan(0);
-    expect(usdPrices.length).toBeGreaterThan(0);
+    expect(brlPrices.length).toBeGreaterThanOrEqual(124);
+    expect(usdPrices.length).toBeGreaterThanOrEqual(124);
+
+    // Every single catalog component must have a store offer in both BR and US
+    const allIds = [
+      ...SEED_CPUS,
+      ...SEED_MOTHERBOARDS,
+      ...SEED_RAM_KITS,
+      ...SEED_STORAGES,
+      ...SEED_COOLERS,
+      ...SEED_CASES,
+      ...SEED_PSUS,
+      ...REAL_WORLD_GPUS,
+    ].map((item) => item.id);
+    const brSet = new Set(brlPrices.map((o) => o.componentId));
+    const usSet = new Set(usdPrices.map((o) => o.componentId));
+    for (const id of allIds) {
+      expect(brSet.has(id)).toBe(true);
+      expect(usSet.has(id)).toBe(true);
+    }
 
     // Verify format of store offers
     const firstBrl = brlPrices[0];

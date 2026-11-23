@@ -16,6 +16,8 @@
     "snap": "node scripts/snap.mjs",
     "sync:skills": "node scripts/sync-claude-skills.cjs",
     "add-part": "node scripts/add-part.cjs",
+    "sync:feeds": "node scripts/sync-store-feeds.cjs --dry-run",
+    "generate:seo": "node scripts/generate-seo-pages.cjs",
     "check:docs": "node scripts/check-docs.cjs",
     "check:catalogs": "node scripts/validate-catalogs.cjs",
     "check:knip": "knip",

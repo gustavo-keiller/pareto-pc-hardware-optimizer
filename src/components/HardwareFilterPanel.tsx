@@ -9,6 +9,7 @@ import {
   KNOWN_GPU_TECHNOLOGIES,
 } from '../lib/math/capabilities';
 import { Cpu, Check, RotateCcw, Sparkles } from 'lucide-react';
+import { AppLocale, t } from '../utils/i18n';
 
 interface HardwareFilterPanelProps {
   candidates: GpuCandidate[];
@@ -16,12 +17,14 @@ interface HardwareFilterPanelProps {
   onChangeConstraints: (
     updater: (prev: HardConstraints) => HardConstraints,
   ) => void;
+  locale?: AppLocale;
 }
 
 export function HardwareFilterPanel({
   candidates,
   constraints,
   onChangeConstraints,
+  locale = 'pt-BR',
 }: HardwareFilterPanelProps) {
   const facets = useMemo(
     () => computeGpuFacets(candidates, constraints),
@@ -84,7 +87,7 @@ export function HardwareFilterPanel({
         <div className="flex items-center gap-2">
           <Cpu className="h-4 w-4 text-sky-400" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-            Brand &amp; Ecosystem Filters
+            {t('xpBrandFilters', locale)}
           </h3>
         </div>
         {isAnyFilterActive && (
@@ -92,10 +95,10 @@ export function HardwareFilterPanel({
             type="button"
             onClick={handleClearAllFilters}
             className="inline-flex items-center gap-1 rounded bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-amber-300 hover:bg-slate-700 transition"
-            title="Reset brand and technology filters"
+            title={t('xpClearFiltersTitle', locale)}
           >
             <RotateCcw className="h-3 w-3" />
-            Clear Filters
+            {t('xpClearFilters', locale)}
           </button>
         )}
       </div>
@@ -104,12 +107,12 @@ export function HardwareFilterPanel({
       <div>
         <div className="flex items-center justify-between text-xs mb-2">
           <span className="font-semibold text-slate-300">
-            Chipset Manufacturer:
+            {t('xpChipMaker', locale)}
           </span>
           <span className="text-[11px] text-slate-400">
             {selectedVendors.length === 0
-              ? 'Showing All Brands'
-              : `${selectedVendors.length} Selected`}
+              ? t('xpAllBrands', locale)
+              : `${selectedVendors.length} ${t('xpSelectedCount', locale)}`}
           </span>
         </div>
 
@@ -117,6 +120,7 @@ export function HardwareFilterPanel({
           {/* All Brands Pill */}
           <button
             type="button"
+            aria-pressed={selectedVendors.length === 0}
             onClick={handleSelectAllVendors}
             className={`rounded-xl border px-2.5 py-2 text-center transition ${
               selectedVendors.length === 0
@@ -124,7 +128,7 @@ export function HardwareFilterPanel({
                 : 'border-slate-800 bg-slate-950/80 text-slate-400 hover:border-slate-700 hover:text-slate-200 font-bold'
             }`}
           >
-            <div className="text-xs">All</div>
+            <div className="text-xs">{t('xpAll', locale)}</div>
             <div className="text-[10px] opacity-75">({candidates.length})</div>
           </button>
 
@@ -136,6 +140,7 @@ export function HardwareFilterPanel({
             return (
               <button
                 type="button"
+                aria-pressed={isSelected}
                 onClick={() => handleToggleVendor('NVIDIA')}
                 className={`rounded-xl border px-2.5 py-2 text-center transition ${
                   isSelected
@@ -160,6 +165,7 @@ export function HardwareFilterPanel({
             return (
               <button
                 type="button"
+                aria-pressed={isSelected}
                 onClick={() => handleToggleVendor('AMD')}
                 className={`rounded-xl border px-2.5 py-2 text-center transition ${
                   isSelected
@@ -184,6 +190,7 @@ export function HardwareFilterPanel({
             return (
               <button
                 type="button"
+                aria-pressed={isSelected}
                 onClick={() => handleToggleVendor('Intel')}
                 className={`rounded-xl border px-2.5 py-2 text-center transition ${
                   isSelected
@@ -207,13 +214,14 @@ export function HardwareFilterPanel({
         <div className="flex items-center justify-between text-xs mb-1.5">
           <span className="font-semibold text-slate-300 flex items-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-            Brand Technologies &amp; Capabilities:
+            {t('xpBrandTech', locale)}
           </span>
-          <span className="text-[10px] text-slate-500">Ecosystem Features</span>
+          <span className="text-[10px] text-slate-500">
+            {t('xpEcosystem', locale)}
+          </span>
         </div>
         <p className="text-[11px] leading-relaxed text-slate-400 mb-2.5">
-          Filter out or isolate proprietary hardware features attached to brands
-          that cannot be compared purely on a numeric axis.
+          {t('xpBrandTechDesc', locale)}
         </p>
 
         <div className="flex flex-wrap gap-1.5">
@@ -223,6 +231,7 @@ export function HardwareFilterPanel({
               <button
                 key={tech.id}
                 type="button"
+                aria-pressed={isRequired}
                 onClick={() => handleToggleFeature(tech.id)}
                 className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition ${
                   isRequired

@@ -16,9 +16,13 @@ import {
   Check,
   RefreshCw,
   Wrench,
+  ImageDown,
+  ExternalLink,
+  Store,
 } from 'lucide-react';
 import { PcBuild } from '../lib/math/buildTypes';
 import { SwappableCategory } from './PartSwapperModal';
+import { BuildBudgetBar } from './BuildBudgetBar';
 import { formatCurrency, getEstimatedPriceNotice } from '../utils/currency';
 import { AppLocale, t } from '../utils/i18n';
 import { generateBuildShoppingReasons } from '../utils/shoppingReasons';
@@ -28,6 +32,33 @@ import {
   formatBuildShareText,
 } from '../utils/shareBuild';
 
+const PartStoreTag: React.FC<{
+  store?: string;
+  url?: string;
+  locale: AppLocale;
+}> = ({ store, url, locale }) => {
+  if (!store) return null;
+  return (
+    <div className="flex items-center gap-1.5 text-[10px]">
+      <span className="inline-flex items-center gap-1 rounded bg-indigo-500/15 border border-indigo-500/30 px-1.5 py-0.5 font-semibold text-indigo-300">
+        <Store className="h-2.5 w-2.5" />
+        {store}
+      </span>
+      {url && (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-0.5 text-sky-400 hover:text-sky-300 underline"
+        >
+          {t('viewAtStore', locale)}
+          <ExternalLink className="h-2.5 w-2.5" />
+        </a>
+      )}
+    </div>
+  );
+};
+
 export interface BuildHeroCardProps {
   build: PcBuild;
   currency?: 'USD' | 'BRL';
@@ -35,6 +66,7 @@ export interface BuildHeroCardProps {
   onSwapPart?: (category: SwappableCategory) => void;
   isCustomized?: boolean;
   onResetCustomization?: () => void;
+  onOpenShareCard?: (build: PcBuild) => void;
 }
 
 export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
@@ -44,6 +76,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
   onSwapPart,
   isCustomized = false,
   onResetCustomization,
+  onOpenShareCard,
 }) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedSpecs, setCopiedSpecs] = useState(false);
@@ -126,13 +159,34 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
                     {t('buildTotalHardwareCost', locale)}
                   </span>
                 </h3>
-                {currency === 'BRL' && (
-                  <div className="text-[10px] text-amber-300/80 font-normal mt-0.5">
-                    {getEstimatedPriceNotice(locale, currency)}
-                  </div>
-                )}
+                {currency === 'BRL' &&
+                  [
+                    build.cpu,
+                    build.gpu,
+                    build.motherboard,
+                    build.ram,
+                    build.storage,
+                    build.cooler,
+                    build.case,
+                    build.psu,
+                  ].some((p) => p.isPriceEstimated) && (
+                    <div className="text-[10px] text-amber-300/80 font-normal mt-0.5">
+                      {getEstimatedPriceNotice(locale, currency, true)}
+                    </div>
+                  )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                {onOpenShareCard && (
+                  <button
+                    type="button"
+                    data-testid="open-build-share-card"
+                    onClick={() => onOpenShareCard(build)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/50 bg-emerald-500/20 px-3 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/30 transition shadow-sm"
+                  >
+                    <ImageDown className="h-3.5 w-3.5" />
+                    <span>{t('btnShareCard', locale)}</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={handleCopyLink}
@@ -286,6 +340,11 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div className="text-sm font-bold text-white leading-tight">
             {build.cpu.name}
           </div>
+          <PartStoreTag
+            store={build.cpu.store}
+            url={build.cpu.url}
+            locale={locale}
+          />
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
               {t('cardPlatform', locale)}{' '}
@@ -342,6 +401,11 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div className="text-sm font-bold text-white leading-tight">
             {build.gpu.name}
           </div>
+          <PartStoreTag
+            store={build.gpu.store}
+            url={build.gpu.url}
+            locale={locale}
+          />
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
               VRAM:{' '}
@@ -398,6 +462,11 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div className="text-sm font-bold text-white leading-tight">
             {build.motherboard.name}
           </div>
+          <PartStoreTag
+            store={build.motherboard.store}
+            url={build.motherboard.url}
+            locale={locale}
+          />
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
               Chipset:{' '}
@@ -450,6 +519,11 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div className="text-sm font-bold text-white leading-tight">
             {build.ram.name}
           </div>
+          <PartStoreTag
+            store={build.ram.store}
+            url={build.ram.url}
+            locale={locale}
+          />
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
               {t('cardCapacity', locale)}{' '}
@@ -503,6 +577,11 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div className="text-sm font-bold text-white leading-tight">
             {build.storage.name}
           </div>
+          <PartStoreTag
+            store={build.storage.store}
+            url={build.storage.url}
+            locale={locale}
+          />
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
               {t('cardCapacity', locale)}{' '}
@@ -559,6 +638,11 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div className="text-sm font-bold text-white leading-tight">
             {build.cooler.name}
           </div>
+          <PartStoreTag
+            store={build.cooler.store}
+            url={build.cooler.url}
+            locale={locale}
+          />
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
               {t('cardCoolingTdp', locale)}{' '}
@@ -613,6 +697,11 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div className="text-sm font-bold text-white leading-tight">
             {build.case.name}
           </div>
+          <PartStoreTag
+            store={build.case.store}
+            url={build.case.url}
+            locale={locale}
+          />
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
               {t('cardMaxGpu', locale)}{' '}
@@ -665,6 +754,11 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
           <div className="text-sm font-bold text-white leading-tight">
             {build.psu.name}
           </div>
+          <PartStoreTag
+            store={build.psu.store}
+            url={build.psu.url}
+            locale={locale}
+          />
           <div className="text-[11px] text-slate-400 space-y-0.5">
             <div>
               {t('cardPsuCapacity', locale)}{' '}
@@ -692,84 +786,7 @@ export const BuildHeroCard: React.FC<BuildHeroCardProps> = ({
       </div>
 
       {/* Budget Allocation Breakdown Bar */}
-      <div className="mt-6 border-t border-slate-800/80 pt-5">
-        <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-          <span className="font-semibold text-slate-300">
-            {t('budgetDistributionTitle', locale)}
-          </span>
-          <span>
-            {t('partGpu', locale)}:{' '}
-            {Math.round((build.gpu.price / build.totalPrice) * 100)}% ·{' '}
-            {t('partCpu', locale)}:{' '}
-            {Math.round((build.cpu.price / build.totalPrice) * 100)}% ·{' '}
-            {t('budgetDistributionOtherParts', locale)}:{' '}
-            {Math.round(
-              ((build.totalPrice - build.gpu.price - build.cpu.price) /
-                build.totalPrice) *
-                100,
-            )}
-            %
-          </span>
-        </div>
-        <div className="flex h-3 w-full rounded-full overflow-hidden bg-slate-800">
-          <div
-            style={{
-              width: `${(build.gpu.price / build.totalPrice) * 100}%`,
-            }}
-            className="bg-indigo-500"
-            title={`${t('partGpu', locale)}: ${formatCurrency(build.gpu.price, currency)}`}
-          />
-          <div
-            style={{
-              width: `${(build.cpu.price / build.totalPrice) * 100}%`,
-            }}
-            className="bg-emerald-500"
-            title={`${t('partCpu', locale)}: ${formatCurrency(build.cpu.price, currency)}`}
-          />
-          <div
-            style={{
-              width: `${(build.motherboard.price / build.totalPrice) * 100}%`,
-            }}
-            className="bg-amber-500"
-            title={`${t('partMotherboard', locale)}: ${formatCurrency(build.motherboard.price, currency)}`}
-          />
-          <div
-            style={{
-              width: `${(build.ram.price / build.totalPrice) * 100}%`,
-            }}
-            className="bg-sky-500"
-            title={`${t('partRam', locale)}: ${formatCurrency(build.ram.price, currency)}`}
-          />
-          <div
-            style={{
-              width: `${(build.storage.price / build.totalPrice) * 100}%`,
-            }}
-            className="bg-purple-500"
-            title={`${t('partStorage', locale)}: ${formatCurrency(build.storage.price, currency)}`}
-          />
-          <div
-            style={{
-              width: `${(build.cooler.price / build.totalPrice) * 100}%`,
-            }}
-            className="bg-cyan-500"
-            title={`${t('partCooler', locale)}: ${formatCurrency(build.cooler.price, currency)}`}
-          />
-          <div
-            style={{
-              width: `${(build.case.price / build.totalPrice) * 100}%`,
-            }}
-            className="bg-rose-500"
-            title={`${t('partCase', locale)}: ${formatCurrency(build.case.price, currency)}`}
-          />
-          <div
-            style={{
-              width: `${(build.psu.price / build.totalPrice) * 100}%`,
-            }}
-            className="bg-teal-500"
-            title={`${t('partPsu', locale)}: ${formatCurrency(build.psu.price, currency)}`}
-          />
-        </div>
-      </div>
+      <BuildBudgetBar build={build} currency={currency} locale={locale} />
     </section>
   );
 };
