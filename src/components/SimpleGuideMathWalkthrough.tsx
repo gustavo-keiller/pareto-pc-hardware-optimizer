@@ -8,6 +8,15 @@ import {
   RankedGpu,
 } from '../lib/math/types';
 import { evaluateParetoFrontier } from '../lib/math/pareto';
+import {
+  DEFAULT_TARGETS,
+  PriorityTargets,
+  rawForValue,
+  resolveParameters,
+  scoreByPriorities,
+  valueOnScale,
+} from '../lib/math/priorityModel';
+import { DEFAULT_USD_TO_BRL_RATE } from '../utils/currency';
 import { Award, Check, Sparkles, Layers, Compass } from 'lucide-react';
 import { SkewedStatBar } from './SimpleGuideWidgets';
 import { SimpleGuideScatterPlot, StoryStep } from './SimpleGuideScatterPlot';
@@ -31,6 +40,10 @@ export interface SimpleGuideMathWalkthroughProps {
   onChangeWeights: (
     updater: (prev: PreferenceWeights) => PreferenceWeights,
   ) => void;
+  /** Current weights, so the step-5 sliders start where the user left them. */
+  weights?: PreferenceWeights;
+  /** The user's "good enough" goals; step 5 scores on the same fixed scales as the top pick. */
+  priorityTargets?: PriorityTargets;
   selectedGpuIds: string[];
   onToggleSelectGpu: (id: string) => void;
   onSwitchToExplorer: () => void;
@@ -41,20 +54,6 @@ export interface SimpleGuideMathWalkthroughProps {
 
 function toStoryStep(n: number): StoryStep {
   return n <= 1 ? 1 : n === 2 ? 2 : n === 3 ? 3 : n === 4 ? 4 : 5;
-}
-
-function computeDirectionalUtility(
-  gpu: RankedGpu,
-  metric: MetricKey,
-  minVal: number,
-  maxVal: number,
-): number {
-  const dir = METRIC_DEFINITIONS[metric].direction;
-  const val = gpu[metric];
-  const span = maxVal - minVal;
-  if (span <= 1e-9) return 1.0;
-  const raw = dir === 'min' ? (maxVal - val) / span : (val - minVal) / span;
-  return 0.05 + 0.95 * Math.max(0, Math.min(1, raw));
 }
 
 export const SimpleGuideMathWalkthrough: React.FC<
@@ -71,6 +70,8 @@ export const SimpleGuideMathWalkthrough: React.FC<
   onSelectYMetric,
   onSelectZMetric,
   onChangeWeights,
+  weights,
+  priorityTargets = DEFAULT_TARGETS,
   selectedGpuIds,
   onToggleSelectGpu,
   onSwitchToExplorer,
@@ -82,7 +83,11 @@ export const SimpleGuideMathWalkthrough: React.FC<
   const [unlockedAllSteps, setUnlockedAllSteps] = useState<boolean>(false);
   const [focusStep5Only, setFocusStep5Only] = useState<boolean>(false);
   const [useThreeVars, setUseThreeVars] = useState<boolean>(false);
-  const [twoVarAlpha, setTwoVarAlpha] = useState<number>(0.5);
+  const [twoVarAlpha, setTwoVarAlpha] = useState<number>(() => {
+    const wx = weights?.[xMetric] ?? 0;
+    const wy = weights?.[yMetric] ?? 0;
+    return wx + wy > 0 ? wy / (wx + wy) : 0.5;
+  });
   const [trapSpotlightIdx, setTrapSpotlightIdx] = useState<number>(0);
   const [onlyFrontier, setOnlyFrontier] = useState<boolean>(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -161,20 +166,18 @@ export const SimpleGuideMathWalkthrough: React.FC<
     return { w1: 0.4, w2: 0.35, w3: 0.25 };
   }, [useThreeVars, twoVarAlpha]);
 
+  // Only the chosen axes change; every other priority keeps its weight (B3).
   const syncGlobalWeights = (w1: number, w2: number, w3: number) => {
-    onChangeWeights(() => {
-      const next: PreferenceWeights = {
-        price: 0,
-        rasterFps1440p: 0,
-        rtFps1440p: 0,
-        vramGb: 0,
-        tdpWatts: 0,
-      };
-      next[xMetric] = Math.round(w1 * 100);
-      next[yMetric] = Math.round((next[yMetric] ?? 0) + w2 * 100);
-      if (useThreeVars) {
-        next[zMetric] = Math.round((next[zMetric] ?? 0) + w3 * 100);
-      }
+    onChangeWeights((prev) => {
+      const axes = useThreeVars
+        ? [xMetric, yMetric, zMetric]
+        : [xMetric, yMetric];
+      const budget = axes.reduce((acc, m) => acc + prev[m], 0) || 100;
+      const next: PreferenceWeights = { ...prev };
+      for (const m of axes) next[m] = 0;
+      next[xMetric] += Math.round(w1 * budget);
+      next[yMetric] += Math.round(w2 * budget);
+      if (useThreeVars) next[zMetric] += Math.round(w3 * budget);
       return next;
     });
   };
@@ -194,47 +197,43 @@ export const SimpleGuideMathWalkthrough: React.FC<
     };
   }, [gpus, xMetric, yMetric, zMetric]);
 
+  const scoringCtx = useMemo(
+    () => ({
+      budget: constraints.maxPrice,
+      priceUnit: currency === 'BRL' ? DEFAULT_USD_TO_BRL_RATE : 1,
+      targets: priorityTargets,
+    }),
+    [constraints.maxPrice, currency, priorityTargets],
+  );
+
   const rankedFrontierChoices = useMemo(() => {
     const candidates = gpus.filter(
-      (g) =>
-        paretoActiveMap.get(g.id)?.isParetoOptimal &&
-        !g.name.includes('[TRAP]'),
+      (g) => paretoActiveMap.get(g.id)?.isParetoOptimal,
     );
-    const pool =
-      candidates.length > 0
-        ? candidates
-        : gpus.filter((g) => !g.name.includes('[TRAP]'));
+    const pool = candidates.length > 0 ? candidates : gpus;
 
-    const scored = pool.map((gpu) => {
-      const ux = computeDirectionalUtility(
-        gpu,
-        xMetric,
-        bounds.x.min,
-        bounds.x.max,
-      );
-      const uy = computeDirectionalUtility(
-        gpu,
-        yMetric,
-        bounds.y.min,
-        bounds.y.max,
-      );
-      const uz = computeDirectionalUtility(
-        gpu,
-        zMetric,
-        bounds.z.min,
-        bounds.z.max,
-      );
-
-      const logUtility = useThreeVars
-        ? priorityShares.w1 * Math.log(ux) +
-          priorityShares.w2 * Math.log(uy) +
-          priorityShares.w3 * Math.log(uz)
-        : priorityShares.w1 * Math.log(ux) + priorityShares.w2 * Math.log(uy);
-
-      const matchPct = Math.exp(logUtility) * 100;
-      return { gpu, ux, uy, uz, logUtility, matchPct };
+    // Same fixed scales as the top pick (PRI-02): additive score, no list-relative min/max.
+    const entries = [
+      { id: xMetric, weight: priorityShares.w1 },
+      { id: yMetric, weight: priorityShares.w2 },
+      ...(useThreeVars ? [{ id: zMetric, weight: priorityShares.w3 }] : []),
+    ];
+    const merged = entries.filter(
+      (e, i) => entries.findIndex((x) => x.id === e.id) === i,
+    );
+    const params = resolveParameters(
+      { entries: merged, targets: priorityTargets, custom: [] },
+      scoringCtx,
+    );
+    const valueOf = (c: { id: string; value: number }[], id: string): number =>
+      c.find((x) => x.id === id)?.value ?? 0;
+    const scored = scoreByPriorities(pool, params, merged).map((s) => {
+      const ux = valueOf(s.contributions, xMetric);
+      const uy = valueOf(s.contributions, yMetric);
+      const uz = valueOf(s.contributions, zMetric);
+      const logUtility = s.score / 10;
+      return { gpu: s.gpu, ux, uy, uz, logUtility, matchPct: s.score * 10 };
     });
-
     scored.sort((a, b) => b.logUtility - a.logUtility);
     return scored;
   }, [
@@ -243,9 +242,10 @@ export const SimpleGuideMathWalkthrough: React.FC<
     xMetric,
     yMetric,
     zMetric,
-    bounds,
     useThreeVars,
     priorityShares,
+    priorityTargets,
+    scoringCtx,
   ]);
 
   const bestChoice = rankedFrontierChoices[0] ?? null;
@@ -296,32 +296,32 @@ export const SimpleGuideMathWalkthrough: React.FC<
   const isoUtilityPath = useMemo(() => {
     if (!bestChoice || activeStep !== 5) return '';
     const points: string[] = [];
+    // Additive score: w1·v_x + w2·v_y = U*, so v_y = (U* − w1·v_x) / w2.
     const targetU = bestChoice.logUtility;
     const w1 = priorityShares.w1;
     const w2 = priorityShares.w2;
     if (w2 <= 0.001) return '';
+    const [px, py] = resolveParameters(
+      {
+        entries: [
+          { id: xMetric, weight: 1 },
+          { id: yMetric, weight: 1 },
+        ],
+        targets: priorityTargets,
+        custom: [],
+      },
+      scoringCtx,
+    );
+    if (!px || !py) return '';
 
-    const steps = 30;
+    const steps = 40;
     for (let i = 0; i <= steps; i++) {
-      const frac = 0.05 + (0.95 * i) / steps;
-      const ux = frac;
-      const term = (targetU - w1 * Math.log(ux)) / w2;
-      const uy = Math.exp(term);
-      if (uy >= 0.05 && uy <= 1.05) {
-        const valX =
-          xDef.direction === 'min'
-            ? bounds.x.max -
-              ((ux - 0.05) / 0.95) * (bounds.x.max - bounds.x.min)
-            : bounds.x.min +
-              ((ux - 0.05) / 0.95) * (bounds.x.max - bounds.x.min);
-        const valY =
-          yDef.direction === 'min'
-            ? bounds.y.max -
-              ((uy - 0.05) / 0.95) * (bounds.y.max - bounds.y.min)
-            : bounds.y.min +
-              ((uy - 0.05) / 0.95) * (bounds.y.max - bounds.y.min);
-        points.push(`${toScreenX(valX)} ${toScreenY(valY)}`);
-      }
+      const valX = bounds.x.min + ((bounds.x.max - bounds.x.min) * i) / steps;
+      const vy = (targetU - w1 * valueOnScale(valX, px.scale)) / w2;
+      if (vy < 0 || vy > 1) continue;
+      const valY = rawForValue(vy, py.scale);
+      if (valY < bounds.y.min || valY > bounds.y.max) continue;
+      points.push(`${toScreenX(valX)} ${toScreenY(valY)}`);
     }
     if (points.length < 2) return '';
     return `M ${points.join(' L ')}`;
@@ -329,8 +329,10 @@ export const SimpleGuideMathWalkthrough: React.FC<
     bestChoice,
     activeStep,
     priorityShares,
-    xDef.direction,
-    yDef.direction,
+    xMetric,
+    yMetric,
+    priorityTargets,
+    scoringCtx,
     bounds,
     toScreenX,
     toScreenY,

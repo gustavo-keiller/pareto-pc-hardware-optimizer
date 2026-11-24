@@ -62,6 +62,9 @@
 
 ---
 
+- [x] **`[PRI-01..11]` Guided priorities with a precise score.** "What matters to you" at the top of Simple mode (stars, any number of parameters, your own ratings, quiz), a fixed-scale 0–10 score that doesn't change when unrelated cards come and go, and explanations (points per priority, flip points, ties). _Done 2026-10-26, spec `.agents/specs/guided-priorities.md`._
+- [ ] **`[PRI-12]`/`[PRI-13]`** Priority score in Explorer/Pro leaderboards; per-resolution benchmarks for the 1080p/4K presets (see `TODO.md`).
+
 ## Phase 2 — Full PC builder (the core goal: "build my dream PC")
 
 - [x] **`[BLD-01]` Data model for every part a working PC needs** (extends P3-01): CPU, GPU, motherboard, RAM, storage (NVMe M.2 / SATA), PSU, case, CPU cooler (8 components complete). Each with the specs compatibility needs (socket, chipset, form factor, dimensions, connectors, TDP). _Done 2026-10-19._

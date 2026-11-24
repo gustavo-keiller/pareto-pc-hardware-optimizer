@@ -11,6 +11,10 @@ import userEvent from '@testing-library/user-event';
 import App from '../App';
 import { REAL_WORLD_GPUS } from '../data/realGpus';
 
+// The Full Builds screen loads a lazy chunk and computes builds on mount; on a
+// loaded CI runner that can take longer than the 1 s default wait.
+const BUILD_WAIT = { timeout: 5000 };
+
 vi.mock('../components/EChartsRenderer', () => ({
   default: forwardRef<HTMLDivElement>(function EChartsPlaceholder(_props, ref) {
     return <div ref={ref} data-testid="echarts-placeholder" />;
@@ -70,7 +74,9 @@ describe('App modes', () => {
     ).toBeGreaterThan(0);
     await user.click(screen.getByRole('button', { name: /^Full Builds/ }));
     expect(screen.queryAllByTestId('top-choice')).toHaveLength(0);
-    expect(await screen.findByTestId('top-build-card')).toBeDefined();
+    expect(
+      await screen.findByTestId('top-build-card', {}, BUILD_WAIT),
+    ).toBeDefined();
     expect(await screen.findByText(/Total Hardware Cost/i)).toBeDefined();
 
     await user.click(screen.getByRole('button', { name: /^Simple Guide/ }));
@@ -81,7 +87,11 @@ describe('App modes', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: /^Full Builds/ }));
-    const topBuildCard = await screen.findByTestId('top-build-card');
+    const topBuildCard = await screen.findByTestId(
+      'top-build-card',
+      {},
+      BUILD_WAIT,
+    );
     const initialText = topBuildCard.textContent ?? '';
 
     // Switch to $2,200 Enthusiast preset
@@ -432,7 +442,9 @@ describe('App modes', () => {
     ).toBeDefined();
 
     // Verify top build card is rendered with BRL total cost
-    expect(await screen.findByTestId('top-build-card')).toBeDefined();
+    expect(
+      await screen.findByTestId('top-build-card', {}, BUILD_WAIT),
+    ).toBeDefined();
     expect(screen.getAllByText(/R\$/i).length).toBeGreaterThan(0);
 
     // Switch to USD
@@ -440,7 +452,9 @@ describe('App modes', () => {
     expect(
       screen.getByRole('button', { name: /\$1,000 Sweet Spot/i }),
     ).toBeDefined();
-    expect(await screen.findByTestId('top-build-card')).toBeDefined();
+    expect(
+      await screen.findByTestId('top-build-card', {}, BUILD_WAIT),
+    ).toBeDefined();
   });
 
   it('UX-07: "See Math in 2D Explorer" button smoothly transitions user from Simple Guide pick to Explorer mode with GPU highlighted', async () => {
@@ -643,7 +657,11 @@ describe('App modes', () => {
     await user.selectOptions(formFactorSelect, 'SFF');
 
     // Verify top build card updates with SFF case and Mini-ITX motherboard
-    const topBuildCard = await screen.findByTestId('top-build-card');
+    const topBuildCard = await screen.findByTestId(
+      'top-build-card',
+      {},
+      BUILD_WAIT,
+    );
     expect(topBuildCard.textContent).toContain('MasterBox NR200P');
     expect(topBuildCard.textContent).toMatch(/B650I|B760I|B550M-ITX/);
 
@@ -654,7 +672,7 @@ describe('App modes', () => {
     await user.selectOptions(coolerSelect, 'AIO');
 
     // Verify top build has an AIO cooler
-    const aioCard = await screen.findByTestId('top-build-card');
+    const aioCard = await screen.findByTestId('top-build-card', {}, BUILD_WAIT);
     expect(aioCard.textContent).toMatch(/Liquid Freezer III|Frozen Prism/);
 
     // 3. Filter by CPU Vendor: Intel
@@ -663,7 +681,11 @@ describe('App modes', () => {
     });
     await user.selectOptions(cpuVendorSelect, 'Intel');
 
-    const intelCard = await screen.findByTestId('top-build-card');
+    const intelCard = await screen.findByTestId(
+      'top-build-card',
+      {},
+      BUILD_WAIT,
+    );
     expect(intelCard.textContent).toMatch(/Core i[3579]/);
   });
 

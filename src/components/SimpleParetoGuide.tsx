@@ -1,4 +1,4 @@
-import { useState, useMemo, lazy, Suspense } from 'react';
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import {
   GpuCandidate,
   HardConstraints,
@@ -9,6 +9,20 @@ import {
 import { PcBuild } from '../lib/math/buildTypes';
 import { AffiliatePartnerProfile } from '../lib/math/pricingEngine';
 import { Compass } from 'lucide-react';
+import { PriorityEntry, PriorityProfile } from '../lib/math/priorityModel';
+import {
+  FlipPoint,
+  TopChangeReason,
+  explainTopChange,
+} from '../lib/math/priorityInsights';
+import {
+  PriorityUseCase,
+  profileForUseCase,
+} from '../lib/math/priorityProfiles';
+import { usePriorityRanking } from '../hooks/usePriorityRanking';
+import { PriorityPanel } from './PriorityPanel';
+import { PickScoreBadges } from './PickScoreBadges';
+import { tp } from '../utils/i18n';
 import {
   BeginnerIntakeCard,
   BeginnerGoal,
@@ -20,6 +34,10 @@ import { useFullSystemOptimizer } from '../hooks/useFullSystemOptimizer';
 import { AppLocale, t } from '../utils/i18n';
 import { getCurrencyAdjustedCatalogs } from '../utils/currency';
 
+// "Why this pick" details sit below the card, so they load after the first paint.
+const PickInsights = lazy(() =>
+  import('./PickInsights').then((m) => ({ default: m.PickInsights })),
+);
 const SimpleGuideMathWalkthrough = lazy(() =>
   import('./SimpleGuideMathWalkthrough').then((m) => ({
     default: m.SimpleGuideMathWalkthrough,
@@ -42,6 +60,10 @@ interface SimpleParetoGuideProps {
   onSelectYMetric: (m: MetricKey) => void;
   onSelectZMetric: (m: MetricKey) => void;
   weights: PreferenceWeights;
+  priorityProfile: PriorityProfile;
+  onChangePriorityProfile: (
+    updater: (prev: PriorityProfile) => PriorityProfile,
+  ) => void;
   onChangeWeights: (
     updater: (prev: PreferenceWeights) => PreferenceWeights,
   ) => void;
@@ -58,6 +80,16 @@ interface SimpleParetoGuideProps {
   maxBudgetBound: number;
 }
 
+const USE_CASE_AXES: Record<
+  BeginnerUseCase,
+  [MetricKey, MetricKey, MetricKey]
+> = {
+  'esports-1080p': ['price', 'rasterFps1440p', 'tdpWatts'],
+  'sweetspot-1440p': ['price', 'rasterFps1440p', 'vramGb'],
+  'enthusiast-4k': ['price', 'rtFps1440p', 'vramGb'],
+  'creator-ai': ['price', 'vramGb', 'rtFps1440p'],
+};
+
 export function SimpleParetoGuide({
   gpus,
   rawCatalog,
@@ -71,6 +103,9 @@ export function SimpleParetoGuide({
   onSelectXMetric,
   onSelectYMetric,
   onSelectZMetric,
+  weights,
+  priorityProfile,
+  onChangePriorityProfile,
   onChangeWeights,
   selectedGpuIds,
   onToggleSelectGpu,
@@ -91,53 +126,21 @@ export function SimpleParetoGuide({
   const [showDeepMath, setShowDeepMath] = useState<boolean>(false);
 
   // Handlers for Beginner Intake
+  // Use cases are presets: they fill the visible priorities (and the walkthrough's chart axes).
   const handleSelectUseCase = (uc: BeginnerUseCase) => {
     setBeginnerUseCase(uc);
-    if (uc === 'esports-1080p') {
-      onSelectXMetric('price');
-      onSelectYMetric('rasterFps1440p');
-      onSelectZMetric('tdpWatts');
-      onChangeWeights(() => ({
-        price: 40,
-        rasterFps1440p: 50,
-        rtFps1440p: 5,
-        vramGb: 5,
-        tdpWatts: 0,
-      }));
-    } else if (uc === 'sweetspot-1440p') {
-      onSelectXMetric('price');
-      onSelectYMetric('rasterFps1440p');
-      onSelectZMetric('vramGb');
-      onChangeWeights(() => ({
-        price: 30,
-        rasterFps1440p: 40,
-        vramGb: 25,
-        rtFps1440p: 5,
-        tdpWatts: 0,
-      }));
-    } else if (uc === 'enthusiast-4k') {
-      onSelectXMetric('price');
-      onSelectYMetric('rtFps1440p');
-      onSelectZMetric('vramGb');
-      onChangeWeights(() => ({
-        price: 15,
-        rtFps1440p: 40,
-        rasterFps1440p: 25,
-        vramGb: 20,
-        tdpWatts: 0,
-      }));
-    } else if (uc === 'creator-ai') {
-      onSelectXMetric('price');
-      onSelectYMetric('vramGb');
-      onSelectZMetric('rtFps1440p');
-      onChangeWeights(() => ({
-        price: 20,
-        vramGb: 45,
-        rtFps1440p: 20,
-        rasterFps1440p: 15,
-        tdpWatts: 0,
-      }));
-    }
+    const [x, y, z] = USE_CASE_AXES[uc];
+    onSelectXMetric(x);
+    onSelectYMetric(y);
+    onSelectZMetric(z);
+    const useCase: PriorityUseCase = uc;
+    onChangePriorityProfile((prev) => {
+      const preset = profileForUseCase(useCase, prev.custom);
+      const customEntries = prev.entries.filter((e) =>
+        prev.custom.some((c) => c.id === e.id),
+      );
+      return { ...preset, entries: [...preset.entries, ...customEntries] };
+    });
   };
 
   const handleSelectBudget = (amount: number) => {
@@ -147,45 +150,71 @@ export function SimpleParetoGuide({
     }));
   };
 
-  // Top pick + Step-Down & Step-Up alternatives for SimpleGuidePickHero (UX-01 & UX-12)
+  // Top pick + Step-Down & Step-Up alternatives, scored on the user's priorities (PRI-04).
+  const budgetGpus = useMemo(
+    () => gpus.filter((g) => g.price <= constraints.maxPrice),
+    [gpus, constraints.maxPrice],
+  );
+  const priorityRanking = usePriorityRanking(
+    budgetGpus,
+    priorityProfile,
+    constraints.maxPrice,
+    currency,
+  );
   const { topPick, stepDownAlt, stepUpAlt } = useMemo(() => {
-    const validChoices = gpus.filter(
-      (g) =>
-        !g.name.includes('[TRAP]') &&
-        !g.isDominated &&
-        g.price <= constraints.maxPrice,
-    );
-    if (validChoices.length === 0) {
-      return { topPick: null, stepDownAlt: null, stepUpAlt: null };
-    }
-
-    const currentGpu = validChoices[0];
-    const cheaper = validChoices
-      .filter((g) => g.id !== currentGpu.id && g.price < currentGpu.price)
-      .sort((a, b) => b.price - a.price);
-    const upgrade = validChoices
-      .filter(
-        (g) =>
-          g.id !== currentGpu.id &&
-          (g.rasterFps1440p > currentGpu.rasterFps1440p ||
-            g.price > currentGpu.price),
-      )
-      .sort((a, b) => a.price - b.price);
-
-    const otherChoices = validChoices.filter((g) => g.id !== currentGpu.id);
-    const stepDown = cheaper[0] ?? otherChoices[0] ?? null;
+    const ranked = priorityRanking.ranked.map((s) => s.gpu);
+    const current = ranked[0] ?? null;
+    if (!current) return { topPick: null, stepDownAlt: null, stepUpAlt: null };
+    // Ranked is best-first, so the first match is the best-scoring option of its kind.
+    const stepDown = ranked.find((g) => g.price < current.price) ?? null;
     const stepUp =
-      upgrade[0] ??
-      otherChoices.find((g) => g.id !== stepDown?.id) ??
-      otherChoices[1] ??
+      ranked.find(
+        (g) =>
+          g.price > current.price && g.rasterFps1440p > current.rasterFps1440p,
+      ) ??
+      ranked.find((g) => g.price > current.price) ??
       null;
+    return { topPick: current, stepDownAlt: stepDown, stepUpAlt: stepUp };
+  }, [priorityRanking.ranked]);
 
-    return {
-      topPick: currentGpu,
-      stepDownAlt: stepDown,
-      stepUpAlt: stepUp,
+  // "X is now #1 because you raised Y" (PRI-10): compare against the last top pick.
+  const lastTop = useRef<{ id: string | null; entries: PriorityEntry[] }>({
+    id: null,
+    entries: priorityProfile.entries,
+  });
+  const [rankChange, setRankChange] = useState<TopChangeReason | null>(null);
+  useEffect(() => {
+    const prev = lastTop.current;
+    // Search every eligible card: the old #1 may now be set aside.
+    const newTopFirst = [
+      ...priorityRanking.ranked.slice(0, 1),
+      ...priorityRanking.eligible,
+    ];
+    const reason = explainTopChange(
+      prev.id,
+      newTopFirst,
+      prev.entries,
+      priorityProfile.entries,
+    );
+    if (prev.id !== (topPick?.id ?? null)) setRankChange(reason);
+    lastTop.current = {
+      id: topPick?.id ?? null,
+      entries: priorityProfile.entries,
     };
-  }, [gpus, constraints.maxPrice]);
+  }, [
+    topPick,
+    priorityRanking.ranked,
+    priorityRanking.eligible,
+    priorityProfile.entries,
+  ]);
+
+  const applyFlip = (flip: FlipPoint) =>
+    onChangePriorityProfile((prev) => ({
+      ...prev,
+      entries: prev.entries.map((e) =>
+        e.id === flip.paramId ? { ...e, weight: flip.toWeight } : e,
+      ),
+    }));
 
   // Combinatorial PC build optimization for Whole PC Goal (UX-11)
   const {
@@ -287,6 +316,21 @@ export function SimpleParetoGuide({
         onSelectGoal={setBeginnerGoal}
         onSelectUseCase={handleSelectUseCase}
         onSelectBudget={handleSelectBudget}
+        priorityPanel={
+          <div className="rounded-2xl border border-violet-500/30 bg-violet-500/5 p-3 sm:p-4">
+            <PriorityPanel
+              profile={priorityProfile}
+              onChangeProfile={onChangePriorityProfile}
+              gpus={budgetGpus}
+              locale={locale}
+            />
+            {beginnerGoal === 'pc' && (
+              <p className="mt-2 text-[11px] text-slate-400">
+                {tp('pcGoalNote', locale)}
+              </p>
+            )}
+          </div>
+        }
       />
 
       {/* 2. Top Pick Recommendation Hero Area */}
@@ -301,6 +345,28 @@ export function SimpleParetoGuide({
           onToggleSelectGpu={onToggleSelectGpu}
           onOpenAccordion={() => setShowDeepMath(true)}
           onInspectInExplorer={onInspectInExplorer}
+          scoreBadges={
+            priorityRanking.ranked[0] && (
+              <PickScoreBadges
+                top={priorityRanking.ranked[0]}
+                confidence={priorityRanking.confidence}
+                locale={locale}
+              />
+            )
+          }
+          insights={
+            <Suspense fallback={null}>
+              <PickInsights
+                ranked={priorityRanking.ranked}
+                profile={priorityProfile}
+                flips={priorityRanking.flips}
+                rankChange={rankChange}
+                setAsideCount={priorityRanking.setAsideCount}
+                locale={locale}
+                onApplyFlip={applyFlip}
+              />
+            </Suspense>
+          }
           onOpenShareCard={onOpenGpuShareCard}
         />
       ) : (
@@ -357,6 +423,8 @@ export function SimpleParetoGuide({
               onSelectYMetric={onSelectYMetric}
               onSelectZMetric={onSelectZMetric}
               onChangeWeights={onChangeWeights}
+              weights={weights}
+              priorityTargets={priorityProfile.targets}
               selectedGpuIds={selectedGpuIds}
               onToggleSelectGpu={onToggleSelectGpu}
               onSwitchToExplorer={onSwitchToExplorer}
