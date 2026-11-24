@@ -5,6 +5,10 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 
+// The Full Builds screen loads a lazy chunk and computes builds on mount; on a
+// loaded CI runner that can take longer than the 1 s default wait.
+const BUILD_WAIT = { timeout: 5000 };
+
 vi.mock('../components/EChartsRenderer', () => ({
   default: forwardRef<HTMLDivElement>(function EChartsPlaceholder(_props, ref) {
     return <div ref={ref} data-testid="echarts-placeholder" />;
@@ -70,6 +74,8 @@ describe('SHARE-01: Influencer & Group Social Share Card Studio UI', () => {
 
     const openBuildShareBtn = await screen.findByTestId(
       'open-build-share-card',
+      {},
+      BUILD_WAIT,
     );
     await user.click(openBuildShareBtn);
 
