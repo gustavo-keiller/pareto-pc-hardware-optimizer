@@ -113,6 +113,8 @@ describe('What matters to you panel', () => {
       'Looks{Enter}',
     );
     expect(screen.getAllByText('Looks').length).toBeGreaterThan(0);
-    expect(screen.getByText(/Rate each card from 0 to 10/)).toBeDefined();
+    expect(
+      await screen.findByText(/Rate each card from 0 to 10/),
+    ).toBeDefined();
   });
 });
