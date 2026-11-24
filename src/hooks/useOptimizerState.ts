@@ -28,6 +28,7 @@ import {
   safeGetString,
   safeSetJSON,
 } from '../utils/storage';
+import { usePriorityProfile } from './usePriorityProfile';
 import {
   DEFAULT_USD_TO_BRL_RATE,
   applyRegionalGpuOverlay,
@@ -380,12 +381,14 @@ export function useOptimizerState() {
     }),
   );
 
-  // Stage 3: TOPSIS Weights
-  const [weights, setWeights] = useState<PreferenceWeights>(() =>
-    initialGpuShare?.weights
-      ? initialGpuShare.weights
-      : safeGetJSON('paretopc_weights', DEFAULT_PREFERENCE_WEIGHTS),
-  );
+  // Stage 3: priorities (one profile for every mode; TOPSIS weights are its five-metric slice).
+  // Weights from a shared GPU link override the stored profile on first render.
+  const {
+    profile: priorityProfile,
+    setProfile: setPriorityProfile,
+    weights,
+    setWeights,
+  } = usePriorityProfile(initialGpuShare?.weights);
   const [activePresetId, setActivePresetId] = useState<string>(() =>
     initialGpuShare?.weights ? 'custom' : 'balanced',
   );
@@ -424,10 +427,6 @@ export function useOptimizerState() {
   useEffect(() => {
     safeSetJSON('paretopc_extrapolation', extrapolation);
   }, [extrapolation]);
-
-  useEffect(() => {
-    safeSetJSON('paretopc_weights', weights);
-  }, [weights]);
 
   useEffect(() => {
     safeSetJSON('paretopc_selected_ids', selectedGpuIds);
@@ -746,6 +745,8 @@ export function useOptimizerState() {
     setExtrapolation,
     weights,
     setWeights,
+    priorityProfile,
+    setPriorityProfile,
     activePresetId,
     setActivePresetId,
     hoveredGpuId,

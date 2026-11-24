@@ -61,6 +61,18 @@ To rank candidates according to user slider weights $w = [w_1, w_2, \dots, w_k]$
    $$C_i = \frac{d_i^-}{d_i^+ + d_i^-}$$
    Sort candidates descending by $C_i$. A score closest to 1.0 is the optimal match for the user's sliders.
 
+TOPSIS is relative to the current list: adding or removing any card moves $A^+$/$A^-$ and can reorder the others (rank reversal), and a weight's real pull depends on how spread out that column is. Explorer and Pro keep it as a second opinion; Simple mode ranks with §3.5.
+
+### 3.5 Stage 3b: Priority Score on Fixed Scales (Simple mode, `priorityModel.ts`)
+Each priority $j$ has a scale with anchors that never come from the other cards: `worst` (0) and `best` (1), set by constants or by the user's own settings (budget, FPS goal, VRAM goal).
+
+1. **Value:** $t = \mathrm{clamp}\big((x_{ij} - \text{worst}_j)/(\text{best}_j - \text{worst}_j), 0, 1\big)$; linear $v = t$, saturating $v = 1 - (1-t)^2$ ("good enough"), threshold $v = [t \ge 1]$ (yes/no features). If worst > best, lower is better, so direction is built into the scale.
+2. **Score:** $S_i = 10 \sum_j s_j v_{ij}$ with $s_j = w_j / \sum w$ (uniform when all $w_j = 0$). Points per priority $10 s_j v_{ij}$ add up exactly to $S_i$.
+3. **No rank reversal:** $S_i$ uses only card $i$'s numbers, so adding or removing other cards never reorders the rest.
+4. **Better alternative (set aside):** $A$ beats $B$ when, on every priority with $w_j > 0$, $A$ is no worse than $B$ by more than 3% (exact for yes/no) and is better by more than 3% on at least one. Falls back to exact comparison if nothing would remain.
+5. **Flip point:** the sign of $S_w - S_c$ is the sign of $N = \sum_j w_j (v_{wj} - v_{cj})$, which is linear in each $w_k$, so the smallest whole-number weight at which challenger $c$ passes winner $w$ is exact: $w_k^\* = (N - w_k \Delta_k)/(-\Delta_k)$ with $\Delta_k = v_{wk} - v_{ck}$.
+6. **Practical tie:** $|S_1 - S_2| < 0.2$ points (about the noise of the benchmarks).
+
 ---
 
 ## 4. Phased Implementation Roadmap
