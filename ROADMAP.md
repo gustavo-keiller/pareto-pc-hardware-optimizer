@@ -12,6 +12,8 @@
 
 **Phase status:** Phases 0, 1, 2, 3, 4, 5, and 6 codebases are 100% implemented (`[LAUNCH-01]`–`[LAUNCH-05]`, `[SHARE-01]`, `[DATA-01]`–`[DATA-09]`, `[DATA-BF26]`, and `[AFF-01]`–`[AFF-07]` shipped). Operational live-deployment actions (connecting domain DNS / Cloudflare Pages / Plausible & running live creator outreach / external sessions) happen on deployment. See [`.agents/specs/business-and-creator-engine.md`](.agents/specs/business-and-creator-engine.md) for the complete cross-thread strategy and research tracks.
 
+**Reality check (2026-11-24):** "implemented" above means the code exists on the local branch `feat/ux-usability-visual-flow`; none of it is on GitHub `main` or deployed yet, prices are mostly unverified reference prices, and affiliate tags are placeholders. The dated launch + long-term plan, including launch blockers `[BF-B2]`–`[BF-B7]`, lives in [`docs/plan/`](docs/plan/README.md).
+
 **Known problems (see `TODO.md`):**
 - Real retail price catalogs are established for key hardware; expanding coverage to remaining long-tail components over time via `npm run add-part`.
 
