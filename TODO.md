@@ -19,6 +19,35 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks
 
+### 🔴 Black Friday launch blockers (due Wed 2026-11-25; full context in [`docs/plan/01-black-friday-launch.md`](docs/plan/01-black-friday-launch.md))
+
+- **`[BF-B3]` Honest price labels:**
+  Offers not verified from a product page show "reference price · checked <date>", are greyed after 72 h, and never drive a "deal" claim. Top 40 parts verified by hand from product pages.
+  - **Files likely touched:** `src/data/prices/{br,us}.json`, `src/data/storePrices.ts`, price badge components, `src/utils/locales/*`
+  - **Done when:** every price on screen shows its age; the top 40 offers link to product pages, not search pages.
+  - **Test to add:** a test that an offer older than 72 h is flagged stale (`src/lib/math/__tests__/pricingEngine.test.ts`).
+- **`[BF-B4]` Only approved affiliate tags:**
+  Remove the demo creators from `partners.json`; keep only tags gustavo has been approved for; stop the Amazon BR link from falling back to the US tag.
+  - **Files likely touched:** `src/data/partners.json`, `src/lib/math/pricingEngine.ts`
+  - **Done when:** with no approved tags, outbound links are clean store URLs plus `utm_source=paretopc`.
+  - **Test to add:** property test that an Amazon BR URL never receives a US tag.
+- **`[BF-B5]` No stored Amazon prices:**
+  Amazon offers show "see price on Amazon" instead of a number (Associates rules, research R-03).
+  - **Files likely touched:** offer/price display components, `src/utils/locales/*`
+  - **Done when:** no Amazon price number is rendered anywhere.
+  - **Test to add:** UI test asserting Amazon offers render no currency amount.
+- **`[BF-B6]` Analytics actually load:**
+  `telemetry.ts` calls `window.plausible`, but no analytics script is loaded. Add Cloudflare Web Analytics.
+  - **Files likely touched:** `index.html`, `src/utils/telemetry.ts`
+  - **Done when:** a visit to the deployed site appears in the analytics dashboard.
+  - **Test to add:** none.
+- **`[BF-B7]` One host, one domain:**
+  Cloudflare Pages (keeps `functions/go/`); replace the `paretopc.com` placeholder with the chosen domain (D-4) in canonical, OG, sitemap, guides and share cards; remove or document `vercel.json`.
+  - **Files likely touched:** `index.html`, `public/sitemap.xml`, `public/robots.txt`, `scripts/generate-seo-pages.cjs`, `src/utils/shareBuild.ts`, `src/components/SocialShareModal.tsx`, `vercel.json`
+  - **Done when:** the live domain serves the app, `/guides/` and `/go/<id>`.
+  - **Test to add:** extend `src/data/__tests__/seoGuides.test.ts` to assert guides use the configured domain.
+
+### Other tasks
 - **`[PRI-12]` Use the priority score in Explorer and Pro leaderboards:**
   Explorer/Pro still rank with TOPSIS, which is relative to the list (see `CONTEXT.md` §3.4). Show the priority score (§3.5) as the main column and keep TOPSIS as "second opinion".
   - **Files likely touched:** `src/components/GpuLeaderboardTable.tsx`, `src/components/TopsisWeightsPanel.tsx`, `src/hooks/usePriorityRanking.ts`, `CODEMAP.md`
