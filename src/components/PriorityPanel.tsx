@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { HelpCircle, Star, X } from 'lucide-react';
 import {
   PriorityProfile,
@@ -14,8 +14,17 @@ import {
   priorityLabel,
   weightToLevel,
 } from '../utils/priorityLabels';
-import { PriorityAddMenu, CustomRatingEditor } from './PriorityAddMenu';
-import { PriorityQuiz } from './PriorityQuiz';
+
+// Opened on demand, so they load lazily and stay out of the first download (check:perf).
+const PriorityQuiz = lazy(() =>
+  import('./PriorityQuiz').then((m) => ({ default: m.PriorityQuiz })),
+);
+const PriorityAddMenu = lazy(() =>
+  import('./PriorityAddMenu').then((m) => ({ default: m.PriorityAddMenu })),
+);
+const CustomRatingEditor = lazy(() =>
+  import('./PriorityAddMenu').then((m) => ({ default: m.CustomRatingEditor })),
+);
 
 export interface PriorityPanelProps {
   profile: PriorityProfile;
@@ -94,23 +103,25 @@ export const PriorityPanel: React.FC<PriorityPanelProps> = ({
       </div>
 
       {quizOpen ? (
-        <PriorityQuiz
-          locale={locale}
-          onCancel={() => setQuizOpen(false)}
-          onFinish={(entries) => {
-            onChangeProfile((prev) => ({
-              ...prev,
-              entries: [
-                ...entries,
-                ...prev.entries.filter(
-                  (e) => !entries.some((n) => n.id === e.id),
-                ),
-              ],
-            }));
-            setQuizOpen(false);
-            setQuizDone(true);
-          }}
-        />
+        <Suspense fallback={null}>
+          <PriorityQuiz
+            locale={locale}
+            onCancel={() => setQuizOpen(false)}
+            onFinish={(entries) => {
+              onChangeProfile((prev) => ({
+                ...prev,
+                entries: [
+                  ...entries,
+                  ...prev.entries.filter(
+                    (e) => !entries.some((n) => n.id === e.id),
+                  ),
+                ],
+              }));
+              setQuizOpen(false);
+              setQuizDone(true);
+            }}
+          />
+        </Suspense>
       ) : (
         <>
           {quizDone && (
@@ -228,35 +239,42 @@ export const PriorityPanel: React.FC<PriorityPanelProps> = ({
           </ul>
 
           {ratingParam && (
-            <CustomRatingEditor
-              param={ratingParam}
-              gpus={gpus}
-              locale={locale}
-              onChange={(ratings) =>
-                onChangeProfile((prev) => ({
-                  ...prev,
-                  custom: prev.custom.map((c) =>
-                    c.id === ratingParam.id ? { ...c, ratings } : c,
-                  ),
-                }))
-              }
-              onClose={() => setRatingId(null)}
-            />
+            <Suspense fallback={null}>
+              <CustomRatingEditor
+                param={ratingParam}
+                gpus={gpus}
+                locale={locale}
+                onChange={(ratings) =>
+                  onChangeProfile((prev) => ({
+                    ...prev,
+                    custom: prev.custom.map((c) =>
+                      c.id === ratingParam.id ? { ...c, ratings } : c,
+                    ),
+                  }))
+                }
+                onClose={() => setRatingId(null)}
+              />
+            </Suspense>
           )}
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <PriorityAddMenu
-              profile={profile}
-              locale={locale}
-              onAdd={(id, custom) => {
-                onChangeProfile((prev) => ({
-                  ...prev,
-                  entries: [...prev.entries, { id, weight: LEVEL_WEIGHTS[3] }],
-                  custom: custom ? [...prev.custom, custom] : prev.custom,
-                }));
-                if (custom) setRatingId(custom.id);
-              }}
-            />
+            <Suspense fallback={null}>
+              <PriorityAddMenu
+                profile={profile}
+                locale={locale}
+                onAdd={(id, custom) => {
+                  onChangeProfile((prev) => ({
+                    ...prev,
+                    entries: [
+                      ...prev.entries,
+                      { id, weight: LEVEL_WEIGHTS[3] },
+                    ],
+                    custom: custom ? [...prev.custom, custom] : prev.custom,
+                  }));
+                  if (custom) setRatingId(custom.id);
+                }}
+              />
+            </Suspense>
             <GoalChips
               label={tp('goalFps', locale)}
               values={FPS_GOALS}

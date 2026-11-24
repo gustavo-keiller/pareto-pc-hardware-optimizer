@@ -21,7 +21,7 @@ import {
 } from '../lib/math/priorityProfiles';
 import { usePriorityRanking } from '../hooks/usePriorityRanking';
 import { PriorityPanel } from './PriorityPanel';
-import { PickInsights, PickScoreBadges } from './PickInsights';
+import { PickScoreBadges } from './PickScoreBadges';
 import { tp } from '../utils/i18n';
 import {
   BeginnerIntakeCard,
@@ -34,6 +34,10 @@ import { useFullSystemOptimizer } from '../hooks/useFullSystemOptimizer';
 import { AppLocale, t } from '../utils/i18n';
 import { getCurrencyAdjustedCatalogs } from '../utils/currency';
 
+// "Why this pick" details sit below the card, so they load after the first paint.
+const PickInsights = lazy(() =>
+  import('./PickInsights').then((m) => ({ default: m.PickInsights })),
+);
 const SimpleGuideMathWalkthrough = lazy(() =>
   import('./SimpleGuideMathWalkthrough').then((m) => ({
     default: m.SimpleGuideMathWalkthrough,
@@ -351,15 +355,17 @@ export function SimpleParetoGuide({
             )
           }
           insights={
-            <PickInsights
-              ranked={priorityRanking.ranked}
-              profile={priorityProfile}
-              flips={priorityRanking.flips}
-              rankChange={rankChange}
-              setAsideCount={priorityRanking.setAsideCount}
-              locale={locale}
-              onApplyFlip={applyFlip}
-            />
+            <Suspense fallback={null}>
+              <PickInsights
+                ranked={priorityRanking.ranked}
+                profile={priorityProfile}
+                flips={priorityRanking.flips}
+                rankChange={rankChange}
+                setAsideCount={priorityRanking.setAsideCount}
+                locale={locale}
+                onApplyFlip={applyFlip}
+              />
+            </Suspense>
           }
           onOpenShareCard={onOpenGpuShareCard}
         />

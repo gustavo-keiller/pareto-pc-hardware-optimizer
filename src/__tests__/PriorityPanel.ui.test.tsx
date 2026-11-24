@@ -35,14 +35,14 @@ afterEach(() => {
 });
 
 describe('What matters to you panel', () => {
-  it('sits in the first card of Simple mode and shows a score out of 10', () => {
+  it('sits in the first card of Simple mode and shows a score out of 10', async () => {
     render(<App />);
     const intake = screen.getByTestId('beginner-intake');
     expect(within(intake).getByTestId('priority-panel')).toBeDefined();
     expect(screen.getByTestId('pick-score').textContent).toMatch(
       /\/10 for you/,
     );
-    expect(screen.getByTestId('pick-insights')).toBeDefined();
+    expect(await screen.findByTestId('pick-insights')).toBeDefined();
   });
 
   it('changing importance re-ranks live and says why the pick changed', async () => {
@@ -69,7 +69,7 @@ describe('What matters to you panel', () => {
   it('a "Try it" flip point hands the lead to the named card', async () => {
     const user = userEvent.setup();
     render(<App />);
-    const insights = screen.getByTestId('pick-insights');
+    const insights = await screen.findByTestId('pick-insights');
     const tryButtons = within(insights).queryAllByRole('button', {
       name: 'Try it',
     });
@@ -86,7 +86,7 @@ describe('What matters to you panel', () => {
       screen.getByRole('button', { name: /Answer 6 quick questions/ }),
     );
     for (let i = 0; i < 6; i++) {
-      const quiz = screen.getByTestId('priority-quiz');
+      const quiz = await screen.findByTestId('priority-quiz');
       const options = within(quiz)
         .getAllByRole('button')
         .filter((b) => b.textContent !== 'Cancel');
@@ -100,13 +100,13 @@ describe('What matters to you panel', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(
-      screen.getByRole('button', { name: '+ Add what matters' }),
+      await screen.findByRole('button', { name: '+ Add what matters' }),
     );
     await user.click(screen.getByRole('button', { name: /Value for money/ }));
     expect(screen.getByTestId('priority-row-fpsPerPrice')).toBeDefined();
 
     await user.click(
-      screen.getByRole('button', { name: '+ Add what matters' }),
+      await screen.findByRole('button', { name: '+ Add what matters' }),
     );
     await user.type(
       screen.getByPlaceholderText('e.g. Brand I trust'),
