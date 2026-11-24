@@ -2,39 +2,48 @@ import { AffiliatePartnerProfile } from '../lib/math/pricingEngine';
 import { sanitizeCreatorRef, sanitizeHttpUrl } from '../utils/shareBuild';
 import partnersJson from './partners.json';
 
-function parsePartner(
-  item: (typeof partnersJson)[number],
-): AffiliatePartnerProfile {
+function optionalString(
+  record: Record<string, unknown>,
+  key: string,
+): string | undefined {
+  const value = record[key];
+  return typeof value === 'string' && value.length > 0 ? value : undefined;
+}
+
+function parsePartner(item: unknown): AffiliatePartnerProfile | null {
+  if (typeof item !== 'object' || item === null) return null;
+  const record: Record<string, unknown> = { ...item };
+  const id = optionalString(record, 'id');
+  const displayName = optionalString(record, 'displayName');
+  const handle = optionalString(record, 'handle');
+  if (!id || !displayName || !handle) return null;
   return {
-    id: item.id,
-    displayName: item.displayName,
-    handle: item.handle,
-    amazonTagBr: 'amazonTagBr' in item ? item.amazonTagBr : undefined,
-    amazonTagUs: 'amazonTagUs' in item ? item.amazonTagUs : undefined,
-    kabumPartnerTag:
-      'kabumPartnerTag' in item ? item.kabumPartnerTag : undefined,
-    terabytePartnerTag:
-      'terabytePartnerTag' in item ? item.terabytePartnerTag : undefined,
-    pichauPartnerTag:
-      'pichauPartnerTag' in item ? item.pichauPartnerTag : undefined,
-    neweggPartnerTag:
-      'neweggPartnerTag' in item ? item.neweggPartnerTag : undefined,
+    id,
+    displayName,
+    handle,
+    amazonTagBr: optionalString(record, 'amazonTagBr'),
+    amazonTagUs: optionalString(record, 'amazonTagUs'),
+    kabumPartnerTag: optionalString(record, 'kabumPartnerTag'),
+    terabytePartnerTag: optionalString(record, 'terabytePartnerTag'),
+    pichauPartnerTag: optionalString(record, 'pichauPartnerTag'),
+    neweggPartnerTag: optionalString(record, 'neweggPartnerTag'),
   };
 }
 
-export const PARTNER_PROFILES: readonly AffiliatePartnerProfile[] =
-  partnersJson.map(parsePartner);
+const rawPartners: readonly unknown[] = partnersJson;
 
+export const PARTNER_PROFILES: readonly AffiliatePartnerProfile[] =
+  rawPartners.flatMap((item) => {
+    const parsed = parsePartner(item);
+    return parsed ? [parsed] : [];
+  });
+
+// House tags stay empty until an affiliate program approves ParetoPC (BF-B4): add the
+// real IDs to partners.json then. Until then organic links are clean store URLs + UTM.
 const DEFAULT_HOUSE_PROFILE: AffiliatePartnerProfile = {
   id: 'paretopc-official',
   displayName: 'ParetoPC Official',
   handle: '@paretopc',
-  amazonTagBr: 'paretopc-20',
-  amazonTagUs: 'paretopcus-20',
-  kabumPartnerTag: 'paretopc',
-  terabytePartnerTag: 'paretopc',
-  pichauPartnerTag: 'paretopc',
-  neweggPartnerTag: 'paretopc',
 };
 
 export const HOUSE_PARTNER_PROFILE: AffiliatePartnerProfile =
@@ -43,7 +52,7 @@ export const HOUSE_PARTNER_PROFILE: AffiliatePartnerProfile =
 
 /**
  * Resolves the active Bring-Your-Own-Affiliate (BYOA) partner profile from URL query parameters (`[AFF-05]`).
- * Supports registered slugs (`?p=ofertas-hardware-br`) and stateless creator tags (`?ref=@Channel&amz=tag-20&kabum=...`).
+ * Supports registered slugs (`?p=<partner-id>`) and stateless creator tags (`?ref=@Channel&amz=tag-20&kabum=...`).
  */
 export function resolveActivePartnerFromSearch(
   searchOrUrl: string,

@@ -418,7 +418,7 @@ export const ptBR: Translations = {
   socialModalSubtitle:
     'Baixe a imagem com especificações e porcentagem dos melhores negócios + texto pronto com seu link.',
   socialCreatorHandleLabel: 'Seu @ ou Nome do Grupo (Opcional)',
-  socialCreatorHandlePlaceholder: 'Ex: @OfertasHardwareBR',
+  socialCreatorHandlePlaceholder: 'Ex: @SeuCanal',
   socialAmazonTagLabel: 'Tag de Afiliado Amazon (Opcional)',
   socialAmazonTagPlaceholder: 'Ex: seucanal-20',
   socialAffiliateUrlLabel: 'Seu Link de Afiliado da Loja (Opcional)',

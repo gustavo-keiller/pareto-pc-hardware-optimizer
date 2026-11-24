@@ -2,7 +2,7 @@
  * Regional Pricing Overlay Engine (`src/lib/math/pricingEngine.ts`)
  *
  * Replaces flat currency multiplication with real retail store shelf prices
- * (KaBuM!, TerabyteShop, Pichau, Amazon BR / Newegg, Amazon US, Best Buy),
+ * (KaBuM!, TerabyteShop, Pichau / Newegg, Best Buy, B&H; never Amazon, see `isAmazonStoreUrl`),
  * with cash/PIX discount awareness and honest uncertainty labeling.
  *
  * Pure TypeScript — zero React, DOM, or localStorage imports (Rule 1).
@@ -68,6 +68,21 @@ export interface PricingResolutionOptions {
 export const DEFAULT_USD_TO_BRL_RATE = 5.7;
 
 /**
+ * Amazon Associates rules forbid showing an Amazon price that was not fetched live
+ * from their API, so a stored Amazon offer never supplies a price (BF-B5, research R-03).
+ */
+export function isAmazonStoreUrl(rawUrl: string): boolean {
+  try {
+    const host = new URL(rawUrl).hostname.toLowerCase();
+    return (
+      /(^|\.)amazon\.[a-z.]+$/.test(host) || /(^|\.)amzn\.[a-z]+$/.test(host)
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Pure URL affiliate tag injector (`[AFF-01]`, `[AFF-05]`).
  * Injects partner tags for Amazon BR/US, KaBuM!, TerabyteShop, Pichau, and Newegg
  * plus referral UTM attribution without modifying prices or rankings (`[AFF-02]`).
@@ -75,7 +90,6 @@ export const DEFAULT_USD_TO_BRL_RATE = 5.7;
 export function injectAffiliateParameters(
   rawUrl: string,
   partner?: AffiliatePartnerProfile | null,
-  currency: SupportedPricingCurrency = 'BRL',
 ): { url: string; isAffiliateLink: boolean; partnerHandle?: string } {
   if (!rawUrl || !partner) {
     return { url: rawUrl, isAffiliateLink: false };
@@ -90,17 +104,15 @@ export function injectAffiliateParameters(
     const host = parsed.hostname.toLowerCase();
     let tagApplied = false;
 
+    // A tag only earns in the store country it was issued for, so never cross BR/US (BF-B4).
     if (host.includes('amazon.com.br')) {
-      const tag = partner.amazonTagBr ?? partner.amazonTagUs;
+      const tag = partner.amazonTagBr;
       if (tag && !parsed.searchParams.has('tag')) {
         parsed.searchParams.set('tag', tag);
         tagApplied = true;
       }
     } else if (host.includes('amazon.')) {
-      const tag =
-        currency === 'BRL'
-          ? (partner.amazonTagBr ?? partner.amazonTagUs)
-          : (partner.amazonTagUs ?? partner.amazonTagBr);
+      const tag = host.endsWith('amazon.com') ? partner.amazonTagUs : undefined;
       if (tag && !parsed.searchParams.has('tag')) {
         parsed.searchParams.set('tag', tag);
         tagApplied = true;
@@ -149,7 +161,7 @@ export function injectAffiliateParameters(
  *
  * Algorithm:
  * 1. Looks up the item by `componentId` in the regional store offers list.
- * 2. If a matching in-stock store offer exists:
+ * 2. If a matching in-stock store offer exists (Amazon offers never count, see `isAmazonStoreUrl`):
  *    - Uses `cashPrice` if `preferCashDiscount` is true and `cashPrice` is defined; otherwise uses `price`.
  *    - Flags `isEstimated: false`.
  *    - Attaches store attribution, direct product URL, and check date.
@@ -170,7 +182,12 @@ export function resolveRegionalPrice(
       : DEFAULT_USD_TO_BRL_RATE;
   const preferCash = options?.preferCashDiscount ?? true;
 
-  const match = storeOffers.find((o) => o.componentId === item.id && o.inStock);
+  const match = storeOffers.find(
+    (o) =>
+      o.componentId === item.id &&
+      o.inStock &&
+      !isAmazonStoreUrl(o.affiliateUrl ?? o.url),
+  );
 
   if (match) {
     const effectivePrice =
@@ -184,7 +201,6 @@ export function resolveRegionalPrice(
     const affiliateResult = injectAffiliateParameters(
       baseUrl,
       effectivePartner,
-      currency,
     );
 
     return {

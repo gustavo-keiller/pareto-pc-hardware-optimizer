@@ -57,8 +57,7 @@ describe('currency utilities (src/utils/currency.ts)', () => {
 
     const usdCatalogs = getCurrencyAdjustedCatalogs('USD');
     const r5600Usd = usdCatalogs.cpus.find((c) => c.id === 'cpu-ryzen-5600');
-    expect(r5600Usd?.store).toBe('Amazon US');
-    expect(r5600Usd?.isPriceEstimated).toBe(false);
+    expect(r5600Usd?.store ?? '').not.toMatch(/amazon/i);
 
     // Honest notice only appears when price is truly estimated
     expect(getEstimatedPriceNotice('pt-BR', 'BRL', false)).toBe('');

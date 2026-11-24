@@ -4,12 +4,16 @@ import {
   DEFAULT_USD_TO_BRL_RATE,
   RegionalPriceOffer,
   injectAffiliateParameters,
+  isAmazonStoreUrl,
   overlayRegionalPrices,
   resolveRegionalPrice,
   verifyFrontierSponsorship,
 } from '../pricingEngine';
 import { REAL_WORLD_GPUS } from '../../../data/realGpus';
-import { BRAZIL_STORE_PRICES } from '../../../data/storePrices';
+import {
+  BRAZIL_STORE_PRICES,
+  US_STORE_PRICES,
+} from '../../../data/storePrices';
 import {
   HOUSE_PARTNER_PROFILE,
   resolveActivePartnerFromSearch,
@@ -191,18 +195,17 @@ describe('DATA-04: Regional Pricing Overlay Engine', () => {
     }
   });
 
-  it('AFF-01 & AFF-05: injects store-specific affiliate parameters and resolves registered/stateless partners', () => {
+  it('AFF-01 & AFF-05: injects store-specific affiliate parameters from stateless creator tags', () => {
     const partner = resolveActivePartnerFromSearch(
-      '?p=ofertas-hardware-br&amz=override-20',
+      '?ref=@OfertasTeste&amz=override-20&kabum=ofertashw',
     );
     expect(partner).not.toBeNull();
-    expect(partner?.handle).toBe('@OfertasHardwareBR');
+    expect(partner?.handle).toBe('@OfertasTeste');
     expect(partner?.amazonTagBr).toBe('override-20');
 
     const amz = injectAffiliateParameters(
       'https://www.amazon.com.br/dp/B0TEST',
       partner,
-      'BRL',
     );
     expect(amz.isAffiliateLink).toBe(true);
     expect(amz.url).toContain('tag=override-20');
@@ -210,7 +213,6 @@ describe('DATA-04: Regional Pricing Overlay Engine', () => {
     const kabum = injectAffiliateParameters(
       'https://www.kabum.com.br/produto/235984',
       partner,
-      'BRL',
     );
     expect(kabum.isAffiliateLink).toBe(true);
     expect(kabum.url).toContain('partner_tag=ofertashw');
@@ -223,28 +225,46 @@ describe('DATA-04: Regional Pricing Overlay Engine', () => {
       injectAffiliateParameters(
         'https://www.terabyteshop.com.br/produto/123',
         stateless,
-        'BRL',
       ).url,
     ).toContain('p=guigatera');
     expect(
       injectAffiliateParameters(
         'https://www.pichau.com.br/placa-de-video',
         stateless,
-        'BRL',
       ).url,
     ).toContain('ref=guigaref');
     expect(
-      injectAffiliateParameters(
-        'https://www.newegg.com/p/123',
-        stateless,
-        'USD',
-      ).url,
+      injectAffiliateParameters('https://www.newegg.com/p/123', stateless).url,
     ).toContain('cm_mmc=guigacmc');
 
     expect(resolveActivePartnerFromSearch('?foo=bar')).toBeNull();
   });
 
-  it('AFF-04: falls back to house affiliate IDs on organic visits while creator tags override 100%', () => {
+  it('BF-B4: an Amazon tag only goes to the store country it was issued for', () => {
+    const brOnly = resolveActivePartnerFromSearch('?ref=@Br&amz_br=brtag-20');
+    const onUs = injectAffiliateParameters(
+      'https://www.amazon.com/dp/B0TEST',
+      brOnly,
+    );
+    expect(onUs.isAffiliateLink).toBe(false);
+    expect(onUs.url).not.toContain('tag=');
+
+    const usOnly = resolveActivePartnerFromSearch('?ref=@Us&amz_us=ustag-20');
+    const onBr = injectAffiliateParameters(
+      'https://www.amazon.com.br/dp/B0TEST',
+      usOnly,
+    );
+    expect(onBr.isAffiliateLink).toBe(false);
+    expect(onBr.url).not.toContain('tag=');
+
+    const onOtherAmazon = injectAffiliateParameters(
+      'https://www.amazon.de/dp/B0TEST',
+      usOnly,
+    );
+    expect(onOtherAmazon.url).not.toContain('tag=');
+  });
+
+  it('AFF-04: organic visits get clean store links until the house has approved tags, creator tags override 100%', () => {
     const organicPartner = resolveEffectivePartner('', true);
     expect(organicPartner?.id).toBe(HOUSE_PARTNER_PROFILE.id);
 
@@ -257,13 +277,15 @@ describe('DATA-04: Regional Pricing Overlay Engine', () => {
         fallbackPartner: HOUSE_PARTNER_PROFILE,
       },
     );
-    expect(organicResolved.storeUrl).toContain('partner_tag=paretopc');
+    expect(organicResolved.storeUrl).not.toContain('partner_tag=');
+    expect(organicResolved.isAffiliateLink).toBe(false);
+    expect(organicResolved.storeUrl).toContain('utm_source=paretopc');
     expect(organicResolved.storeUrl).toContain(
       'utm_campaign=paretopc-official',
     );
 
     const creatorPartner = resolveEffectivePartner(
-      '?p=ofertas-hardware-br',
+      '?ref=@OfertasTeste&kabum=ofertashw',
       true,
     );
     const creatorResolved = resolveRegionalPrice(
@@ -276,7 +298,47 @@ describe('DATA-04: Regional Pricing Overlay Engine', () => {
       },
     );
     expect(creatorResolved.storeUrl).toContain('partner_tag=ofertashw');
-    expect(creatorResolved.storeUrl).not.toContain('partner_tag=paretopc');
+    expect(creatorResolved.storeUrl).toContain('utm_campaign=ofertasteste');
+  });
+
+  it('BF-B5: a stored Amazon offer never supplies the price, whatever its position or price', () => {
+    const amazonFirst: RegionalPriceOffer[] = [
+      {
+        componentId: 'rx-6600',
+        store: 'Amazon BR',
+        price: 1,
+        url: 'https://www.amazon.com.br/dp/B0TEST',
+        inStock: true,
+        checkedAt: '2026-11-24',
+      },
+      ...mockOffers,
+    ];
+    const resolved = resolveRegionalPrice(
+      { id: 'rx-6600', price: 195 },
+      amazonFirst,
+      { currency: 'BRL' },
+    );
+    expect(resolved.store).toBe('KaBuM!');
+    expect(resolved.effectivePrice).toBe(1399);
+
+    const amazonOnly = resolveRegionalPrice(
+      { id: 'rx-6600', price: 195 },
+      amazonFirst.slice(0, 1),
+      { currency: 'USD' },
+    );
+    expect(amazonOnly.isEstimated).toBe(true);
+    expect(amazonOnly.store).toBeUndefined();
+    expect(amazonOnly.storeUrl).toBeUndefined();
+
+    for (const offers of [BRAZIL_STORE_PRICES, US_STORE_PRICES]) {
+      for (const offer of offers) {
+        expect(isAmazonStoreUrl(offer.url)).toBe(false);
+      }
+    }
+    expect(isAmazonStoreUrl('https://amzn.to/abc')).toBe(true);
+    expect(isAmazonStoreUrl('https://www.amazon.com/dp/X')).toBe(true);
+    expect(isAmazonStoreUrl('https://www.kabum.com.br/produto/1')).toBe(false);
+    expect(isAmazonStoreUrl('https://notamazon.example.com/')).toBe(false);
   });
 
   it('AFF-07: allows sponsorship labels/coupons only on Pareto-optimal non-trap items', () => {

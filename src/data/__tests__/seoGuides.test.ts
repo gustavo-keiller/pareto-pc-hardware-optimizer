@@ -57,7 +57,10 @@ describe('LAUNCH-04: Pre-Rendered SEO Buyer Guides & Sitemap', () => {
       for (const entry of parsed.itemListElement ?? []) {
         const sku = entry.item?.sku ?? '';
         expect(knownGpuIds.has(sku)).toBe(true);
-        expect(entry.item?.offers?.price ?? 0).toBeGreaterThan(0);
+        // Estimates carry no Offer; a real store Offer always has a price.
+        if (entry.item?.offers) {
+          expect(entry.item.offers.price ?? 0).toBeGreaterThan(0);
+        }
       }
     }
   });

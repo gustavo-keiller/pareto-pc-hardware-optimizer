@@ -836,17 +836,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "ram-sp-16gb-d4-3200",
-    "store": "Amazon BR",
-    "price": 249,
-    "cashPrice": 249,
-    "installmentPrice": 293,
-    "installments": 10,
-    "url": "https://www.amazon.com.br/s?k=Silicon%20Power%2016GB%20(2x8GB)%20DDR4-3200%20CL16",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "ram-kingston-fury-16gb-d4-rgb",
     "store": "KaBuM!",
     "price": 299,
@@ -887,17 +876,6 @@
     "installmentPrice": 1057,
     "installments": 12,
     "url": "https://www.pichau.com.br/search?q=Corsair%20Vengeance%20LPX%2064GB%20(2x32GB)%20DDR4-3600%20CL18",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "ram-crucial-32gb-d5-5600",
-    "store": "Amazon BR",
-    "price": 599,
-    "cashPrice": 599,
-    "installmentPrice": 704,
-    "installments": 10,
-    "url": "https://www.amazon.com.br/s?k=Crucial%20Pro%2032GB%20(2x16GB)%20DDR5-5600%20CL46",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -979,17 +957,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "storage-crucial-p3plus-1tb",
-    "store": "Amazon BR",
-    "price": 449,
-    "cashPrice": 449,
-    "installmentPrice": 528,
-    "installments": 10,
-    "url": "https://www.amazon.com.br/s?k=Crucial%20P3%20Plus%201TB%20M.2%20NVMe",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "storage-wd-sn770-1tb",
     "store": "KaBuM!",
     "price": 499,
@@ -997,17 +964,6 @@
     "installmentPrice": 587,
     "installments": 10,
     "url": "https://www.kabum.com.br/busca/wd-black-sn770-1tb-m-2-nvme",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "storage-crucial-p3plus-2tb",
-    "store": "Amazon BR",
-    "price": 799,
-    "cashPrice": 799,
-    "installmentPrice": 940,
-    "installments": 10,
-    "url": "https://www.amazon.com.br/s?k=Crucial%20P3%20Plus%202TB%20M.2%20NVMe",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -1074,39 +1030,6 @@
     "installmentPrice": 175,
     "installments": 12,
     "url": "https://www.terabyteshop.com.br/busca?str=DeepCool%20AG400%20ARGB",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "cooler-thermalright-peerless-assassin",
-    "store": "Amazon BR",
-    "price": 269,
-    "cashPrice": 269,
-    "installmentPrice": 316,
-    "installments": 10,
-    "url": "https://www.amazon.com.br/s?k=Thermalright%20Peerless%20Assassin%20120%20SE",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "cooler-thermalright-phantom-spirit",
-    "store": "Amazon BR",
-    "price": 299,
-    "cashPrice": 299,
-    "installmentPrice": 352,
-    "installments": 10,
-    "url": "https://www.amazon.com.br/s?k=Thermalright%20Phantom%20Spirit%20120%20SE",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "cooler-noctua-nh-l9a",
-    "store": "Amazon BR",
-    "price": 349,
-    "cashPrice": 349,
-    "installmentPrice": 410,
-    "installments": 10,
-    "url": "https://www.amazon.com.br/s?k=Noctua%20NH-L9a-AM5%20Low%20Profile",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },

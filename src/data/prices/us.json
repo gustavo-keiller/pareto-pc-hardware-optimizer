@@ -1,13 +1,5 @@
 [
   {
-    "componentId": "arc-a580",
-    "store": "Amazon US",
-    "price": 160,
-    "url": "https://www.amazon.com/s?k=Intel%20Arc%20A580%208GB",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "rtx-3050-6gb",
     "store": "Newegg",
     "price": 175,
@@ -20,22 +12,6 @@
     "store": "Best Buy",
     "price": 190,
     "url": "https://www.bestbuy.com/site/searchpage.jsp?st=Intel%20Arc%20A750%208GB",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "rx-6600",
-    "store": "Amazon US",
-    "price": 194.99,
-    "url": "https://www.amazon.com/dp/B09HHLX543",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "rtx-3050-8gb",
-    "store": "Amazon US",
-    "price": 210,
-    "url": "https://www.amazon.com/s?k=GeForce%20RTX%203050%208GB",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -96,14 +72,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "rtx-3060-ti",
-    "store": "Amazon US",
-    "price": 310,
-    "url": "https://www.amazon.com/s?k=GeForce%20RTX%203060%20Ti%208GB",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "rx-6700-xt",
     "store": "Newegg",
     "price": 310,
@@ -128,14 +96,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "rtx-3070",
-    "store": "Amazon US",
-    "price": 360,
-    "url": "https://www.amazon.com/s?k=GeForce%20RTX%203070%208GB",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "rtx-4060-ti-8gb",
     "store": "Newegg",
     "price": 385,
@@ -144,26 +104,10 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "rx-7700-xt",
-    "store": "Amazon US",
-    "price": 389.99,
-    "url": "https://www.amazon.com/dp/B0CFWRP773",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "rx-6800-xt",
     "store": "B&H",
     "price": 440,
     "url": "https://www.bhphotovideo.com/c/search?q=Radeon%20RX%206800%20XT%2016GB",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "rtx-4060-ti-16gb",
-    "store": "Amazon US",
-    "price": 445,
-    "url": "https://www.amazon.com/s?k=GeForce%20RTX%204060%20Ti%2016GB",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -192,14 +136,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "rx-7900-gre",
-    "store": "Amazon US",
-    "price": 540,
-    "url": "https://www.amazon.com/s?k=Radeon%20RX%207900%20GRE%2016GB",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "rtx-4070-super",
     "store": "Best Buy",
     "price": 589.99,
@@ -220,22 +156,6 @@
     "store": "B&H",
     "price": 680,
     "url": "https://www.bhphotovideo.com/c/search?q=Radeon%20RX%207900%20XT%2020GB",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "rtx-4070-ti",
-    "store": "Amazon US",
-    "price": 720,
-    "url": "https://www.amazon.com/s?k=GeForce%20RTX%204070%20Ti%2012GB",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "rtx-4070-ti-super",
-    "store": "Amazon US",
-    "price": 789.99,
-    "url": "https://www.amazon.com/dp/B0CSBD4T9H",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -288,26 +208,10 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "cpu-ryzen-3600",
-    "store": "Amazon US",
-    "price": 70,
-    "url": "https://www.amazon.com/s?k=AMD%20Ryzen%205%203600",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "cpu-ryzen-5500",
     "store": "Newegg",
     "price": 85,
     "url": "https://www.newegg.com/p/pl?d=AMD%20Ryzen%205%205500",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "cpu-ryzen-5600",
-    "store": "Amazon US",
-    "price": 124.99,
-    "url": "https://www.amazon.com/dp/B09VCHR1VH",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -344,22 +248,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "cpu-ryzen-7600",
-    "store": "Amazon US",
-    "price": 184.99,
-    "url": "https://www.amazon.com/dp/B0BMQJWBDQ",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "cpu-ryzen-7600x",
-    "store": "Amazon US",
-    "price": 205,
-    "url": "https://www.amazon.com/s?k=AMD%20Ryzen%205%207600X",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "cpu-ryzen-9600x",
     "store": "Newegg",
     "price": 250,
@@ -380,14 +268,6 @@
     "store": "Best Buy",
     "price": 429.99,
     "url": "https://www.bestbuy.com/site/6537004.p",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "cpu-ryzen-9800x3d",
-    "store": "Amazon US",
-    "price": 479,
-    "url": "https://www.amazon.com/s?k=AMD%20Ryzen%207%209800X3D",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -416,14 +296,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "cpu-i5-13400f",
-    "store": "Amazon US",
-    "price": 160,
-    "url": "https://www.amazon.com/s?k=Intel%20Core%20i5-13400F",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "cpu-i5-13600k",
     "store": "Newegg",
     "price": 270,
@@ -448,14 +320,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "cpu-i9-14900k",
-    "store": "Amazon US",
-    "price": 520,
-    "url": "https://www.amazon.com/s?k=Intel%20Core%20i9-14900K",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "cpu-ultra5-245k",
     "store": "Newegg",
     "price": 295,
@@ -476,22 +340,6 @@
     "store": "B&H",
     "price": 589,
     "url": "https://www.bhphotovideo.com/c/search?q=Intel%20Core%20Ultra%209%20285K",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "mobo-asrock-b550m-hdv",
-    "store": "Amazon US",
-    "price": 75,
-    "url": "https://www.amazon.com/s?k=ASRock%20B550M-HDV",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "mobo-msi-b550-a-pro",
-    "store": "Amazon US",
-    "price": 109.99,
-    "url": "https://www.amazon.com/dp/B089CZ3884",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -544,14 +392,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "mobo-msi-mag-b650-tomahawk",
-    "store": "Amazon US",
-    "price": 200,
-    "url": "https://www.amazon.com/s?k=MSI%20MAG%20B650%20TOMAHAWK%20WIFI",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "mobo-asrock-b760m-d4",
     "store": "Newegg",
     "price": 90,
@@ -572,14 +412,6 @@
     "store": "B&H",
     "price": 155,
     "url": "https://www.bhphotovideo.com/c/search?q=MSI%20B760%20GAMING%20PLUS%20WIFI",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "mobo-asrock-b760i-lightning",
-    "store": "Amazon US",
-    "price": 185,
-    "url": "https://www.amazon.com/s?k=ASRock%20B760I%20Lightning%20WiFi",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -608,26 +440,10 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "ram-sp-16gb-d4-3200",
-    "store": "Amazon US",
-    "price": 32,
-    "url": "https://www.amazon.com/s?k=Silicon%20Power%2016GB%20(2x8GB)%20DDR4-3200%20CL16",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "ram-kingston-fury-16gb-d4-rgb",
     "store": "Newegg",
     "price": 42,
     "url": "https://www.newegg.com/p/pl?d=Kingston%20Fury%20Beast%20RGB%2016GB%20(2x8GB)%20DDR4-3200%20CL16",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "ram-team-32gb-d4-3200",
-    "store": "Amazon US",
-    "price": 53.99,
-    "url": "https://www.amazon.com/dp/B086693X5R",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -640,14 +456,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "ram-corsair-64gb-d4-3600",
-    "store": "Amazon US",
-    "price": 130,
-    "url": "https://www.amazon.com/s?k=Corsair%20Vengeance%20LPX%2064GB%20(2x32GB)%20DDR4-3600%20CL18",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "ram-crucial-32gb-d5-5600",
     "store": "Newegg",
     "price": 75,
@@ -656,26 +464,10 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "ram-team-32gb-d5-6000-cl30",
-    "store": "Amazon US",
-    "price": 91.99,
-    "url": "https://www.amazon.com/dp/B0C3RYHZJQ",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "ram-gskill-flare-32gb-d5-6000",
     "store": "B&H",
     "price": 105,
     "url": "https://www.bhphotovideo.com/c/search?q=G.Skill%20Flare%20X5%2032GB%20(2x16GB)%20DDR5-6000%20CL30",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "ram-corsair-32gb-d5-rgb",
-    "store": "Amazon US",
-    "price": 115,
-    "url": "https://www.amazon.com/s?k=Corsair%20Vengeance%20RGB%2032GB%20(2x16GB)%20DDR5-6000%20CL30",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -704,14 +496,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "storage-kingston-nv2-1tb",
-    "store": "Amazon US",
-    "price": 59.99,
-    "url": "https://www.amazon.com/dp/B0BBWH1R8H",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "storage-crucial-p3plus-1tb",
     "store": "Newegg",
     "price": 68,
@@ -732,14 +516,6 @@
     "store": "B&H",
     "price": 118,
     "url": "https://www.bhphotovideo.com/c/search?q=Crucial%20P3%20Plus%202TB%20M.2%20NVMe",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "storage-wd-sn850x-2tb",
-    "store": "Amazon US",
-    "price": 155,
-    "url": "https://www.amazon.com/s?k=WD%20Black%20SN850X%202TB%20M.2%20NVMe",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -768,14 +544,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "cooler-thermalright-assassin-x",
-    "store": "Amazon US",
-    "price": 19.99,
-    "url": "https://www.amazon.com/dp/B09LHB5PN8",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "cooler-deepcool-ag400",
     "store": "Newegg",
     "price": 25,
@@ -796,14 +564,6 @@
     "store": "B&H",
     "price": 38,
     "url": "https://www.bhphotovideo.com/c/search?q=Thermalright%20Phantom%20Spirit%20120%20SE",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "cooler-noctua-nh-l9a",
-    "store": "Amazon US",
-    "price": 45,
-    "url": "https://www.amazon.com/s?k=Noctua%20NH-L9a-AM5%20Low%20Profile",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -832,14 +592,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "cooler-arctic-lf3-360-black",
-    "store": "Amazon US",
-    "price": 100,
-    "url": "https://www.amazon.com/s?k=Arctic%20Liquid%20Freezer%20III%20360%20Black",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "case-deepcool-cc560",
     "store": "Newegg",
     "price": 55,
@@ -860,14 +612,6 @@
     "store": "B&H",
     "price": 65,
     "url": "https://www.bhphotovideo.com/c/search?q=Montech%20Air%20903%20Base%20Mid-Tower",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "case-lianli-a3-matx",
-    "store": "Amazon US",
-    "price": 70,
-    "url": "https://www.amazon.com/s?k=Lian%20Li%20DAN%20Cases%20A3-mATX",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -896,14 +640,6 @@
     "checkedAt": "2026-11-22"
   },
   {
-    "componentId": "case-cm-nr200p",
-    "store": "Amazon US",
-    "price": 95,
-    "url": "https://www.amazon.com/s?k=Cooler%20Master%20MasterBox%20NR200P%20SFF",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
     "componentId": "case-fractal-terra",
     "store": "Newegg",
     "price": 179,
@@ -916,22 +652,6 @@
     "store": "Best Buy",
     "price": 55,
     "url": "https://www.bestbuy.com/site/searchpage.jsp?st=MSI%20MAG%20A550BN%20550W",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "psu-msi-a650bn",
-    "store": "Amazon US",
-    "price": 64.99,
-    "url": "https://www.amazon.com/dp/B0991W1HKT",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "psu-corsair-cx650m",
-    "store": "Amazon US",
-    "price": 70,
-    "url": "https://www.amazon.com/s?k=Corsair%20CX650M%20650W",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },
@@ -956,14 +676,6 @@
     "store": "B&H",
     "price": 110,
     "url": "https://www.bhphotovideo.com/c/search?q=Montech%20TITAN%20GOLD%20850W",
-    "inStock": true,
-    "checkedAt": "2026-11-22"
-  },
-  {
-    "componentId": "psu-bequiet-850",
-    "store": "Amazon US",
-    "price": 120,
-    "url": "https://www.amazon.com/s?k=be%20quiet!%20Pure%20Power%2012%20M%20850W",
     "inStock": true,
     "checkedAt": "2026-11-22"
   },

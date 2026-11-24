@@ -51,8 +51,9 @@ function overlayPriceMap(items, offers, currency) {
       store: offer
         ? offer.store
         : currency === 'BRL'
-          ? 'Brasil Ref.'
-          : 'US MSRP',
+          ? 'Estimativa (sem oferta de loja)'
+          : 'Estimate (US MSRP, no store offer)',
+      isEstimated: !offer,
       storeUrl: offer ? offer.url : `${BASE_URL}/`,
       checkedAt: offer ? offer.checkedAt : item.checkedAt,
     };
@@ -232,17 +233,22 @@ function renderHtmlPage({
         sku: prod.sku,
         name: prod.name,
         description: prod.summary,
-        offers: {
-          '@type': 'Offer',
-          priceCurrency: currency,
-          price: Number(prod.price.toFixed(2)),
-          availability: 'https://schema.org/InStock',
-          url: prod.url,
-          seller: {
-            '@type': 'Organization',
-            name: prod.store,
-          },
-        },
+        // An estimate is not a real store offer, so it gets no Offer markup.
+        ...(prod.isEstimated
+          ? {}
+          : {
+              offers: {
+                '@type': 'Offer',
+                priceCurrency: currency,
+                price: Number(prod.price.toFixed(2)),
+                availability: 'https://schema.org/InStock',
+                url: prod.url,
+                seller: {
+                  '@type': 'Organization',
+                  name: prod.store,
+                },
+              },
+            }),
       },
     })),
   };
@@ -341,7 +347,7 @@ function main() {
       lang: 'pt-BR',
       title: 'Melhor Placa de Vídeo até R$ 2.500 (2026) — ParetoPC',
       description:
-        'Seleção matemática das placas de vídeo com maior FPS e menor preço até R$ 2.500 nas lojas brasileiras (KaBuM!, Terabyte, Pichau, Amazon BR).',
+        'Seleção matemática das placas de vídeo com maior FPS e menor preço até R$ 2.500 nas lojas brasileiras (KaBuM!, Terabyte, Pichau).',
       heading: 'Melhores Placas de Vídeo até R$ 2.500',
       subheading:
         'Comparação direta de custo-benefício usando preços verificados no PIX/à vista e desempenho real em 1440p.',
@@ -355,6 +361,7 @@ function main() {
         summary: `${g.rasterFps1440p} FPS (1440p) · ${g.vramGb}GB VRAM · ${g.tdpWatts}W`,
         price: g.effectivePrice,
         store: g.store,
+        isEstimated: g.isEstimated,
         url: g.storeUrl,
       })),
       cardsHtml: brGpus
@@ -395,6 +402,8 @@ function main() {
         summary: `${b.cpu.name} + ${b.gpu.name} + ${b.ram.name} + ${b.mobo.name} (${b.effectiveFps} FPS est.)`,
         price: b.totalPrice,
         store: b.store,
+        // A build total spans several stores, so it is not one Offer.
+        isEstimated: true,
         url: `${BASE_URL}/?mode=builds&curr=BRL&budget=6000&cpu=${encodeURIComponent(b.cpu.id)}&gpu=${encodeURIComponent(b.gpu.id)}`,
       })),
       cardsHtml: brBuilds
@@ -424,7 +433,7 @@ function main() {
         'Mathematically filtered non-dominated GPUs under $400 across US stores using 1440p raster benchmarks, VRAM capacity, and power efficiency.',
       heading: 'Best Graphics Cards Under $400',
       subheading:
-        'Objective multi-criteria comparison eliminating overpriced traps across Amazon US, Newegg, Best Buy, and B&H.',
+        'Objective multi-criteria comparison eliminating overpriced traps across Newegg, Best Buy, and B&H.',
       appLink: `${BASE_URL}/?mode=simple&curr=USD&budget=400`,
       appCtaLabel: 'Open Interactive Optimizer ($400) →',
       currency: 'USD',
@@ -435,6 +444,7 @@ function main() {
         summary: `${g.rasterFps1440p} FPS (1440p) · ${g.vramGb}GB VRAM · ${g.tdpWatts}W`,
         price: g.effectivePrice,
         store: g.store,
+        isEstimated: g.isEstimated,
         url: g.storeUrl,
       })),
       cardsHtml: usGpus
@@ -475,6 +485,8 @@ function main() {
         summary: `${b.cpu.name} + ${b.gpu.name} + ${b.ram.name} + ${b.mobo.name} (${b.effectiveFps} est. FPS)`,
         price: b.totalPrice,
         store: b.store,
+        // A build total spans several stores, so it is not one Offer.
+        isEstimated: true,
         url: `${BASE_URL}/?mode=builds&curr=USD&budget=1000&cpu=${encodeURIComponent(b.cpu.id)}&gpu=${encodeURIComponent(b.gpu.id)}`,
       })),
       cardsHtml: usBuilds
@@ -521,7 +533,7 @@ function main() {
         {
           href: brGpuSlug,
           title: 'Melhores Placas de Vídeo até R$ 2.500',
-          desc: 'Guia Brasil em Reais (PIX) com preços da KaBuM!, Pichau, Terabyte e Amazon BR.',
+          desc: 'Guia Brasil em Reais (PIX) com preços da KaBuM!, Pichau e Terabyte.',
         },
         {
           href: brBuildSlug,
@@ -531,7 +543,7 @@ function main() {
         {
           href: usGpuSlug,
           title: 'Best GPUs Under $400 (US)',
-          desc: 'Frontier graphics cards across Amazon US, Newegg, Best Buy, and B&H.',
+          desc: 'Frontier graphics cards across Newegg, Best Buy, and B&H.',
         },
         {
           href: usBuildSlug,

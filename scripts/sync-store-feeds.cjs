@@ -61,6 +61,14 @@ function evaluateOfferSanity(offer, referencePrice, maxDeviation) {
   if (!offer.url || !/^https?:\/\/[^\s]+$/i.test(String(offer.url))) {
     return { accepted: false, reason: 'invalid_store_url', deviation: 1 };
   }
+  if (/^https?:\/\/([^/]*\.)?(amazon|amzn)\./i.test(String(offer.url))) {
+    // Amazon Associates rules forbid storing Amazon prices (BF-B5).
+    return {
+      accepted: false,
+      reason: 'amazon_price_not_storable',
+      deviation: 1,
+    };
+  }
   if (!Number.isFinite(referencePrice) || referencePrice <= 0) {
     return { accepted: false, reason: 'missing_reference_price', deviation: 1 };
   }
