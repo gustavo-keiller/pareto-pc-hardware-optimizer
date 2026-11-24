@@ -11,7 +11,12 @@ import {
   PresetProfile,
   UiMode,
 } from '../hooks/useOptimizerState';
-import { AppLocale } from '../utils/i18n';
+import {
+  AppLocale,
+  getMetricShortLabel,
+  getPresetCopy,
+  t,
+} from '../utils/i18n';
 import { CustomWeightProfilesManager } from './CustomWeightProfilesManager';
 
 export interface TopsisWeightsPanelProps {
@@ -43,7 +48,7 @@ export const TopsisWeightsPanel: React.FC<TopsisWeightsPanelProps> = ({
         <div className="flex items-center gap-2">
           <Sliders className="h-4 w-4 text-amber-400" />
           <h2 className="text-sm font-bold uppercase tracking-wider text-white">
-            Stage 3: TOPSIS Priority Weights
+            {t('xpStage3Title', locale)}
           </h2>
         </div>
         {uiMode === 'pro' && (
@@ -55,15 +60,17 @@ export const TopsisWeightsPanel: React.FC<TopsisWeightsPanelProps> = ({
       <div className="mt-3">
         <div className="text-[11px] font-medium text-slate-400 mb-2 flex items-center gap-1">
           <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-          Quick Buyer Persona Presets:
+          {t('xpPresetsLabel', locale)}
         </div>
         <div className="grid grid-cols-1 gap-2">
           {PRESET_PROFILES.map((preset) => {
             const isActive = activePresetId === preset.id;
+            const copy = getPresetCopy(preset.id, preset, locale);
             return (
               <button
                 key={preset.id}
                 type="button"
+                aria-pressed={isActive}
                 onClick={() => onApplyPreset(preset)}
                 className={`rounded-xl border p-2.5 text-left transition ${
                   isActive
@@ -72,15 +79,15 @@ export const TopsisWeightsPanel: React.FC<TopsisWeightsPanelProps> = ({
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold">{preset.label}</span>
+                  <span className="text-xs font-bold">{copy.label}</span>
                   {isActive && (
                     <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
-                      Active
+                      {t('xpActive', locale)}
                     </span>
                   )}
                 </div>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  {preset.shortDesc}
+                  {copy.shortDesc}
                 </p>
               </button>
             );
@@ -91,7 +98,7 @@ export const TopsisWeightsPanel: React.FC<TopsisWeightsPanelProps> = ({
       {/* Individual Objective Weights */}
       <div className="mt-4 pt-3 border-t border-slate-800/80 space-y-3">
         <span className="block text-[11px] font-semibold text-slate-400">
-          Individual Objective Weights:
+          {t('xpIndividualWeights', locale)}
         </span>
 
         <div className="space-y-3 pt-1">
@@ -107,7 +114,7 @@ export const TopsisWeightsPanel: React.FC<TopsisWeightsPanelProps> = ({
                     htmlFor={`weight-${metric}`}
                     className="font-medium text-slate-200 flex items-center gap-1.5"
                   >
-                    <span>{def.shortLabel}</span>
+                    <span>{getMetricShortLabel(metric, locale)}</span>
                     {uiMode === 'pro' && (
                       <span
                         className={`rounded px-1.5 py-0.2 text-[9px] font-semibold uppercase ${
@@ -116,7 +123,9 @@ export const TopsisWeightsPanel: React.FC<TopsisWeightsPanelProps> = ({
                             : 'bg-sky-500/15 text-sky-400'
                         }`}
                       >
-                        {def.direction}
+                        {def.direction === 'min'
+                          ? t('xpDirMin', locale)
+                          : t('xpDirMax', locale)}
                       </span>
                     )}
                   </label>

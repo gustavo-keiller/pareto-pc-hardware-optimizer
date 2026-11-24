@@ -41,7 +41,7 @@ test.describe('PERF-05: Runtime Performance & DOM Health Audits', () => {
 
     // Switch to Full Builds (Montar PC)
     await page
-      .getByRole('button', { name: /4\. (Full Builds|Montar PC)/i })
+      .getByRole('button', { name: /^(Full Builds|Montar PC)$/i })
       .click();
 
     const topBuild = page.getByTestId('top-build-card');

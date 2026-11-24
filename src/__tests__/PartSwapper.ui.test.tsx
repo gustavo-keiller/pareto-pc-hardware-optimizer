@@ -26,7 +26,7 @@ describe('BLD-05: Interactive Part Swapper UI', () => {
 
     // 1. Navigate to 4. Montar PC
     const buildsModeBtn = screen.getByRole('button', {
-      name: /4\. Montar PC|4\. Full Builds/i,
+      name: /^Montar PC|^Full Builds/i,
     });
     await user.click(buildsModeBtn);
 

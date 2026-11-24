@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   decodeBuildShareUrl,
+  decodeGpuShareUrl,
   encodeBuildShareUrl,
+  encodeGpuShareUrl,
   formatBuildShareText,
   BuildShareParams,
+  GpuShareParams,
 } from '../shareBuild';
 import { assemblePcBuild } from '../../lib/math/buildTypes';
 import {
@@ -141,6 +144,75 @@ describe('Save & Share Builds Engine (BLD-07)', () => {
       expect(text).toContain(gpu.name);
       expect(text).toContain('Total Hardware Cost:');
       expect(text).toContain(shareUrl);
+    });
+  });
+
+  describe('encodeGpuShareUrl & decodeGpuShareUrl & creator attribution', () => {
+    it('round-trips GPU ID, budget, currency, TOPSIS weights, and creator ref', () => {
+      const params: GpuShareParams = {
+        gpuId: 'arc-b580',
+        budget: 2500,
+        currency: 'BRL',
+        mode: 'simple',
+        weights: {
+          price: 30,
+          rasterFps1440p: 40,
+          rtFps1440p: 5,
+          vramGb: 25,
+          tdpWatts: 0,
+        },
+        ref: '@GuigaGames',
+        amz: 'guiga-20',
+        storeUrl: 'https://www.amazon.com.br/dp/B0EXAMPLE',
+      };
+
+      const url = encodeGpuShareUrl(params, 'https://paretopc.com');
+      expect(url).toContain('mode=simple');
+      expect(url).toContain('gpu=arc-b580');
+      expect(url).toContain('w=30-40-5-25-0');
+      expect(url).toContain('ref=%40GuigaGames');
+
+      // Should not be misparsed as a full build URL
+      expect(decodeBuildShareUrl(url)).toBeNull();
+
+      const decoded = decodeGpuShareUrl(url);
+      expect(decoded).not.toBeNull();
+      expect(decoded?.gpuId).toBe('arc-b580');
+      expect(decoded?.budget).toBe(2500);
+      expect(decoded?.currency).toBe('BRL');
+      expect(decoded?.mode).toBe('simple');
+      expect(decoded?.weights).toEqual(params.weights);
+      expect(decoded?.ref).toBe('@GuigaGames');
+      expect(decoded?.amz).toBe('guiga-20');
+      expect(decoded?.storeUrl).toBe('https://www.amazon.com.br/dp/B0EXAMPLE');
+    });
+
+    it('sanitizes unsafe store URLs and returns null on empty/unrelated queries', () => {
+      const url = encodeGpuShareUrl(
+        {
+          gpuId: 'rx-7600',
+          storeUrl: 'javascript:alert(1)',
+        },
+        'https://paretopc.com',
+      );
+      expect(url).not.toContain('javascript:');
+      expect(decodeGpuShareUrl('?foo=bar')).toBeNull();
+      expect(decodeGpuShareUrl('?mode=builds&cpu=cpu-1')).toBeNull();
+    });
+
+    it('preserves creator attribution params on Build share URLs', () => {
+      const url = encodeBuildShareUrl(
+        {
+          cpuId: cpu.id,
+          gpuId: gpu.id,
+          ref: 'OfertasPC',
+          amz: 'ofertas-20',
+        },
+        'https://paretopc.com',
+      );
+      const decoded = decodeBuildShareUrl(url);
+      expect(decoded?.ref).toBe('OfertasPC');
+      expect(decoded?.amz).toBe('ofertas-20');
     });
   });
 });

@@ -6,10 +6,12 @@ import { DealbreakerFilterPanel } from './components/DealbreakerFilterPanel';
 import { TopWinnerBanner } from './components/TopWinnerBanner';
 import { TopsisWeightsPanel } from './components/TopsisWeightsPanel';
 import { AppHeader } from './components/AppHeader';
+import { AppFooter } from './components/AppFooter';
 import { VisualizerPanel } from './components/VisualizerPanel';
 import { t } from './utils/i18n';
-import { ListFilter } from 'lucide-react';
+import { ListFilter, Sparkles, X } from 'lucide-react';
 import { BuildExplorerLoadingFallback } from './components/LoadingFallbacks';
+import type { SocialShareTarget } from './components/SocialShareModal';
 
 // Lazy-loaded heavy visualizers & mode views (PERF-01)
 const FullBuildExplorer = lazy(() =>
@@ -25,6 +27,11 @@ const ComparisonDrawer = lazy(() =>
 const GpuDealImporterModal = lazy(() =>
   import('./components/GpuDealImporterModal').then((m) => ({
     default: m.GpuDealImporterModal,
+  })),
+);
+const SocialShareModal = lazy(() =>
+  import('./components/SocialShareModal').then((m) => ({
+    default: m.SocialShareModal,
   })),
 );
 
@@ -83,6 +90,8 @@ export default function App() {
     setExchangeRateUsdToBrl,
     locale,
     handleToggleLocale,
+    activePartner,
+    clearActivePartner,
   } = useOptimizerState();
 
   const [isChartExpanded, setIsChartExpanded] = useState<boolean>(false);
@@ -91,6 +100,9 @@ export default function App() {
   const [hideDominatedNodes, setHideDominatedNodes] = useState<boolean>(false);
   const [showAllGpusInSimple, setShowAllGpusInSimple] =
     useState<boolean>(false);
+  const [shareTarget, setShareTarget] = useState<SocialShareTarget | null>(
+    null,
+  );
 
   // When switching away from Pro mode, gracefully fall back to 2D view if residuals was selected
   useEffect(() => {
@@ -106,11 +118,13 @@ export default function App() {
   };
 
   const maxBudgetBound =
-    datasetMode === 'real'
-      ? 1800
-      : datasetMode === 'synthetic'
-        ? 1000
-        : Math.max(15000, ...rawCatalog.map((g) => g.price), 0);
+    datasetMode === 'synthetic'
+      ? 1000
+      : Math.max(
+          activeCurrency === 'BRL' ? 15000 : 2000,
+          ...rawCatalog.map((g) => g.price),
+          0,
+        );
   const maxWattsBound = datasetMode === 'real' ? 450 : 350;
 
   return (
@@ -143,14 +157,42 @@ export default function App() {
         tabIndex={-1}
         className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 focus:outline-none"
       >
+        {/* Co-Branded Creator BYOA Attribution Banner [AFF-05] */}
+        {activePartner && (
+          <div
+            data-testid="creator-attribution-banner"
+            className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-indigo-500/40 bg-indigo-500/10 px-4 py-2.5 text-xs"
+          >
+            <div className="flex flex-wrap items-center gap-2 text-indigo-200">
+              <Sparkles className="h-4 w-4 shrink-0 text-indigo-400" />
+              <span className="font-bold text-white">
+                {t('creatorBannerBadge', locale)} {activePartner.handle}
+              </span>
+              <span className="text-indigo-300/90">
+                {t('creatorBannerNotice', locale)}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={clearActivePartner}
+              aria-label={t('creatorBannerDismiss', locale)}
+              className="rounded-lg p-1 text-indigo-300 hover:bg-indigo-500/20 hover:text-white transition"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
+
         {uiMode === 'builds' ? (
           <Suspense fallback={<BuildExplorerLoadingFallback />}>
             <FullBuildExplorer
               gpus={rawCatalog}
               currency={activeCurrency}
               locale={locale}
-              onSwitchToSimple={() => setUiMode('simple')}
-              onSwitchToExplorer={() => setUiMode('explorer')}
+              onOpenShareCard={(build) =>
+                setShareTarget({ kind: 'build', build })
+              }
+              activePartner={activePartner}
             />
           </Suspense>
         ) : uiMode === 'simple' ? (
@@ -182,13 +224,41 @@ export default function App() {
               setChartView('hyper');
             }}
             onSwitchToBuilds={() => setUiMode('builds')}
+            onOpenGpuShareCard={(gpu, reason) =>
+              setShareTarget({
+                kind: 'gpu',
+                gpu,
+                weights,
+                budget: constraints.maxPrice,
+                uiMode: 'simple',
+                reason,
+              })
+            }
+            onOpenBuildShareCard={(build) =>
+              setShareTarget({ kind: 'build', build })
+            }
+            activePartner={activePartner}
             maxBudgetBound={maxBudgetBound}
           />
         ) : (
           <>
             {/* Top #1 Winner Hero Banner */}
             {topWinner && (
-              <TopWinnerBanner topWinner={topWinner} uiMode={uiMode} />
+              <TopWinnerBanner
+                topWinner={topWinner}
+                uiMode={uiMode}
+                locale={locale}
+                onOpenShareCard={(gpu) =>
+                  setShareTarget({
+                    kind: 'gpu',
+                    gpu,
+                    weights,
+                    budget: constraints.maxPrice,
+                    uiMode,
+                    reason: gpu.notes,
+                  })
+                }
+              />
             )}
 
             {/* Main 12-Column Interactive Grid */}
@@ -211,6 +281,7 @@ export default function App() {
                   maxBudgetBound={maxBudgetBound}
                   maxWattsBound={maxWattsBound}
                   datasetMode={datasetMode}
+                  locale={locale}
                 />
 
                 {/* Step 2: Gaming Priorities / Stage 3 TOPSIS Sliders */}
@@ -233,6 +304,7 @@ export default function App() {
                 } space-y-6 transition-all duration-300`}
               >
                 <VisualizerPanel
+                  locale={locale}
                   chartView={chartView}
                   setChartView={setChartView}
                   uiMode={uiMode}
@@ -364,7 +436,21 @@ export default function App() {
             />
           </Suspense>
         )}
+
+        {/* Influencer & Group Share Card Studio Modal */}
+        {shareTarget && (
+          <Suspense fallback={null}>
+            <SocialShareModal
+              target={shareTarget}
+              currency={activeCurrency}
+              locale={locale}
+              onClose={() => setShareTarget(null)}
+            />
+          </Suspense>
+        )}
       </main>
+
+      <AppFooter locale={locale} />
     </div>
   );
 }

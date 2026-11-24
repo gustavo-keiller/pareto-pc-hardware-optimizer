@@ -13,10 +13,16 @@ import {
   FileText,
 } from 'lucide-react';
 import { GpuCandidate } from '../lib/math/types';
+import { ParsedGpuDeal } from '../lib/parser/gpuListingParser';
 import {
-  parseGpuListings,
-  ParsedGpuDeal,
-} from '../lib/parser/gpuListingParser';
+  ParsedHardwareDeal,
+  parseHardwareListings,
+} from '../lib/parser/hardwareListingParser';
+import {
+  IMPORTER_SAMPLE_LISTINGS,
+  MultiCategoryDealsPanel,
+  StoreBookmarkletStrip,
+} from './ImporterBookmarkletBar';
 import { formatCurrency } from '../utils/currency';
 
 interface GpuDealImporterModalProps {
@@ -28,54 +34,6 @@ interface GpuDealImporterModalProps {
   onClearCustomGpus: () => void;
   onSwitchToCustomDataset: () => void;
 }
-
-const SAMPLE_LISTINGS = [
-  {
-    name: 'Pichau RX 9060 XT',
-    store: 'Pichau',
-    text: `Placa de Video PowerColor Radeon RX 9060 XT Reaper, 16GB, GDDR6, 128-bit, RX9060XT-16G-A-NAC de R$ 5.176,46 por:
-à vista
-R$ 3.899,99
-no PIX com 15% desconto pichau
-R$ 4.588,22
-em até 12x de R$ 382,35
-sem juros no cartão`,
-  },
-  {
-    name: 'Terabyte GTX 1660 Super',
-    store: 'TerabyteShop',
-    text: `Placa de Vídeo Gamer Ninja NVIDIA GeForce GTX 1660 Super Ronin, 6GB, GDDR6, 192bit, GN-PV-NVGTX1660S6D6
-CÓD: GN-PV-NVGTX1660S6D6 Vendido por: TerabyteShop
-MAIS VENDIDO 1º Posição em [Placa de Vídeo](https://www.terabyteshop.com.br/hardware/placas-de-video)
-FRETE GRÁTIS: RS,PR,SC,SP,MG,RJ,ES
-De: R$ 1.449,99 por:
-R$ 1.389,99
-à vista com 15% de desconto no pix
-R$ 1.635,28 em até 12x de R$ 136,27 sem juros no cartão`,
-  },
-  {
-    name: 'PCYes RX 7600 XT',
-    store: 'PCYes',
-    text: `Placa de vídeo AMD Radeon RX 7600XT 16GB GDDR6 128 Bits Projeto Edge (PVR760016GBPEDF)
-[Seja o primeiro a avaliar este produto](https://www.pcyes.com.br/placa-de-video-amd-radeon-rx-7600xt-16gb-gddr6-128-bits-projeto-edge-pvr760016gbpedf#review-form)
-COD: 317981
-R$ 2.944,05 Ganhe 3.090 PC Points
-À vista no PIX com 5% de desconto
-ou R$ 3099,00 em até 10x R$ 309,90 sem juros.`,
-  },
-  {
-    name: 'KaBuM! RTX 5060',
-    store: 'KaBuM!',
-    text: `Placa de Video Palit GeForce RTX 5060 8GB INFINITY 2 OC GDDR7 128bits - NE75060V19P1-GB2063L
-Vendido e entregue por:
-KaBuM!
-Sobre o produto
-Resumo gerado por IA
-
-Performance de Próxima Geração: Eleve seu setup com a arquitetura NVIDIA Blackwell!
-R$ 2.499,00 à vista no PIX ou R$ 2.899,00 em até 10x`,
-  },
-];
 
 export function GpuDealImporterModal({
   isOpen,
@@ -91,21 +49,34 @@ export function GpuDealImporterModal({
   );
   const [rawText, setRawText] = useState<string>('');
   const [parsedDeals, setParsedDeals] = useState<ParsedGpuDeal[]>([]);
+  const [hardwareDeals, setHardwareDeals] = useState<ParsedHardwareDeal[]>([]);
 
   if (!isOpen) return null;
 
+  const runSmartParse = (inputText: string) => {
+    const parsedAll = parseHardwareListings(inputText);
+    const gpuOnly: ParsedGpuDeal[] = [];
+    const otherHardware: ParsedHardwareDeal[] = [];
+    for (const item of parsedAll) {
+      if (item.category === 'gpu' && item.gpuDeal) {
+        gpuOnly.push(item.gpuDeal);
+      } else {
+        otherHardware.push(item);
+      }
+    }
+    setParsedDeals(gpuOnly);
+    setHardwareDeals(otherHardware);
+    setActiveTab('validate');
+  };
+
   const handleParse = () => {
     if (!rawText.trim()) return;
-    const results = parseGpuListings(rawText);
-    setParsedDeals(results);
-    setActiveTab('validate');
+    runSmartParse(rawText);
   };
 
   const handleLoadSample = (sampleText: string) => {
     setRawText(sampleText);
-    const results = parseGpuListings(sampleText);
-    setParsedDeals(results);
-    setActiveTab('validate');
+    runSmartParse(sampleText);
   };
 
   const handleUpdateParsedDeal = (
@@ -282,7 +253,7 @@ export function GpuDealImporterModal({
                 Or test with real Brazilian store examples:
               </span>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {SAMPLE_LISTINGS.map((sample) => (
+                {IMPORTER_SAMPLE_LISTINGS.map((sample) => (
                   <button
                     key={sample.name}
                     type="button"
@@ -299,6 +270,8 @@ export function GpuDealImporterModal({
                 ))}
               </div>
             </div>
+
+            <StoreBookmarkletStrip />
 
             {/* Actions */}
             <div className="flex items-center justify-between pt-2">
@@ -324,7 +297,7 @@ export function GpuDealImporterModal({
         {/* Tab 2: Inspect & Validate */}
         {activeTab === 'validate' && (
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            {parsedDeals.length === 0 ? (
+            {parsedDeals.length === 0 && hardwareDeals.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center text-slate-400">
                 <FileText className="h-10 w-10 text-slate-600 mb-2" />
                 <p className="text-sm font-semibold">No parsed listings yet</p>
@@ -342,21 +315,25 @@ export function GpuDealImporterModal({
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-300">
-                    Found {parsedDeals.length} Deal
-                    {parsedDeals.length > 1 ? 's' : ''} — Verify prices and
-                    benchmark links before saving:
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleSaveAllValidated}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3.5 py-1.5 text-xs font-bold text-white shadow hover:bg-emerald-400 transition"
-                  >
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    Save All to My Deals ({parsedDeals.length})
-                  </button>
-                </div>
+                <MultiCategoryDealsPanel deals={hardwareDeals} />
+
+                {parsedDeals.length > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-300">
+                      Found {parsedDeals.length} GPU Deal
+                      {parsedDeals.length > 1 ? 's' : ''} — Verify prices and
+                      benchmark links before saving:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleSaveAllValidated}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3.5 py-1.5 text-xs font-bold text-white shadow hover:bg-emerald-400 transition"
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Save All to My Deals ({parsedDeals.length})
+                    </button>
+                  </div>
+                )}
 
                 <div className="space-y-4">
                   {parsedDeals.map((deal, idx) => (

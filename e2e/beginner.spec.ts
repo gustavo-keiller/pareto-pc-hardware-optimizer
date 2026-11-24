@@ -30,7 +30,7 @@ test('a user explores complete PC builds in Mario Kart mode', async ({
   await page.goto('/');
 
   await page
-    .getByRole('button', { name: /4\. (Full Builds|Montar PC)/i })
+    .getByRole('button', { name: /^(Full Builds|Montar PC)$/i })
     .click();
   const topBuild = page.getByTestId('top-build-card');
   await expect(topBuild).toBeVisible();

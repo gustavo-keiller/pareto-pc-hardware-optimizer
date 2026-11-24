@@ -28,8 +28,15 @@ import {
   safeGetString,
   safeSetJSON,
 } from '../utils/storage';
-import { DEFAULT_USD_TO_BRL_RATE, convertUsdToBrl } from '../utils/currency';
+import {
+  DEFAULT_USD_TO_BRL_RATE,
+  applyRegionalGpuOverlay,
+  convertUsdToBrl,
+} from '../utils/currency';
 import { AppLocale, DEFAULT_LOCALE } from '../utils/i18n';
+import { decodeGpuShareUrl } from '../utils/shareBuild';
+import { AffiliatePartnerProfile } from '../lib/math/pricingEngine';
+import { resolveActivePartnerFromSearch } from '../data/partnerProfiles';
 
 export type DatasetMode = 'real' | 'custom' | 'synthetic' | 'combined';
 export type UiMode = 'simple' | 'explorer' | 'pro' | 'builds';
@@ -227,8 +234,67 @@ export function useOptimizerState() {
     runStorageMigrations();
   }, []);
 
+  // Consume optional `#import=...` bookmarklet payload lazily (`[DATA-08]`)
+  useEffect(() => {
+    if (
+      typeof window === 'undefined' ||
+      !window.location.hash.includes('#import=')
+    ) {
+      return;
+    }
+    let cancelled = false;
+    Promise.all([
+      import('../utils/bookmarklet'),
+      import('../lib/parser/hardwareListingParser'),
+    ])
+      .then(([{ consumeLocationImportHash }, { parseHardwareListings }]) => {
+        if (cancelled) return;
+        consumeLocationImportHash((rawText) => {
+          const parsed = parseHardwareListings(rawText);
+          const importedGpus = parsed
+            .filter((d) => d.category === 'gpu' && d.gpuDeal && d.price > 0)
+            .map((d) => d.gpuDeal)
+            .filter((g): g is NonNullable<typeof g> => Boolean(g));
+          if (importedGpus.length > 0) {
+            addCustomGpus(importedGpus);
+            setDatasetMode('combined');
+            setUiMode('explorer');
+          } else if (parsed.length > 0) {
+            setUiMode('explorer');
+            setIsDealImporterOpen(true);
+          }
+        });
+      })
+      .catch(() => {
+        // Ignore dynamic import failures
+      });
+    return () => {
+      cancelled = true;
+    };
+    // Intentionally runs once on mount for bookmarklet hash consumption
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const initialGpuShare = useMemo(
+    () =>
+      typeof window !== 'undefined' && window.location.search
+        ? decodeGpuShareUrl(window.location.search)
+        : null,
+    [],
+  );
+
+  // Active Bring-Your-Own-Affiliate (BYOA) Creator / Partner Profile (`[AFF-05]`)
+  const [activePartner, setActivePartner] =
+    useState<AffiliatePartnerProfile | null>(() =>
+      typeof window !== 'undefined' && window.location.search
+        ? resolveActivePartnerFromSearch(window.location.search)
+        : null,
+    );
+
   // Active UI Locale: 'pt-BR' (default, Brazil-first per D-1) or 'en-US'
   const [locale, setLocale] = useState<AppLocale>(() => {
+    if (initialGpuShare?.currency === 'BRL') return 'pt-BR';
+    if (initialGpuShare?.currency === 'USD') return 'en-US';
     const saved = safeGetString('paretopc_locale', DEFAULT_LOCALE);
     return saved === 'en-US' ? 'en-US' : 'pt-BR';
   });
@@ -287,10 +353,14 @@ export function useOptimizerState() {
       locale === 'pt-BR'
         ? DEFAULT_CONSTRAINTS_REAL_BRL
         : DEFAULT_CONSTRAINTS_REAL_USD;
-    return {
+    const merged = {
       ...baseDefault,
       ...safeGetJSON('paretopc_constraints', baseDefault),
     };
+    if (initialGpuShare?.budget && initialGpuShare.budget > 0) {
+      merged.maxPrice = initialGpuShare.budget;
+    }
+    return merged;
   });
 
   // Stage 2: Axes & Pareto Mode
@@ -312,14 +382,20 @@ export function useOptimizerState() {
 
   // Stage 3: TOPSIS Weights
   const [weights, setWeights] = useState<PreferenceWeights>(() =>
-    safeGetJSON('paretopc_weights', DEFAULT_PREFERENCE_WEIGHTS),
+    initialGpuShare?.weights
+      ? initialGpuShare.weights
+      : safeGetJSON('paretopc_weights', DEFAULT_PREFERENCE_WEIGHTS),
   );
-  const [activePresetId, setActivePresetId] = useState<string>('balanced');
+  const [activePresetId, setActivePresetId] = useState<string>(() =>
+    initialGpuShare?.weights ? 'custom' : 'balanced',
+  );
 
   // Selection & Hover
   const [hoveredGpuId, setHoveredGpuId] = useState<string | null>(null);
   const [selectedGpuIds, setSelectedGpuIds] = useState<string[]>(() =>
-    safeGetJSON('paretopc_selected_ids', []),
+    initialGpuShare?.gpuId
+      ? [initialGpuShare.gpuId]
+      : safeGetJSON('paretopc_selected_ids', []),
   );
   const [hideTrapsInTable, setHideTrapsInTable] = useState<boolean>(() =>
     safeGetBool('paretopc_hide_traps', false),
@@ -376,31 +452,30 @@ export function useOptimizerState() {
     }
     if (datasetMode === 'combined') {
       const deals = customGpus.length > 0 ? customGpus : DEFAULT_CUSTOM_GPUS;
-      // Convert real GPUs to BRL so both live store deals and US benchmarks share the same currency
-      const convertedBaselineGpus: GpuCandidate[] = REAL_WORLD_GPUS.map(
-        (g) => ({
-          ...g,
-          id: `ref-${g.id}`,
-          name: `${g.name} (Ref)`,
-          originalUsdPrice: g.price,
-          price: convertUsdToBrl(g.price, exchangeRateUsdToBrl),
-          currency: 'BRL',
-          isBenchmarkRef: true,
-          notes: `US Baseline Ref: $${g.price} × R$ ${exchangeRateUsdToBrl.toFixed(2)} | ${g.notes ?? ''}`,
-        }),
-      );
+      const convertedBaselineGpus: GpuCandidate[] = applyRegionalGpuOverlay(
+        REAL_WORLD_GPUS,
+        'BRL',
+        exchangeRateUsdToBrl,
+        activePartner,
+      ).map((g) => ({
+        ...g,
+        id: `ref-${g.id}`,
+        name: `${g.name} (Ref)`,
+        isBenchmarkRef: true,
+        notes: `${g.store ?? 'Ref'} · US MSRP: $${g.originalUsdPrice ?? g.price} | ${g.notes ?? ''}`,
+      }));
       return [...deals, ...convertedBaselineGpus];
     }
-    if (locale === 'pt-BR' && datasetMode === 'real') {
-      return REAL_WORLD_GPUS.map((g) => ({
-        ...g,
-        originalUsdPrice: g.price,
-        price: convertUsdToBrl(g.price, exchangeRateUsdToBrl),
-        currency: 'BRL' as const,
-      }));
+    if (datasetMode === 'real') {
+      return applyRegionalGpuOverlay(
+        REAL_WORLD_GPUS,
+        locale === 'pt-BR' ? 'BRL' : 'USD',
+        exchangeRateUsdToBrl,
+        activePartner,
+      );
     }
-    return datasetMode === 'real' ? REAL_WORLD_GPUS : PHASE1_SEED_GPUS;
-  }, [datasetMode, customGpus, exchangeRateUsdToBrl, locale]);
+    return PHASE1_SEED_GPUS;
+  }, [datasetMode, customGpus, exchangeRateUsdToBrl, locale, activePartner]);
 
   // Detected active currency ('BRL' or 'USD')
   const activeCurrency = useMemo<'USD' | 'BRL'>(() => {
@@ -707,5 +782,7 @@ export function useOptimizerState() {
     locale,
     setLocale,
     handleToggleLocale,
+    activePartner,
+    clearActivePartner: () => setActivePartner(null),
   };
 }
