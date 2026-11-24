@@ -81,7 +81,18 @@ import {
   PsuCandidate,
   RamCandidate,
   StorageCandidate,
+  StorePriceMetadata,
 } from '../lib/math/buildTypes';
+import { GpuCandidate } from '../lib/math/types';
+import {
+  AffiliatePartnerProfile,
+  resolveRegionalPrice,
+} from '../lib/math/pricingEngine';
+import { getRegionalStorePrices } from '../data/storePrices';
+import {
+  HOUSE_PARTNER_PROFILE,
+  resolveActivePartnerFromSearch,
+} from '../data/partnerProfiles';
 import {
   SEED_CASES,
   SEED_COOLERS,
@@ -102,66 +113,151 @@ export interface CurrencyAdjustedCatalogs {
   coolers: CoolerCandidate[];
 }
 
+function getActivePartnerFromBrowser(): AffiliatePartnerProfile | null {
+  if (typeof window === 'undefined' || !window.location.search) return null;
+  return resolveActivePartnerFromSearch(window.location.search);
+}
+
+function applyRegionalStoreOverlay<
+  T extends {
+    id: string;
+    price: number;
+    checkedAt?: string;
+  } & StorePriceMetadata,
+>(
+  items: readonly T[],
+  currency: 'USD' | 'BRL',
+  rate: number,
+  partner: AffiliatePartnerProfile | null,
+): T[] {
+  const storeOffers = getRegionalStorePrices(currency);
+  return items.map((item) => {
+    const resolved = resolveRegionalPrice(item, storeOffers, {
+      currency,
+      exchangeRate: rate,
+      preferCashDiscount: true,
+      partner,
+      fallbackPartner: HOUSE_PARTNER_PROFILE,
+    });
+    return {
+      ...item,
+      price: resolved.effectivePrice,
+      currency,
+      store: resolved.store ?? item.store,
+      url: resolved.storeUrl ?? item.url,
+      priceCash: resolved.cashPrice ?? item.priceCash,
+      priceInstallment: resolved.installmentPrice ?? item.priceInstallment,
+      installments: resolved.installments ?? item.installments,
+      isPriceEstimated: resolved.isEstimated,
+      checkedAt: resolved.checkedAt ?? item.checkedAt,
+    };
+  });
+}
+
 /**
- * Returns complete hardware catalogs adjusted for active currency.
- * When currency is BRL, prices are centralized and converted from USD baseline.
+ * Overlays regional store pricing (br.json / us.json) onto GPU catalog items,
+ * tracking original USD baseline and applying optional creator affiliate tags (`[AFF-05]`).
+ */
+export function applyRegionalGpuOverlay(
+  gpus: readonly GpuCandidate[],
+  currency: 'USD' | 'BRL' = 'USD',
+  rate = DEFAULT_USD_TO_BRL_RATE,
+  partner?: AffiliatePartnerProfile | null,
+): GpuCandidate[] {
+  const effectivePartner =
+    partner === undefined ? getActivePartnerFromBrowser() : partner;
+  const storeOffers = getRegionalStorePrices(currency);
+  return gpus.map((gpu) => {
+    const resolved = resolveRegionalPrice(gpu, storeOffers, {
+      currency,
+      exchangeRate: rate,
+      preferCashDiscount: true,
+      partner: effectivePartner,
+      fallbackPartner: HOUSE_PARTNER_PROFILE,
+    });
+    return {
+      ...gpu,
+      originalUsdPrice: gpu.originalUsdPrice ?? gpu.price,
+      price: resolved.effectivePrice,
+      currency,
+      store: resolved.store ?? gpu.store,
+      url: resolved.storeUrl ?? gpu.url,
+      priceCash: resolved.cashPrice ?? gpu.priceCash,
+      priceInstallment: resolved.installmentPrice ?? gpu.priceInstallment,
+      installments: resolved.installments ?? gpu.installments,
+      isPriceEstimated: resolved.isEstimated,
+      checkedAt: resolved.checkedAt ?? gpu.checkedAt,
+    };
+  });
+}
+
+/**
+ * Returns complete hardware catalogs overlaid with real regional store prices
+ * (KaBuM!, TerabyteShop, Pichau, Amazon BR for BRL; Amazon US, Newegg, Best Buy, B&H for USD),
+ * falling back to USD conversion only when a component lacks an in-stock store listing.
  */
 export function getCurrencyAdjustedCatalogs(
   currency: 'USD' | 'BRL' = 'USD',
   rate = DEFAULT_USD_TO_BRL_RATE,
+  partner?: AffiliatePartnerProfile | null,
 ): CurrencyAdjustedCatalogs {
-  if (currency !== 'BRL') {
-    return {
-      cpus: SEED_CPUS,
-      motherboards: SEED_MOTHERBOARDS,
-      ramKits: SEED_RAM_KITS,
-      psus: SEED_PSUS,
-      storages: SEED_STORAGES,
-      cases: SEED_CASES,
-      coolers: SEED_COOLERS,
-    };
-  }
-
+  const effectivePartner =
+    partner === undefined ? getActivePartnerFromBrowser() : partner;
   return {
-    cpus: SEED_CPUS.map((c) => ({
-      ...c,
-      price: convertUsdToBrl(c.price, rate),
-    })),
-    motherboards: SEED_MOTHERBOARDS.map((m) => ({
-      ...m,
-      price: convertUsdToBrl(m.price, rate),
-    })),
-    ramKits: SEED_RAM_KITS.map((r) => ({
-      ...r,
-      price: convertUsdToBrl(r.price, rate),
-    })),
-    psus: SEED_PSUS.map((p) => ({
-      ...p,
-      price: convertUsdToBrl(p.price, rate),
-    })),
-    storages: SEED_STORAGES.map((s) => ({
-      ...s,
-      price: convertUsdToBrl(s.price, rate),
-    })),
-    cases: SEED_CASES.map((c) => ({
-      ...c,
-      price: convertUsdToBrl(c.price, rate),
-    })),
-    coolers: SEED_COOLERS.map((c) => ({
-      ...c,
-      price: convertUsdToBrl(c.price, rate),
-    })),
+    cpus: applyRegionalStoreOverlay(
+      SEED_CPUS,
+      currency,
+      rate,
+      effectivePartner,
+    ),
+    motherboards: applyRegionalStoreOverlay(
+      SEED_MOTHERBOARDS,
+      currency,
+      rate,
+      effectivePartner,
+    ),
+    ramKits: applyRegionalStoreOverlay(
+      SEED_RAM_KITS,
+      currency,
+      rate,
+      effectivePartner,
+    ),
+    psus: applyRegionalStoreOverlay(
+      SEED_PSUS,
+      currency,
+      rate,
+      effectivePartner,
+    ),
+    storages: applyRegionalStoreOverlay(
+      SEED_STORAGES,
+      currency,
+      rate,
+      effectivePartner,
+    ),
+    cases: applyRegionalStoreOverlay(
+      SEED_CASES,
+      currency,
+      rate,
+      effectivePartner,
+    ),
+    coolers: applyRegionalStoreOverlay(
+      SEED_COOLERS,
+      currency,
+      rate,
+      effectivePartner,
+    ),
   };
 }
 
 /**
- * Returns honest estimated price notice for converted BRL benchmarks.
+ * Returns honest estimated price notice only when prices fell back to currency conversion.
  */
 export function getEstimatedPriceNotice(
   locale: AppLocale = 'pt-BR',
   currency: 'USD' | 'BRL' = 'BRL',
+  isPriceEstimated = true,
 ): string {
-  if (currency !== 'BRL') return '';
+  if (currency !== 'BRL' || !isPriceEstimated) return '';
   return locale === 'pt-BR'
     ? 'Preço estimado (convertido de US$)'
     : 'Estimated price (converted from USD)';

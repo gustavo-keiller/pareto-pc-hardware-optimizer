@@ -16,8 +16,26 @@ export interface RegionalPriceOffer {
   readonly installmentPrice?: number;
   readonly installments?: number;
   readonly url: string;
+  readonly affiliateUrl?: string;
+  readonly partner?: string;
+  readonly sponsored?: boolean;
+  readonly sponsorLabel?: string;
+  readonly couponCode?: string;
   readonly inStock: boolean;
   readonly checkedAt: string;
+}
+
+export interface AffiliatePartnerProfile {
+  readonly id: string;
+  readonly displayName: string;
+  readonly handle: string;
+  readonly amazonTagBr?: string;
+  readonly amazonTagUs?: string;
+  readonly kabumPartnerTag?: string;
+  readonly terabytePartnerTag?: string;
+  readonly pichauPartnerTag?: string;
+  readonly neweggPartnerTag?: string;
+  readonly customStoreUrl?: string;
 }
 
 export type SupportedPricingCurrency = 'USD' | 'BRL';
@@ -28,19 +46,103 @@ export interface ResolvedPriceInfo {
   readonly isEstimated: boolean;
   readonly store?: string;
   readonly storeUrl?: string;
+  readonly isAffiliateLink?: boolean;
+  readonly partnerHandle?: string;
   readonly cashPrice?: number;
   readonly installmentPrice?: number;
   readonly installments?: number;
   readonly checkedAt?: string;
+  readonly sponsored?: boolean;
+  readonly sponsorLabel?: string;
+  readonly couponCode?: string;
 }
 
 export interface PricingResolutionOptions {
   readonly currency?: SupportedPricingCurrency;
   readonly exchangeRate?: number;
   readonly preferCashDiscount?: boolean;
+  readonly partner?: AffiliatePartnerProfile | null;
+  readonly fallbackPartner?: AffiliatePartnerProfile | null;
 }
 
 export const DEFAULT_USD_TO_BRL_RATE = 5.7;
+
+/**
+ * Pure URL affiliate tag injector (`[AFF-01]`, `[AFF-05]`).
+ * Injects partner tags for Amazon BR/US, KaBuM!, TerabyteShop, Pichau, and Newegg
+ * plus referral UTM attribution without modifying prices or rankings (`[AFF-02]`).
+ */
+export function injectAffiliateParameters(
+  rawUrl: string,
+  partner?: AffiliatePartnerProfile | null,
+  currency: SupportedPricingCurrency = 'BRL',
+): { url: string; isAffiliateLink: boolean; partnerHandle?: string } {
+  if (!rawUrl || !partner) {
+    return { url: rawUrl, isAffiliateLink: false };
+  }
+
+  try {
+    const parsed = new URL(rawUrl);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return { url: rawUrl, isAffiliateLink: false };
+    }
+
+    const host = parsed.hostname.toLowerCase();
+    let tagApplied = false;
+
+    if (host.includes('amazon.com.br')) {
+      const tag = partner.amazonTagBr ?? partner.amazonTagUs;
+      if (tag && !parsed.searchParams.has('tag')) {
+        parsed.searchParams.set('tag', tag);
+        tagApplied = true;
+      }
+    } else if (host.includes('amazon.')) {
+      const tag =
+        currency === 'BRL'
+          ? (partner.amazonTagBr ?? partner.amazonTagUs)
+          : (partner.amazonTagUs ?? partner.amazonTagBr);
+      if (tag && !parsed.searchParams.has('tag')) {
+        parsed.searchParams.set('tag', tag);
+        tagApplied = true;
+      }
+    } else if (host.includes('kabum.com.br')) {
+      if (partner.kabumPartnerTag && !parsed.searchParams.has('partner_tag')) {
+        parsed.searchParams.set('partner_tag', partner.kabumPartnerTag);
+        tagApplied = true;
+      }
+    } else if (host.includes('terabyteshop.com.br')) {
+      if (partner.terabytePartnerTag && !parsed.searchParams.has('p')) {
+        parsed.searchParams.set('p', partner.terabytePartnerTag);
+        tagApplied = true;
+      }
+    } else if (host.includes('pichau.com.br')) {
+      if (partner.pichauPartnerTag && !parsed.searchParams.has('ref')) {
+        parsed.searchParams.set('ref', partner.pichauPartnerTag);
+        tagApplied = true;
+      }
+    } else if (host.includes('newegg.com')) {
+      if (partner.neweggPartnerTag && !parsed.searchParams.has('cm_mmc')) {
+        parsed.searchParams.set('cm_mmc', partner.neweggPartnerTag);
+        tagApplied = true;
+      }
+    }
+
+    if (!parsed.searchParams.has('utm_source')) {
+      parsed.searchParams.set('utm_source', 'paretopc');
+    }
+    if (partner.id && !parsed.searchParams.has('utm_campaign')) {
+      parsed.searchParams.set('utm_campaign', partner.id);
+    }
+
+    return {
+      url: parsed.toString(),
+      isAffiliateLink: tagApplied,
+      partnerHandle: partner.handle,
+    };
+  } catch {
+    return { url: rawUrl, isAffiliateLink: false };
+  }
+}
 
 /**
  * Resolves the effective purchasing price for a component given a regional price dataset.
@@ -76,16 +178,31 @@ export function resolveRegionalPrice(
         ? match.cashPrice
         : match.price;
 
+    const baseUrl = match.affiliateUrl ?? match.url;
+    const effectivePartner =
+      options?.partner ?? options?.fallbackPartner ?? null;
+    const affiliateResult = injectAffiliateParameters(
+      baseUrl,
+      effectivePartner,
+      currency,
+    );
+
     return {
       effectivePrice,
       currency,
       isEstimated: false,
       store: match.store,
-      storeUrl: match.url,
+      storeUrl: affiliateResult.url,
+      isAffiliateLink:
+        Boolean(match.affiliateUrl) || affiliateResult.isAffiliateLink,
+      partnerHandle: affiliateResult.partnerHandle ?? match.partner,
       cashPrice: match.cashPrice,
       installmentPrice: match.installmentPrice,
       installments: match.installments,
       checkedAt: match.checkedAt,
+      sponsored: match.sponsored,
+      sponsorLabel: match.sponsorLabel,
+      couponCode: match.couponCode,
     };
   }
 
@@ -122,4 +239,28 @@ export function overlayRegionalPrices<
       priceInfo,
     };
   });
+}
+
+/**
+ * Ethical Frontier Sponsorship Guardrail (`[AFF-07]`):
+ * Brands or stores can only surface a sponsored deal badge or coupon when
+ * the promotional price keeps the component mathematically Pareto-optimal
+ * and non-trapped (`[AFF-02]`).
+ */
+export function verifyFrontierSponsorship(
+  item: { readonly isParetoOptimal: boolean; readonly isTrap?: boolean },
+  priceInfo?: ResolvedPriceInfo,
+): {
+  readonly isEligibleSponsor: boolean;
+  readonly sponsorLabel?: string;
+  readonly couponCode?: string;
+} {
+  if (!priceInfo?.sponsored || !item.isParetoOptimal || item.isTrap) {
+    return { isEligibleSponsor: false };
+  }
+  return {
+    isEligibleSponsor: true,
+    sponsorLabel: priceInfo.sponsorLabel,
+    couponCode: priceInfo.couponCode,
+  };
 }

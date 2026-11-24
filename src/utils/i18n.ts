@@ -11,6 +11,7 @@ import {
   PRIORITY_TRANSLATIONS,
   PriorityTranslations,
 } from './locales/priorities';
+import type { MetricKey } from '../lib/math/types';
 
 export type { AppLocale, Translations } from './locales/types';
 export { DEFAULT_LOCALE, isAppLocale } from './locales/types';
@@ -57,24 +58,24 @@ export function getHeaderBadge(
   if (locale === 'pt-BR') {
     switch (uiMode) {
       case 'simple':
-        return 'Nível 1: Guia do Comprador';
+        return 'Guia do Comprador';
       case 'explorer':
-        return 'Nível 2: Explorador Visual';
+        return 'Explorador Visual';
       case 'builds':
-        return 'Nível 4: Montador de PCs';
+        return 'Montador de PCs';
       default:
-        return 'Nível 3: Laboratório Pro';
+        return 'Laboratório Matemático';
     }
   }
   switch (uiMode) {
     case 'simple':
-      return 'Level 1: Easy Buyer Guide';
+      return 'Easy Buyer Guide';
     case 'explorer':
-      return 'Level 2: Visual Axis Explorer';
+      return 'Visual Axis Explorer';
     case 'builds':
-      return 'Level 4: Mario Kart Full-Build Explorer';
+      return 'Balanced Full-PC Builder';
     default:
-      return 'Level 3: Pro MCDM Lab';
+      return 'Pro MCDM Lab';
   }
 }
 
@@ -136,4 +137,64 @@ export function formatAltStepUpText(
     return `Entrega +${scoreDiff} ${unit} (+${pctScore}%) chegando a ${stepUpScore} ${unit} por +${extraPriceFormatted} adicionais.`;
   }
   return `Delivers +${scoreDiff} ${unit} (+${pctScore}%) reaching ${stepUpScore} ${unit} for +${extraPriceFormatted} more.`;
+}
+
+/**
+ * Localized short label for a TOPSIS metric (Explorer & Pro Lab panels).
+ */
+export function getMetricShortLabel(
+  metric: MetricKey,
+  locale: AppLocale = 'pt-BR',
+): string {
+  switch (metric) {
+    case 'price':
+      return t('xpMetricPrice', locale);
+    case 'rasterFps1440p':
+      return t('xpMetricRaster', locale);
+    case 'rtFps1440p':
+      return t('xpMetricRt', locale);
+    case 'vramGb':
+      return t('xpMetricVram', locale);
+    case 'tdpWatts':
+      return t('xpMetricPower', locale);
+    default: {
+      const _exhaustive: never = metric;
+      return String(_exhaustive);
+    }
+  }
+}
+
+/**
+ * Localized label and description for a built-in weight preset.
+ * Unknown preset ids fall back to the caller's English copy.
+ */
+export function getPresetCopy(
+  presetId: string,
+  fallback: { label: string; shortDesc: string },
+  locale: AppLocale = 'pt-BR',
+): { label: string; shortDesc: string } {
+  switch (presetId) {
+    case 'balanced':
+      return {
+        label: t('xpPresetBalancedLabel', locale),
+        shortDesc: t('xpPresetBalancedDesc', locale),
+      };
+    case 'budget':
+      return {
+        label: t('xpPresetBudgetLabel', locale),
+        shortDesc: t('xpPresetBudgetDesc', locale),
+      };
+    case 'esports':
+      return {
+        label: t('xpPresetEsportsLabel', locale),
+        shortDesc: t('xpPresetEsportsDesc', locale),
+      };
+    case 'pathtracing':
+      return {
+        label: t('xpPresetPathtracingLabel', locale),
+        shortDesc: t('xpPresetPathtracingDesc', locale),
+      };
+    default:
+      return fallback;
+  }
 }

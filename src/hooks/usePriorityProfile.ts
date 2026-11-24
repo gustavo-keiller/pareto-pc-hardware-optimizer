@@ -16,13 +16,18 @@ const LEGACY_WEIGHTS_KEY = 'paretopc_weights';
  * Simple mode edits the full profile; Explorer and Pro keep editing five-metric
  * TOPSIS weights, which are read from and written back into the same profile.
  */
-export function usePriorityProfile() {
-  const [profile, setProfile] = useState<PriorityProfile>(() =>
-    parsePriorityProfile(
+/**
+ * @param initialWeights TOPSIS weights from a shared link (`?w=`); when given they
+ * override the stored profile's five-metric slice on first render.
+ */
+export function usePriorityProfile(initialWeights?: PreferenceWeights) {
+  const [profile, setProfile] = useState<PriorityProfile>(() => {
+    const stored = parsePriorityProfile(
       safeGetJSON<unknown>(PROFILE_KEY, null),
       safeGetJSON<unknown>(LEGACY_WEIGHTS_KEY, null),
-    ),
-  );
+    );
+    return initialWeights ? applyTopsisWeights(stored, initialWeights) : stored;
+  });
 
   useEffect(() => {
     safeSetJSON(PROFILE_KEY, profile);

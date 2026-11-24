@@ -4,13 +4,38 @@
 
 ## 🔴 In Flight
 
-- None (Phase 4 100% completed; ready for UX-10 / Phase 5 Launch).
+- **All Engineering Stages Shipped — Ready for PR, Cloud Deployment & Outreach:** All codebase milestones in [`ROADMAP.md`](../ROADMAP.md) (`[LAUNCH-01]`–`[LAUNCH-05]`, `[SHARE-01]`, `[DATA-01]`–`[DATA-09]`, `[DATA-BF26]`, and `[AFF-01]`–`[AFF-07]`) are complete and verified. Next step is external operational launch: open PR to `main`, connect Cloudflare Pages / Vercel + custom DNS (`D-4`), verify live affiliate portal tags, and run initial external buyer & creator sessions.
 
 ## 🔶 Decisions Made Without Validation
 
 - Defaulted the UI to **Simple Guide** mode (`uiMode = 'simple'`), the **Real-World GPU Dataset** (`datasetMode = 'real'`, 18 GPUs), and **Brazilian Portuguese / Reais** (`locale = 'pt-BR'`, `BRL`), so users testing locally get an instant zero-friction experience, while `[🇧🇷 PT (R$) | 🇺🇸 EN ($)]` and Pro Math Mode are one click away in the header.
+- Used `ParetoPC` / `paretopc.com` as the editable website brand/domain placeholder in `index.html`, `shareBuild.ts`, and `SocialShareModal.tsx` (`[SHARE-01]`) until custom DNS is attached (D-4).
+- Closed `[UX-10]` via an autonomous usability audit across Simple GPU, Simple Whole-PC, and Full Builds paths while external live user testing remains queued post-deployment.
 
 ## 🟡 Recently Completed
+
+- **Full Phase 5–6 Completion: Ingestion, Feed Sanity Guard, Static SEO Guides & Full Monetization (`[DATA-07]`–`[DATA-09]`, `[LAUNCH-04]`, `[AFF-04]`, `[AFF-06]`, `[AFF-07]`, 2026-11-23):**
+  - Expanded Smart Paste (`hardwareListingParser.ts` + `ImporterBookmarkletBar.tsx`) to detect all 8 hardware categories, match 124 catalog IDs, export `RegionalPriceOffer` diffs, and added the 1-click store bookmarklet + lazy `#import=...` URL hash importer (`bookmarklet.ts`, `useOptimizerState.ts`).
+  - Added automated store feed validation (`npm run sync:feeds` + `.github/workflows/sync-prices.yml`) protected by pure Hedonic OLS / reference fair-value sanity bounds ($\pm 40\%$) in `src/lib/math/priceSanityGuard.ts`.
+  - Generated pre-rendered `pt-BR` and `en-US` static buyer guides (`public/guides/*.html`) with Schema.org `ItemList`/`Product` JSON-LD, `public/sitemap.xml`, and `public/robots.txt` (`scripts/generate-seo-pages.cjs`).
+  - Shipped house affiliate fallback (`paretopc-official` in `partners.json` + `HOUSE_PARTNER_PROFILE`), serverless edge redirect (`/go/:offerId` in `functions/go/[offerId].ts` + `affiliateRedirect.ts`), and `verifyFrontierSponsorship` guardrail in `pricingEngine.ts`.
+  - Extracted `FooterModals.tsx` and lazy-loaded `SimpleGuideMathWalkthrough` cleanly within strict bundle budgets.
+
+- **Launch Foundations & Creator BYOA Engine (`[LAUNCH-01]`–`[LAUNCH-03]`, `[LAUNCH-05]`, `[AFF-01]`–`[AFF-03]`, `[AFF-05]`, 2026-11-23):**
+  - Added static hosting SPA config (`public/_redirects`, `vercel.json`), canonical/OpenGraph tags in `index.html`, `ErrorBoundary.tsx`, and zero-cookie `telemetry.ts`.
+  - Built `injectAffiliateParameters` in `src/lib/math/pricingEngine.ts` + `src/data/partners.json` / `src/data/partnerProfiles.ts` (`resolveActivePartnerFromSearch`), wiring creator affiliate tags (`?p=`, `?ref=`, `?amz=`, `?kabum=`, `?terabyte=`, `?pichau=`, `?newegg=`) across GPU and 8-part PC Build links while asserting strict ranking neutrality (`[AFF-02]`).
+  - Added co-branded Creator Attribution Banner in `App.tsx` and `AppFooter.tsx` with affiliate & ranking-neutrality disclosure, LGPD/GDPR privacy modal, and price/issue feedback modal.
+
+- **Regional Store Pricing Overlay Integration & 100% BR/US Catalog Coverage (`[DATA-BF26]`, 2026-11-22):**
+  - Connected `resolveRegionalPrice` into `applyRegionalGpuOverlay`, `getCurrencyAdjustedCatalogs`, and `useOptimizerState` so both BRL (`KaBuM!`, `TerabyteShop`, `Pichau`, `Amazon BR`) and USD (`Amazon US`, `Newegg`, `Best Buy`, `B&H`) views load verified store offers instead of flat USD conversion.
+  - Expanded `src/data/prices/br.json` and `src/data/prices/us.json` to cover all 124 catalog components with `2026-11-22` audit dates and enforced 100% regional price coverage in `scripts/validate-catalogs.cjs`.
+  - Surfaced store badges, direct store links, PIX/installment breakdowns, and accurate `isPriceEstimated` guarding in `SimpleGuidePickHero`, `BuildHeroCard` (with `BuildBudgetBar.tsx` extracted), `TopWinnerBanner`, and `GpuLeaderboardTable`, plus fixed BRL budget slider bounds (`maxBudgetBound` in `App.tsx` and `DealbreakerFilterPanel.tsx`).
+
+- **Influencer & Social Share Spec Card Studio & Cross-Thread Master Plan (`[SHARE-01]` & `[UX-10]`, 2026-11-22):**
+  - Documented the 5-stage Black Friday launch -> BYOA creator attribution -> 1-click store ingestion -> outreach -> monetization plan across [`.agents/specs/business-and-creator-engine.md`](specs/business-and-creator-engine.md), [`ROADMAP.md`](../ROADMAP.md), and [`TODO.md`](../TODO.md).
+  - Built `src/utils/socialShareCard.ts` and lazy-loaded `src/components/SocialShareModal.tsx` generating `1200×630` spec cards (exported as `2400×1260` HD PNG) for GPUs and 8-part PC builds with Pareto priority percentages (`sum === 100%`), website watermark, `@Handle` badge, affiliate URL support, and 1-click "Download Image + Copy Caption".
+  - Added single-GPU share URL encoding/decoding (`encodeGpuShareUrl` / `decodeGpuShareUrl` with `ref`, `amz`, `store`, and `w` priority weights) and wired state restoration into `src/hooks/useOptimizerState.ts`.
+  - Wired Share Card Studio buttons into `SimpleGuidePickHero`, `BuildHeroCard` (covering both Simple Whole-PC and Full Builds), and `TopWinnerBanner`, preserving plain-language compliance in Simple mode.
 
 - **Math Off-Main-Thread & Input Memoization Optimization (`[PERF-06]`, 2026-10-20):**
   - Added 24-entry LRU cache to `useFullSystemOptimizer` returning 0ms instant responses for repeated budget presets without redundant worker round-trips.

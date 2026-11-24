@@ -58,29 +58,29 @@ describe('App modes', () => {
   it('Explorer, Pro, and Full Builds modes render without crashing', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
+    await user.click(screen.getByRole('button', { name: /^Explorer/ }));
     expect(screen.queryAllByTestId('top-choice')).toHaveLength(0);
     expect(
       (await screen.findAllByTestId('echarts-placeholder')).length,
     ).toBeGreaterThan(0);
-    await user.click(screen.getByRole('button', { name: /3\. Pro Lab/ }));
+    await user.click(screen.getByRole('button', { name: /^Pro Lab/ }));
     expect(screen.queryAllByTestId('top-choice')).toHaveLength(0);
     expect(
       (await screen.findAllByTestId('echarts-placeholder')).length,
     ).toBeGreaterThan(0);
-    await user.click(screen.getByRole('button', { name: /4\. Full Builds/ }));
+    await user.click(screen.getByRole('button', { name: /^Full Builds/ }));
     expect(screen.queryAllByTestId('top-choice')).toHaveLength(0);
     expect(await screen.findByTestId('top-build-card')).toBeDefined();
     expect(await screen.findByText(/Total Hardware Cost/i)).toBeDefined();
 
-    await user.click(screen.getByRole('button', { name: /1\. Simple Guide/ }));
+    await user.click(screen.getByRole('button', { name: /^Simple Guide/ }));
     expect(screen.getAllByTestId('top-choice')).toHaveLength(3);
   });
 
   it('picking a different budget in Full Builds updates the top build', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByRole('button', { name: /4\. Full Builds/ }));
+    await user.click(screen.getByRole('button', { name: /^Full Builds/ }));
     const topBuildCard = await screen.findByTestId('top-build-card');
     const initialText = topBuildCard.textContent ?? '';
 
@@ -114,7 +114,7 @@ describe('App modes', () => {
     render(<App />);
 
     // Switch to Explorer mode
-    await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
+    await user.click(screen.getByRole('button', { name: /^Explorer/ }));
 
     // Trap Rule should be visible in Explorer mode
     expect(screen.getByText(/Trap Rule:/i)).toBeDefined();
@@ -133,13 +133,13 @@ describe('App modes', () => {
     render(<App />);
 
     // Go to Pro Lab
-    await user.click(screen.getByRole('button', { name: /3\. Pro Lab/ }));
+    await user.click(screen.getByRole('button', { name: /^Pro Lab/ }));
     await user.click(
       screen.getByRole('button', { name: /Fair Value \(OLS\)/i }),
     );
 
     // Switch to Explorer mode
-    await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
+    await user.click(screen.getByRole('button', { name: /^Explorer/ }));
 
     // Should fall back to 2D Frontier instead of crashing or showing invalid tab
     expect(screen.getByRole('button', { name: /2D Frontier/i })).toBeDefined();
@@ -153,7 +153,7 @@ describe('App modes', () => {
     render(<App />);
 
     // Switch to Explorer mode first because expert dataset controls are hidden in Simple Guide mode (UX-02)
-    await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
+    await user.click(screen.getByRole('button', { name: /^Explorer/ }));
 
     // Switch to Combined Sandbox
     await user.click(screen.getByRole('button', { name: /Combined Sandbox/i }));
@@ -181,21 +181,17 @@ describe('App modes', () => {
     expect(
       screen.queryByRole('button', { name: /Combined Sandbox/i }),
     ).toBeNull();
-    expect(
-      screen.queryByRole('button', { name: /\+ Import Deals/i }),
-    ).toBeNull();
+    expect(screen.queryByRole('button', { name: /Import Deals/i })).toBeNull();
 
     // Switch to Explorer mode
-    await user.click(screen.getByRole('button', { name: /2\. Explorer/ }));
+    await user.click(screen.getByRole('button', { name: /^Explorer/ }));
 
     // Now expert dataset switchers and deal importer must be visible
     expect(screen.getByRole('button', { name: /Real GPUs/i })).toBeDefined();
     expect(
       screen.getByRole('button', { name: /Combined Sandbox/i }),
     ).toBeDefined();
-    expect(
-      screen.getByRole('button', { name: /\+ Import Deals/i }),
-    ).toBeDefined();
+    expect(screen.getByRole('button', { name: /Import Deals/i })).toBeDefined();
   });
 
   it('UX-12: no [TRAP] card in the leaderboard table is ever labeled "Smart Buy"', async () => {
@@ -272,9 +268,7 @@ describe('App modes', () => {
 
     // Verifies transition to Full Builds mode
     expect(
-      screen.getByText(
-        /Nível 4: Montador de PCs|Level 4: Mario Kart Full-Build Explorer/i,
-      ),
+      screen.getByText(/Montador de PCs|Balanced Full-PC Builder/i),
     ).toBeDefined();
   });
 
@@ -404,21 +398,21 @@ describe('App modes', () => {
 
     // Defaults to pt-BR
     expect(
-      screen.getByRole('button', { name: /1\. Guia Simples/i }),
+      screen.getByRole('button', { name: /^Guia Simples/i }),
     ).toBeDefined();
     expect(screen.getAllByText(/R\$/i).length).toBeGreaterThan(0);
 
     // Switch to EN
     await user.click(screen.getByRole('button', { name: /🇺🇸 EN/i }));
     expect(
-      screen.getByRole('button', { name: /1\. Simple Guide/i }),
+      screen.getByRole('button', { name: /^Simple Guide/i }),
     ).toBeDefined();
     expect(screen.getByRole('button', { name: '≤ $550' })).toBeDefined();
 
     // Switch back to PT
     await user.click(screen.getByRole('button', { name: /🇧🇷 PT/i }));
     expect(
-      screen.getByRole('button', { name: /1\. Guia Simples/i }),
+      screen.getByRole('button', { name: /^Guia Simples/i }),
     ).toBeDefined();
   });
 
@@ -432,7 +426,7 @@ describe('App modes', () => {
     expect(screen.getByRole('button', { name: /🇺🇸 EN/i })).toBeDefined();
 
     // Switch to Full Builds mode in default BRL locale
-    await user.click(screen.getByRole('button', { name: /4\. Montar PC/i }));
+    await user.click(screen.getByRole('button', { name: /^Montar PC/i }));
     expect(
       screen.getByRole('button', { name: /R\$ 6\.000 Ponto Ideal/i }),
     ).toBeDefined();
@@ -465,9 +459,7 @@ describe('App modes', () => {
 
     // Verify mode switched to Explorer (Level 2: Visual Axis Explorer)
     expect(
-      screen.getByText(
-        /Nível 2: Explorador Visual|Level 2: Visual Axis Explorer/i,
-      ),
+      screen.getByText(/Explorador Visual|Visual Axis Explorer/i),
     ).toBeDefined();
     // Leaderboard table and comparison drawer are rendered
     expect(screen.getAllByRole('table').length).toBeGreaterThanOrEqual(1);
@@ -478,7 +470,7 @@ describe('App modes', () => {
     render(<App />);
 
     // Switch to Full Builds mode
-    const buildsBtn = screen.getByRole('button', { name: /4\. Full Builds/i });
+    const buildsBtn = screen.getByRole('button', { name: /^Full Builds/i });
     await user.click(buildsBtn);
 
     // Verify Upgrade Mode button exists
@@ -535,7 +527,7 @@ describe('App modes', () => {
 
     // Switch to Full Builds mode
     const buildsBtn = screen.getByRole('button', {
-      name: /4\. Full Builds|4\. Montar PC/i,
+      name: /^Full Builds|^Montar PC/i,
     });
     await user.click(buildsBtn);
 
@@ -544,9 +536,7 @@ describe('App modes', () => {
     expect(
       screen.queryByRole('button', { name: /Combined Sandbox/i }),
     ).toBeNull();
-    expect(
-      screen.queryByRole('button', { name: /\+ Import Deals/i }),
-    ).toBeNull();
+    expect(screen.queryByRole('button', { name: /Import Deals/i })).toBeNull();
   });
 
   it('renders each mode in pt-BR without residual English UI terms [FIX-03]', async () => {
@@ -579,21 +569,21 @@ describe('App modes', () => {
     }
 
     // Switch to Explorer mode (mode 2)
-    const explorerBtn = screen.getByRole('button', { name: /2\. Explorador/i });
+    const explorerBtn = screen.getByRole('button', { name: /^Explorador/i });
     await user.click(explorerBtn);
     for (const phrase of forbiddenEnglishWords) {
       expect(screen.queryByText(new RegExp(`^${phrase}$`, 'i'))).toBeNull();
     }
 
     // Switch to Pro mode (mode 3)
-    const proBtn = screen.getByRole('button', { name: /3\. Laborat/i });
+    const proBtn = screen.getByRole('button', { name: /^Laborat/i });
     await user.click(proBtn);
     for (const phrase of forbiddenEnglishWords) {
       expect(screen.queryByText(new RegExp(`^${phrase}$`, 'i'))).toBeNull();
     }
 
     // Switch to Full Builds mode (mode 4)
-    const buildsBtn = screen.getByRole('button', { name: /4\. Montar PC/i });
+    const buildsBtn = screen.getByRole('button', { name: /^Montar PC/i });
     await user.click(buildsBtn);
 
     for (const phrase of forbiddenEnglishWords) {
@@ -617,7 +607,7 @@ describe('App modes', () => {
     await user.click(ptToggle);
 
     // Switch to Full Builds mode (4. Montar PC)
-    const buildsBtn = screen.getByRole('button', { name: /4\. Montar PC/i });
+    const buildsBtn = screen.getByRole('button', { name: /^Montar PC/i });
     await user.click(buildsBtn);
 
     // 1. Verify estimate badge next to workload score
@@ -628,7 +618,7 @@ describe('App modes', () => {
     // 2. Verify estimate explanation note is displayed
     expect(
       screen.getByText(
-        /Desempenho e gargalo calculados por modelo estimado até calibração com dados reais de benchmark \(DATA-02\)\./i,
+        /Desempenho e gargalo calculados por modelo estimado até calibração com dados reais de benchmark\./i,
       ),
     ).toBeDefined();
   });
@@ -643,7 +633,7 @@ describe('App modes', () => {
     await user.click(enToggle);
 
     // Switch to Full Builds mode
-    const buildsBtn = screen.getByRole('button', { name: /4\. Full Builds/i });
+    const buildsBtn = screen.getByRole('button', { name: /^Full Builds/i });
     await user.click(buildsBtn);
 
     // 1. Filter by Form Factor: SFF
@@ -683,7 +673,7 @@ describe('App modes', () => {
     render(<App />);
 
     // Switch to Pro mode
-    const proBtn = screen.getByRole('button', { name: /3\. Laborat|3\. Pro/i });
+    const proBtn = screen.getByRole('button', { name: /^Laborat|^Pro/i });
     await user.click(proBtn);
 
     // 1. Save a named custom profile
@@ -755,16 +745,16 @@ describe('App modes', () => {
     await user.click(toggleMathBtn);
 
     expect(
-      screen.getByText(
+      await screen.findByText(
         /Tabela acessível de placas de vídeo|Accessible graphics cards table/i,
       ),
     ).toBeDefined();
 
     // 4. Switch to Pro mode and verify residuals table alternative
-    const proBtn = screen.getByRole('button', { name: /3\. Laborat|3\. Pro/i });
+    const proBtn = screen.getByRole('button', { name: /^Laborat|^Pro/i });
     await user.click(proBtn);
     const residualsViewBtn = screen.getByRole('button', {
-      name: /Fair Value \(OLS\)/i,
+      name: /Preço Justo \(OLS\)|Fair Value \(OLS\)/i,
     });
     await user.click(residualsViewBtn);
 

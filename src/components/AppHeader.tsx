@@ -12,6 +12,8 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import { DatasetMode, UiMode } from '../hooks/useOptimizerState';
+import { REAL_WORLD_GPUS } from '../data/realGpus';
+import { PHASE1_SEED_GPUS } from '../data/seedGpus';
 import { AppLocale, getHeaderBadge, getHeaderSubtitle, t } from '../utils/i18n';
 
 export interface AppHeaderProps {
@@ -27,6 +29,63 @@ export interface AppHeaderProps {
   onChangeExchangeRate: (rate: number) => void;
   onOpenDealImporter: () => void;
 }
+
+const MODE_GROUPS: ReadonlyArray<{
+  labelKey: 'navGroupBuy' | 'navGroupExpert';
+  modes: ReadonlyArray<{
+    id: UiMode;
+    labelKey: 'modeSimple' | 'modeBuilds' | 'modeExplorer' | 'modePro';
+    shortKey:
+      | 'modeSimpleShort'
+      | 'modeBuildsShort'
+      | 'modeExplorerShort'
+      | 'modeProShort';
+    icon: React.ElementType;
+    activeClass: string;
+  }>;
+}> = [
+  {
+    labelKey: 'navGroupBuy',
+    modes: [
+      {
+        id: 'simple',
+        labelKey: 'modeSimple',
+        shortKey: 'modeSimpleShort',
+        icon: Eye,
+        activeClass:
+          'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
+      },
+      {
+        id: 'builds',
+        labelKey: 'modeBuilds',
+        shortKey: 'modeBuildsShort',
+        icon: Layers,
+        activeClass:
+          'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30',
+      },
+    ],
+  },
+  {
+    labelKey: 'navGroupExpert',
+    modes: [
+      {
+        id: 'explorer',
+        labelKey: 'modeExplorer',
+        shortKey: 'modeExplorerShort',
+        icon: Compass,
+        activeClass: 'bg-sky-500/20 text-sky-300 border border-sky-500/30',
+      },
+      {
+        id: 'pro',
+        labelKey: 'modePro',
+        shortKey: 'modeProShort',
+        icon: Wrench,
+        activeClass:
+          'bg-amber-500/20 text-amber-300 border border-amber-500/30',
+      },
+    ],
+  },
+];
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
   uiMode,
@@ -111,57 +170,52 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
         {/* Navigation & Controls Bar: Level Buttons + Expert Controls */}
         <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-slate-800/60 pt-2 text-xs">
-          {/* 4 Proportional Experience Level Buttons */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-0.5 max-w-full rounded-lg border border-slate-800 bg-slate-900 p-0.5">
-            <button
-              type="button"
-              onClick={() => setUiMode('simple')}
-              className={`flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                uiMode === 'simple'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Eye className="h-3.5 w-3.5" />
-              {t('modeSimple', locale)}
-            </button>
-            <button
-              type="button"
-              onClick={() => setUiMode('explorer')}
-              className={`flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                uiMode === 'explorer'
-                  ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Compass className="h-3.5 w-3.5" />
-              {t('modeExplorer', locale)}
-            </button>
-            <button
-              type="button"
-              onClick={() => setUiMode('pro')}
-              className={`flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                uiMode === 'pro'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Wrench className="h-3.5 w-3.5" />
-              {t('modePro', locale)}
-            </button>
-            <button
-              type="button"
-              onClick={() => setUiMode('builds')}
-              className={`flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 font-semibold transition ${
-                uiMode === 'builds'
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Layers className="h-3.5 w-3.5" />
-              {t('modeBuilds', locale)}
-            </button>
-          </div>
+          {/* Mode navigation: buyer views first, expert views second */}
+          <nav
+            aria-label={t('navLabel', locale)}
+            className="flex w-full sm:w-auto items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 p-0.5"
+          >
+            {MODE_GROUPS.map((group, groupIndex) => (
+              <div
+                key={group.labelKey}
+                role="group"
+                aria-label={t(group.labelKey, locale)}
+                className={`flex flex-1 sm:flex-none items-center gap-1 ${
+                  groupIndex > 0 ? 'border-l border-slate-700/80 pl-1' : ''
+                }`}
+              >
+                <span className="hidden lg:inline px-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  {t(group.labelKey, locale)}
+                </span>
+                {group.modes.map((mode) => {
+                  const Icon = mode.icon;
+                  const isActive = uiMode === mode.id;
+                  return (
+                    <button
+                      key={mode.id}
+                      type="button"
+                      aria-label={t(mode.labelKey, locale)}
+                      aria-current={isActive ? 'page' : undefined}
+                      onClick={() => setUiMode(mode.id)}
+                      className={`flex flex-1 sm:flex-none shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-md px-2 sm:px-2.5 py-1.5 font-semibold transition ${
+                        isActive
+                          ? mode.activeClass
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5 shrink-0" />
+                      <span className="sm:hidden">
+                        {t(mode.shortKey, locale)}
+                      </span>
+                      <span className="hidden sm:inline">
+                        {t(mode.labelKey, locale)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </nav>
 
           {/* Expert Controls: Dataset Switcher + Import Deals (Visible only in Explorer and Pro modes) */}
           {(uiMode === 'explorer' || uiMode === 'pro') && (
@@ -170,6 +224,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               <div className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 p-0.5">
                 <button
                   type="button"
+                  aria-pressed={datasetMode === 'real'}
                   onClick={() => onSwitchDataset('real')}
                   className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
                     datasetMode === 'real'
@@ -178,45 +233,48 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                   }`}
                 >
                   <Database className="h-3.5 w-3.5" />
-                  Real GPUs (18)
+                  {t('datasetReal', locale)} ({REAL_WORLD_GPUS.length})
                 </button>
                 <button
                   type="button"
+                  aria-pressed={datasetMode === 'custom'}
                   onClick={() => onSwitchDataset('custom')}
                   className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
                     datasetMode === 'custom'
                       ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
-                  title="View your custom imported deals from Pichau, Terabyte, KaBuM, etc."
+                  title={t('datasetCustomTitle', locale)}
                 >
                   <Store className="h-3.5 w-3.5" />
-                  My Deals ({customGpuCount})
+                  {t('datasetCustom', locale)} ({customGpuCount})
                 </button>
                 <button
                   type="button"
+                  aria-pressed={datasetMode === 'combined'}
                   onClick={() => onSwitchDataset('combined')}
                   className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-semibold transition ${
                     datasetMode === 'combined'
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
-                  title="Combined Sandbox: Compare live store deals directly against converted US benchmark baselines in BRL"
+                  title={t('datasetCombinedTitle', locale)}
                 >
                   <Sparkles className="h-3.5 w-3.5" />
-                  Combined Sandbox
+                  {t('datasetCombined', locale)}
                 </button>
                 <button
                   type="button"
+                  aria-pressed={datasetMode === 'synthetic'}
                   onClick={() => onSwitchDataset('synthetic')}
                   className={`rounded-md px-2.5 py-1.5 font-semibold transition ${
                     datasetMode === 'synthetic'
                       ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
-                  title="Synthetic testbed with mathematically verified anchors and trap cards"
+                  title={t('datasetSyntheticTitle', locale)}
                 >
-                  Synthetic (10)
+                  {t('datasetSynthetic', locale)} ({PHASE1_SEED_GPUS.length})
                 </button>
               </div>
 
@@ -228,7 +286,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     $1 = R$
                   </span>
                   <input
-                    aria-label="USD to BRL Exchange Rate"
+                    aria-label={t('exchangeRateLabel', locale)}
                     type="number"
                     min={1}
                     max={20}
@@ -239,7 +297,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                       if (!isNaN(val) && val > 0) onChangeExchangeRate(val);
                     }}
                     className="w-14 rounded bg-slate-900 px-1 py-0.5 text-center font-mono font-bold text-amber-300 focus:outline-none border border-slate-700"
-                    title="Exchange rate used to convert US benchmark MSRP to BRL"
+                    title={t('exchangeRateLabel', locale)}
                   />
                 </div>
               )}
@@ -249,9 +307,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 type="button"
                 onClick={onOpenDealImporter}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/20 px-3 py-1.5 font-bold text-indigo-300 hover:bg-indigo-500/30 hover:border-indigo-400 transition shadow-sm"
-                title="Paste listings from Pichau, Terabyte, KaBuM, PCYes, Amazon, etc."
+                title={t('importDealsTitle', locale)}
               >
-                <PlusCircle className="h-3.5 w-3.5" />+ Import Deals
+                <PlusCircle className="h-3.5 w-3.5" />
+                {t('importDeals', locale)}
               </button>
             </div>
           )}

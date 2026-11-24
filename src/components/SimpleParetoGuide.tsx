@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import {
   GpuCandidate,
   HardConstraints,
@@ -6,6 +6,8 @@ import {
   PreferenceWeights,
   RankedGpu,
 } from '../lib/math/types';
+import { PcBuild } from '../lib/math/buildTypes';
+import { AffiliatePartnerProfile } from '../lib/math/pricingEngine';
 import { Compass } from 'lucide-react';
 import { PriorityEntry, PriorityProfile } from '../lib/math/priorityModel';
 import {
@@ -28,10 +30,15 @@ import {
 } from './BeginnerIntakeCard';
 import { SimpleGuidePickHero } from './SimpleGuidePickHero';
 import { FullBuildPickHero } from './FullBuildPickHero';
-import { SimpleGuideMathWalkthrough } from './SimpleGuideMathWalkthrough';
 import { useFullSystemOptimizer } from '../hooks/useFullSystemOptimizer';
 import { AppLocale, t } from '../utils/i18n';
 import { getCurrencyAdjustedCatalogs } from '../utils/currency';
+
+const SimpleGuideMathWalkthrough = lazy(() =>
+  import('./SimpleGuideMathWalkthrough').then((m) => ({
+    default: m.SimpleGuideMathWalkthrough,
+  })),
+);
 
 interface SimpleParetoGuideProps {
   gpus: RankedGpu[];
@@ -63,6 +70,9 @@ interface SimpleParetoGuideProps {
   onSwitchTo3D: () => void;
   onSwitchToHyper: () => void;
   onSwitchToBuilds?: () => void;
+  onOpenGpuShareCard?: (gpu: RankedGpu, reason: string) => void;
+  onOpenBuildShareCard?: (build: PcBuild) => void;
+  activePartner?: AffiliatePartnerProfile | null;
   maxBudgetBound: number;
 }
 
@@ -100,6 +110,9 @@ export function SimpleParetoGuide({
   onSwitchTo3D,
   onSwitchToHyper,
   onSwitchToBuilds,
+  onOpenGpuShareCard,
+  onOpenBuildShareCard,
+  activePartner,
   maxBudgetBound,
 }: SimpleParetoGuideProps) {
   // Beginner Intake Flow State (UX-01 & UX-11)
@@ -208,7 +221,10 @@ export function SimpleParetoGuide({
     storages: effectiveStorages,
     cases: effectiveCases,
     coolers: effectiveCoolers,
-  } = useMemo(() => getCurrencyAdjustedCatalogs(currency), [currency]);
+  } = useMemo(
+    () => getCurrencyAdjustedCatalogs(currency, undefined, activePartner),
+    [currency, activePartner],
+  );
 
   const fullSystemCatalogs = useMemo(
     () => ({
@@ -278,6 +294,11 @@ export function SimpleParetoGuide({
     return { topBuild: top, stepDownBuild: stepDown, stepUpBuild: stepUp };
   }, [pcBuildsResult, constraints.maxPrice]);
 
+  const effectiveMaxBudgetBound =
+    beginnerGoal === 'pc'
+      ? Math.max(maxBudgetBound, currency === 'BRL' ? 20000 : 3200)
+      : maxBudgetBound;
+
   return (
     <div className="space-y-6">
       {/* 1. Answer-First Beginner Intake Card */}
@@ -287,7 +308,7 @@ export function SimpleParetoGuide({
         budget={constraints.maxPrice}
         currency={currency}
         locale={locale}
-        maxBudgetBound={maxBudgetBound}
+        maxBudgetBound={effectiveMaxBudgetBound}
         onSelectGoal={setBeginnerGoal}
         onSelectUseCase={handleSelectUseCase}
         onSelectBudget={handleSelectBudget}
@@ -340,6 +361,7 @@ export function SimpleParetoGuide({
               onApplyFlip={applyFlip}
             />
           }
+          onOpenShareCard={onOpenGpuShareCard}
         />
       ) : (
         <FullBuildPickHero
@@ -349,6 +371,7 @@ export function SimpleParetoGuide({
           currency={currency}
           locale={locale}
           onSwitchToBuilds={onSwitchToBuilds ?? (() => {})}
+          onOpenShareCard={onOpenBuildShareCard}
         />
       )}
 
@@ -380,28 +403,30 @@ export function SimpleParetoGuide({
         </button>
 
         {showDeepMath && (
-          <SimpleGuideMathWalkthrough
-            gpus={gpus}
-            rawCatalog={rawCatalog}
-            currency={currency}
-            constraints={constraints}
-            onChangeConstraints={onChangeConstraints}
-            xMetric={xMetric}
-            yMetric={yMetric}
-            zMetric={zMetric}
-            onSelectXMetric={onSelectXMetric}
-            onSelectYMetric={onSelectYMetric}
-            onSelectZMetric={onSelectZMetric}
-            onChangeWeights={onChangeWeights}
-            weights={weights}
-            priorityTargets={priorityProfile.targets}
-            selectedGpuIds={selectedGpuIds}
-            onToggleSelectGpu={onToggleSelectGpu}
-            onSwitchToExplorer={onSwitchToExplorer}
-            onSwitchTo3D={onSwitchTo3D}
-            onSwitchToHyper={onSwitchToHyper}
-            maxBudgetBound={maxBudgetBound}
-          />
+          <Suspense fallback={null}>
+            <SimpleGuideMathWalkthrough
+              gpus={gpus}
+              rawCatalog={rawCatalog}
+              currency={currency}
+              constraints={constraints}
+              onChangeConstraints={onChangeConstraints}
+              xMetric={xMetric}
+              yMetric={yMetric}
+              zMetric={zMetric}
+              onSelectXMetric={onSelectXMetric}
+              onSelectYMetric={onSelectYMetric}
+              onSelectZMetric={onSelectZMetric}
+              onChangeWeights={onChangeWeights}
+              weights={weights}
+              priorityTargets={priorityProfile.targets}
+              selectedGpuIds={selectedGpuIds}
+              onToggleSelectGpu={onToggleSelectGpu}
+              onSwitchToExplorer={onSwitchToExplorer}
+              onSwitchTo3D={onSwitchTo3D}
+              onSwitchToHyper={onSwitchToHyper}
+              maxBudgetBound={maxBudgetBound}
+            />
+          </Suspense>
         )}
       </div>
     </div>

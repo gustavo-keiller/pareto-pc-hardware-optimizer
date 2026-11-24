@@ -2,15 +2,32 @@ import { Translations } from './types';
 
 export const enUS: Translations = {
   // Navigation & Mode Bar
-  modeSimple: '1. Simple Guide',
-  modeExplorer: '2. Explorer',
-  modePro: '3. Pro Lab',
-  modeBuilds: '4. Full Builds',
-  datasetReal: 'Real GPUs (18)',
-  datasetCustom: 'My Prices',
-  datasetSynthetic: 'Synthetic (10)',
-  datasetCombined: 'US Market Deals',
-  importDeals: '+ Import Deals',
+  modeSimple: 'Simple Guide',
+  modeExplorer: 'Explorer',
+  modePro: 'Pro Lab',
+  modeBuilds: 'Full Builds',
+  modeSimpleShort: 'Guide',
+  modeBuildsShort: 'Build PC',
+  modeExplorerShort: 'Explore',
+  modeProShort: 'Pro',
+  navGroupBuy: 'To buy',
+  navGroupExpert: 'For experts',
+  navLabel: 'Choose a view',
+  buildMoreFilters: 'More filters: platform, memory, brand, case',
+  buildActiveFilter: 'active',
+  buildActiveFilters: 'active',
+  datasetReal: 'Real GPUs',
+  datasetCustom: 'My Deals',
+  datasetSynthetic: 'Synthetic',
+  datasetCombined: 'Combined Sandbox',
+  importDeals: 'Import Deals',
+  datasetCustomTitle: 'Your imported deals from Pichau, Terabyte, KaBuM, etc.',
+  datasetCombinedTitle:
+    'Compare your store deals against US benchmark prices converted to BRL',
+  datasetSyntheticTitle: 'Teaching set with known winners and trap cards',
+  importDealsTitle:
+    'Paste listings from Pichau, Terabyte, KaBuM, PCYes, Amazon, etc.',
+  exchangeRateLabel: 'USD to BRL exchange rate',
   languageToggle: 'Language',
   appResetTitle: 'Reset filters and weights to defaults',
   appResetButton: 'Reset',
@@ -129,7 +146,7 @@ export const enUS: Translations = {
   mathGuideToggleHide: 'Hide mathematical details',
   mathGuideHeading: 'How we calculate the best recommendation for you',
   mathGuideSubheading:
-    'Hard constraints, Pareto Frontier, and TOPSIS multi-criteria closeness explained step-by-step.',
+    'Your limits, the cards no cheaper card beats, and how we weigh your priorities, step by step.',
 
   // Simple Mode Controls & Notices
   showAllGpusButton: 'View All Graphics Cards (Complete Leaderboard)',
@@ -145,7 +162,7 @@ export const enUS: Translations = {
   specFutureProof: 'For ultra textures without stutter',
   specPowerDraw: 'Peak Power (TBP)',
   specRatedPower: 'Required power supply headroom',
-  specFpsPer100: 'FPS per $100',
+  specFpsPer100: 'FPS per',
   savePrefix: 'Save',
   moreSuffix: 'more',
 
@@ -337,7 +354,7 @@ export const enUS: Translations = {
   // Estimate labels (FIX-04)
   estimateBadge: 'estimate',
   estimateExplanation:
-    'Performance and bottleneck figures are model estimates until calibrated with empirical benchmark telemetry (DATA-02).',
+    'Performance and bottleneck figures are model estimates until calibrated with empirical benchmark telemetry.',
 
   // Pro-Mode Extras (UX-08)
   weightsProfilesTitle: 'Saved Weight Profiles',
@@ -392,4 +409,164 @@ export const enUS: Translations = {
   swapIncompatible: 'Incompatible',
   swapCustomizedBuildBadge: 'Customized Build',
   swapResetToRecommended: 'Reset to Recommended',
+
+  // Social Share Card & Creator Studio (SHARE-01)
+  btnShareCard: 'Share Image & Link',
+  socialModalTitle: 'Share Card & Link Studio (Creators & Groups)',
+  socialModalSubtitle:
+    'Download the spec image with best-deal percentages + ready-to-post caption and link.',
+  socialCreatorHandleLabel: 'Your @Handle or Group Name (Optional)',
+  socialCreatorHandlePlaceholder: 'e.g. @TechDealsDaily',
+  socialAmazonTagLabel: 'Amazon Affiliate Tag (Optional)',
+  socialAmazonTagPlaceholder: 'e.g. yourchannel-20',
+  socialAffiliateUrlLabel: 'Your Store Affiliate Link (Optional)',
+  socialAffiliateUrlPlaceholder:
+    'Paste your Amazon / Newegg / BestBuy affiliate link...',
+  socialSiteBrandLabel: 'Website Brand & Domain on Card',
+  socialDownloadPngBtn: 'Download PNG Image (HD)',
+  socialCopyCaptionBtn: 'Copy Ready Caption + Link',
+  socialCaptionCopied: 'Caption & Link Copied!',
+  socialBundleBtn: 'Download Image + Copy Caption (1-Click)',
+  socialBundleDone: 'Image Downloaded & Caption Copied!',
+  socialPreviewCaptionTitle:
+    'Caption Preview for WhatsApp / Telegram / Discord / YouTube',
+  socialFrontierWeightsLabel: 'Best-Deal Priority Split',
+  socialCloseModal: 'Close share card studio',
+
+  // Regional Store Pricing Attribution (DATA-04)
+  verifiedStorePriceBadge: 'Verified Store Price',
+  viewAtStore: 'View at Store',
+  pixCashLabel: 'cash / PIX',
+  installmentUpTo: 'or up to',
+
+  // Launch Foundations & Creator Attribution (LAUNCH-02/03/05 & AFF-03/05)
+  errorBoundaryTitle: 'Something went wrong rendering this view',
+  errorBoundaryDesc:
+    'Reload the page to safely restore your filters and recommendations.',
+  errorBoundaryReload: 'Reset & Reload',
+  creatorBannerBadge: 'Curated with',
+  creatorBannerNotice:
+    'Store links carry this creator affiliate code. Mathematical rankings never change.',
+  creatorBannerDismiss: 'Clear partner attribution',
+  footerAffiliateDisclosure:
+    'Disclosure: we may earn a commission from partner store links. This never changes mathematical rankings or deal scores.',
+  footerLegalBtn: 'Privacy (LGPD/GDPR) & Terms',
+  footerFeedbackBtn: 'Report Wrong Price / Feedback',
+  legalModalTitle: 'Privacy, Cookies & Disclosure (LGPD / GDPR)',
+  legalPrivacyBody:
+    'We use zero tracking cookies and never sell personal data. Your preferences and imported deals remain strictly in your browser (localStorage). Outbound store links may carry creator or project affiliate codes with zero influence on mathematical rankings.',
+  legalCloseBtn: 'Close',
+  feedbackModalTitle: 'Report Outdated Price or Issue',
+  feedbackModalSubtitle:
+    'Found an out-of-stock item, wrong store price, or compatibility issue? Copy and record a report below.',
+  feedbackPlaceholder:
+    'e.g. RX 6600 price changed to $209 on Amazon US today...',
+  feedbackSubmitBtn: 'Copy & Record Report',
+  feedbackSubmittedMsg: 'Report recorded and copied to clipboard!',
+
+  // Explorer & Pro Lab panels
+  xpWinnerTitle: 'Stage 3 Optimal Recommendation (#1 TOPSIS Match)',
+  xpCloseness: 'Closeness',
+  xpBelowFair: 'below fair market price',
+  xpAboveFair: 'above fair market price',
+  xpIdealDistance: 'Ideal distance',
+  xpAntiIdealDistance: 'Anti-ideal',
+  xpStat1440p: '1440p Gaming',
+  xpStatRt: 'Ray Tracing',
+  xpStatPower: 'Power Draw',
+  xpStage1Title: 'Stage 1: Hard Dealbreakers',
+  xpGpusFit: 'GPUs fit',
+  xpMaxBudget: 'Maximum Budget',
+  xpAll: 'All',
+  xpMinVram: 'Minimum VRAM Required',
+  xpMaxPower: 'Max GPU Power Draw (PSU Limit)',
+  xpLowPower: 'Low Power',
+  xpNoLimit: 'No Limit',
+  xpBrandFilters: 'Brand & Ecosystem Filters',
+  xpClearFilters: 'Clear Filters',
+  xpClearFiltersTitle: 'Reset brand and technology filters',
+  xpChipMaker: 'Chipset Manufacturer:',
+  xpAllBrands: 'Showing All Brands',
+  xpSelectedCount: 'selected',
+  xpBrandTech: 'Brand Technologies & Capabilities:',
+  xpEcosystem: 'Ecosystem Features',
+  xpBrandTechDesc:
+    'Require features tied to one brand that cannot be compared on a numeric axis.',
+  xpStage3Title: 'Stage 3: TOPSIS Priority Weights',
+  xpPresetsLabel: 'Quick Buyer Persona Presets:',
+  xpActive: 'Active',
+  xpIndividualWeights: 'Individual Objective Weights:',
+  xpPresetBalancedLabel: 'Balanced 1440p Sweet-Spot',
+  xpPresetBalancedDesc:
+    'Best mix of price, raster FPS, and 12–16GB VRAM longevity',
+  xpPresetBudgetLabel: 'Budget Value Hunter',
+  xpPresetBudgetDesc: 'Maximizes frames per dollar and low power draw',
+  xpPresetEsportsLabel: 'Pure Raster / Competitive FPS',
+  xpPresetEsportsDesc: 'Prioritizes raw 1440p frame rates over Ray Tracing',
+  xpPresetPathtracingLabel: 'Heavy Ray Tracing & 16GB+ VRAM',
+  xpPresetPathtracingDesc:
+    'Built for Cyberpunk/Alan Wake path tracing and local AI',
+  xpMetricPrice: 'Price',
+  xpMetricRaster: '1440p Raster',
+  xpMetricRt: '1440p RT',
+  xpMetricVram: 'VRAM',
+  xpMetricPower: 'Power (TBP)',
+  xpDirMin: 'min',
+  xpDirMax: 'max',
+  xpTitle2d: 'Price vs. Performance Frontier (Value Trap Detector)',
+  xpTitle3d: '3D Multi-Objective Frontier Cube (Price × FPS × VRAM/RT)',
+  xpTitleHyper:
+    '4D–7D Hyper-Space Explorer (N-Dimensional Pareto & Projections)',
+  xpTitleAxes: 'Multi-Axis & Individual Measurement Views',
+  xpTitleResiduals: 'Phase 2: Fair Market Value vs. Street Price (Hedonic OLS)',
+  xpDesc2d5d:
+    'Green circles = 2D frontier. Cyan diamonds = 5D specialists (saved by high VRAM, Ray Tracing, or low watts). Red = strictly dominated traps.',
+  xpDesc2dStrict:
+    '2D slice mode: every card below the green staircase is beaten on both axes at once.',
+  xpDesc3d:
+    'Exact 3D step-corner polyhedron + quick camera views for X×Y, Z×Y, and X×Z.',
+  xpDescHyper:
+    'Compare up to 7 hardware dimensions at once via parallel dominance, star glyphs, or RadViz springs.',
+  xpDescAxes:
+    'Inspect all 4 Price vs. Spec frontiers side by side, or isolate each measurement in 1D.',
+  xpDescResiduals:
+    'Green bars on the left are underpriced for their benchmarks; red bars on the right are overpriced.',
+  xpTab2d: '2D Frontier',
+  xpTab3d: '3D Cloud',
+  xpTabHyper: '4D–7D Hyper-Graph',
+  xpTabHyperTitle: 'Compare 4 to 7 hardware dimensions at once',
+  xpTabAxes: 'Axis Views',
+  xpTabAxesTitle:
+    'See every measurement axis on its own or as a 4-panel matrix',
+  xpTabResiduals: 'Fair Value (OLS)',
+  xpExpand: 'Expand Graphic',
+  xpExpandTitle: 'Expand the chart to full width',
+  xpShrink: 'Shrink View',
+  xpShrinkTitle: 'Restore the side-by-side layout',
+  xpTrapRule: 'Trap Rule:',
+  xpTrapRule5d: 'All 5 Specs (5D)',
+  xpTrapRule2d: 'Strict 2D Axes',
+  xpShadeOn: 'Shade Unoptimized Zone: ON',
+  xpShadeOff: 'Shade Unoptimized Zone: OFF',
+  xpShadeTitle: 'Paint the dominated region with one translucent color',
+  xpTrapsHidden: 'Traps Hidden',
+  xpHideTraps: 'Hide Trap Points',
+  xpHideTrapsTitle: 'Hide dominated trap points from the chart',
+  xpBaseAxis: 'Base Axis (Bottom-Left):',
+  xpYAxis: '↑ Y-Axis:',
+  xpNoFitTitle: 'No GPUs Fit Your Current Limits',
+  xpNoFitDesc:
+    'Raise the Maximum Budget, lower the Minimum VRAM, or increase the power limit.',
+  xpTrapDetected: 'Value trap',
+  xpTrapBeaten: 'is strictly beaten by another card',
+  xpSmartBuy: 'Smart buy',
+  xp5dOptimal: '5D Pareto optimal',
+  xp2dOptimal: '2D frontier optimal',
+  xpMatchScore: 'Match score',
+  xpRank: 'Rank',
+  xpOlsFair: 'OLS fair value',
+  xpTip:
+    'Tip: hover any GPU to see why it is a smart buy or a value trap. Use Expand Graphic for a full-width view.',
+  xpOptimalCount: 'optimal',
+  xpTrapsFlagged: 'traps flagged',
 };

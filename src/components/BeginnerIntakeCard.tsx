@@ -100,7 +100,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
   return (
     <section
       data-testid="beginner-intake"
-      className="rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-900/95 via-slate-900 to-slate-950 p-5 sm:p-6 shadow-xl space-y-6"
+      className="rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-900/95 via-slate-900 to-slate-950 p-4 sm:p-6 shadow-xl space-y-4 sm:space-y-6"
     >
       {/* Step 1: Goal (GPU vs Whole PC) */}
       <div>
@@ -108,24 +108,25 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
           <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
             {t('intakeStep1Title', locale)}
           </span>
-          <span className="text-xs text-slate-400">
+          <span className="hidden sm:inline text-xs text-slate-400">
             {goal === 'gpu'
               ? t('intakeGoalGpu', locale)
               : t('intakeGoalPc', locale)}
           </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <button
             type="button"
+            aria-pressed={goal === 'gpu'}
             onClick={() => handleSelectGoal('gpu')}
-            className={`flex items-center gap-3 rounded-2xl border p-3.5 text-left transition ${
+            className={`flex items-center gap-2 sm:gap-3 rounded-2xl border p-2.5 sm:p-3.5 text-left transition ${
               goal === 'gpu'
                 ? 'border-emerald-500/60 bg-emerald-500/15 text-white shadow-md shadow-emerald-500/10'
                 : 'border-slate-800 bg-slate-950/80 text-slate-300 hover:border-slate-700 hover:text-white'
             }`}
           >
             <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+              className={`flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl border ${
                 goal === 'gpu'
                   ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
                   : 'border-slate-800 bg-slate-900 text-slate-400'
@@ -137,7 +138,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
               <div className="text-sm font-bold">
                 {t('intakeGoalGpu', locale)}
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="hidden sm:block text-xs text-slate-400 mt-0.5">
                 {t('intakeGoalGpuDesc', locale)}
               </p>
             </div>
@@ -145,15 +146,16 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
 
           <button
             type="button"
+            aria-pressed={goal === 'pc'}
             onClick={() => handleSelectGoal('pc')}
-            className={`flex items-center gap-3 rounded-2xl border p-3.5 text-left transition ${
+            className={`flex items-center gap-2 sm:gap-3 rounded-2xl border p-2.5 sm:p-3.5 text-left transition ${
               goal === 'pc'
                 ? 'border-emerald-500/60 bg-emerald-500/15 text-white shadow-md shadow-emerald-500/10'
                 : 'border-slate-800 bg-slate-950/80 text-slate-300 hover:border-slate-700 hover:text-white'
             }`}
           >
             <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+              className={`flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl border ${
                 goal === 'pc'
                   ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
                   : 'border-slate-800 bg-slate-900 text-slate-400'
@@ -165,7 +167,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
               <div className="text-sm font-bold">
                 {t('intakeGoalPc', locale)}
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="hidden sm:block text-xs text-slate-400 mt-0.5">
                 {t('intakeGoalPcDesc', locale)}
               </p>
             </div>
@@ -179,11 +181,11 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
           <span className="text-xs font-black uppercase tracking-wider text-sky-400">
             {t('intakeStep2Title', locale)}
           </span>
-          <span className="text-xs text-slate-400">
+          <span className="hidden sm:inline text-xs text-slate-400">
             {t('intakeStep2Subtitle', locale)}
           </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
           {useCases.map((uc) => {
             const Icon = uc.icon;
             const isSelected = useCase === uc.id;
@@ -191,15 +193,16 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
               <button
                 key={uc.id}
                 type="button"
+                aria-pressed={isSelected}
                 onClick={() => onSelectUseCase(uc.id)}
-                className={`flex flex-col justify-between rounded-2xl border p-3.5 text-left transition ${
+                className={`flex flex-col justify-between rounded-2xl border p-2.5 sm:p-3.5 text-left transition ${
                   isSelected
                     ? 'border-sky-500/60 bg-sky-500/15 text-white shadow-md shadow-sky-500/10'
                     : 'border-slate-800 bg-slate-950/80 text-slate-300 hover:border-slate-700 hover:text-white'
                 }`}
               >
                 <div>
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 sm:mb-1.5">
                     <Icon
                       className={`h-4 w-4 shrink-0 ${
                         isSelected ? 'text-sky-300' : 'text-slate-400'
@@ -209,7 +212,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
                       {uc.title}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="hidden sm:block text-[11px] text-slate-400 leading-relaxed">
                     {uc.subtitle}
                   </p>
                 </div>
@@ -227,7 +230,7 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
           <span className="text-xs font-black uppercase tracking-wider text-amber-400">
             {t('intakeStep3Title', locale)}
           </span>
-          <span className="font-mono text-sm font-bold text-emerald-400">
+          <span className="font-mono text-sm font-bold text-emerald-400 whitespace-nowrap">
             {t('intakeUpTo', locale)}
             {formatCurrency(budget, currency, false, locale)}
           </span>
@@ -239,8 +242,9 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
               <button
                 key={amount}
                 type="button"
+                aria-pressed={isSelected}
                 onClick={() => onSelectBudget(amount)}
-                className={`flex-1 min-w-[100px] rounded-xl border px-3 py-2 text-xs font-bold transition text-center ${
+                className={`flex-1 min-w-[88px] sm:min-w-[100px] rounded-xl border px-2 sm:px-3 py-2 text-xs font-bold transition text-center ${
                   isSelected
                     ? 'border-emerald-500/60 bg-emerald-500/20 text-emerald-300 shadow-sm'
                     : 'border-slate-800 bg-slate-950/90 text-slate-400 hover:border-slate-700 hover:text-slate-200'
@@ -252,8 +256,9 @@ export const BeginnerIntakeCard: React.FC<BeginnerIntakeCardProps> = ({
           })}
           <button
             type="button"
+            aria-pressed={budget >= maxBudgetBound}
             onClick={() => onSelectBudget(maxBudgetBound)}
-            className={`rounded-xl border px-3 py-2 text-xs font-bold transition ${
+            className={`flex-1 sm:flex-none min-w-[88px] rounded-xl border px-3 py-2 text-xs font-bold transition ${
               budget >= maxBudgetBound
                 ? 'border-emerald-500/60 bg-emerald-500/20 text-emerald-300 shadow-sm'
                 : 'border-slate-800 bg-slate-950/90 text-slate-400 hover:border-slate-700 hover:text-slate-200'

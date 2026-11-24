@@ -19,6 +19,7 @@ import {
   StorageCandidate,
 } from '../lib/math/buildTypes';
 import { GpuCandidate, HardwareVendor } from '../lib/math/types';
+import { AffiliatePartnerProfile } from '../lib/math/pricingEngine';
 import { BudgetPreset } from '../data/budgetPresets';
 import { BuildFilterCriteria } from '../lib/math/combinatorial';
 import { useFullSystemOptimizer } from '../hooks/useFullSystemOptimizer';
@@ -51,16 +52,16 @@ interface FullBuildExplorerProps {
   gpus: GpuCandidate[];
   currency?: 'USD' | 'BRL';
   locale?: AppLocale;
-  onSwitchToSimple?: () => void;
-  onSwitchToExplorer?: () => void;
+  onOpenShareCard?: (build: PcBuild) => void;
+  activePartner?: AffiliatePartnerProfile | null;
 }
 
 export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   gpus,
   currency = 'USD',
   locale = 'pt-BR',
-  onSwitchToSimple,
-  onSwitchToExplorer,
+  onOpenShareCard,
+  activePartner,
 }) => {
   const isBrl = currency === 'BRL';
 
@@ -132,7 +133,10 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
     storages: activeStorages,
     cases: activeCases,
     coolers: activeCoolers,
-  } = useMemo(() => getCurrencyAdjustedCatalogs(currency), [currency]);
+  } = useMemo(
+    () => getCurrencyAdjustedCatalogs(currency, undefined, activePartner),
+    [currency, activePartner],
+  );
 
   // Compute Full Systems using combinatorial optimization
   const filterCriteria: BuildFilterCriteria = useMemo(() => {
@@ -431,7 +435,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
   return (
     <div className="space-y-6">
       {/* Hero Header */}
-      <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 p-6 sm:p-8 shadow-2xl">
+      <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 p-5 sm:p-6 shadow-2xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
@@ -441,33 +445,15 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                 {t('buildFullTitle', locale)}
               </h2>
-              <span className="rounded-full bg-indigo-500/10 border border-indigo-500/30 px-3 py-0.5 text-xs font-semibold text-indigo-300">
+              <span className="hidden sm:inline rounded-full bg-indigo-500/10 border border-indigo-500/30 px-3 py-0.5 text-xs font-semibold text-indigo-300">
                 {t('buildFullSubtitle', locale)}
               </span>
             </div>
-            <p className="mt-2 text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
+            <p className="hidden sm:block mt-2 text-sm text-slate-300 max-w-3xl leading-relaxed">
               {t('buildFullDescription', locale)}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            {onSwitchToSimple && (
-              <button
-                type="button"
-                onClick={onSwitchToSimple}
-                className="rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition"
-              >
-                {t('btnSimpleGuide', locale)}
-              </button>
-            )}
-            {onSwitchToExplorer && (
-              <button
-                type="button"
-                onClick={onSwitchToExplorer}
-                className="rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition"
-              >
-                {t('btnGpuExplorer', locale)}
-              </button>
-            )}
             <button
               type="button"
               onClick={() => setIsUpgradeModalOpen(true)}
@@ -587,6 +573,7 @@ export const FullBuildExplorer: React.FC<FullBuildExplorerProps> = ({
           onSwapPart={(cat) => setSwappingCategory(cat)}
           isCustomized={isCustomized}
           onResetCustomization={() => setCustomOverrides(null)}
+          onOpenShareCard={onOpenShareCard}
         />
       ) : (
         <div className="rounded-3xl border border-dashed border-slate-800 bg-slate-900/40 p-12 text-center text-slate-400">

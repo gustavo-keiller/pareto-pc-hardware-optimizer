@@ -7,6 +7,7 @@ import historyJson from './prices/history.json';
 function parsePriceOffer(
   item: (typeof brPricesJson)[number] | (typeof usPricesJson)[number],
 ): RegionalPriceOffer {
+  const rawRecord: Record<string, unknown> = item;
   return {
     componentId: item.componentId,
     store: item.store,
@@ -16,6 +17,24 @@ function parsePriceOffer(
       'installmentPrice' in item ? item.installmentPrice : undefined,
     installments: 'installments' in item ? item.installments : undefined,
     url: item.url,
+    affiliateUrl:
+      typeof rawRecord.affiliateUrl === 'string'
+        ? rawRecord.affiliateUrl
+        : undefined,
+    partner:
+      typeof rawRecord.partner === 'string' ? rawRecord.partner : undefined,
+    sponsored:
+      typeof rawRecord.sponsored === 'boolean'
+        ? rawRecord.sponsored
+        : undefined,
+    sponsorLabel:
+      typeof rawRecord.sponsorLabel === 'string'
+        ? rawRecord.sponsorLabel
+        : undefined,
+    couponCode:
+      typeof rawRecord.couponCode === 'string'
+        ? rawRecord.couponCode
+        : undefined,
     inStock: item.inStock,
     checkedAt: item.checkedAt,
   };

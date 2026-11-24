@@ -10,6 +10,7 @@ import {
   isFormFactorPreference,
   PcBuild,
 } from '../lib/math/buildTypes';
+import { PreferenceWeights } from '../lib/math/types';
 import { formatCurrency } from './currency';
 import { AppLocale } from './i18n';
 
@@ -30,6 +31,88 @@ export interface BuildShareParams {
   formFactor?: FormFactorPreference;
   coolerType?: CoolerTypePreference;
   aesthetic?: AestheticPreference;
+  ref?: string;
+  amz?: string;
+  storeUrl?: string;
+}
+
+export interface GpuShareParams {
+  gpuId?: string;
+  budget?: number;
+  currency?: 'USD' | 'BRL';
+  weights?: PreferenceWeights;
+  mode?: 'simple' | 'explorer' | 'pro';
+  ref?: string;
+  amz?: string;
+  storeUrl?: string;
+}
+
+/**
+ * Validates that an external store/affiliate URL uses a safe http(s) scheme.
+ */
+export function sanitizeHttpUrl(
+  rawUrl: string | null | undefined,
+): string | undefined {
+  if (!rawUrl) return undefined;
+  const trimmed = rawUrl.trim();
+  if (!trimmed) return undefined;
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed.toString();
+    }
+    return undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Sanitizes a short creator/group handle or tag (letters, numbers, _, -, @, .).
+ */
+export function sanitizeCreatorRef(
+  rawRef: string | null | undefined,
+): string | undefined {
+  if (!rawRef) return undefined;
+  const cleaned = rawRef
+    .trim()
+    .replace(/[^a-zA-Z0-9_@.-]/g, '')
+    .slice(0, 48);
+  return cleaned.length > 0 ? cleaned : undefined;
+}
+
+/**
+ * Encodes 5 TOPSIS preference weights into compact dash-separated integers.
+ */
+export function encodeWeightsParam(weights: PreferenceWeights): string {
+  const vals = [
+    weights.price,
+    weights.rasterFps1440p,
+    weights.rtFps1440p,
+    weights.vramGb,
+    weights.tdpWatts,
+  ].map((n) => (Number.isFinite(n) && n >= 0 ? Math.round(n) : 0));
+  return vals.join('-');
+}
+
+/**
+ * Decodes compact dash-separated TOPSIS weights (`price-raster-rt-vram-tdp`).
+ */
+export function decodeWeightsParam(
+  raw: string | null,
+): PreferenceWeights | undefined {
+  if (!raw) return undefined;
+  const parts = raw.split('-');
+  if (parts.length !== 5) return undefined;
+  const nums = parts.map((p) => Number(p));
+  if (nums.some((n) => !Number.isFinite(n) || n < 0)) return undefined;
+  return {
+    price: nums[0],
+    rasterFps1440p: nums[1],
+    rtFps1440p: nums[2],
+    vramGb: nums[3],
+    tdpWatts: nums[4],
+  };
 }
 
 export function isBuildWorkloadProfile(
@@ -81,6 +164,13 @@ export function encodeBuildShareUrl(
   if (params.aesthetic && params.aesthetic !== 'ALL')
     url.searchParams.set('aesthetic', params.aesthetic);
 
+  const safeRef = sanitizeCreatorRef(params.ref);
+  if (safeRef) url.searchParams.set('ref', safeRef);
+  const safeAmz = sanitizeCreatorRef(params.amz);
+  if (safeAmz) url.searchParams.set('amz', safeAmz);
+  const safeStore = sanitizeHttpUrl(params.storeUrl);
+  if (safeStore) url.searchParams.set('store', safeStore);
+
   return url.toString();
 }
 
@@ -100,6 +190,10 @@ export function decodeBuildShareUrl(
     const params = new URLSearchParams(search);
 
     const mode = params.get('mode');
+    if (mode === 'simple' || mode === 'explorer' || mode === 'pro') {
+      return null;
+    }
+
     const cpuId = params.get('cpu') ?? undefined;
     const gpuId = params.get('gpu') ?? undefined;
     const moboId = params.get('mobo') ?? undefined;
@@ -162,6 +256,10 @@ export function decodeBuildShareUrl(
         ? rawAesthetic
         : undefined;
 
+    const ref = sanitizeCreatorRef(params.get('ref'));
+    const amz = sanitizeCreatorRef(params.get('amz'));
+    const storeUrl = sanitizeHttpUrl(params.get('store'));
+
     return {
       cpuId,
       gpuId,
@@ -179,6 +277,97 @@ export function decodeBuildShareUrl(
       formFactor,
       coolerType,
       aesthetic,
+      ref,
+      amz,
+      storeUrl,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Encodes a single-GPU recommendation, active priority weights, and creator attribution into a shareable URL.
+ */
+export function encodeGpuShareUrl(
+  params: GpuShareParams,
+  baseUrl?: string,
+): string {
+  const origin =
+    baseUrl ??
+    (typeof window !== 'undefined'
+      ? window.location.origin
+      : 'https://paretopc.com');
+  const url = new URL(origin);
+  url.pathname = '/';
+  url.searchParams.set('mode', params.mode ?? 'simple');
+
+  if (params.gpuId) url.searchParams.set('gpu', params.gpuId);
+  if (params.budget && params.budget > 0)
+    url.searchParams.set('budget', String(Math.round(params.budget)));
+  if (params.currency) url.searchParams.set('curr', params.currency);
+  if (params.weights)
+    url.searchParams.set('w', encodeWeightsParam(params.weights));
+
+  const safeRef = sanitizeCreatorRef(params.ref);
+  if (safeRef) url.searchParams.set('ref', safeRef);
+  const safeAmz = sanitizeCreatorRef(params.amz);
+  if (safeAmz) url.searchParams.set('amz', safeAmz);
+  const safeStore = sanitizeHttpUrl(params.storeUrl);
+  if (safeStore) url.searchParams.set('store', safeStore);
+
+  return url.toString();
+}
+
+/**
+ * Safely decodes GPU mode share parameters and creator attribution from a URL query string.
+ */
+export function decodeGpuShareUrl(searchOrUrl: string): GpuShareParams | null {
+  if (!searchOrUrl || !searchOrUrl.includes('=')) return null;
+
+  try {
+    const search = searchOrUrl.includes('?')
+      ? searchOrUrl.slice(searchOrUrl.indexOf('?'))
+      : searchOrUrl;
+    const params = new URLSearchParams(search);
+
+    const rawMode = params.get('mode');
+    if (rawMode === 'builds') return null;
+
+    const mode =
+      rawMode === 'simple' || rawMode === 'explorer' || rawMode === 'pro'
+        ? rawMode
+        : undefined;
+
+    const gpuId = params.get('gpu') ?? undefined;
+    const rawBudget = params.get('budget');
+    const budget =
+      rawBudget && Number.isFinite(Number(rawBudget)) && Number(rawBudget) > 0
+        ? Number(rawBudget)
+        : undefined;
+
+    const rawCurr = params.get('curr');
+    const currency =
+      rawCurr === 'USD' || rawCurr === 'BRL' ? rawCurr : undefined;
+
+    const weights = decodeWeightsParam(params.get('w'));
+    const ref = sanitizeCreatorRef(params.get('ref'));
+    const amz = sanitizeCreatorRef(params.get('amz'));
+    const storeUrl = sanitizeHttpUrl(params.get('store'));
+
+    if (!gpuId && !weights && !budget && !ref && !amz && !storeUrl && !mode) {
+      return null;
+    }
+
+    return {
+      gpuId,
+      budget,
+      currency,
+      weights,
+      mode,
+      ref,
+      amz,
+      storeUrl,
     };
   } catch {
     return null;

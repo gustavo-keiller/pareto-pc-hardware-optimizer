@@ -31,14 +31,15 @@ describe('i18n localization (src/utils/i18n.ts)', () => {
     for (const locale of ['pt-BR', 'en-US'] as const) {
       const dict = TRANSLATIONS[locale];
       for (const [key, text] of Object.entries(dict)) {
-        // Exclude mathGuide heading/subheading, pro modes, and multidimensional charts from beginner prohibition
+        // Exclude mathGuide heading/subheading, pro modes, Explorer/Pro panels (xp*), and multidimensional charts from beginner prohibition
         if (
           key.startsWith('mathGuide') ||
           key.includes('Pro') ||
           key.startsWith('verdict') ||
           key.startsWith('radar') ||
           key.startsWith('parallel') ||
-          key.startsWith('drawer')
+          key.startsWith('drawer') ||
+          key.startsWith('xp')
         )
           continue;
         const lower = text.toLowerCase();

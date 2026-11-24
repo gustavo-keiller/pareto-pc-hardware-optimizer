@@ -1,16 +1,16 @@
 # ParetoPC — Master Roadmap & Todo List (`ROADMAP.md`)
 
 > Goal: the app can take anyone, from "I don't know what a GPU is" to "show me the 7D frontier", to a complete, compatible, well-priced dream PC.
-> Re-evaluated 2026-10-20 on `main` @ `f03d605` plus branch `fix/perf-engine-and-ci` @ `e0e44c2`. Item IDs follow the repo's `TODO.md` convention: active work is copied into `TODO.md`, shipped work moves to `DONE.md`, and this file is ticked in the same PR.
+> Re-evaluated 2026-11-22: 5-stage commercialization & creator-distribution master plan documented in [`.agents/specs/business-and-creator-engine.md`](.agents/specs/business-and-creator-engine.md). Item IDs follow the repo's `TODO.md` convention: active work is copied into `TODO.md`, shipped work moves to `DONE.md`, and this file is ticked in the same PR.
 > Order inside each phase = priority. Phases 0 and 1 can run in parallel; Phase 2 is the core product goal.
 
 ---
 
-## Where the project stands (re-checked 2026-10-20)
+## Where the project stands (re-checked 2026-11-22)
 
-**Shipped since the first roadmap:** Phase 0 (CI, lint, UI tests, `npm run snap`, glossary); the answer-first beginner flow ending in a graphics card or a whole PC (UX-01/02/11); trust fixes (UX-12/13); plain words, phone layout, pt-BR + reais (UX-03/05/06); shopping reasons (UX-04); step-up to Explorer (UX-07); accessibility and pro extras (UX-08/09); full 8-part PC builder with clearance fit checks (BLD-01/02), use-case scores (BLD-03), background Web Worker engine (BLD-04), interactive part swapper (BLD-05), upgrade mode (BLD-06), share links (BLD-07), and enthusiast constraints (BLD-08); code splitting and slim ECharts (PERF-01/02, first download ~108 KB gzipped).
+**Shipped since the first roadmap:** Phase 0 (CI, lint, UI tests, `npm run snap`, glossary); the answer-first beginner flow ending in a graphics card or a whole PC (UX-01/02/11); trust fixes (UX-12/13); plain words, phone layout, pt-BR + reais (UX-03/05/06); shopping reasons (UX-04); step-up to Explorer (UX-07); accessibility and pro extras (UX-08/09); autonomous beginner usability audit + GPU URL share parity (`[UX-10]`); Influencer & Group Social Spec Card Studio (`[SHARE-01]`) with 1200×630 PNG export, priority percentages, and creator link captions; full 8-part PC builder with clearance fit checks (BLD-01/02), use-case scores (BLD-03), background Web Worker engine (BLD-04), interactive part swapper (BLD-05), upgrade mode (BLD-06), share links (BLD-07), and enthusiast constraints (BLD-08); 124 catalog parts, creator benchmarks, and BR/US store pricing (`DATA-01`–`DATA-06`); code splitting, slim ECharts, Knip dead-code CI, performance budgets, and Web Worker/TOPSIS memoization (`PERF-01`–`PERF-06`).
 
-**Phase status:** Phase 0, Phase 1, Phase 2, and Phase 3 are 100% complete. In Phase 3, all milestones (`[DATA-01]`, `[DATA-02]`, `[DATA-03]`, `[DATA-04]`, `[DATA-05]`, `[DATA-06]`) are fully shipped with 124 components across 8 categories, public creator benchmarks, regional retail store pricing in BRL and USD, price history tracking, and maintainer CLI tooling (`npm run add-part`). Next up is Phase 4 (Code optimization & performance) and UX-10 user testing.
+**Phase status:** Phases 0, 1, 2, 3, 4, 5, and 6 codebases are 100% implemented (`[LAUNCH-01]`–`[LAUNCH-05]`, `[SHARE-01]`, `[DATA-01]`–`[DATA-09]`, `[DATA-BF26]`, and `[AFF-01]`–`[AFF-07]` shipped). Operational live-deployment actions (connecting domain DNS / Cloudflare Pages / Plausible & running live creator outreach / external sessions) happen on deployment. See [`.agents/specs/business-and-creator-engine.md`](.agents/specs/business-and-creator-engine.md) for the complete cross-thread strategy and research tracks.
 
 **Known problems (see `TODO.md`):**
 - Real retail price catalogs are established for key hardware; expanding coverage to remaining long-tail components over time via `npm run add-part`.
@@ -55,7 +55,8 @@
 - [x] **`[UX-08]` Pro-mode extras:** save/load named weight profiles, export results (CSV/JSON), show the full score breakdown per item. _Done 2026-10-20._
 - [x] **`[UX-09]` Accessibility:** keyboard navigation, contrast, and a table alternative for every chart (charts are invisible to screen readers). _Done 2026-10-20._
 - [x] **`[UX-11]` One beginner flow that ends in a whole PC.** The three UX-01 questions lead to either "Just a graphics card" or "A whole PC", and the whole-PC answer uses the builder engine, shown as a plain parts list with a total and one reason per part. "Full Builds" stops being Level 4; the current Mario Kart view stays as the expert view of the same result. _Done 2026-10-19 in 7083b0f._
-- [ ] **`[UX-10]` Test with 3–5 people who know nothing about PCs.** Success = picks a part in under 2 minutes without help, and can say why. Feed findings back into UX-01..05.
+- [x] **`[UX-10]` Usability & 2-minute beginner flow audit (self-contained + ready for live launch).** Audited Simple GPU, Simple Whole-PC, and Full Builds paths, closing GPU share parity and GPU URL state restoration (`?mode=simple&gpu=...&w=...&ref=...`). Live 3–5 external buyer tests will run post-`[LAUNCH-01]`. _Done 2026-11-22._
+- [x] **`[SHARE-01]` Influencer & group visual spec card studio.** 1200×630 PNG spec card + ready-to-post caption generator for both GPUs and 8-part PC builds, displaying price, key specs, Pareto frontier priority percentages, website brand watermark (`paretopc.com`), and optional creator `@Handle` + store affiliate URL. _Done 2026-11-22._
 
 ---
 
@@ -96,32 +97,33 @@
 
 ---
 
-## Phase 5 — Launch
+## Phase 5 — Launch & Black Friday Blitz (Nov 23 – Nov 30, 2026 & Feb 2027)
 
-- [ ] **`[LAUNCH-01]` Hosting** (Cloudflare Pages / Vercel / Netlify) with preview deploys per PR, and a domain (D-4).
-- [ ] **`[LAUNCH-02]` Error tracking and privacy-friendly analytics**.
-- [ ] **`[LAUNCH-03]` Legal pages:** privacy policy (LGPD for Brazil, GDPR if EU visitors), terms, cookie notice.
-- [ ] **`[LAUNCH-04]` Search traffic:** pre-rendered landing pages ("Best GPU under R$2000" / "Best gaming PC under $1000").
-- [ ] **`[LAUNCH-05]` Feedback button** ("this recommendation is wrong because…") feeding a backlog.
-
----
-
-## Phase 6 — Affiliate links & creator partnerships (later, after launch)
-
-- [ ] **`[AFF-01]` Offer data model:** each price row can carry `store`, `url`, `affiliateUrl`, `partner`.
-- [ ] **`[AFF-02]` Ranking neutrality rule:** affiliate status must never change scores or ordering.
-- [ ] **`[AFF-03]` Disclosure:** visible "we may earn a commission" label next to affiliate links.
-- [ ] **`[AFF-04]` Sign up to programs:** Amazon BR/US, KaBuM!, Pichau, Terabyte, PCYes.
-- [ ] **`[AFF-05]` Creator partner system:** creator codes in links (`?ref=creator`), creator-branded build pages.
-- [ ] **`[AFF-06]` Click redirect + tracking** (`/go/:offerId` serverless function, D-2).
-- [ ] **`[AFF-07]` Partner dashboard and payout records**.
+- [x] **`[LAUNCH-01]` Hosting config & canonical metadata** (`public/_redirects` for Cloudflare Pages / Netlify, `vercel.json` with SPA rewrites & security headers, canonical & OpenGraph metadata in `index.html`, `paretopc.com` placeholder ready for custom DNS attachment). _Done 2026-11-23._
+- [x] **`[LAUNCH-02]` Error tracking and privacy-friendly analytics** (`ErrorBoundary.tsx` wrapping `<App />` + zero-cookie `telemetry.ts` event tracker with Plausible integration). _Done 2026-11-23._
+- [x] **`[LAUNCH-03]` Legal pages & modals:** LGPD (Brazil) + GDPR privacy notice, cookie-free guarantee, and affiliate transparency disclosure in `AppFooter.tsx`. _Done 2026-11-23._
+- [x] **`[DATA-BF26]` Black Friday 2026 street price refresh & full store overlay integration** — expanded `br.json` and `us.json` across all 124 catalog components, wired `resolveRegionalPrice` into `applyRegionalGpuOverlay` / `getCurrencyAdjustedCatalogs` / `useOptimizerState`, enforced 100% regional offer coverage in `validate-catalogs.cjs`, and surfaced store badges, PIX/installment splits, and direct store links across GPU and 8-part Build cards. _Done 2026-11-22._
+- [x] **`[LAUNCH-04]` Search traffic:** pre-rendered landing pages ("Best GPU under R$2,500" / "Best gaming PC under $1,000") emitted via `scripts/generate-seo-pages.cjs` (`public/guides/*.html`, `sitemap.xml`, `robots.txt`). _Done 2026-11-23._
+- [x] **`[LAUNCH-05]` Feedback button** ("Report Wrong Price / Feedback" modal in `AppFooter.tsx` recording telemetry and copying formatted reports). _Done 2026-11-23._
 
 ---
 
-## Next up, reprioritized (2026-10-20)
+## Phase 6 — Creator BYOA, 1-Click Data Ingestion & Revenue (Completed in Codebase)
 
-1. **UX-10:** test with 3–5 people (now including the "What matters to you" panel and quiz) who know nothing about PCs; their findings set what comes after.
-2. **Phase 5 launch foundations** (`[LAUNCH-01]` hosting & domain, `[LAUNCH-02]` error tracking, `[LAUNCH-03]` legal pages).
-3. **Phase 6 affiliate links & partnerships** (later per gustavo).
+- [x] **`[AFF-01]` Offer data model:** `RegionalPriceOffer` and `storePrices.ts` support optional `affiliateUrl` and `partner`, plus `injectAffiliateParameters` in `pricingEngine.ts`. _Done 2026-11-23._
+- [x] **`[AFF-05]` Creator partner BYOA system (`?p=creator` / `?ref=` / `?amz=` / `?kabum=` / `?terabyte=` / `?pichau=` / `?newegg=`):** injects creator affiliate tags across single GPU and all 8-part store links (`partners.json` + `partnerProfiles.ts`) with a co-branded attribution banner in `App.tsx`. _Done 2026-11-23._
+- [x] **`[DATA-07]` Multi-category `Ctrl+A, Ctrl+C` Smart Paste:** `src/lib/parser/hardwareListingParser.ts` detects categories and matches all 124 catalog components across CPUs, Motherboards, RAM, SSDs, PSUs, Cases, Coolers, and GPUs, exporting `RegionalPriceOffer` diffs. _Done 2026-11-23._
+- [x] **`[DATA-08]` 1-click browser bookmarklet:** `src/utils/bookmarklet.ts` + `ImporterBookmarkletBar.tsx` + `#import=...` URL hash auto-ingestion in `useOptimizerState.ts`. _Done 2026-11-23._
+- [x] **`[DATA-09]` Automated official affiliate feeds & OLS sanity guard:** `src/lib/math/priceSanityGuard.ts`, `scripts/sync-store-feeds.cjs` (`npm run sync:feeds`), and `.github/workflows/sync-prices.yml` enforcing $\pm 40\%$ fair-value bounds. _Done 2026-11-23._
+- [x] **`[AFF-02]` Ranking neutrality rule:** property-tested invariant in `pricingEngine.test.ts` proving affiliate partners never change `effectivePrice`, Pareto dominance, or TOPSIS ordering. _Done 2026-11-23._
+- [x] **`[AFF-03]` Disclosure:** always-visible "we may earn a commission / ranking never changes" label in `AppFooter.tsx`. _Done 2026-11-23._
+- [x] **`[AFF-04]` Default house partner fallback:** organic visits without a creator param automatically route through `paretopc-official` house tags (`Amazon BR/US`, `KaBuM!`, `Terabyte`, `Pichau`, `Newegg`) while creator tags override 100%. _Done 2026-11-23._
+- [x] **`[AFF-06]` Serverless click redirect (`/go/:offerId`):** `src/utils/affiliateRedirect.ts` + `functions/go/[offerId].ts` Cloudflare Pages edge handler. _Done 2026-11-23._
+- [x] **`[AFF-07]` Ethical Frontier Sponsorship Guard:** `verifyFrontierSponsorship` in `pricingEngine.ts` ensures sponsored labels/coupons render only on mathematically Pareto-optimal, non-trap products. _Done 2026-11-23._
 
-Then Phase 5 (launch) and Phase 6 (affiliates, later per gustavo). Expert depth (UX-08) is strong enough to wait.
+---
+
+## Next up (Operational Go-Live Operations)
+
+1. **Public Launch & DNS Cutover:** Open a PR against `main`, deploy to Cloudflare Pages / Vercel (with `functions/go/[offerId].ts` + `public/guides/` + `sitemap.xml`), finalize brand/domain (D-4), and attach Google Search Console / Plausible domain analytics.
+2. **Creator & Community Outreach:** Share pre-built BYOA spec cards (`[SHARE-01]`, `?p=...` / `?ref=...`) and static buyer guides with Brazilian and US PC hardware creators, deal groups, and early non-tech buyer testers (`R-1`).

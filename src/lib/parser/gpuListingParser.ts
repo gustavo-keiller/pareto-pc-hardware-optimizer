@@ -170,6 +170,171 @@ export function splitMultiListings(rawText: string): string[] {
   return [rawText.trim()];
 }
 
+export interface ExtractedStoreListingMeta {
+  readonly normalizedListing: string;
+  readonly rawTitle: string;
+  readonly store: string;
+  readonly url?: string;
+  readonly currency: 'BRL' | 'USD';
+  readonly priceCash?: number;
+  readonly priceInstallment?: number;
+  readonly originalPrice?: number;
+  readonly activePrice: number;
+}
+
+/**
+ * Extracts store, URL, currency, and cash/installment/original prices from raw e-commerce text.
+ */
+export function extractListingPriceAndStore(
+  rawListing: string,
+  minPrice = 100,
+): ExtractedStoreListingMeta {
+  const cleanedListing = cleanPromotionalPrefixes(rawListing);
+  const normalizedListing = normalizeSquishedListing(cleanedListing);
+  const lines = normalizedListing
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  let rawTitle = lines[0] || 'Unknown Hardware Listing';
+  rawTitle = rawTitle
+    .replace(/\s*(?:de|de:)?\s*R?\$?\s*[\d.]+(?:,\d{2})?\s*por.*$/i, '')
+    .trim();
+
+  let store = 'Online Store';
+  let url: string | undefined;
+
+  const mdUrlMatch = rawListing.match(/\[.*?\]\((https?:\/\/[^\s)]+)\)/i);
+  const rawUrlMatch = rawListing.match(/https?:\/\/[^\s)]+/i);
+  if (mdUrlMatch && mdUrlMatch[1]) {
+    url = mdUrlMatch[1];
+  } else if (rawUrlMatch && rawUrlMatch[0]) {
+    url = rawUrlMatch[0];
+  }
+
+  const soldByMatch = normalizedListing.match(
+    /Vendido\s*(?:e\s*entregue)?\s*por:\s*([^\n\r,]+)/i,
+  );
+  if (soldByMatch && soldByMatch[1]) {
+    store = soldByMatch[1].trim();
+  } else {
+    for (const s of KNOWN_STORES) {
+      if (s.pattern.test(normalizedListing) || (url && s.pattern.test(url))) {
+        store = s.name;
+        break;
+      }
+    }
+  }
+
+  const hasBrl = /R\$|PIX|reais|sem\s*juros/i.test(normalizedListing);
+  const currency: 'BRL' | 'USD' = hasBrl ? 'BRL' : 'USD';
+
+  let originalPrice: number | undefined;
+  let priceCash: number | undefined;
+  let priceInstallment: number | undefined;
+
+  const origMatch = normalizedListing.match(
+    /(?:de|de:)\s*R?\$?\s*([\d.]+(?:,\d{2})?)\s*(?:por|\/)/i,
+  );
+  if (origMatch && origMatch[1]) {
+    originalPrice = parsePriceString(origMatch[1]);
+  }
+
+  interface FoundPrice {
+    value: number;
+    lineIndex: number;
+    rawText: string;
+  }
+  const foundPrices: FoundPrice[] = [];
+
+  const pricePattern =
+    /(?:R\$\s*|\$\s*|(?<!\w))(\d{1,3}(?:\.\d{3})+,\d{2}|\d{1,3}(?:,\d{3})+\.\d{2}|\d{2,6},\d{2}|\d{2,6}\.\d{2})\b/g;
+
+  lines.forEach((line, lineIdx) => {
+    if (
+      lineIdx === 0 &&
+      !line.includes('R$') &&
+      !line.includes('$') &&
+      !/\b\d{2,6}[,.]\d{2}\b/.test(line)
+    ) {
+      return;
+    }
+    const matches = Array.from(line.matchAll(pricePattern));
+    for (const m of matches) {
+      const matchIndex = m.index ?? 0;
+      const preText = line.slice(Math.max(0, matchIndex - 30), matchIndex);
+      if (/\b\d{1,2}\s*x\s*(?:de\s*)?$/i.test(preText.trim())) {
+        continue;
+      }
+
+      const val = parsePriceString(m[1]);
+      if (val >= minPrice) {
+        if (originalPrice && Math.abs(val - originalPrice) < 0.01) continue;
+
+        const windowStart = Math.max(0, matchIndex - 50);
+        const windowEnd = Math.min(line.length, matchIndex + m[0].length + 50);
+        const localContext = line.slice(windowStart, windowEnd);
+
+        foundPrices.push({
+          value: val,
+          lineIndex: lineIdx,
+          rawText: localContext,
+        });
+      }
+    }
+  });
+
+  for (const fp of foundPrices) {
+    const isInstallmentContext =
+      /em\s*até|\d+\s*x|cartão|sem\s*juros|ou\s*R\$/i.test(fp.rawText);
+    const isCashContext =
+      /à\s*vista|a\s*vista|pix|no\s*pix|desconto|por\s*R\$/i.test(fp.rawText);
+
+    if (isCashContext && !isInstallmentContext && !priceCash) {
+      priceCash = fp.value;
+    } else if (isInstallmentContext && !isCashContext && !priceInstallment) {
+      priceInstallment = fp.value;
+    }
+  }
+
+  if (foundPrices.length > 0) {
+    if (!priceCash && !priceInstallment) {
+      if (foundPrices.length >= 2) {
+        const sorted = [...foundPrices].sort((a, b) => a.value - b.value);
+        priceCash = sorted[0].value;
+        priceInstallment = sorted[sorted.length - 1].value;
+      } else {
+        priceCash = foundPrices[0].value;
+      }
+    } else if (!priceCash && priceInstallment) {
+      const remaining = foundPrices.filter((p) => p.value !== priceInstallment);
+      if (remaining.length > 0) {
+        priceCash = Math.min(...remaining.map((p) => p.value));
+      }
+    } else if (priceCash !== undefined && !priceInstallment) {
+      const cash = priceCash;
+      const remaining = foundPrices.filter((p) => p.value > cash);
+      if (remaining.length > 0) {
+        priceInstallment = Math.max(...remaining.map((p) => p.value));
+      }
+    }
+  }
+
+  const activePrice = priceCash || priceInstallment || 0;
+
+  return {
+    normalizedListing,
+    rawTitle,
+    store,
+    url,
+    currency,
+    priceCash,
+    priceInstallment,
+    originalPrice,
+    activePrice,
+  };
+}
+
 /**
  * Parses a single GPU listing block into a typed ParsedGpuDeal.
  */
@@ -178,18 +343,18 @@ export function parseSingleGpuListing(
   index = 0,
 ): ParsedGpuDeal {
   const warnings: string[] = [];
-  const cleanedListing = cleanPromotionalPrefixes(rawListing);
-  const normalizedListing = normalizeSquishedListing(cleanedListing);
-  const lines = normalizedListing
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter(Boolean);
-
-  // 1. Raw Title & Clean Name
-  let rawTitle = lines[0] || 'Unknown GPU Listing';
-  rawTitle = rawTitle
-    .replace(/\s*(?:de|de:)?\s*R?\$?\s*[\d.]+(?:,\d{2})?\s*por.*$/i, '')
-    .trim();
+  const extracted = extractListingPriceAndStore(rawListing, 100);
+  const {
+    normalizedListing,
+    rawTitle,
+    store,
+    url,
+    currency,
+    priceCash,
+    priceInstallment,
+    originalPrice,
+    activePrice,
+  } = extracted;
 
   // 2. Chip & Benchmark Match
   const benchmarkMatch = matchKnownGpuChip(normalizedListing);
@@ -223,136 +388,6 @@ export function parseSingleGpuListing(
     }
   }
 
-  // 5. Store & URL extraction
-  let store = 'Online Store';
-  let url: string | undefined;
-
-  // Markdown link or direct URL
-  const mdUrlMatch = rawListing.match(/\[.*?\]\((https?:\/\/[^\s)]+)\)/i);
-  const rawUrlMatch = rawListing.match(/https?:\/\/[^\s)]+/i);
-  if (mdUrlMatch && mdUrlMatch[1]) {
-    url = mdUrlMatch[1];
-  } else if (rawUrlMatch && rawUrlMatch[0]) {
-    url = rawUrlMatch[0];
-  }
-
-  // Check explicit seller label "Vendido por: TerabyteShop"
-  const soldByMatch = normalizedListing.match(
-    /Vendido\s*(?:e\s*entregue)?\s*por:\s*([^\n\r,]+)/i,
-  );
-  if (soldByMatch && soldByMatch[1]) {
-    store = soldByMatch[1].trim();
-  } else {
-    for (const s of KNOWN_STORES) {
-      if (s.pattern.test(normalizedListing) || (url && s.pattern.test(url))) {
-        store = s.name;
-        break;
-      }
-    }
-  }
-
-  // 6. Currency Detection
-  const hasBrl = /R\$|PIX|reais|sem\s*juros/i.test(normalizedListing);
-  const currency: 'BRL' | 'USD' = hasBrl ? 'BRL' : 'USD';
-
-  // 7. Price Extraction (Cash/PIX vs. Card/Installment vs. Original)
-  let originalPrice: number | undefined;
-  let priceCash: number | undefined;
-  let priceInstallment: number | undefined;
-
-  // Original price: e.g. "de R$ 5.176,46 por:" or "De: R$ 1.449,99 por:"
-  const origMatch = normalizedListing.match(
-    /(?:de|de:)\s*R?\$?\s*([\d.]+(?:,\d{2})?)\s*(?:por|\/)/i,
-  );
-  if (origMatch && origMatch[1]) {
-    originalPrice = parsePriceString(origMatch[1]);
-  }
-
-  // Extract all valid currency tokens with explicit currency sign or decimal cents
-  interface FoundPrice {
-    value: number;
-    lineIndex: number;
-    rawText: string;
-  }
-  const foundPrices: FoundPrice[] = [];
-
-  const pricePattern =
-    /(?:R\$\s*|(?<!\w))(\d{1,3}(?:\.\d{3})+,\d{2}|\d{3,6},\d{2}|\d{3,6}\.\d{2})\b/g;
-
-  lines.forEach((line, lineIdx) => {
-    if (
-      lineIdx === 0 &&
-      !line.includes('R$') &&
-      !/\b\d{3,6},\d{2}\b/.test(line)
-    )
-      return;
-    const matches = Array.from(line.matchAll(pricePattern));
-    for (const m of matches) {
-      const matchIndex = m.index ?? 0;
-      // Preceding text up to match - check if it's an installment monthly installment
-      const preText = line.slice(Math.max(0, matchIndex - 30), matchIndex);
-      if (/\b\d{1,2}\s*x\s*(?:de\s*)?$/i.test(preText.trim())) {
-        continue;
-      }
-
-      const val = parsePriceString(m[1]);
-      if (val >= 100) {
-        if (originalPrice && Math.abs(val - originalPrice) < 0.01) continue;
-
-        // Context window around this specific price occurrence (±50 characters)
-        const windowStart = Math.max(0, matchIndex - 50);
-        const windowEnd = Math.min(line.length, matchIndex + m[0].length + 50);
-        const localContext = line.slice(windowStart, windowEnd);
-
-        foundPrices.push({
-          value: val,
-          lineIndex: lineIdx,
-          rawText: localContext,
-        });
-      }
-    }
-  });
-
-  // Classify each found price using its surrounding context
-  for (const fp of foundPrices) {
-    const isInstallmentContext =
-      /em\s*até|\d+\s*x|cartão|sem\s*juros|ou\s*R\$/i.test(fp.rawText);
-    const isCashContext =
-      /à\s*vista|a\s*vista|pix|no\s*pix|desconto|por\s*R\$/i.test(fp.rawText);
-
-    if (isCashContext && !isInstallmentContext && !priceCash) {
-      priceCash = fp.value;
-    } else if (isInstallmentContext && !isCashContext && !priceInstallment) {
-      priceInstallment = fp.value;
-    }
-  }
-
-  // If we found prices but couldn't strictly differentiate:
-  if (foundPrices.length > 0) {
-    if (!priceCash && !priceInstallment) {
-      if (foundPrices.length >= 2) {
-        const sorted = [...foundPrices].sort((a, b) => a.value - b.value);
-        priceCash = sorted[0].value;
-        priceInstallment = sorted[sorted.length - 1].value;
-      } else {
-        priceCash = foundPrices[0].value;
-      }
-    } else if (!priceCash && priceInstallment) {
-      const remaining = foundPrices.filter((p) => p.value !== priceInstallment);
-      if (remaining.length > 0) {
-        priceCash = Math.min(...remaining.map((p) => p.value));
-      }
-    } else if (priceCash !== undefined && !priceInstallment) {
-      const cash = priceCash;
-      const remaining = foundPrices.filter((p) => p.value > cash);
-      if (remaining.length > 0) {
-        priceInstallment = Math.max(...remaining.map((p) => p.value));
-      }
-    }
-  }
-
-  // Default active optimization price
-  const activePrice = priceCash || priceInstallment || 0;
   if (activePrice <= 0) {
     warnings.push(
       'Could not detect a valid price. Please enter price manually.',
