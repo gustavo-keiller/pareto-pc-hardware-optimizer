@@ -2,28 +2,6 @@
   {
     "id": "paretopc-official",
     "displayName": "ParetoPC Official",
-    "handle": "@paretopc",
-    "amazonTagBr": "paretopc-20",
-    "amazonTagUs": "paretopcus-20",
-    "kabumPartnerTag": "paretopc",
-    "terabytePartnerTag": "paretopc",
-    "pichauPartnerTag": "paretopc",
-    "neweggPartnerTag": "paretopc"
-  },
-  {
-    "id": "ofertas-hardware-br",
-    "displayName": "Ofertas Hardware BR",
-    "handle": "@OfertasHardwareBR",
-    "amazonTagBr": "ofertashw-20",
-    "kabumPartnerTag": "ofertashw",
-    "terabytePartnerTag": "ofertashw",
-    "pichauPartnerTag": "ofertashw"
-  },
-  {
-    "id": "tech-deals-us",
-    "displayName": "Tech Deals US",
-    "handle": "@TechDealsUS",
-    "amazonTagUs": "techdealsus-20",
-    "neweggPartnerTag": "techdeals"
+    "handle": "@paretopc"
   }
 ]

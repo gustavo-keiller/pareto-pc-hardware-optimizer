@@ -26,16 +26,11 @@ Every item uses this shape, so an agent knows where to look and when it is finis
   - **Files likely touched:** `src/data/prices/{br,us}.json`, `src/data/storePrices.ts`, price badge components, `src/utils/locales/*`
   - **Done when:** every price on screen shows its age; the top 40 offers link to product pages, not search pages.
   - **Test to add:** a test that an offer older than 72 h is flagged stale (`src/lib/math/__tests__/pricingEngine.test.ts`).
-- **`[BF-B4]` Only approved affiliate tags:**
-  Remove the demo creators from `partners.json`; keep only tags gustavo has been approved for; stop the Amazon BR link from falling back to the US tag.
-  - **Files likely touched:** `src/data/partners.json`, `src/lib/math/pricingEngine.ts`
-  - **Done when:** with no approved tags, outbound links are clean store URLs plus `utm_source=paretopc`.
-  - **Test to add:** property test that an Amazon BR URL never receives a US tag.
-- **`[BF-B5]` No stored Amazon prices:**
-  Amazon offers show "see price on Amazon" instead of a number (Associates rules, research R-03).
-  - **Files likely touched:** offer/price display components, `src/utils/locales/*`
-  - **Done when:** no Amazon price number is rendered anywhere.
-  - **Test to add:** UI test asserting Amazon offers render no currency amount.
+- **`[BF-B8]` "See price on Amazon" link:**
+  Amazon offers were removed from `br.json`/`us.json` (BF-B5), so parts sold only there show an estimate with no store link. Once an Amazon Associates account is approved, add link-only Amazon offers (no `price`) and a "see price on Amazon" button next to the estimate.
+  - **Files likely touched:** `src/lib/math/pricingEngine.ts`, `src/data/storePrices.ts`, `src/components/{SimpleGuidePickHero,BuildHeroCard}.tsx`, `src/utils/locales/*`
+  - **Done when:** an Amazon-only part shows its estimate plus a "see price on Amazon" link, and no Amazon number.
+  - **Test to add:** UI test asserting the Amazon link renders with no currency amount beside it.
 - **`[BF-B6]` Analytics actually load:**
   `telemetry.ts` calls `window.plausible`, but no analytics script is loaded. Add Cloudflare Web Analytics.
   - **Files likely touched:** `index.html`, `src/utils/telemetry.ts`

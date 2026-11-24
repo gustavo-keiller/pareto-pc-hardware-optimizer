@@ -475,6 +475,10 @@ for (const offer of [...brPrices, ...usPrices]) {
     !offer.url.startsWith('http')
   ) {
     errors.push(`${p} missing or invalid store url (must start with http)`);
+  } else if (/^https?:\/\/([^/]*\.)?(amazon|amzn)\./i.test(offer.url)) {
+    errors.push(
+      `${p} Amazon prices must not be stored (Associates rules, BF-B5); link to Amazon without a price instead`,
+    );
   }
   if (typeof offer.inStock !== 'boolean') {
     errors.push(`${p} inStock must be a boolean`);
@@ -500,20 +504,16 @@ for (const offer of [...brPrices, ...usPrices]) {
   }
 }
 
-// Enforce 100% regional store price coverage across all catalog parts
+// Parts without a store offer show a labelled estimate. Amazon offers were removed
+// (BF-B5), so coverage is reported instead of enforced.
 const brOfferIds = new Set(brPrices.map((o) => o.componentId));
 const usOfferIds = new Set(usPrices.map((o) => o.componentId));
-for (const partId of allValidPartIds) {
-  if (!brOfferIds.has(partId)) {
-    errors.push(
-      `[price -> ${partId}] missing BRL store offer in src/data/prices/br.json`,
-    );
-  }
-  if (!usOfferIds.has(partId)) {
-    errors.push(
-      `[price -> ${partId}] missing USD store offer in src/data/prices/us.json`,
-    );
-  }
+const missingBr = [...allValidPartIds].filter((id) => !brOfferIds.has(id));
+const missingUs = [...allValidPartIds].filter((id) => !usOfferIds.has(id));
+if (missingBr.length > 0 || missingUs.length > 0) {
+  console.log(
+    `ℹ Parts priced as estimates: ${missingBr.length} in BRL, ${missingUs.length} in USD (no store offer).`,
+  );
 }
 
 // 13. Validate Price History (DATA-05)

@@ -90,7 +90,6 @@ export function resolveOfferRedirect(
   const injected = injectAffiliateParameters(
     match.affiliateUrl ?? match.url,
     partner,
-    resolvedCurrency,
   );
 
   return {

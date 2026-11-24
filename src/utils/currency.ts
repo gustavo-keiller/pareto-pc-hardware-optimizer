@@ -193,7 +193,7 @@ export function applyRegionalGpuOverlay(
 
 /**
  * Returns complete hardware catalogs overlaid with real regional store prices
- * (KaBuM!, TerabyteShop, Pichau, Amazon BR for BRL; Amazon US, Newegg, Best Buy, B&H for USD),
+ * (KaBuM!, TerabyteShop, Pichau for BRL; Newegg, Best Buy, B&H for USD; never Amazon, see BF-B5),
  * falling back to USD conversion only when a component lacks an in-stock store listing.
  */
 export function getCurrencyAdjustedCatalogs(

@@ -171,25 +171,26 @@ describe('DATA-01 & DATA-03: Versioned JSON Catalogs & Hardware Coverage', () =>
     const brlPrices = getRegionalStorePrices('BRL');
     const usdPrices = getRegionalStorePrices('USD');
 
-    expect(brlPrices.length).toBeGreaterThanOrEqual(124);
-    expect(usdPrices.length).toBeGreaterThanOrEqual(124);
+    expect(brlPrices.length).toBeGreaterThan(0);
+    expect(usdPrices.length).toBeGreaterThan(0);
 
-    // Every single catalog component must have a store offer in both BR and US
-    const allIds = [
-      ...SEED_CPUS,
-      ...SEED_MOTHERBOARDS,
-      ...SEED_RAM_KITS,
-      ...SEED_STORAGES,
-      ...SEED_COOLERS,
-      ...SEED_CASES,
-      ...SEED_PSUS,
-      ...REAL_WORLD_GPUS,
-    ].map((item) => item.id);
-    const brSet = new Set(brlPrices.map((o) => o.componentId));
-    const usSet = new Set(usdPrices.map((o) => o.componentId));
-    for (const id of allIds) {
-      expect(brSet.has(id)).toBe(true);
-      expect(usSet.has(id)).toBe(true);
+    // Every offer belongs to a catalog component and never stores an Amazon price
+    // (BF-B5). Components without an offer fall back to a labelled estimate.
+    const allIds = new Set(
+      [
+        ...SEED_CPUS,
+        ...SEED_MOTHERBOARDS,
+        ...SEED_RAM_KITS,
+        ...SEED_STORAGES,
+        ...SEED_COOLERS,
+        ...SEED_CASES,
+        ...SEED_PSUS,
+        ...REAL_WORLD_GPUS,
+      ].map((item) => item.id),
+    );
+    for (const offer of [...brlPrices, ...usdPrices]) {
+      expect(allIds.has(offer.componentId)).toBe(true);
+      expect(offer.url).not.toMatch(/amazon\.|amzn\./i);
     }
 
     // Verify format of store offers
