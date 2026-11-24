@@ -7,13 +7,18 @@ import { TopWinnerBanner } from './components/TopWinnerBanner';
 import { TopsisWeightsPanel } from './components/TopsisWeightsPanel';
 import { AppHeader } from './components/AppHeader';
 import { AppFooter } from './components/AppFooter';
-import { VisualizerPanel } from './components/VisualizerPanel';
 import { t } from './utils/i18n';
 import { ListFilter, Sparkles, X } from 'lucide-react';
 import { BuildExplorerLoadingFallback } from './components/LoadingFallbacks';
 import type { SocialShareTarget } from './components/SocialShareModal';
 
 // Lazy-loaded heavy visualizers & mode views (PERF-01)
+// Explorer/Pro charts (and their extrapolation toolbar) stay out of the Simple-mode first download.
+const VisualizerPanel = lazy(() =>
+  import('./components/VisualizerPanel').then((m) => ({
+    default: m.VisualizerPanel,
+  })),
+);
 const FullBuildExplorer = lazy(() =>
   import('./components/FullBuildExplorer').then((m) => ({
     default: m.FullBuildExplorer,
@@ -56,6 +61,8 @@ export default function App() {
     setExtrapolation,
     weights,
     setWeights,
+    priorityProfile,
+    setPriorityProfile,
     activePresetId,
     setActivePresetId,
     hoveredGpuId,
@@ -210,6 +217,8 @@ export default function App() {
             onSelectYMetric={setYMetric}
             onSelectZMetric={setZMetric}
             weights={weights}
+            priorityProfile={priorityProfile}
+            onChangePriorityProfile={setPriorityProfile}
             onChangeWeights={setWeights}
             selectedGpuIds={selectedGpuIds}
             onToggleSelectGpu={handleToggleSelectGpu}
@@ -303,37 +312,39 @@ export default function App() {
                   isChartExpanded ? 'lg:col-span-12 order-1' : 'lg:col-span-8'
                 } space-y-6 transition-all duration-300`}
               >
-                <VisualizerPanel
-                  locale={locale}
-                  chartView={chartView}
-                  setChartView={setChartView}
-                  uiMode={uiMode}
-                  paretoMode={paretoMode}
-                  setParetoMode={setParetoMode}
-                  isChartExpanded={isChartExpanded}
-                  setIsChartExpanded={setIsChartExpanded}
-                  showDominatedZoneMesh={showDominatedZoneMesh}
-                  setShowDominatedZoneMesh={setShowDominatedZoneMesh}
-                  hideDominatedNodes={hideDominatedNodes}
-                  setHideDominatedNodes={setHideDominatedNodes}
-                  xMetric={xMetric}
-                  setXMetric={setXMetric}
-                  yMetric={yMetric}
-                  setYMetric={setYMetric}
-                  zMetric={zMetric}
-                  setZMetric={setZMetric}
-                  rankedGpus={rankedGpus}
-                  hoveredGpuId={hoveredGpuId}
-                  setHoveredGpuId={setHoveredGpuId}
-                  selectedGpuIds={selectedGpuIds}
-                  onToggleSelectGpu={handleToggleSelectGpu}
-                  extrapolation={extrapolation}
-                  setExtrapolation={setExtrapolation}
-                  olsModel={olsModel}
-                  hoveredGpu={hoveredGpu}
-                  optimalCount={optimalCount}
-                  trapCount={trapCount}
-                />
+                <Suspense fallback={<div className="min-h-[420px]" />}>
+                  <VisualizerPanel
+                    locale={locale}
+                    chartView={chartView}
+                    setChartView={setChartView}
+                    uiMode={uiMode}
+                    paretoMode={paretoMode}
+                    setParetoMode={setParetoMode}
+                    isChartExpanded={isChartExpanded}
+                    setIsChartExpanded={setIsChartExpanded}
+                    showDominatedZoneMesh={showDominatedZoneMesh}
+                    setShowDominatedZoneMesh={setShowDominatedZoneMesh}
+                    hideDominatedNodes={hideDominatedNodes}
+                    setHideDominatedNodes={setHideDominatedNodes}
+                    xMetric={xMetric}
+                    setXMetric={setXMetric}
+                    yMetric={yMetric}
+                    setYMetric={setYMetric}
+                    zMetric={zMetric}
+                    setZMetric={setZMetric}
+                    rankedGpus={rankedGpus}
+                    hoveredGpuId={hoveredGpuId}
+                    setHoveredGpuId={setHoveredGpuId}
+                    selectedGpuIds={selectedGpuIds}
+                    onToggleSelectGpu={handleToggleSelectGpu}
+                    extrapolation={extrapolation}
+                    setExtrapolation={setExtrapolation}
+                    olsModel={olsModel}
+                    hoveredGpu={hoveredGpu}
+                    optimalCount={optimalCount}
+                    trapCount={trapCount}
+                  />
+                </Suspense>
               </div>
             </div>
           </>

@@ -19,6 +19,18 @@ Every item uses this shape, so an agent knows where to look and when it is finis
 
 ## 🧩 Active Tasks
 
+- **`[PRI-12]` Use the priority score in Explorer and Pro leaderboards:**
+  Explorer/Pro still rank with TOPSIS, which is relative to the list (see `CONTEXT.md` §3.4). Show the priority score (§3.5) as the main column and keep TOPSIS as "second opinion".
+  - **Files likely touched:** `src/components/GpuLeaderboardTable.tsx`, `src/components/TopsisWeightsPanel.tsx`, `src/hooks/usePriorityRanking.ts`, `CODEMAP.md`
+  - **Done when:** the Explorer #1 equals the Simple #1 for the same priorities and budget.
+  - **Test to add:** UI test comparing the Simple and Explorer #1 under each use-case preset.
+
+- **`[PRI-13]` Per-resolution benchmarks for the 1080p and 4K use cases:**
+  Both presets score on 1440p FPS with goals scaled by hand. Add 1080p/4K FPS fields so the FPS goal is in the user's real resolution, and label scaled numbers "estimated" until then.
+  - **Files likely touched:** `src/data/catalogs/gpus.json`, `src/lib/math/priorityModel.ts`, `src/lib/math/priorityProfiles.ts`
+  - **Done when:** the 4K preset's FPS goal is expressed in 4K FPS.
+  - **Test to add:** catalog test that every GPU has the new fields or is marked estimated.
+
 - **`[UX-12]` Finish pt-BR translation of the Explorer & Pro chart internals:**
   `[UX-11]` translated the panels around the charts, but text inside them is still English in pt-BR: the extrapolation toolbar ("Extrapolation Rule"), scatter-plot controls and tooltips ("Scroll to Zoom • Drag to Pan", "Reset Zoom"), axis titles in `AxisViewsGrid`, the 3D cloud and hyper-graph labels, the deal importer modal, GPU technology badges (`KNOWN_GPU_TECHNOLOGIES`), dominance reason sentences, and catalog `notes` (e.g. "Budget 12GB disruptor…", which also quotes USD prices in BRL view).
   - **Files likely touched:** `src/components/{ExtrapolationToolbar,ParetoScatterPlot,AxisViewsGrid,Pareto3DCloud,HyperDimensionalExplorer,GpuDealImporterModal}.tsx`, `src/lib/math/capabilities.ts`, `src/data/realGpus.ts`, `src/utils/locales/*`
